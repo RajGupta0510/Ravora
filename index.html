@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ravora - AI-Powered Wealth Copilot for Smarter Investing</title>
+  <meta name="description" content="Grow your wealth intelligently with Ravora, your AI-powered wealth copilot. Ravora monitors markets 24/7, identifies opportunities, and manages risk for beginners and busy professionals.">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Background Ambient Glow Blobs -->
+  <div class="ambient-glows">
+    <div class="glow-blob glow-1"></div>
+    <div class="glow-blob glow-2"></div>
+    <div class="glow-blob glow-3"></div>
+    <div class="glow-blob glow-4"></div>
+  </div>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar" id="navbar">
+    <div class="container">
+      <a href="#" class="logo" id="nav-logo">
+        <div class="logo-icon">R</div>
+        Ravora
+      </a>
+      <ul class="nav-links" id="nav-menu">
+        <li><a href="#features" id="link-features">Features</a></li>
+        <li><a href="#how-it-works" id="link-how-it-works">How It Works</a></li>
+        <li><a href="#ai-showcase" id="link-showcase">AI Insights</a></li>
+        <li><a href="#pricing" id="link-pricing">Pricing</a></li>
+      </ul>
+      <div class="nav-actions">
+        <a href="#" class="btn-signin" id="btn-login-nav">Sign In</a>
+        <a href="#pricing" class="btn btn-primary btn-sm" id="btn-get-started-nav">Get Started</a>
+      </div>
+      <button class="mobile-toggle" id="mobile-menu-btn" aria-label="Toggle Navigation">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero" id="hero-section">
+    <div class="container">
+      <div class="hero-content">
+        <div class="hero-badge" id="hero-badge">
+          <span class="hero-badge-dot"></span>
+          Ravora AI Wealth Copilot V1.0 Live
+        </div>
+        <h1 class="text-gradient">Intelligent Wealth. Simplified by AI.</h1>
+        <p class="hero-subtitle">
+          Ravora monitors global markets 24/7, finding opportunities and protecting capital. Grow your portfolio automatically without wasting hours staring at complex charts.
+        </p>
+        <div class="hero-actions">
+          <a href="#pricing" class="btn btn-primary btn-lg" id="hero-cta-primary">Get Started</a>
+          <a href="#" class="btn btn-secondary btn-lg btn-watch-demo" id="hero-cta-secondary">
+            <svg style="width: 18px; height: 18px; margin-right: 8px; fill: currentColor;" viewBox="0 0 24 24">
+              <path d="M8 5v14l11-7z"/>
+            </svg>
+            Watch Demo
+          </a>
+        </div>
+        
+        <div class="hero-social-proof">
+          <p>Integrated with secure brokerages</p>
+          <div class="hero-logos">
+            <!-- Binance Mock Logo -->
+            <svg viewBox="0 0 120 28" width="100" height="24">
+              <text x="0" y="20" font-family="'Outfit', sans-serif" font-weight="700" font-size="16" fill="currentColor">BINANCE</text>
+            </svg>
+            <!-- Coinbase Mock Logo -->
+            <svg viewBox="0 0 120 28" width="100" height="24">
+              <text x="0" y="20" font-family="'Outfit', sans-serif" font-weight="700" font-size="16" fill="currentColor">COINBASE</text>
+            </svg>
+            <!-- Kraken Mock Logo -->
+            <svg viewBox="0 0 120 28" width="100" height="24">
+              <text x="0" y="20" font-family="'Outfit', sans-serif" font-weight="700" font-size="16" fill="currentColor">KRAKEN</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Interactive Mockup (Dashboard Widget) -->
+      <div class="hero-visual">
+        <div class="dashboard-glow"></div>
+        <div class="card-glass dashboard-mockup" id="hero-dashboard-widget">
+          
+          <div class="dashboard-header">
+            <div class="dashboard-profile">
+              <div class="dashboard-avatar"></div>
+              <div>
+                <div class="dashboard-username">Sarah Jenkins</div>
+                <div style="font-size: 0.7rem; color: var(--text-secondary);">Beta Account</div>
+              </div>
+            </div>
+            <div class="dashboard-badge">AI Active</div>
+          </div>
+
+          <div class="dashboard-grid">
+            <div class="dashboard-balance">
+              <span class="balance-label">Total Portfolio Value</span>
+              <span class="balance-amount" id="dashboard-balance-val">$132,194.10</span>
+              <div class="balance-change" id="dashboard-growth-val">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                  <path d="M18 15l-6-6-6 6"/>
+                </svg>
+                +$14,210.60 (+12.0%)
+              </div>
+              
+              <div class="dashboard-chart">
+                <svg class="chart-svg" viewBox="0 0 420 100">
+                  <defs>
+                    <linearGradient id="chart-grad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="#2563eb" stop-opacity="0.25"/>
+                      <stop offset="100%" stop-color="#7c3aed" stop-opacity="0"/>
+                    </linearGradient>
+                  </defs>
+                  <!-- Base grid line -->
+                  <line x1="0" y1="90" x2="420" y2="90" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+                  <!-- Dynamic curve -->
+                  <path id="chart-path" d="M 10 80 Q 90 40 210 60 T 410 30" fill="none" stroke="url(#chart-grad)" stroke-width="3" style="stroke: #2563eb; transition: d var(--transition-slow);"/>
+                </svg>
+              </div>
+            </div>
+
+            <!-- Sidebar widgets -->
+            <div class="dashboard-widgets">
+              
+              <!-- AI Opportunity Alert Widget -->
+              <div class="widget-opportunity" id="dashboard-opp-widget">
+                <div class="widget-opportunity-header">
+                  <span class="opp-badge">AI Insight</span>
+                  <span class="opp-confidence" id="opp-conf-gauge">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                    </svg>
+                    <span id="opp-conf-val">94%</span> Conf.
+                  </span>
+                </div>
+                <div class="opp-title" id="opp-title-val">ETH Staking & Bluechip Allocation</div>
+                <div class="opp-desc" id="opp-desc-val">Layer 1 accumulation signals detected. AI reallocation triggered for peak efficiency.</div>
+                <button class="btn btn-primary btn-sm opp-action" id="opp-btn-action">Rebalance Portfolio</button>
+              </div>
+
+              <!-- Goal Progress Circle Widget -->
+              <div class="widget-goal" id="dashboard-goal-widget">
+                <div class="goal-ring">
+                  <svg class="goal-svg" viewBox="0 0 60 60">
+                    <defs>
+                      <linearGradient id="ring-gradient" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stop-color="#2563eb" />
+                        <stop offset="100%" stop-color="#7c3aed" />
+                      </linearGradient>
+                    </defs>
+                    <circle class="goal-bg-circle" cx="30" cy="30" r="24" />
+                    <circle class="goal-fill-circle" id="goal-circle-fill" cx="30" cy="30" r="24" />
+                  </svg>
+                  <div class="goal-percentage" id="goal-percentage-val">70%</div>
+                </div>
+                <div class="goal-info">
+                  <span class="goal-title">Yearly Wealth Goal</span>
+                  <span class="goal-target">$180,000 target</span>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Risk Selector Control -->
+          <div class="dashboard-controls">
+            <div class="controls-label">
+              <span>Risk Tolerance Profile:</span>
+              <span class="risk-value-text" id="risk-value-text" style="color: #c084fc;">Moderate</span>
+            </div>
+            <div class="slider-container">
+              <input type="range" min="0" max="2" value="1" class="risk-slider" id="risk-slider" aria-label="Risk Tolerance Slider">
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 0.65rem; color: var(--text-muted); margin-top: 6px;">
+              <span>Conservative</span>
+              <span>Balanced</span>
+              <span>Aggressive</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works Section -->
+  <section class="how-it-works" id="how-it-works">
+    <div class="container">
+      <div class="text-center">
+        <h2>Simple Wealth Building</h2>
+        <p class="section-subtitle">Grow your assets securely in just four simple stages with full transparent AI guidance.</p>
+      </div>
+
+      <div class="steps-grid">
+        <div class="steps-line"></div>
+        
+        <!-- Step 1 -->
+        <div class="step-card" id="step-1">
+          <div class="step-icon-wrapper">1</div>
+          <h3>Connect Exchanges</h3>
+          <p>Link your existing brokerage accounts or exchanges securely using read-only API access. Your funds never leave your account.</p>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="step-card active" id="step-2">
+          <div class="step-icon-wrapper">2</div>
+          <h3>Set Goals & Risk</h3>
+          <p>Define your financial target timeline and choose a risk tolerance. The wealth copilot creates a dynamic strategy customized for you.</p>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="step-card" id="step-3">
+          <div class="step-icon-wrapper">3</div>
+          <h3>AI Scans Markets</h3>
+          <p>Our algorithms monitor patterns, macroeconomic factors, and sentiment indicators to identify high-probability setups continuously.</p>
+        </div>
+
+        <!-- Step 4 -->
+        <div class="step-card" id="step-4">
+          <div class="step-icon-wrapper">4</div>
+          <h3>Grow Portfolio</h3>
+          <p>Approve AI suggestions with one click, or enable automated execution to grow your capital with institutional-grade efficiency.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="features" id="features">
+    <div class="container">
+      <div class="text-center">
+        <h2>Built for Busy Professionals</h2>
+        <p class="section-subtitle">Everything you need to grow and protect your money in a modern, streamlined interface.</p>
+      </div>
+
+      <div class="features-grid">
+        <!-- Feature 1 -->
+        <div class="card-glass feature-card" id="feat-market-intel">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+              <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+              <line x1="12" y1="22.08" x2="12" y2="12"/>
+            </svg>
+          </div>
+          <h3>AI Market Intelligence</h3>
+          <p>Aggregated analysis from global indices, sentiment layers, and economic data translated into clear, actionable summaries.</p>
+        </div>
+
+        <!-- Feature 2 -->
+        <div class="card-glass feature-card" id="feat-opp-discovery">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="22" y1="12" x2="18" y2="12"/>
+              <line x1="6" y1="12" x2="2" y2="12"/>
+              <line x1="12" y1="6" x2="12" y2="2"/>
+              <line x1="12" y1="22" x2="12" y2="18"/>
+            </svg>
+          </div>
+          <h3>Opportunity Discovery</h3>
+          <p>Continuous scanning filters out chart noise to surface high-probability entries matching your specific growth goals.</p>
+        </div>
+
+        <!-- Feature 3 -->
+        <div class="card-glass feature-card" id="feat-port-insights">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 3v18h18"/>
+              <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/>
+            </svg>
+          </div>
+          <h3>Portfolio Insights</h3>
+          <p>Deep allocation breakdown that explains exactly where your gains come from and identifies potential asset overlaps.</p>
+        </div>
+
+        <!-- Feature 4 -->
+        <div class="card-glass feature-card" id="feat-risk-mgmt">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+          </div>
+          <h3>Risk Management</h3>
+          <p>Automated hedge suggestions, position sizing safety protocols, and drawback protection rules built to guard your capital.</p>
+        </div>
+
+        <!-- Feature 5 -->
+        <div class="card-glass feature-card" id="feat-goal-tracking">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <polyline points="12 6 12 12 16 14"/>
+            </svg>
+          </div>
+          <h3>Goal Tracking</h3>
+          <p>Link your accounts directly to financial milestones (retirement, house fund, etc.) and let AI optimize targets dynamically.</p>
+        </div>
+
+        <!-- Feature 6 -->
+        <div class="card-glass feature-card" id="feat-smart-alerts">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+            </svg>
+          </div>
+          <h3>Smart Alerts</h3>
+          <p>No spam. Receive real-time push alerts only when significant market structural shifts affect your specific positions.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI Showcase Section -->
+  <section class="ai-showcase" id="ai-showcase">
+    <div class="container">
+      <div class="ai-showcase-grid">
+        <div class="showcase-content">
+          <h2>Clear Language. No Complex Charts.</h2>
+          <p>
+            Traditional platforms flood your screen with messy candlestick indicators, order books, and flashing numbers. Ravora translates all that complexity into clear, human-understandable insights.
+          </p>
+          <div style="display: flex; flex-direction: column; gap: 16px;">
+            <div style="display: flex; gap: 12px; align-items: flex-start;">
+              <div style="width: 20px; height: 20px; border-radius: 50%; background: rgba(16, 185, 129, 0.1); color: var(--success); display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; flex-shrink: 0; margin-top: 2px;">✓</div>
+              <p style="font-size: 0.95rem; color: var(--text-secondary);"><strong style="color: #fff;">Clear Explanations:</strong> Understand exactly <em>why</em> an action is suggested before committing.</p>
+            </div>
+            <div style="display: flex; gap: 12px; align-items: flex-start;">
+              <div style="width: 20px; height: 20px; border-radius: 50%; background: rgba(16, 185, 129, 0.1); color: var(--success); display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; flex-shrink: 0; margin-top: 2px;">✓</div>
+              <p style="font-size: 0.95rem; color: var(--text-secondary);"><strong style="color: #fff;">One-Click Execution:</strong> Execute complex multi-asset swaps and deposits instantly.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="showcase-comparison">
+          <!-- The Complicated Trading Way -->
+          <div class="comparison-panel">
+            <div class="panel-label red">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+              Standard Complex Terminals
+            </div>
+            <div class="card-glass tech-mess-card" id="showcase-mess-card">
+              <div class="tech-mess-header">
+                <span>BTC/USDT 4H Chart</span>
+                <span>MACD (12, 26, 9) Bearish Cross</span>
+              </div>
+              <div class="tech-mess-chart">
+                <!-- Messy Candlestick Lines SVG -->
+                <svg width="100%" height="100%" viewBox="0 0 350 120">
+                  <!-- candles -->
+                  <rect x="20" y="40" width="6" height="30" fill="#ef4444" />
+                  <line x1="23" y1="20" x2="23" y2="80" stroke="#ef4444" stroke-width="1.5" />
+                  
+                  <rect x="50" y="55" width="6" height="20" fill="#10b981" />
+                  <line x1="53" y1="40" x2="53" y2="90" stroke="#10b981" stroke-width="1.5" />
+                  
+                  <rect x="80" y="30" width="6" height="40" fill="#ef4444" />
+                  <line x1="83" y1="15" x2="83" y2="85" stroke="#ef4444" stroke-width="1.5" />
+                  
+                  <!-- Zigzag indicators -->
+                  <path d="M 23 30 L 53 70 L 83 45 L 113 90 L 143 75 L 173 95" fill="none" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="3"/>
+                  <path d="M 10 90 Q 90 20 200 110 T 340 70" fill="none" stroke="#3b82f6" stroke-width="2"/>
+                  <!-- grid lines -->
+                  <line x1="0" y1="30" x2="350" y2="30" stroke="rgba(255,255,255,0.05)" />
+                  <line x1="0" y1="60" x2="350" y2="60" stroke="rgba(255,255,255,0.05)" />
+                  <line x1="0" y1="90" x2="350" y2="90" stroke="rgba(255,255,255,0.05)" />
+                </svg>
+              </div>
+              <div class="tech-indicators">
+                <span>RSI (14): 64.21</span>
+                <span>EMA (50): $68,420</span>
+                <span>Stoch: Oversold</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- The Ravora Way -->
+          <div class="comparison-panel">
+            <div class="panel-label green">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+              Ravora Intelligent Insight
+            </div>
+            <div class="card-glass ai-insight-card" id="showcase-insight-card">
+              <div class="ai-insight-header">
+                <div class="ai-avatar">
+                  <svg viewBox="0 0 24 24"><path d="M12 2c1.1 0 2 .9 2 2v1c2.76 0 5 2.24 5 5v5c0 2.76-2.24 5-5 5v1c0 1.1-.9 2-2 2s-2-.9-2-2v-1c-2.76 0-5-2.24-5-5v-5c0-2.76 2.24-5 5-5V4c0-1.1.9-2 2-2zm0 7c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+                </div>
+                <div class="ai-title-block">
+                  <h4>Ravora Wealth Copilot</h4>
+                  <span>Market Analysis • Just now</span>
+                </div>
+              </div>
+              <div class="ai-message">
+                "Bitcoin accumulation detected by long-term holders at current support levels. We recommend reallocating 8% of USD reserves to BTC to capture dynamic momentum. Under current market volatility, this carries a low-risk profile."
+              </div>
+              <div class="ai-actions-row">
+                <a href="#pricing" class="ai-action-btn ai-btn-approve" id="showcase-approve-btn">Approve Allocation</a>
+                <a href="#" class="ai-action-btn ai-btn-dismiss" id="showcase-dismiss-btn" onclick="return false;">Dismiss</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing Preview Section -->
+  <section class="pricing" id="pricing">
+    <div class="container">
+      <div class="text-center">
+        <h2>Transparent Plans for Everyone</h2>
+        <p class="section-subtitle">Start growing your wealth for free, then upgrade to unlocked premium AI execution when you're ready.</p>
+      </div>
+
+      <!-- Price Switch Toggle -->
+      <div class="pricing-toggle-container">
+        <span class="toggle-label active" id="label-monthly">Billed Monthly</span>
+        <button class="pricing-switch" id="pricing-switch-btn" aria-label="Toggle annual pricing">
+          <span class="pricing-switch-handle"></span>
+        </button>
+        <span class="toggle-label" id="label-yearly">Billed Annually</span>
+        <span class="toggle-discount">Save 30%</span>
+      </div>
+
+      <!-- Pricing Cards Grid -->
+      <div class="pricing-grid">
+        
+        <!-- Free Plan -->
+        <div class="card-glass pricing-card" id="price-card-free">
+          <h3 class="pricing-tier">Free Plan</h3>
+          <div class="pricing-price"><span class="pricing-price-val">$0</span><span class="pricing-period">/mo</span></div>
+          <p class="pricing-desc">Perfect to explore Ravora's market summaries and test insights via simulated paper trading.</p>
+          <ul class="pricing-features">
+            <li>
+              <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+              1 Connected Account
+            </li>
+            <li>
+              <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+              Daily AI Market Summaries
+            </li>
+            <li>
+              <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+              Virtual Paper Trading Account
+            </li>
+            <li style="opacity: 0.4;">
+              <svg viewBox="0 0 24 24" style="fill: var(--text-muted);"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+              Real-time Portfolio Auto-Execution
+            </li>
+          </ul>
+          <a href="#" class="btn btn-secondary pricing-btn" id="btn-select-free" onclick="return false;">Get Started</a>
+        </div>
+
+        <!-- Pro Plan (Recommended) -->
+        <div class="card-glass pricing-card premium" id="price-card-pro">
+          <div class="pricing-badge">Recommended</div>
+          <h3 class="pricing-tier" style="color: #fff;">Pro Plan</h3>
+          <div class="pricing-price"><span class="pricing-price-val">$29</span><span class="pricing-period">/mo</span></div>
+          <p class="pricing-desc">Comprehensive AI insights and execution designed for busy professionals seeking optimal passive growth.</p>
+          <ul class="pricing-features">
+            <li>
+              <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+              Up to 3 Connected Accounts
+            </li>
+            <li>
+              <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+              Continuous Opportunity Feed
+            </li>
+            <li>
+              <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+              One-Click Rebalancing Suggestions
+            </li>
+            <li>
+              <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+              Custom Portfolio Risk Hedging
+            </li>
+          </ul>
+          <a href="#" class="btn btn-primary pricing-btn" id="btn-select-pro" onclick="return false;">Start 14-day Free Trial</a>
+        </div>
+
+        <!-- Premium Plan -->
+        <div class="card-glass pricing-card" id="price-card-premium">
+          <h3 class="pricing-tier">Premium Plan</h3>
+          <div class="pricing-price"><span class="pricing-price-val">$99</span><span class="pricing-period">/mo</span></div>
+          <p class="pricing-desc">Advanced features for active investors requiring custom allocations and priority AI performance.</p>
+          <ul class="pricing-features">
+            <li>
+              <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+              Unlimited Connected Accounts
+            </li>
+            <li>
+              <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+              Custom Goal-Tracking Strategies
+            </li>
+            <li>
+              <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+              Dedicated Auto-Execution Engine
+            </li>
+            <li>
+              <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+              Priority Support & Analyst Access
+            </li>
+          </ul>
+          <a href="#" class="btn btn-secondary pricing-btn" id="btn-select-premium" onclick="return false;">Talk to Sales</a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section class="faq" id="faq">
+    <div class="container">
+      <div class="text-center">
+        <h2>Frequently Asked Questions</h2>
+        <p class="section-subtitle">Have questions about Ravora? Find answers to the most common queries below.</p>
+      </div>
+
+      <div class="faq-list">
+        
+        <!-- FAQ 1 -->
+        <div class="card-glass faq-item" id="faq-item-1">
+          <button class="faq-question" id="faq-q-1">
+            <h3>How does Ravora help beginners?</h3>
+            <div class="faq-icon-wrapper">
+              <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+            </div>
+          </button>
+          <div class="faq-answer">
+            <div class="faq-answer-content">
+              Ravora translates complex market signals and charts into plain, readable insights. Instead of spending hours learning technical analysis or candle patterns, you receive digestible suggestions with the reasoning clearly explained, which you can approve with a single click.
+            </div>
+          </div>
+        </div>
+
+        <!-- FAQ 2 -->
+        <div class="card-glass faq-item" id="faq-item-2">
+          <button class="faq-question" id="faq-q-2">
+            <h3>Is my capital secure?</h3>
+            <div class="faq-icon-wrapper">
+              <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+            </div>
+          </button>
+          <div class="faq-answer">
+            <div class="faq-answer-content">
+              Yes, absolutely. Ravora does not hold your funds. We connect to your existing exchange or brokerage (like Binance, Coinbase, or Kraken) using secure, read-only API access. Your assets stay safely in your personal brokerage accounts, and Ravora only recommends or routes execution instructions with your consent.
+            </div>
+          </div>
+        </div>
+
+        <!-- FAQ 3 -->
+        <div class="card-glass faq-item" id="faq-item-3">
+          <button class="faq-question" id="faq-q-3">
+            <h3>Do I need to be a trading expert?</h3>
+            <div class="faq-icon-wrapper">
+              <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+            </div>
+          </button>
+          <div class="faq-answer">
+            <div class="faq-answer-content">
+              No. Ravora is designed specifically for beginners and busy professionals who want to grow their portfolios passively. The interface is clean and straightforward, focusing on goals, risk settings, and simple text notifications rather than complicated trading grids.
+            </div>
+          </div>
+        </div>
+
+        <!-- FAQ 4 -->
+        <div class="card-glass faq-item" id="faq-item-4">
+          <button class="faq-question" id="faq-q-4">
+            <h3>How does the AI discover opportunities?</h3>
+            <div class="faq-icon-wrapper">
+              <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+            </div>
+          </button>
+          <div class="faq-answer">
+            <div class="faq-answer-content">
+              Our AI wealth engine evaluates multi-dimensional datasets, combining technical indicator trends, social media and news sentiment, capital flow, and macroeconomic indexes. It filters this raw data through your personalized risk tolerance profile to highlight only appropriate investment allocations.
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer Section -->
+  <footer class="footer" id="footer">
+    <div class="container">
+      <div class="footer-grid">
+        
+        <div class="footer-info">
+          <a href="#" class="logo" id="footer-logo">
+            <div class="logo-icon">R</div>
+            Ravora
+          </a>
+          <p>Your premium, AI-powered wealth copilot designed to grow capital with confidence and simplicity.</p>
+        </div>
+
+        <div class="footer-col">
+          <h4>Product</h4>
+          <ul class="footer-links">
+            <li><a href="#features" id="foot-link-features">Features</a></li>
+            <li><a href="#how-it-works" id="foot-link-how">How it Works</a></li>
+            <li><a href="#pricing" id="foot-link-pricing">Pricing</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Company</h4>
+          <ul class="footer-links">
+            <li><a href="#" onclick="return false;">About Us</a></li>
+            <li><a href="#" onclick="return false;">Security</a></li>
+            <li><a href="#" onclick="return false;">Careers</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Legal</h4>
+          <ul class="footer-links">
+            <li><a href="#" onclick="return false;">Privacy Policy</a></li>
+            <li><a href="#" onclick="return false;">Terms of Service</a></li>
+            <li><a href="#" onclick="return false;">Risk Disclosure</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-newsletter">
+          <h4>Stay Updated</h4>
+          <p>Subscribe to receive weekly AI market breakdowns directly to your inbox.</p>
+          <form class="newsletter-form" id="newsletter-form" onsubmit="event.preventDefault(); alert('Subscribed successfully!'); this.reset();">
+            <input type="email" placeholder="Your Email Address" class="newsletter-input" id="newsletter-email" required>
+            <button type="submit" class="btn btn-primary newsletter-btn" id="newsletter-submit-btn">
+              <svg style="width: 16px; height: 16px; fill: currentColor;" viewBox="0 0 24 24">
+                <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+              </svg>
+            </button>
+          </form>
+        </div>
+
+      </div>
+
+      <div class="footer-bottom">
+        <p>&copy; 2026 Ravora Technologies Inc. All rights reserved.</p>
+        <div class="footer-socials">
+          <a href="#" aria-label="Twitter" onclick="return false;">
+            <svg viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/></svg>
+          </a>
+          <a href="#" aria-label="LinkedIn" onclick="return false;">
+            <svg viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.779-1.75-1.75s.784-1.75 1.75-1.75 1.75.779 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+          </a>
+          <a href="#" aria-label="Discord" onclick="return false;">
+            <svg viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994.021-.041.001-.09-.041-.106a13.094 13.094 0 0 1-1.873-.894.077.077 0 0 1-.008-.128c.126-.093.252-.19.372-.287a.075.075 0 0 1 .077-.011c3.92 1.793 8.18 1.793 12.061 0a.073.073 0 0 1 .078.009c.12.099.246.195.373.289a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.894.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.156-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.156 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.156-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.156 2.418z"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Interactive Demo Video Modal -->
+  <div class="modal-overlay" id="demo-modal">
+    <div class="modal-content">
+      <button class="modal-close" id="modal-close-btn" aria-label="Close Modal">&times;</button>
+      <div class="modal-video-placeholder">
+        <div class="modal-demo-ui">
+          <div class="modal-demo-glow" id="modal-play-btn">
+            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          </div>
+          <h3 style="font-family: var(--font-display); margin-bottom: 8px;">Ravora Experience Tour</h3>
+          <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 20px;">Watch how Ravora links brokerages, discovers opportunities, and optimizes risk automatically in 90 seconds.</p>
+          <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-default); border-radius: 8px; padding: 12px; font-family: monospace; font-size: 0.8rem; color: var(--accent-secondary); text-align: left; overflow: hidden; white-space: nowrap;">
+            [SYSTEM] Loading video player configuration...<br>
+            [SYSTEM] API key validated. Buffer initialized.<br>
+            [SYSTEM] Playback ready. Click the button to start simulation.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
