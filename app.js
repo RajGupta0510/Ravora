@@ -148,6 +148,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const dashboardGrowth = document.getElementById('dashboard-growth-val');
   const chartPath = document.getElementById('chart-path');
   const chartGradPath = document.getElementById('chart-grad-path');
+  const chartPointerDot = document.getElementById('chart-pointer-dot');
   const goalCircle = document.getElementById('goal-circle-fill');
   const goalText = document.getElementById('goal-percentage-val');
   
@@ -164,6 +165,7 @@ document.addEventListener('DOMContentLoaded', () => {
       growth: '+$8,340.20 (+7.2%)',
       chartD: 'M 10 35 Q 55 32 105 25 T 190 20',
       chartGradD: 'M 10 35 Q 55 32 105 25 T 190 20 L 190 50 L 10 50 Z',
+      chartPointerY: 20,
       goalOffset: '75', // 50%
       goalText: '50%',
       oppTitle: 'Treasury Yield Basket',
@@ -177,6 +179,7 @@ document.addEventListener('DOMContentLoaded', () => {
       growth: '+$14,210.60 (+12.0%)',
       chartD: 'M 10 40 Q 45 20 105 30 T 190 12',
       chartGradD: 'M 10 40 Q 45 20 105 30 T 190 12 L 190 50 L 10 50 Z',
+      chartPointerY: 12,
       goalOffset: '45', // 70%
       goalText: '70%',
       oppTitle: 'ETH Staking & Bluechip Allocation',
@@ -190,6 +193,7 @@ document.addEventListener('DOMContentLoaded', () => {
       growth: '+$31,520.10 (+26.7%)',
       chartD: 'M 10 45 Q 35 5 100 38 T 190 7',
       chartGradD: 'M 10 45 Q 35 5 100 38 T 190 7 L 190 50 L 10 50 Z',
+      chartPointerY: 7,
       goalOffset: '15', // 90%
       goalText: '90%',
       oppTitle: 'AI Sentiment Basket Alpha',
@@ -212,9 +216,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (dashboardBalance) dashboardBalance.textContent = profile.balance;
     if (dashboardGrowth) dashboardGrowth.textContent = profile.growth;
 
-    // 3. Update Chart path & gradient path
+    // 3. Update Chart path, gradient path & pointer dot position
     if (chartPath) chartPath.setAttribute('d', profile.chartD);
     if (chartGradPath) chartGradPath.setAttribute('d', profile.chartGradD);
+    if (chartPointerDot) chartPointerDot.setAttribute('cy', profile.chartPointerY);
 
     // 4. Update Goal Ring
     if (goalCircle) goalCircle.style.strokeDashoffset = profile.goalOffset;
@@ -254,4 +259,47 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // 7. 3D Mouse Parallax & Smooth Lerp Tilt Effect
+  const container3D = document.getElementById('hero-3d-container');
+  const scene3D = document.querySelector('.scene-3d');
+  
+  if (container3D && scene3D) {
+    let targetRotX = 15;
+    let targetRotY = -10;
+    let currentRotX = 15;
+    let currentRotY = -10;
+    
+    container3D.addEventListener('mousemove', (e) => {
+      const rect = container3D.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width - 0.5; // -0.5 to 0.5
+      const y = (e.clientY - rect.top) / rect.height - 0.5; // -0.5 to 0.5
+      
+      // Target rotation values based on mouse position
+      targetRotX = 15 - y * 25;  // tilt up/down
+      targetRotY = -10 + x * 25; // tilt left/right
+      
+      // Update custom properties on the container for extra CSS control if needed
+      container3D.style.setProperty('--mouse-x', x * 2);
+      container3D.style.setProperty('--mouse-y', y * 2);
+    });
+
+    container3D.addEventListener('mouseleave', () => {
+      targetRotX = 15;
+      targetRotY = -10;
+      container3D.style.setProperty('--mouse-x', 0);
+      container3D.style.setProperty('--mouse-y', 0);
+    });
+
+    // Animate loop with smooth interpolation (lerp)
+    function smoothParallax() {
+      currentRotX += (targetRotX - currentRotX) * 0.08;
+      currentRotY += (targetRotY - currentRotY) * 0.08;
+      
+      scene3D.style.transform = `rotateX(${currentRotX}deg) rotateY(${currentRotY}deg)`;
+      requestAnimationFrame(smoothParallax);
+    }
+    
+    // Start animation loop
+    smoothParallax();
+  }
 });

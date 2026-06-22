@@ -47,8 +47,9 @@
     <div class="container">
       <div class="hero-content">
         <div class="hero-badge" id="hero-badge">
+          <span class="hero-badge-glow"></span>
           <span class="hero-badge-dot"></span>
-          Ravora AI Wealth Copilot V1.1 Live
+          <span class="hero-badge-text">Ravora Engine v1.2 Active</span>
         </div>
         <h1 class="text-gradient">Autonomous wealth.<br>Orchestrated by AI.</h1>
         <p class="hero-subtitle">
@@ -102,6 +103,9 @@
         <div class="scene-glow-ambient"></div>
         <div class="scene-3d">
           
+          <!-- Volumetric Light Beam -->
+          <div class="core-light-beam"></div>
+
           <!-- Pedestal Reflection Base -->
           <div class="pedestal-base">
             <div class="pedestal-ring ring-outer"></div>
@@ -119,12 +123,24 @@
           <!-- Central Glowing AI Core -->
           <div class="ai-core-group">
             <div class="ai-core-sphere">
+              <!-- Volumetric Energy Rings -->
+              <div class="core-torus-ring ring-x"></div>
+              <div class="core-torus-ring ring-y"></div>
+              
+              <!-- Core Shell Layers -->
               <div class="core-layer core-nucleus"></div>
+              <div class="core-layer core-layer-inner-shell"></div>
               <div class="core-layer core-layer-middle"></div>
               <div class="core-layer core-layer-outer"></div>
               <div class="core-flare"></div>
             </div>
           </div>
+
+          <!-- Refractive Glass Shards (orbiting crystals) -->
+          <div class="glass-shard shard-1"></div>
+          <div class="glass-shard shard-2"></div>
+          <div class="glass-shard shard-3"></div>
+          <div class="glass-shard shard-4"></div>
 
           <!-- Floating Glassmorphic Panels -->
           
@@ -161,12 +177,13 @@
                 <svg class="mini-chart-svg" viewBox="0 0 200 50">
                   <defs>
                     <linearGradient id="mini-chart-grad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stop-color="var(--state-glow-color, #7c3aed)" stop-opacity="0.3"/>
-                      <stop offset="100%" stop-color="var(--state-glow-color, #7c3aed)" stop-opacity="0"/>
+                      <stop offset="0%" stop-color="var(--state-glow-color, #a855f7)" stop-opacity="0.3"/>
+                      <stop offset="100%" stop-color="var(--state-glow-color, #a855f7)" stop-opacity="0"/>
                     </linearGradient>
                   </defs>
-                  <path id="chart-path" d="M 10 40 Q 60 15 110 30 T 190 10" fill="none" stroke="var(--state-glow-color, #7c3aed)" stroke-width="2.5" stroke-linecap="round"/>
-                  <path id="chart-grad-path" d="M 10 40 Q 60 15 110 30 T 190 10 L 190 50 L 10 50 Z" fill="url(#mini-chart-grad)"/>
+                  <path id="chart-path" d="M 10 40 Q 45 20 105 30 T 190 12" fill="none" stroke="var(--state-glow-color, #a855f7)" stroke-width="2.5" stroke-linecap="round"/>
+                  <path id="chart-grad-path" d="M 10 40 Q 45 20 105 30 T 190 12 L 190 50 L 10 50 Z" fill="url(#mini-chart-grad)"/>
+                  <circle id="chart-pointer-dot" cx="190" cy="12" r="4.5" fill="var(--state-glow-color, #a855f7)" stroke="#ffffff" stroke-width="2"/>
                 </svg>
               </div>
             </div>
