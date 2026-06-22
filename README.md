@@ -1,2 +1,2 @@
-# Ravora-
+# Ravora
 AI powered wealth copilot
