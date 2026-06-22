@@ -137,14 +137,17 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // 6. Interactive Hero Dashboard Simulation (Risk Tolerance Slider)
-  const riskSlider = document.getElementById('risk-slider');
+  // 6. Interactive Hero 3D Scene Simulation (Segmented Control)
+  const heroSection = document.getElementById('hero-section');
+  const segmentedControl = document.getElementById('risk-segmented-control');
+  const segmentedBtns = document.querySelectorAll('.segmented-btn');
   const riskValueText = document.getElementById('risk-value-text');
   
-  // Dashboard mock components that will update
+  // 3D Scene components that will update
   const dashboardBalance = document.getElementById('dashboard-balance-val');
   const dashboardGrowth = document.getElementById('dashboard-growth-val');
   const chartPath = document.getElementById('chart-path');
+  const chartGradPath = document.getElementById('chart-grad-path');
   const goalCircle = document.getElementById('goal-circle-fill');
   const goalText = document.getElementById('goal-percentage-val');
   
@@ -159,7 +162,8 @@ document.addEventListener('DOMContentLoaded', () => {
       label: 'Conservative',
       balance: '$124,582.40',
       growth: '+$8,340.20 (+7.2%)',
-      chartD: 'M 10 70 Q 110 65 210 50 T 410 40',
+      chartD: 'M 10 35 Q 55 32 105 25 T 190 20',
+      chartGradD: 'M 10 35 Q 55 32 105 25 T 190 20 L 190 50 L 10 50 Z',
       goalOffset: '75', // 50%
       goalText: '50%',
       oppTitle: 'Treasury Yield Basket',
@@ -171,7 +175,8 @@ document.addEventListener('DOMContentLoaded', () => {
       label: 'Moderate',
       balance: '$132,194.10',
       growth: '+$14,210.60 (+12.0%)',
-      chartD: 'M 10 80 Q 90 40 210 60 T 410 30',
+      chartD: 'M 10 40 Q 45 20 105 30 T 190 12',
+      chartGradD: 'M 10 40 Q 45 20 105 30 T 190 12 L 190 50 L 10 50 Z',
       goalOffset: '45', // 70%
       goalText: '70%',
       oppTitle: 'ETH Staking & Bluechip Allocation',
@@ -183,51 +188,69 @@ document.addEventListener('DOMContentLoaded', () => {
       label: 'Aggressive',
       balance: '$149,425.80',
       growth: '+$31,520.10 (+26.7%)',
-      chartD: 'M 10 90 Q 70 10 210 80 T 410 15',
+      chartD: 'M 10 45 Q 35 5 100 38 T 190 7',
+      chartGradD: 'M 10 45 Q 35 5 100 38 T 190 7 L 190 50 L 10 50 Z',
       goalOffset: '15', // 90%
       goalText: '90%',
       oppTitle: 'AI Sentiment Basket Alpha',
       oppDesc: 'Social momentum & micro-cap institutional interest detected in top 15 utility tokens.',
       oppConfidence: '88%',
-      oppActionText: 'Deploy Alpha capital'
+      oppActionText: 'Deploy Alpha Capital'
     }
   };
 
-  if (riskSlider) {
-    riskSlider.addEventListener('input', (e) => {
-      const val = parseInt(e.target.value);
-      const profile = riskProfiles[val];
-      
-      if (profile) {
-        // 1. Update text label
-        riskValueText.textContent = profile.label;
+  function updateProfile(val) {
+    const profile = riskProfiles[val];
+    if (!profile) return;
+
+    // 1. Update text label
+    if (riskValueText) {
+      riskValueText.textContent = profile.label;
+    }
+    
+    // 2. Update dashboard/panel numbers
+    if (dashboardBalance) dashboardBalance.textContent = profile.balance;
+    if (dashboardGrowth) dashboardGrowth.textContent = profile.growth;
+
+    // 3. Update Chart path & gradient path
+    if (chartPath) chartPath.setAttribute('d', profile.chartD);
+    if (chartGradPath) chartGradPath.setAttribute('d', profile.chartGradD);
+
+    // 4. Update Goal Ring
+    if (goalCircle) goalCircle.style.strokeDashoffset = profile.goalOffset;
+    if (goalText) goalText.textContent = profile.goalText;
+
+    // 5. Update Opportunity card
+    if (oppTitle) oppTitle.textContent = profile.oppTitle;
+    if (oppDesc) oppDesc.textContent = profile.oppDesc;
+    if (oppConfidence) oppConfidence.textContent = profile.oppConfidence;
+    if (oppBtn) oppBtn.textContent = profile.oppActionText;
+  }
+
+  if (segmentedControl) {
+    segmentedBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const val = parseInt(btn.getAttribute('data-value'));
         
-        // Apply color based on risk value
-        if (val === 0) {
-          riskValueText.style.color = '#60a5fa'; // Blue
-        } else if (val === 1) {
-          riskValueText.style.color = '#c084fc'; // Purple
-        } else {
-          riskValueText.style.color = '#f59e0b'; // Amber
+        // Remove active class from all buttons
+        segmentedBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        
+        // Update hero section state class
+        if (heroSection) {
+          heroSection.classList.remove('state-conservative', 'state-balanced', 'state-aggressive');
+          if (val === 0) {
+            heroSection.classList.add('state-conservative');
+          } else if (val === 1) {
+            heroSection.classList.add('state-balanced');
+          } else if (val === 2) {
+            heroSection.classList.add('state-aggressive');
+          }
         }
-
-        // 2. Update dashboard numbers
-        dashboardBalance.textContent = profile.balance;
-        dashboardGrowth.textContent = profile.growth;
-
-        // 3. Update Chart path
-        chartPath.setAttribute('d', profile.chartD);
-
-        // 4. Update Goal Ring
-        goalCircle.style.strokeDashoffset = profile.goalOffset;
-        goalText.textContent = profile.goalText;
-
-        // 5. Update Opportunity card
-        oppTitle.textContent = profile.oppTitle;
-        oppDesc.textContent = profile.oppDesc;
-        oppConfidence.textContent = profile.oppConfidence;
-        oppBtn.textContent = profile.oppActionText;
-      }
+        
+        // Trigger update with profile
+        updateProfile(val);
+      });
     });
   }
 

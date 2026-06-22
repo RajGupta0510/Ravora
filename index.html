@@ -43,16 +43,16 @@
   </nav>
 
   <!-- Hero Section -->
-  <section class="hero" id="hero-section">
+  <section class="hero state-balanced" id="hero-section">
     <div class="container">
       <div class="hero-content">
         <div class="hero-badge" id="hero-badge">
           <span class="hero-badge-dot"></span>
-          Ravora AI Wealth Copilot V1.0 Live
+          Ravora AI Wealth Copilot V1.1 Live
         </div>
-        <h1 class="text-gradient">Intelligent Wealth. Simplified by AI.</h1>
+        <h1 class="text-gradient">Autonomous wealth.<br>Orchestrated by AI.</h1>
         <p class="hero-subtitle">
-          Ravora monitors global markets 24/7, finding opportunities and protecting capital. Grow your portfolio automatically without wasting hours staring at complex charts.
+          Ravora is the premium wealth engine that monitors markets 24/7. Discover high-probability opportunities, manage risks, and grow your portfolio with institutional precision.
         </p>
         <div class="hero-actions">
           <a href="#pricing" class="btn btn-primary btn-lg" id="hero-cta-primary">Get Started</a>
@@ -62,6 +62,20 @@
             </svg>
             Watch Demo
           </a>
+        </div>
+
+        <!-- Segmented Risk Control -->
+        <div class="risk-control-container">
+          <div class="risk-control-header">
+            <span class="risk-control-title">ACTIVE COPILOT PROFILE</span>
+            <span class="risk-value-display" id="risk-value-text">Moderate</span>
+          </div>
+          <div class="risk-segmented-control" id="risk-segmented-control">
+            <div class="segmented-pill"></div>
+            <button class="segmented-btn" data-value="0" id="btn-risk-conservative">Conservative</button>
+            <button class="segmented-btn active" data-value="1" id="btn-risk-moderate">Balanced</button>
+            <button class="segmented-btn" data-value="2" id="btn-risk-aggressive">Aggressive</button>
+          </div>
         </div>
         
         <div class="hero-social-proof">
@@ -83,107 +97,104 @@
         </div>
       </div>
 
-      <!-- Interactive Mockup (Dashboard Widget) -->
-      <div class="hero-visual">
-        <div class="dashboard-glow"></div>
-        <div class="card-glass dashboard-mockup" id="hero-dashboard-widget">
+      <!-- 3D AI Wealth Visualization -->
+      <div class="hero-visual-3d" id="hero-3d-container">
+        <div class="scene-glow-ambient"></div>
+        <div class="scene-3d">
           
-          <div class="dashboard-header">
-            <div class="dashboard-profile">
-              <div class="dashboard-avatar"></div>
-              <div>
-                <div class="dashboard-username">Sarah Jenkins</div>
-                <div style="font-size: 0.7rem; color: var(--text-secondary);">Beta Account</div>
-              </div>
-            </div>
-            <div class="dashboard-badge">AI Active</div>
+          <!-- Pedestal Reflection Base -->
+          <div class="pedestal-base">
+            <div class="pedestal-ring ring-outer"></div>
+            <div class="pedestal-ring ring-inner"></div>
+            <div class="pedestal-grid"></div>
           </div>
 
-          <div class="dashboard-grid">
-            <div class="dashboard-balance">
-              <span class="balance-label">Total Portfolio Value</span>
-              <span class="balance-amount" id="dashboard-balance-val">$132,194.10</span>
-              <div class="balance-change" id="dashboard-growth-val">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-                  <path d="M18 15l-6-6-6 6"/>
-                </svg>
-                +$14,210.60 (+12.0%)
+          <!-- Concentric Orbiting Wireframe Rings -->
+          <div class="orbit-rings">
+            <div class="orbit-ring ring-1"></div>
+            <div class="orbit-ring ring-2"></div>
+            <div class="orbit-ring ring-3"></div>
+          </div>
+
+          <!-- Central Glowing AI Core -->
+          <div class="ai-core-group">
+            <div class="ai-core-sphere">
+              <div class="core-layer core-nucleus"></div>
+              <div class="core-layer core-layer-middle"></div>
+              <div class="core-layer core-layer-outer"></div>
+              <div class="core-flare"></div>
+            </div>
+          </div>
+
+          <!-- Floating Glassmorphic Panels -->
+          
+          <!-- Panel 1: Market Signals -->
+          <div class="glass-panel panel-signal" id="panel-signal-widget">
+            <div class="glass-panel-glow"></div>
+            <div class="panel-header">
+              <span class="signal-indicator"><span class="pulse-dot"></span></span>
+              <span class="panel-tag">AI Market Signal</span>
+              <span class="signal-confidence" id="opp-conf-val">94%</span>
+            </div>
+            <div class="panel-body">
+              <div class="signal-title" id="opp-title-val">ETH Staking & Bluechip Allocation</div>
+              <div class="signal-desc" id="opp-desc-val">Layer 1 accumulation signals detected. AI reallocation triggered for peak efficiency.</div>
+            </div>
+            <div class="panel-footer">
+              <button class="btn-panel-action" id="opp-btn-action">Rebalance Portfolio</button>
+            </div>
+          </div>
+
+          <!-- Panel 2: Wealth Growth -->
+          <div class="glass-panel panel-growth" id="panel-growth-widget">
+            <div class="glass-panel-glow"></div>
+            <div class="panel-body">
+              <div class="growth-header">
+                <span class="panel-tag">Wealth Growth</span>
+                <span class="growth-change" id="dashboard-growth-val">+$14,210.60 (+12.0%)</span>
               </div>
-              
-              <div class="dashboard-chart">
-                <svg class="chart-svg" viewBox="0 0 420 100">
+              <div class="growth-stats">
+                <span class="balance-label">Portfolio Balance</span>
+                <span class="balance-amount" id="dashboard-balance-val">$132,194.10</span>
+              </div>
+              <div class="growth-chart">
+                <svg class="mini-chart-svg" viewBox="0 0 200 50">
                   <defs>
-                    <linearGradient id="chart-grad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stop-color="#2563eb" stop-opacity="0.25"/>
-                      <stop offset="100%" stop-color="#7c3aed" stop-opacity="0"/>
+                    <linearGradient id="mini-chart-grad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="var(--state-glow-color, #7c3aed)" stop-opacity="0.3"/>
+                      <stop offset="100%" stop-color="var(--state-glow-color, #7c3aed)" stop-opacity="0"/>
                     </linearGradient>
                   </defs>
-                  <!-- Base grid line -->
-                  <line x1="0" y1="90" x2="420" y2="90" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
-                  <!-- Dynamic curve -->
-                  <path id="chart-path" d="M 10 80 Q 90 40 210 60 T 410 30" fill="none" stroke="url(#chart-grad)" stroke-width="3" style="stroke: #2563eb; transition: d var(--transition-slow);"/>
+                  <path id="chart-path" d="M 10 40 Q 60 15 110 30 T 190 10" fill="none" stroke="var(--state-glow-color, #7c3aed)" stroke-width="2.5" stroke-linecap="round"/>
+                  <path id="chart-grad-path" d="M 10 40 Q 60 15 110 30 T 190 10 L 190 50 L 10 50 Z" fill="url(#mini-chart-grad)"/>
                 </svg>
               </div>
             </div>
+          </div>
 
-            <!-- Sidebar widgets -->
-            <div class="dashboard-widgets">
-              
-              <!-- AI Opportunity Alert Widget -->
-              <div class="widget-opportunity" id="dashboard-opp-widget">
-                <div class="widget-opportunity-header">
-                  <span class="opp-badge">AI Insight</span>
-                  <span class="opp-confidence" id="opp-conf-gauge">
-                    <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                    </svg>
-                    <span id="opp-conf-val">94%</span> Conf.
-                  </span>
-                </div>
-                <div class="opp-title" id="opp-title-val">ETH Staking & Bluechip Allocation</div>
-                <div class="opp-desc" id="opp-desc-val">Layer 1 accumulation signals detected. AI reallocation triggered for peak efficiency.</div>
-                <button class="btn btn-primary btn-sm opp-action" id="opp-btn-action">Rebalance Portfolio</button>
+          <!-- Panel 3: Goal progress -->
+          <div class="glass-panel panel-goal" id="panel-goal-widget">
+            <div class="glass-panel-glow"></div>
+            <div class="panel-body">
+              <div class="goal-ring-container">
+                <svg class="goal-ring-svg" viewBox="0 0 60 60">
+                  <circle class="goal-bg-circle" cx="30" cy="30" r="24" />
+                  <circle class="goal-fill-circle" id="goal-circle-fill" cx="30" cy="30" r="24" />
+                </svg>
+                <div class="goal-percentage" id="goal-percentage-val">70%</div>
               </div>
-
-              <!-- Goal Progress Circle Widget -->
-              <div class="widget-goal" id="dashboard-goal-widget">
-                <div class="goal-ring">
-                  <svg class="goal-svg" viewBox="0 0 60 60">
-                    <defs>
-                      <linearGradient id="ring-gradient" x1="0" y1="0" x2="1" y2="1">
-                        <stop offset="0%" stop-color="#2563eb" />
-                        <stop offset="100%" stop-color="#7c3aed" />
-                      </linearGradient>
-                    </defs>
-                    <circle class="goal-bg-circle" cx="30" cy="30" r="24" />
-                    <circle class="goal-fill-circle" id="goal-circle-fill" cx="30" cy="30" r="24" />
-                  </svg>
-                  <div class="goal-percentage" id="goal-percentage-val">70%</div>
-                </div>
-                <div class="goal-info">
-                  <span class="goal-title">Yearly Wealth Goal</span>
-                  <span class="goal-target">$180,000 target</span>
-                </div>
+              <div class="goal-text">
+                <span class="goal-title">Yearly Target</span>
+                <span class="goal-desc">$180,000 Milestone</span>
               </div>
-
             </div>
           </div>
 
-          <!-- Risk Selector Control -->
-          <div class="dashboard-controls">
-            <div class="controls-label">
-              <span>Risk Tolerance Profile:</span>
-              <span class="risk-value-text" id="risk-value-text" style="color: #c084fc;">Moderate</span>
-            </div>
-            <div class="slider-container">
-              <input type="range" min="0" max="2" value="1" class="risk-slider" id="risk-slider" aria-label="Risk Tolerance Slider">
-            </div>
-            <div style="display: flex; justify-content: space-between; font-size: 0.65rem; color: var(--text-muted); margin-top: 6px;">
-              <span>Conservative</span>
-              <span>Balanced</span>
-              <span>Aggressive</span>
-            </div>
-          </div>
+          <!-- Orbiting Asset Badges (3D coordinates) -->
+          <div class="orbiting-particle part-btc"><span class="coin-icon">₿</span></div>
+          <div class="orbiting-particle part-eth"><span class="coin-icon">Ξ</span></div>
+          <div class="orbiting-particle part-sol"><span class="coin-icon">S</span></div>
+          <div class="orbiting-particle part-usdc"><span class="coin-icon">$</span></div>
 
         </div>
       </div>
