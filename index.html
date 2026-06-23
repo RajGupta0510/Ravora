@@ -54,18 +54,27 @@
           <span class="hero-badge-dot"></span>
           <span class="hero-badge-text">Powered by Araiven Intelligence</span>
         </div>
-        <h1 class="text-gradient">Stop Learning Charts.<br>Start Building Wealth.</h1>
+        
+        <!-- Rotating Outcome-Driven Headline -->
+        <h1 class="text-gradient" id="hero-headline">Grow Wealth Without Learning Trading.</h1>
+        
+        <!-- Headline variation pagination -->
+        <div class="headline-pagination" id="headline-pagination">
+          <button class="pag-dot active" data-index="0" aria-label="Variation 1"></button>
+          <button class="pag-dot" data-index="1" aria-label="Variation 2"></button>
+          <button class="pag-dot" data-index="2" aria-label="Variation 3"></button>
+          <button class="pag-dot" data-index="3" aria-label="Variation 4"></button>
+          <button class="pag-dot" data-index="4" aria-label="Variation 5"></button>
+        </div>
+
         <p class="hero-subtitle">
-          Araiven monitors markets, identifies opportunities, evaluates risk, and helps you make smarter financial decisions without spending years learning technical analysis.
+          Most people don't have time to learn candlestick patterns, indicators, support and resistance, chart analysis, and market psychology.
+          <br><br>
+          Araiven continuously monitors markets, identifies opportunities, evaluates risk, and helps you make smarter financial decisions without spending years learning how to trade.
         </p>
         <div class="hero-actions">
           <a href="#pricing" class="btn btn-primary btn-lg" id="hero-cta-primary">Get Started</a>
-          <a href="#" class="btn btn-secondary btn-lg btn-watch-demo" id="hero-cta-secondary">
-            <svg style="width: 18px; height: 18px; margin-right: 8px; fill: currentColor;" viewBox="0 0 24 24">
-              <path d="M8 5v14l11-7z"/>
-            </svg>
-            Watch Demo
-          </a>
+          <a href="#about-araiven" class="btn btn-secondary btn-lg" id="hero-cta-secondary">See Araiven In Action</a>
         </div>
 
         <!-- Segmented Risk Control -->
@@ -101,10 +110,33 @@
         </div>
       </div>
 
-      <!-- 3D AI Wealth Visualization -->
+      <!-- 3D AI Wealth Visualization (Layered Depth) -->
       <div class="hero-visual-3d" id="hero-3d-container">
         <div class="scene-glow-ambient"></div>
         <div class="scene-3d">
+          
+          <!-- Complexity Background Chart Layer (Markets are complex) -->
+          <div class="complexity-bg-chart">
+            <svg viewBox="0 0 400 300" class="complexity-svg">
+              <line x1="0" y1="50" x2="400" y2="50" stroke="rgba(255, 255, 255, 0.02)" />
+              <line x1="0" y1="100" x2="400" y2="100" stroke="rgba(255, 255, 255, 0.02)" />
+              <line x1="0" y1="150" x2="400" y2="150" stroke="rgba(255, 255, 255, 0.02)" />
+              <line x1="0" y1="200" x2="400" y2="200" stroke="rgba(255, 255, 255, 0.02)" />
+              <line x1="0" y1="250" x2="400" y2="250" stroke="rgba(255, 255, 255, 0.02)" />
+              <path d="M 10 180 Q 80 260 150 120 T 320 60 T 390 190" fill="none" stroke="rgba(239, 68, 68, 0.12)" stroke-width="1.5" stroke-dasharray="4,4" />
+              <path d="M 10 120 Q 90 20 180 170 T 340 100 T 390 40" fill="none" stroke="rgba(37, 99, 235, 0.12)" stroke-width="1.5" />
+              <line x1="50" y1="110" x2="50" y2="170" stroke="rgba(239, 68, 68, 0.15)" stroke-width="1" />
+              <rect x="46" y="125" width="8" height="30" fill="rgba(239, 68, 68, 0.15)" rx="1" />
+              <line x1="90" y1="190" x2="90" y2="250" stroke="rgba(16, 185, 129, 0.15)" stroke-width="1" />
+              <rect x="86" y="200" width="8" height="35" fill="rgba(16, 185, 129, 0.15)" rx="1" />
+              <line x1="130" y1="70" x2="130" y2="130" stroke="rgba(239, 68, 68, 0.15)" stroke-width="1" />
+              <rect x="126" y="85" width="8" height="30" fill="rgba(239, 68, 68, 0.15)" rx="1" />
+              <line x1="280" y1="130" x2="280" y2="210" stroke="rgba(16, 185, 129, 0.15)" stroke-width="1" />
+              <rect x="276" y="150" width="8" height="40" fill="rgba(16, 185, 129, 0.15)" rx="1" />
+              <text x="35" y="105" fill="rgba(255,255,255,0.06)" font-size="7" font-family="monospace">RSI OVERBOUGHT</text>
+              <text x="270" y="120" fill="rgba(255,255,255,0.06)" font-size="7" font-family="monospace">MACD CROSSOVER</text>
+            </svg>
+          </div>
           
           <!-- Volumetric Light Beam -->
           <div class="core-light-beam"></div>
@@ -123,7 +155,7 @@
             <div class="orbit-ring ring-3"></div>
           </div>
 
-          <!-- Central Glowing AI Core -->
+          <!-- Central Glowing AI Core (Araiven Core handles complexity) -->
           <div class="ai-core-group">
             <div class="ai-core-sphere">
               <!-- Volumetric Energy Rings -->
@@ -145,7 +177,7 @@
           <div class="glass-shard shard-3"></div>
           <div class="glass-shard shard-4"></div>
 
-          <!-- Floating Glassmorphic Panels -->
+          <!-- Floating Glassmorphic Panels (Outcome Layer: Users focus on outcomes) -->
           
           <!-- Panel 1: Market Signals -->
           <div class="glass-panel panel-signal" id="panel-signal-widget">
@@ -210,6 +242,23 @@
             </div>
           </div>
 
+          <!-- Panel 4: Risk Monitoring Layer (Foreground) -->
+          <div class="glass-panel panel-risk-guard" id="panel-risk-guard-widget">
+            <div class="glass-panel-glow"></div>
+            <div class="panel-body">
+              <div class="risk-guard-header">
+                <span class="shield-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width: 12px; height: 12px; color: var(--success);"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </span>
+                <span class="panel-tag">Araiven Guard</span>
+              </div>
+              <div class="risk-guard-status">
+                <span class="status-label">Active Protection</span>
+                <span class="status-val" id="dashboard-risk-guard-val">Balanced Shield</span>
+              </div>
+            </div>
+          </div>
+
           <!-- Orbiting Asset Badges (3D coordinates) -->
           <div class="orbiting-particle part-btc"><span class="coin-icon">₿</span></div>
           <div class="orbiting-particle part-eth"><span class="coin-icon">Ξ</span></div>
@@ -218,6 +267,35 @@
 
         </div>
       </div>
+      
+      <!-- Trust Statement Bar -->
+      <div class="hero-trust-bar">
+        <div class="trust-item">
+          <div class="trust-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;"><path d="M2 12h20"/><path d="M9 12V4h6v8"/></svg>
+          </div>
+          <span>No chart watching</span>
+        </div>
+        <div class="trust-item">
+          <div class="trust-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;"><path d="M3 3v18h18"/><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/></svg>
+          </div>
+          <span>No technical indicators</span>
+        </div>
+        <div class="trust-item">
+          <div class="trust-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          </div>
+          <span>No endless market monitoring</span>
+        </div>
+        <div class="trust-item highlight">
+          <div class="trust-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+          </div>
+          <span>Just intelligent decision-making</span>
+        </div>
+      </div>
+
     </div>
   </section>
 

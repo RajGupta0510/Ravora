@@ -217,6 +217,21 @@ document.addEventListener('DOMContentLoaded', () => {
     if (dashboardBalance) dashboardBalance.textContent = profile.balance;
     if (dashboardGrowth) dashboardGrowth.textContent = profile.growth;
 
+    // Update Foreground Risk Guard Panel
+    const riskGuardVal = document.getElementById('dashboard-risk-guard-val');
+    if (riskGuardVal) {
+      if (val === 0) {
+        riskGuardVal.textContent = 'Conservative Shield';
+        riskGuardVal.style.color = '#3b82f6';
+      } else if (val === 1) {
+        riskGuardVal.textContent = 'Balanced Shield';
+        riskGuardVal.style.color = '#10b981';
+      } else if (val === 2) {
+        riskGuardVal.textContent = 'Aggressive Buffer';
+        riskGuardVal.style.color = '#f59e0b';
+      }
+    }
+
     // 2. Mini chart path mutations
     if (chartPath) chartPath.setAttribute('d', profile.chartD);
     if (chartGradPath) chartGradPath.setAttribute('d', profile.chartGradD);
@@ -567,5 +582,78 @@ document.addEventListener('DOMContentLoaded', () => {
       }, 2000);
     });
   });
+
+  // ==========================================================================
+  // 11. Headline Variation Rotation & Manual Pagination
+  // ==========================================================================
+  const headlines = [
+    "Grow Wealth Without Learning Trading.",
+    "Stop Learning Charts. Start Building Wealth.",
+    "Trading Is Hard. Araiven Makes It Simple.",
+    "Let Intelligence Trade. Not Emotions.",
+    "The Future Of Trading Doesn't Require Traders."
+  ];
+
+  const headlineEl = document.getElementById('hero-headline');
+  const pagDots = document.querySelectorAll('#headline-pagination .pag-dot');
+  let currentHeadlineIndex = 0;
+  let headlineTimer = null;
+
+  function switchHeadline(index) {
+    if (!headlineEl || index === currentHeadlineIndex) return;
+
+    // 1. Fade out current text
+    headlineEl.classList.add('fade-out');
+
+    setTimeout(() => {
+      // 2. Change text content
+      headlineEl.textContent = headlines[index];
+      
+      // 3. Update pagination dots active state
+      pagDots.forEach((dot, idx) => {
+        if (idx === index) dot.classList.add('active');
+        else dot.classList.remove('active');
+      });
+
+      // 4. Fade in new text
+      headlineEl.classList.remove('fade-out');
+      headlineEl.classList.add('fade-in');
+
+      // Clear fade-in class after animation finishes
+      setTimeout(() => {
+        headlineEl.classList.remove('fade-in');
+      }, 300);
+
+      currentHeadlineIndex = index;
+    }, 300);
+  }
+
+  function startHeadlineRotation() {
+    headlineTimer = setInterval(() => {
+      const nextIndex = (currentHeadlineIndex + 1) % headlines.length;
+      switchHeadline(nextIndex);
+    }, 5000);
+  }
+
+  function resetHeadlineRotation() {
+    if (headlineTimer) {
+      clearInterval(headlineTimer);
+      startHeadlineRotation();
+    }
+  }
+
+  // Bind pagination dots to manual switcher
+  if (pagDots.length > 0) {
+    pagDots.forEach(dot => {
+      dot.addEventListener('click', () => {
+        const index = parseInt(dot.getAttribute('data-index'));
+        switchHeadline(index);
+        resetHeadlineRotation(); // Reset rotation timer on manual click
+      });
+    });
+  }
+
+  // Start the automatic rotation
+  startHeadlineRotation();
 
 });
