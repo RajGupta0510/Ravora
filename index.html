@@ -25,9 +25,12 @@
         Ravora
       </a>
       <ul class="nav-links" id="nav-menu">
-        <li><a href="#features" id="link-features">Features</a></li>
-        <li><a href="#how-it-works" id="link-how-it-works">How It Works</a></li>
-        <li><a href="#ai-showcase" id="link-showcase">AI Insights</a></li>
+        <li><a href="#problem-section" id="link-problem">Traditional vs Araiven</a></li>
+        <li><a href="#workflow-section" id="link-workflow">How Araiven Thinks</a></li>
+        <li><a href="#action-section" id="link-action">Araiven in Action</a></li>
+        <li><a href="#opportunities-section" id="link-opportunities">Opportunity Engine</a></li>
+        <li><a href="#chat-section" id="link-chat">Copilot Chat</a></li>
+        <li><a href="#portfolio-section" id="link-portfolio">Portfolio Intel</a></li>
         <li><a href="#pricing" id="link-pricing">Pricing</a></li>
       </ul>
       <div class="nav-actions">
@@ -49,11 +52,11 @@
         <div class="hero-badge" id="hero-badge">
           <span class="hero-badge-glow"></span>
           <span class="hero-badge-dot"></span>
-          <span class="hero-badge-text">Ravora Engine v1.2 Active</span>
+          <span class="hero-badge-text">Powered by Araiven Intelligence</span>
         </div>
-        <h1 class="text-gradient">Autonomous wealth.<br>Orchestrated by AI.</h1>
+        <h1 class="text-gradient">The AI Wealth<br>Copilot</h1>
         <p class="hero-subtitle">
-          Ravora is the premium wealth engine that monitors markets 24/7. Discover high-probability opportunities, manage risks, and grow your portfolio with institutional precision.
+          Ravora continuously monitors global markets, identifies opportunities, analyzes risk, and helps you make smarter financial decisions.
         </p>
         <div class="hero-actions">
           <a href="#pricing" class="btn btn-primary btn-lg" id="hero-cta-primary">Get Started</a>
@@ -68,7 +71,7 @@
         <!-- Segmented Risk Control -->
         <div class="risk-control-container">
           <div class="risk-control-header">
-            <span class="risk-control-title">ACTIVE COPILOT PROFILE</span>
+            <span class="risk-control-title">ACTIVE ARAIVEN RISK PROFILE</span>
             <span class="risk-value-display" id="risk-value-text">Moderate</span>
           </div>
           <div class="risk-segmented-control" id="risk-segmented-control">
@@ -216,223 +219,424 @@
         </div>
       </div>
     </div>
-  </section>
-
-  <!-- How It Works Section -->
-  <section class="how-it-works" id="how-it-works">
+  </section  <!-- SECTION 2 — The Problem -->
+  <section class="problem-section" id="problem-section">
     <div class="container">
       <div class="text-center">
-        <h2>Simple Wealth Building</h2>
-        <p class="section-subtitle">Grow your assets securely in just four simple stages with full transparent AI guidance.</p>
+        <span class="section-badge">The Reality of Investing</span>
+        <h2>Traditional Chaos vs. Autonomous Calm</h2>
+        <p class="section-subtitle">Why managing wealth manually in today's 24/7 global market is a losing battle.</p>
       </div>
-
-      <div class="steps-grid">
-        <div class="steps-line"></div>
-        
-        <!-- Step 1 -->
-        <div class="step-card" id="step-1">
-          <div class="step-icon-wrapper">1</div>
-          <h3>Connect Exchanges</h3>
-          <p>Link your existing brokerage accounts or exchanges securely using read-only API access. Your funds never leave your account.</p>
+      <div class="problem-grid">
+        <!-- Traditional Card -->
+        <div class="card-glass problem-card traditional">
+          <div class="card-glow-red"></div>
+          <div class="problem-header">
+            <div class="status-indicator-red"></div>
+            <h3>Traditional Investing</h3>
+          </div>
+          <p class="problem-intro">A stressful cycle of information overload and missed timings.</p>
+          <ul class="problem-list">
+            <li>
+              <span class="list-bullet-red">✕</span>
+              <span><strong>Chart Watching:</strong> Spending hours analyzing complex, noisy candles.</span>
+            </li>
+            <li>
+              <span class="list-bullet-red">✕</span>
+              <span><strong>News Sentiment:</strong> Parsing endless feeds, social spam, and macro announcements.</span>
+            </li>
+            <li>
+              <span class="list-bullet-red">✕</span>
+              <span><strong>Manual Risk:</strong> Hard-coding stops and limits that miss rapid flash crashes.</span>
+            </li>
+            <li>
+              <span class="list-bullet-red">✕</span>
+              <span><strong>Lost Opportunities:</strong> High-probability entries that occur while you are asleep.</span>
+            </li>
+          </ul>
+          <div class="traditional-chart-mock">
+            <svg viewBox="0 0 300 80" class="stress-chart">
+              <!-- Grid lines -->
+              <line x1="0" y1="20" x2="300" y2="20" stroke="rgba(239, 68, 68, 0.08)" />
+              <line x1="0" y1="50" x2="300" y2="50" stroke="rgba(239, 68, 68, 0.08)" />
+              <!-- Candles & Zigzag -->
+              <path d="M 10 50 L 50 15 L 90 60 L 130 10 L 170 65 L 210 30 L 250 70 L 290 25" fill="none" stroke="#ef4444" stroke-width="1.5" />
+              <circle cx="290" cy="25" r="3" fill="#ef4444" />
+              <text x="15" y="72" fill="#ef4444" font-size="8" font-family="monospace" opacity="0.8">EMOTIONAL PANIC SELL DETECTED</text>
+            </svg>
+          </div>
         </div>
 
-        <!-- Step 2 -->
-        <div class="step-card active" id="step-2">
-          <div class="step-icon-wrapper">2</div>
-          <h3>Set Goals & Risk</h3>
-          <p>Define your financial target timeline and choose a risk tolerance. The wealth copilot creates a dynamic strategy customized for you.</p>
-        </div>
-
-        <!-- Step 3 -->
-        <div class="step-card" id="step-3">
-          <div class="step-icon-wrapper">3</div>
-          <h3>AI Scans Markets</h3>
-          <p>Our algorithms monitor patterns, macroeconomic factors, and sentiment indicators to identify high-probability setups continuously.</p>
-        </div>
-
-        <!-- Step 4 -->
-        <div class="step-card" id="step-4">
-          <div class="step-icon-wrapper">4</div>
-          <h3>Grow Portfolio</h3>
-          <p>Approve AI suggestions with one click, or enable automated execution to grow your capital with institutional-grade efficiency.</p>
+        <!-- Araiven Card -->
+        <div class="card-glass problem-card araiven-way">
+          <div class="card-glow-purple"></div>
+          <div class="problem-header">
+            <div class="status-indicator-green"></div>
+            <h3>The Ravora Way</h3>
+          </div>
+          <p class="problem-intro">Autonomous intelligence operating at institutional efficiency.</p>
+          <ul class="problem-list">
+            <li>
+              <span class="list-bullet-green">✓</span>
+              <span><strong>Continuous Scanning:</strong> Araiven monitors global orderbooks 24/7.</span>
+            </li>
+            <li>
+              <span class="list-bullet-green">✓</span>
+              <span><strong>Algorithmic Extraction:</strong> Sifts out sentiment noise to pinpoint raw opportunity.</span>
+            </li>
+            <li>
+              <span class="list-bullet-green">✓</span>
+              <span><strong>Dynamic Hedging:</strong> Instantly updates risk models and drawdown exposure.</span>
+            </li>
+            <li>
+              <span class="list-bullet-green">✓</span>
+              <span><strong>1-Click Execution:</strong> Approve and deploy Araiven’s recommendations instantly.</span>
+            </li>
+          </ul>
+          <div class="araiven-chart-mock">
+            <svg viewBox="0 0 300 80" class="calm-chart">
+              <defs>
+                <linearGradient id="calm-chart-grad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#10b981" stop-opacity="0.3"/>
+                  <stop offset="100%" stop-color="#10b981" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+              <path d="M 10 65 Q 80 50 150 35 T 290 15" fill="none" stroke="#10b981" stroke-width="2" />
+              <path d="M 10 65 Q 80 50 150 35 T 290 15 L 290 80 L 10 80 Z" fill="url(#calm-chart-grad)" opacity="0.1" />
+              <circle cx="290" cy="15" r="4.5" fill="#10b981" stroke="#ffffff" stroke-width="1.5" />
+              <text x="15" y="72" fill="#10b981" font-size="8" font-family="monospace" opacity="0.8">ARAIVEN AUTONOMOUS COMPLIANT GROWTH</text>
+            </svg>
+          </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Features Section -->
-  <section class="features" id="features">
+  <!-- SECTION 3 — How Ravora Thinks -->
+  <section class="workflow-section" id="workflow-section">
     <div class="container">
       <div class="text-center">
-        <h2>Built for Busy Professionals</h2>
-        <p class="section-subtitle">Everything you need to grow and protect your money in a modern, streamlined interface.</p>
+        <span class="section-badge">Decision Architecture</span>
+        <h2>How Araiven Thinks</h2>
+        <p class="section-subtitle">Trace the sequential flow of our decision engine as it converts raw data feeds into wealth recommendations.</p>
       </div>
 
-      <div class="features-grid">
-        <!-- Feature 1 -->
-        <div class="card-glass feature-card" id="feat-market-intel">
-          <div class="feature-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
-              <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
-              <line x1="12" y1="22.08" x2="12" y2="12"/>
-            </svg>
-          </div>
-          <h3>AI Market Intelligence</h3>
-          <p>Aggregated analysis from global indices, sentiment layers, and economic data translated into clear, actionable summaries.</p>
+      <div class="pipeline-flow" id="pipeline-flow">
+        <!-- Connecting Line -->
+        <div class="pipeline-connector-line">
+          <div class="pipeline-progress-bar" id="pipeline-progress"></div>
         </div>
 
-        <!-- Feature 2 -->
-        <div class="card-glass feature-card" id="feat-opp-discovery">
-          <div class="feature-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="10"/>
-              <line x1="22" y1="12" x2="18" y2="12"/>
-              <line x1="6" y1="12" x2="2" y2="12"/>
-              <line x1="12" y1="6" x2="12" y2="2"/>
-              <line x1="12" y1="22" x2="12" y2="18"/>
-            </svg>
+        <div class="pipeline-steps">
+          <!-- Step 1 -->
+          <div class="pipeline-step active" data-step="1" id="think-step-1">
+            <div class="step-circle">
+              <span class="step-num">1</span>
+            </div>
+            <h4>Breaking News</h4>
+            <p>Monitors global news, CPI indexes, and feeds instantly.</p>
+            <span class="node-tag">Data Ingest</span>
           </div>
-          <h3>Opportunity Discovery</h3>
-          <p>Continuous scanning filters out chart noise to surface high-probability entries matching your specific growth goals.</p>
-        </div>
 
-        <!-- Feature 3 -->
-        <div class="card-glass feature-card" id="feat-port-insights">
-          <div class="feature-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M3 3v18h18"/>
-              <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/>
-            </svg>
+          <!-- Step 2 -->
+          <div class="pipeline-step" data-step="2" id="think-step-2">
+            <div class="step-circle">
+              <span class="step-num">2</span>
+            </div>
+            <h4>Market Analysis</h4>
+            <p>Correlates liquidity changes and token patterns.</p>
+            <span class="node-tag">Sentiment Mapping</span>
           </div>
-          <h3>Portfolio Insights</h3>
-          <p>Deep allocation breakdown that explains exactly where your gains come from and identifies potential asset overlaps.</p>
-        </div>
 
-        <!-- Feature 4 -->
-        <div class="card-glass feature-card" id="feat-risk-mgmt">
-          <div class="feature-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-            </svg>
+          <!-- Step 3 -->
+          <div class="pipeline-step" data-step="3" id="think-step-3">
+            <div class="step-circle">
+              <span class="step-num">3</span>
+            </div>
+            <h4>Risk Assessment</h4>
+            <p>Simulates portfolio exposures against volatility.</p>
+            <span class="node-tag">Safety Evaluation</span>
           </div>
-          <h3>Risk Management</h3>
-          <p>Automated hedge suggestions, position sizing safety protocols, and drawback protection rules built to guard your capital.</p>
-        </div>
 
-        <!-- Feature 5 -->
-        <div class="card-glass feature-card" id="feat-goal-tracking">
-          <div class="feature-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="10"/>
-              <polyline points="12 6 12 12 16 14"/>
-            </svg>
+          <!-- Step 4 -->
+          <div class="pipeline-step" data-step="4" id="think-step-4">
+            <div class="step-circle">
+              <span class="step-num">4</span>
+            </div>
+            <h4>Opportunity Detection</h4>
+            <p>Discovers highly-probable setups and yields.</p>
+            <span class="node-tag">Alpha Extraction</span>
           </div>
-          <h3>Goal Tracking</h3>
-          <p>Link your accounts directly to financial milestones (retirement, house fund, etc.) and let AI optimize targets dynamically.</p>
-        </div>
 
-        <!-- Feature 6 -->
-        <div class="card-glass feature-card" id="feat-smart-alerts">
-          <div class="feature-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-              <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-            </svg>
+          <!-- Step 5 -->
+          <div class="pipeline-step" data-step="5" id="think-step-5">
+            <div class="step-circle">
+              <span class="step-num">5</span>
+            </div>
+            <h4>Portfolio Impact</h4>
+            <p>Evaluates correlation shifts and sizing changes.</p>
+            <span class="node-tag">Rebalance Simulation</span>
           </div>
-          <h3>Smart Alerts</h3>
-          <p>No spam. Receive real-time push alerts only when significant market structural shifts affect your specific positions.</p>
+
+          <!-- Step 6 -->
+          <div class="pipeline-step" data-step="6" id="think-step-6">
+            <div class="step-circle">
+              <span class="step-num">6</span>
+            </div>
+            <h4>Recommendation</h4>
+            <p>Formulates final suggestion with plain rationale.</p>
+            <span class="node-tag">User Action Pushed</span>
+          </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- AI Showcase Section -->
-  <section class="ai-showcase" id="ai-showcase">
+  <!-- SECTION 4 — Ravora In Action -->
+  <section class="action-section" id="action-section">
     <div class="container">
-      <div class="ai-showcase-grid">
-        <div class="showcase-content">
-          <h2>Clear Language. No Complex Charts.</h2>
-          <p>
-            Traditional platforms flood your screen with messy candlestick indicators, order books, and flashing numbers. Ravora translates all that complexity into clear, human-understandable insights.
+      <div class="action-layout">
+        <!-- Interactive Trigger side -->
+        <div class="action-intro-col">
+          <span class="section-badge">Live Scenario Simulation</span>
+          <h2>Araiven in Action</h2>
+          <p class="action-desc">
+            When a major macroeconomic event hits the wire, watch how the Araiven engine handles it instantly. Click the button to trigger a mock Federal Reserve interest rate announcement.
           </p>
-          <div style="display: flex; flex-direction: column; gap: 16px;">
-            <div style="display: flex; gap: 12px; align-items: flex-start;">
-              <div style="width: 20px; height: 20px; border-radius: 50%; background: rgba(16, 185, 129, 0.1); color: var(--success); display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; flex-shrink: 0; margin-top: 2px;">✓</div>
-              <p style="font-size: 0.95rem; color: var(--text-secondary);"><strong style="color: #fff;">Clear Explanations:</strong> Understand exactly <em>why</em> an action is suggested before committing.</p>
-            </div>
-            <div style="display: flex; gap: 12px; align-items: flex-start;">
-              <div style="width: 20px; height: 20px; border-radius: 50%; background: rgba(16, 185, 129, 0.1); color: var(--success); display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; flex-shrink: 0; margin-top: 2px;">✓</div>
-              <p style="font-size: 0.95rem; color: var(--text-secondary);"><strong style="color: #fff;">One-Click Execution:</strong> Execute complex multi-asset swaps and deposits instantly.</p>
-            </div>
+          <div class="simulation-trigger-box">
+            <button class="btn btn-primary btn-lg" id="btn-trigger-simulation">
+              <svg style="width: 20px; height: 20px; margin-right: 8px; fill: currentColor;" viewBox="0 0 24 24">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/>
+              </svg>
+              Trigger Fed Rate Event
+            </button>
+            <div class="simulation-status" id="sim-status-text">Ready for simulation</div>
           </div>
         </div>
 
-        <div class="showcase-comparison">
-          <!-- The Complicated Trading Way -->
-          <div class="comparison-panel">
-            <div class="panel-label red">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
-              Standard Complex Terminals
-            </div>
-            <div class="card-glass tech-mess-card" id="showcase-mess-card">
-              <div class="tech-mess-header">
-                <span>BTC/USDT 4H Chart</span>
-                <span>MACD (12, 26, 9) Bearish Cross</span>
-              </div>
-              <div class="tech-mess-chart">
-                <!-- Messy Candlestick Lines SVG -->
-                <svg width="100%" height="100%" viewBox="0 0 350 120">
-                  <!-- candles -->
-                  <rect x="20" y="40" width="6" height="30" fill="#ef4444" />
-                  <line x1="23" y1="20" x2="23" y2="80" stroke="#ef4444" stroke-width="1.5" />
-                  
-                  <rect x="50" y="55" width="6" height="20" fill="#10b981" />
-                  <line x1="53" y1="40" x2="53" y2="90" stroke="#10b981" stroke-width="1.5" />
-                  
-                  <rect x="80" y="30" width="6" height="40" fill="#ef4444" />
-                  <line x1="83" y1="15" x2="83" y2="85" stroke="#ef4444" stroke-width="1.5" />
-                  
-                  <!-- Zigzag indicators -->
-                  <path d="M 23 30 L 53 70 L 83 45 L 113 90 L 143 75 L 173 95" fill="none" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="3"/>
-                  <path d="M 10 90 Q 90 20 200 110 T 340 70" fill="none" stroke="#3b82f6" stroke-width="2"/>
-                  <!-- grid lines -->
-                  <line x1="0" y1="30" x2="350" y2="30" stroke="rgba(255,255,255,0.05)" />
-                  <line x1="0" y1="60" x2="350" y2="60" stroke="rgba(255,255,255,0.05)" />
-                  <line x1="0" y1="90" x2="350" y2="90" stroke="rgba(255,255,255,0.05)" />
-                </svg>
-              </div>
-              <div class="tech-indicators">
-                <span>RSI (14): 64.21</span>
-                <span>EMA (50): $68,420</span>
-                <span>Stoch: Oversold</span>
-              </div>
-            </div>
-          </div>
+        <!-- Chronological Step Cards -->
+        <div class="action-timeline-col">
+          <div class="timeline-wrapper">
+            <!-- Timeline Line -->
+            <div class="timeline-bar"></div>
 
-          <!-- The Ravora Way -->
-          <div class="comparison-panel">
-            <div class="panel-label green">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-              Ravora Intelligent Insight
+            <!-- Time Step 1 -->
+            <div class="timeline-item" id="time-step-1">
+              <div class="time-marker">1</div>
+              <div class="card-glass timeline-card">
+                <div class="timeline-time">14:00:02 EST • EVENT DETECTED</div>
+                <h4>Fed Rates Announced</h4>
+                <p>Federal Reserve reports 25bps interest rate increase. Yield volatility index spikes instantly.</p>
+              </div>
             </div>
-            <div class="card-glass ai-insight-card" id="showcase-insight-card">
-              <div class="ai-insight-header">
-                <div class="ai-avatar">
-                  <svg viewBox="0 0 24 24"><path d="M12 2c1.1 0 2 .9 2 2v1c2.76 0 5 2.24 5 5v5c0 2.76-2.24 5-5 5v1c0 1.1-.9 2-2 2s-2-.9-2-2v-1c-2.76 0-5-2.24-5-5v-5c0-2.76 2.24-5 5-5V4c0-1.1.9-2 2-2zm0 7c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
-                </div>
-                <div class="ai-title-block">
-                  <h4>Ravora Wealth Copilot</h4>
-                  <span>Market Analysis • Just now</span>
+
+            <!-- Time Step 2 -->
+            <div class="timeline-item" id="time-step-2">
+              <div class="time-marker">2</div>
+              <div class="card-glass timeline-card">
+                <div class="timeline-time">14:00:15 EST • ANALYSIS COMPLETE</div>
+                <h4>Impact Correlated</h4>
+                <p>Araiven scans 150+ asset feeds. Detects liquidity outflow from high-risk pools towards stablecoin staking baskets.</p>
+              </div>
+            </div>
+
+            <!-- Time Step 3 -->
+            <div class="timeline-item" id="time-step-3">
+              <div class="time-marker">3</div>
+              <div class="card-glass timeline-card">
+                <div class="timeline-time">14:00:32 EST • MODEL UPDATED</div>
+                <h4>Risk Re-evaluated</h4>
+                <p>Calculates new maximum drawdown threshold. Active exposure limits automatically lowered by 5% to shield capital.</p>
+              </div>
+            </div>
+
+            <!-- Time Step 4 -->
+            <div class="timeline-item" id="time-step-4">
+              <div class="time-marker">4</div>
+              <div class="card-glass timeline-card">
+                <div class="timeline-time">14:01:05 EST • OPPORTUNITY FOUND</div>
+                <h4>Ethereum Staking Target</h4>
+                <p>Araiven detects a short-term yield premium on decentralized ETH pools. Expected yield return: 9.6% APY.</p>
+              </div>
+            </div>
+
+            <!-- Time Step 5 -->
+            <div class="timeline-item" id="time-step-5">
+              <div class="time-marker">5</div>
+              <div class="card-glass timeline-card">
+                <div class="timeline-time">14:01:10 EST • USER NOTIFICATION</div>
+                <h4>Araiven Recommendation</h4>
+                <div class="timeline-push-mock">
+                  <div class="push-header">
+                    <span class="push-icon">R</span>
+                    <strong>Araiven Recommendation</strong>
+                    <span class="push-time">Just now</span>
+                  </div>
+                  <div class="push-body">
+                    "Reallocate 8% USD reserves to ETH Staking. Confidence: 94%. Risk: Low."
+                  </div>
+                  <div class="push-actions">
+                    <button class="push-btn-approve">Approve & Execute</button>
+                  </div>
                 </div>
               </div>
-              <div class="ai-message">
-                "Bitcoin accumulation detected by long-term holders at current support levels. We recommend reallocating 8% of USD reserves to BTC to capture dynamic momentum. Under current market volatility, this carries a low-risk profile."
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 5 — Opportunity Engine -->
+  <section class="opportunities-section" id="opportunities-section">
+    <div class="container">
+      <div class="text-center">
+        <span class="section-badge">Live Detection Feed</span>
+        <h2>The Araiven Opportunity Engine</h2>
+        <p class="section-subtitle">Real-time asset allocations surfaced by continuous global analysis. Tap tabs to inspect.</p>
+      </div>
+
+      <!-- Asset Toggles -->
+      <div class="asset-tabs-container">
+        <div class="asset-tabs">
+          <button class="asset-tab active" data-asset="eth" id="tab-eth">Ethereum (ETH)</button>
+          <button class="asset-tab" data-asset="btc" id="tab-btc">Bitcoin (BTC)</button>
+          <button class="asset-tab" data-asset="yield" id="tab-yield">Stablecoin Yield Basket</button>
+        </div>
+      </div>
+
+      <!-- Opportunities Display Card -->
+      <div class="opportunities-card-container">
+        <div class="card-glass opportunity-display-card" id="opportunity-card">
+          <div class="opp-main-grid">
+            
+            <div class="opp-info-block">
+              <div class="opp-asset-header">
+                <span class="opp-icon" id="opp-display-icon">Ξ</span>
+                <div>
+                  <h3 id="opp-display-name">Ethereum Staking Alpha</h3>
+                  <span class="opp-symbol" id="opp-display-symbol">ETH / USD</span>
+                </div>
               </div>
-              <div class="ai-actions-row">
-                <a href="#pricing" class="ai-action-btn ai-btn-approve" id="showcase-approve-btn">Approve Allocation</a>
-                <a href="#" class="ai-action-btn ai-btn-dismiss" id="showcase-dismiss-btn" onclick="return false;">Dismiss</a>
+              
+              <div class="opp-reasoning-box">
+                <h5>ARAIVEN REASONING</h5>
+                <p id="opp-display-reasoning">
+                  Validator queue consolidation and post-upgrade staking patterns show major support. Accumulation layers at $3,450 indicate institutional backing with minimal downside risk.
+                </p>
+              </div>
+
+              <div class="opp-actions">
+                <button class="btn btn-primary" id="opp-btn-execute">Deploy Allocation</button>
+                <span class="opp-execution-notice">Requires 1-click authorization</span>
+              </div>
+            </div>
+
+            <div class="opp-metrics-block">
+              <!-- Confidence Circle -->
+              <div class="metric-gauge-wrapper">
+                <div class="metric-circle-box">
+                  <svg viewBox="0 0 100 100" class="metric-svg">
+                    <circle cx="50" cy="50" r="40" class="bg-circle" />
+                    <circle cx="50" cy="50" r="40" class="fill-circle" id="opp-circle-fill" style="stroke-dashoffset: 27.6; stroke: #10b981;" />
+                  </svg>
+                  <div class="metric-value-overlay">
+                    <span class="val-num" id="opp-display-confidence">89%</span>
+                    <span class="val-label">Araiven Confidence</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Stat Rows -->
+              <div class="opp-stats-rows">
+                <div class="stat-row">
+                  <span class="stat-label">EXPECTED RETURN</span>
+                  <span class="stat-value" id="opp-display-return">8.0% - 12.0%</span>
+                </div>
+                <div class="stat-row">
+                  <span class="stat-label">RISK FACTOR</span>
+                  <span class="stat-value text-green" id="opp-display-risk">Low</span>
+                </div>
+                <div class="stat-row">
+                  <span class="stat-label">STRATEGY TYPE</span>
+                  <span class="stat-value" id="opp-display-strategy">Staking / Delta Neutral</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- SECTION 6 — AI Wealth Copilot -->
+  <section class="chat-section" id="chat-section">
+    <div class="container">
+      <div class="chat-grid">
+        <!-- Chat Interface Mock -->
+        <div class="chat-interface-col">
+          <div class="card-glass chat-window">
+            <!-- Header -->
+            <div class="chat-header">
+              <div class="chat-avatar">A</div>
+              <div>
+                <h4>Araiven Engine</h4>
+                <span class="chat-status"><span class="status-pulse"></span>Active Copilot Instance</span>
+              </div>
+              <span class="engine-badge">v1.2</span>
+            </div>
+
+            <!-- Messages Area -->
+            <div class="chat-messages" id="chat-messages-container">
+              <!-- Initial Welcome Message -->
+              <div class="msg-bubble system">
+                <p>Welcome! I am Araiven, your wealth decision engine. You can ask me to evaluate strategies, analyze risk, or check opportunities. Select one of the questions below to test my analysis.</p>
+              </div>
+            </div>
+
+            <!-- Chat suggestion buttons -->
+            <div class="chat-suggestions">
+              <button class="chat-suggest-btn" data-question="eth-exposure">Should I increase exposure to Ethereum?</button>
+              <button class="chat-suggest-btn" data-question="risk-model">What is my current risk model setting?</button>
+              <button class="chat-suggest-btn" data-question="macro-scans">What global events is Araiven monitoring?</button>
+            </div>
+            
+            <div class="chat-input-row">
+              <div class="chat-input-mock">Ask Araiven a question...</div>
+              <button class="chat-send-btn" disabled>
+                <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+              </button>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Chat Description -->
+        <div class="chat-intro-col">
+          <span class="section-badge">Interactive Dialogue</span>
+          <h2>Conversational Strategy, Powered by Araiven</h2>
+          <p class="chat-desc">
+            Araiven is not a simple chatbot. It is the intelligence layer directly hooked into your portfolio's execution pipeline.
+          </p>
+          <p class="chat-desc">
+            Ask complex structural questions about capital allocation, assess correlation risks, and receive precise recommendations with transparent reasoning.
+          </p>
+          <div class="chat-feature-highlights">
+            <div class="highlight-item">
+              <span class="highlight-icon">⚡</span>
+              <div>
+                <h5>No Chatbot Hallucinations</h5>
+                <p>Araiven runs math models directly over active liquidity indicators.</p>
+              </div>
+            </div>
+            <div class="highlight-item">
+              <span class="highlight-icon">🔒</span>
+              <div>
+                <h5>Actionable Prompts</h5>
+                <p>Authorize recommended swaps and rebalances directly from the chat conversation.</p>
               </div>
             </div>
           </div>
@@ -441,10 +645,154 @@
     </div>
   </section>
 
-  <!-- Pricing Preview Section -->
+  <!-- SECTION 7 — Portfolio Intelligence -->
+  <section class="portfolio-section" id="portfolio-section">
+    <div class="container">
+      <div class="text-center">
+        <span class="section-badge">Analytics Dashboard</span>
+        <h2>Portfolio Intelligence</h2>
+        <p class="section-subtitle">Real-time health audits, allocations, and projections audited continuously by Araiven.</p>
+      </div>
+
+      <div class="portfolio-grid">
+        <!-- Health Card -->
+        <div class="card-glass dashboard-card card-health">
+          <h4>Araiven Health Score</h4>
+          <div class="dashboard-gauge">
+            <svg viewBox="0 0 100 50" class="gauge-svg">
+              <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="8" stroke-linecap="round"/>
+              <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#10b981" stroke-width="8" stroke-linecap="round" stroke-dasharray="125" stroke-dashoffset="5" id="health-gauge-fill"/>
+            </svg>
+            <div class="gauge-value" id="dashboard-health-val">96%</div>
+          </div>
+          <p class="gauge-desc">Your portfolio complies with 100% of defined risk hedge rules.</p>
+        </div>
+
+        <!-- Risk Index Card -->
+        <div class="card-glass dashboard-card card-risk">
+          <h4>Active Risk Exposure</h4>
+          <div class="risk-index-bar">
+            <div class="risk-bar-track">
+              <div class="risk-bar-fill" id="risk-bar-indicator" style="width: 42%;"></div>
+            </div>
+            <div class="risk-labels">
+              <span>Low</span>
+              <span class="active-risk-label" id="dashboard-risk-index">42/100</span>
+              <span>High</span>
+            </div>
+          </div>
+          <p class="risk-desc">Mild exposure to volatility. Stables and L1 hedging active.</p>
+        </div>
+
+        <!-- Diversification Card -->
+        <div class="card-glass dashboard-card card-diversification">
+          <h4>Asset Allocations</h4>
+          <div class="diversification-bars">
+            <div class="div-row">
+              <span class="div-asset">ETH (Staking)</span>
+              <div class="div-bar-track"><div class="div-bar-fill" style="width: 45%; background: #7c3aed;"></div></div>
+              <span class="div-pct">45%</span>
+            </div>
+            <div class="div-row">
+              <span class="div-asset">USDC (Yields)</span>
+              <div class="div-bar-track"><div class="div-bar-fill" style="width: 30%; background: #2563eb;"></div></div>
+              <span class="div-pct">30%</span>
+            </div>
+            <div class="div-row">
+              <span class="div-asset">BTC (Holdings)</span>
+              <div class="div-bar-track"><div class="div-bar-fill" style="width: 20%; background: #f59e0b;"></div></div>
+              <span class="div-pct">20%</span>
+            </div>
+            <div class="div-row">
+              <span class="div-asset">Cash Reserves</span>
+              <div class="div-bar-track"><div class="div-bar-fill" style="width: 5%; background: #64748b;"></div></div>
+              <span class="div-pct">5%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- SVG Trend Forecast Card -->
+        <div class="card-glass dashboard-card card-forecast">
+          <h4>5-Year Growth Projections</h4>
+          <div class="forecast-chart-container">
+            <svg viewBox="0 0 350 150" class="forecast-svg">
+              <defs>
+                <linearGradient id="forecast-grad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#7c3aed" stop-opacity="0.25"/>
+                  <stop offset="100%" stop-color="#7c3aed" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+              <g class="forecast-grid-lines">
+                <line x1="0" y1="30" x2="350" y2="30" stroke="rgba(255,255,255,0.03)" />
+                <line x1="0" y1="65" x2="350" y2="65" stroke="rgba(255,255,255,0.03)" />
+                <line x1="0" y1="100" x2="350" y2="100" stroke="rgba(255,255,255,0.03)" />
+              </g>
+              <!-- Moderate Projection Area -->
+              <path d="M 0 130 C 50 120, 100 90, 150 75 T 350 20 L 350 150 L 0 150 Z" fill="url(#forecast-grad)"/>
+              <!-- Projection Paths -->
+              <path d="M 0 130 C 50 120, 100 90, 150 75 T 350 20" fill="none" stroke="#7c3aed" stroke-width="2.5" />
+              <path d="M 0 130 C 50 125, 100 105, 150 95 T 350 60" fill="none" stroke="#2563eb" stroke-width="1.5" stroke-dasharray="4" />
+              <path d="M 0 130 C 50 110, 100 75, 150 50 T 350 5" fill="none" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="4" />
+              <circle cx="350" cy="20" r="4" fill="#7c3aed" stroke="#ffffff" stroke-width="1" />
+              <!-- Labels -->
+              <text x="10" y="20" fill="var(--text-muted)" font-size="8">Capital Projection (USD)</text>
+              <text x="300" y="32" fill="#7c3aed" font-size="8">Balanced</text>
+              <text x="300" y="72" fill="#2563eb" font-size="8">Conservative</text>
+              <text x="300" y="14" fill="#f59e0b" font-size="8">Aggressive</text>
+            </svg>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 8 — Trust & Security -->
+  <section class="security-section" id="security-section">
+    <div class="container">
+      <div class="text-center">
+        <span class="section-badge">Asset Safety & Governance</span>
+        <h2>Institutional Trust & Security</h2>
+        <p class="section-subtitle">Araiven is an analytical engine, not a custodian. Your assets remain secure inside your own brokerages.</p>
+      </div>
+
+      <div class="security-grid">
+        <!-- Security Card 1 -->
+        <div class="card-glass security-card">
+          <div class="sec-icon-box">🔑</div>
+          <h4>Read-Only API Access</h4>
+          <p>We bind using secure read-only keys. Ravora cannot withdraw your tokens, transfer cash, or access external credentials.</p>
+        </div>
+
+        <!-- Security Card 2 -->
+        <div class="card-glass security-card">
+          <div class="sec-icon-box">🛡️</div>
+          <h4>User-in-the-Loop Control</h4>
+          <p>Araiven detects setups, but you maintain final command. No buy, sell, or swap executes without your explicit click approval.</p>
+        </div>
+
+        <!-- Security Card 3 -->
+        <div class="card-glass security-card">
+          <div class="sec-icon-box">🛑</div>
+          <h4>Hard Exposure Limits</h4>
+          <p>Define custom max allocation limits, drawdowns, and safety rules that Araiven is mathematically bound to obey.</p>
+        </div>
+
+        <!-- Security Card 4 -->
+        <div class="card-glass security-card">
+          <div class="sec-icon-box">🔍</div>
+          <h4>Zero Hidden Strategies</h4>
+          <p>Every suggestion includes full, plain-text calculations explaining the reasoning. Audit the logic before executing.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 9 — Pricing -->
   <section class="pricing" id="pricing">
     <div class="container">
       <div class="text-center">
+        <span class="section-badge">Simple Pricing</span>
         <h2>Transparent Plans for Everyone</h2>
         <p class="section-subtitle">Start growing your wealth for free, then upgrade to unlocked premium AI execution when you're ready.</p>
       </div>
@@ -474,7 +822,7 @@
             </li>
             <li>
               <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
-              Daily AI Market Summaries
+              Daily Araiven Market Summaries
             </li>
             <li>
               <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
@@ -501,7 +849,7 @@
             </li>
             <li>
               <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
-              Continuous Opportunity Feed
+              Continuous Araiven Opportunity Feed
             </li>
             <li>
               <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
@@ -535,7 +883,7 @@
             </li>
             <li>
               <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
-              Priority Support & Analyst Access
+              Priority Support & Araiven Access
             </li>
           </ul>
           <a href="#" class="btn btn-secondary pricing-btn" id="btn-select-premium" onclick="return false;">Talk to Sales</a>
@@ -545,79 +893,18 @@
     </div>
   </section>
 
-  <!-- FAQ Section -->
-  <section class="faq" id="faq">
-    <div class="container">
-      <div class="text-center">
-        <h2>Frequently Asked Questions</h2>
-        <p class="section-subtitle">Have questions about Ravora? Find answers to the most common queries below.</p>
-      </div>
-
-      <div class="faq-list">
-        
-        <!-- FAQ 1 -->
-        <div class="card-glass faq-item" id="faq-item-1">
-          <button class="faq-question" id="faq-q-1">
-            <h3>How does Ravora help beginners?</h3>
-            <div class="faq-icon-wrapper">
-              <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
-            </div>
-          </button>
-          <div class="faq-answer">
-            <div class="faq-answer-content">
-              Ravora translates complex market signals and charts into plain, readable insights. Instead of spending hours learning technical analysis or candle patterns, you receive digestible suggestions with the reasoning clearly explained, which you can approve with a single click.
-            </div>
-          </div>
-        </div>
-
-        <!-- FAQ 2 -->
-        <div class="card-glass faq-item" id="faq-item-2">
-          <button class="faq-question" id="faq-q-2">
-            <h3>Is my capital secure?</h3>
-            <div class="faq-icon-wrapper">
-              <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
-            </div>
-          </button>
-          <div class="faq-answer">
-            <div class="faq-answer-content">
-              Yes, absolutely. Ravora does not hold your funds. We connect to your existing exchange or brokerage (like Binance, Coinbase, or Kraken) using secure, read-only API access. Your assets stay safely in your personal brokerage accounts, and Ravora only recommends or routes execution instructions with your consent.
-            </div>
-          </div>
-        </div>
-
-        <!-- FAQ 3 -->
-        <div class="card-glass faq-item" id="faq-item-3">
-          <button class="faq-question" id="faq-q-3">
-            <h3>Do I need to be a trading expert?</h3>
-            <div class="faq-icon-wrapper">
-              <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
-            </div>
-          </button>
-          <div class="faq-answer">
-            <div class="faq-answer-content">
-              No. Ravora is designed specifically for beginners and busy professionals who want to grow their portfolios passively. The interface is clean and straightforward, focusing on goals, risk settings, and simple text notifications rather than complicated trading grids.
-            </div>
-          </div>
-        </div>
-
-        <!-- FAQ 4 -->
-        <div class="card-glass faq-item" id="faq-item-4">
-          <button class="faq-question" id="faq-q-4">
-            <h3>How does the AI discover opportunities?</h3>
-            <div class="faq-icon-wrapper">
-              <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
-            </div>
-          </button>
-          <div class="faq-answer">
-            <div class="faq-answer-content">
-              Our AI wealth engine evaluates multi-dimensional datasets, combining technical indicator trends, social media and news sentiment, capital flow, and macroeconomic indexes. It filters this raw data through your personalized risk tolerance profile to highlight only appropriate investment allocations.
-            </div>
-          </div>
-        </div>
-
+  <!-- SECTION 10 — Final Call To Action -->
+  <section class="final-cta-section" id="final-cta-section">
+    <div class="cta-glow-bg"></div>
+    <div class="container text-center">
+      <h2>Stop Watching Charts.<br>Start Building Wealth.</h2>
+      <p class="cta-subtitle">Let Araiven do the heavy lifting while you focus on what matters. Connect your first exchange securely in under 3 minutes.</p>
+      <div class="cta-actions">
+        <a href="#pricing" class="btn btn-primary btn-lg">Get Started Now</a>
+        <a href="#" class="btn btn-secondary btn-lg btn-watch-demo">Watch 90s Tour</a>
       </div>
     </div>
-  </section>
+  </section>/section>
 
   <!-- Footer Section -->
   <footer class="footer" id="footer">
