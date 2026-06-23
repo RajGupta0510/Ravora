@@ -353,6 +353,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const triggerSimBtn = document.getElementById('btn-trigger-simulation');
   const simStatus = document.getElementById('sim-status-text');
   const timelineItems = document.querySelectorAll('.timeline-wrapper .timeline-item');
+  const timelineProgressBar = document.getElementById('timeline-progress-bar');
   let simTimeoutIds = [];
 
   if (triggerSimBtn) {
@@ -361,6 +362,7 @@ document.addEventListener('DOMContentLoaded', () => {
       simTimeoutIds.forEach(id => clearTimeout(id));
       simTimeoutIds = [];
       timelineItems.forEach(item => item.classList.remove('active'));
+      if (timelineProgressBar) timelineProgressBar.style.height = '0%';
 
       triggerSimBtn.disabled = true;
       triggerSimBtn.textContent = 'Simulating event...';
@@ -373,6 +375,7 @@ document.addEventListener('DOMContentLoaded', () => {
       let id1 = setTimeout(() => {
         const step = document.getElementById('time-step-1');
         if (step) step.classList.add('active');
+        if (timelineProgressBar) timelineProgressBar.style.height = '0%';
         if (simStatus) simStatus.textContent = 'Federal Reserve interest rate announcement intercepted.';
       }, 500);
       simTimeoutIds.push(id1);
@@ -381,6 +384,7 @@ document.addEventListener('DOMContentLoaded', () => {
       let id2 = setTimeout(() => {
         const step = document.getElementById('time-step-2');
         if (step) step.classList.add('active');
+        if (timelineProgressBar) timelineProgressBar.style.height = '25%';
         if (simStatus) simStatus.textContent = 'Liquidity shifts analyzed. Stablecoin inflows increasing.';
       }, 2000);
       simTimeoutIds.push(id2);
@@ -389,6 +393,7 @@ document.addEventListener('DOMContentLoaded', () => {
       let id3 = setTimeout(() => {
         const step = document.getElementById('time-step-3');
         if (step) step.classList.add('active');
+        if (timelineProgressBar) timelineProgressBar.style.height = '50%';
         if (simStatus) simStatus.textContent = 'Hedge parameters updated. Exposure limits buffered.';
       }, 3500);
       simTimeoutIds.push(id3);
@@ -397,6 +402,7 @@ document.addEventListener('DOMContentLoaded', () => {
       let id4 = setTimeout(() => {
         const step = document.getElementById('time-step-4');
         if (step) step.classList.add('active');
+        if (timelineProgressBar) timelineProgressBar.style.height = '75%';
         if (simStatus) simStatus.textContent = 'Opportunity detected on Ethereum pools.';
       }, 5000);
       simTimeoutIds.push(id4);
@@ -405,6 +411,7 @@ document.addEventListener('DOMContentLoaded', () => {
       let id5 = setTimeout(() => {
         const step = document.getElementById('time-step-5');
         if (step) step.classList.add('active');
+        if (timelineProgressBar) timelineProgressBar.style.height = '100%';
         if (simStatus) {
           simStatus.textContent = 'Araiven pushed recommendation to the active copilot layer.';
           simStatus.style.color = 'var(--success)';
@@ -655,5 +662,74 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Start the automatic rotation
   startHeadlineRotation();
+
+  // ==========================================================================
+  // 12. Section 3 Console Parallax & Graph Hover Micro-interactions
+  // ==========================================================================
+  const visualConsole = document.getElementById('visual-console-widget');
+  
+  if (visualConsole) {
+    let targetX = 5;
+    let targetY = -8;
+    let currX = 5;
+    let currY = -8;
+
+    visualConsole.addEventListener('mousemove', (e) => {
+      const rect = visualConsole.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width - 0.5; // -0.5 to 0.5
+      const y = (e.clientY - rect.top) / rect.height - 0.5; // -0.5 to 0.5
+
+      // Dynamic tilt offsets
+      targetX = 5 - y * 20;
+      targetY = -8 + x * 20;
+    });
+
+    visualConsole.addEventListener('mouseleave', () => {
+      targetX = 5;
+      targetY = -8;
+    });
+
+    function smoothConsoleParallax() {
+      currX += (targetX - currX) * 0.1;
+      currY += (targetY - currY) * 0.1;
+      visualConsole.style.transform = `rotateX(${currX}deg) rotateY(${currY}deg)`;
+      requestAnimationFrame(smoothConsoleParallax);
+    }
+    smoothConsoleParallax();
+  }
+
+  // Graph cols hover details update
+  const barCols = document.querySelectorAll('.console-graph .bar-col');
+  const metricIngest = document.getElementById('console-metric-ingest');
+  const metricCorrelation = document.getElementById('console-metric-correlation');
+
+  if (barCols.length > 0 && metricIngest && metricCorrelation) {
+    barCols.forEach(col => {
+      col.addEventListener('mouseenter', () => {
+        const metric = col.getAttribute('data-metric');
+        const val = col.getAttribute('data-val');
+        
+        if (metric === 'ingest') {
+          metricIngest.textContent = val;
+          metricIngest.classList.remove('text-gradient');
+          metricIngest.style.color = 'var(--accent-secondary)';
+        } else if (metric === 'correlation') {
+          metricCorrelation.textContent = val;
+          metricCorrelation.classList.remove('text-gradient');
+          metricCorrelation.style.color = 'var(--accent-secondary)';
+        }
+      });
+
+      col.addEventListener('mouseleave', () => {
+        // Restore default metrics
+        metricIngest.textContent = '24,410 feeds/sec';
+        metricIngest.classList.add('text-gradient');
+        metricIngest.style.color = '';
+        metricCorrelation.textContent = '99.8% Active';
+        metricCorrelation.classList.add('text-gradient');
+        metricCorrelation.style.color = '';
+      });
+    });
+  }
 
 });

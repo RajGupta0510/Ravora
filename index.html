@@ -304,7 +304,7 @@
     <div class="container">
       <div class="text-center">
         <span class="section-badge">The Reality of Trading</span>
-        <h2>Why Traditional Trading Fails</h2>
+        <h2 class="text-gradient">Why Traditional Trading Fails</h2>
         <p class="section-subtitle">Managing wealth manually in today's 24/7 global market requires tools and time you shouldn't have to waste.</p>
       </div>
       <div class="problem-grid">
@@ -396,7 +396,7 @@
       <div class="about-araiven-grid">
         <div class="about-araiven-content">
           <span class="section-badge">The Core Engine</span>
-          <h2>Meet Araiven</h2>
+          <h2 class="text-gradient">Meet Araiven</h2>
           <p class="about-desc">
             Araiven is not a simple chatbot. It is the sophisticated multi-dimensional decision engine behind the Ravora platform.
           </p>
@@ -425,7 +425,7 @@
           </div>
         </div>
         <div class="about-araiven-visual">
-          <div class="card-glass visual-console">
+          <div class="card-glass visual-console" id="visual-console-widget">
             <div class="console-glow"></div>
             <div class="console-header">
               <span class="indicator-glow-dot"></span>
@@ -434,19 +434,19 @@
             <div class="console-body">
               <div class="metric-row">
                 <span>Core Scan Ingestion</span>
-                <span class="metric-val text-gradient">24,410 feeds/sec</span>
+                <span class="metric-val text-gradient" id="console-metric-ingest">24,410 feeds/sec</span>
               </div>
               <div class="metric-row">
                 <span>Model Correlation</span>
-                <span class="metric-val">99.8% Active</span>
+                <span class="metric-val text-gradient" id="console-metric-correlation">99.8% Active</span>
               </div>
               <div class="console-graph">
-                <div class="bar-col"><div class="bar-value" style="height: 60%;"></div></div>
-                <div class="bar-col"><div class="bar-value" style="height: 85%;"></div></div>
-                <div class="bar-col"><div class="bar-value" style="height: 40%;"></div></div>
-                <div class="bar-col"><div class="bar-value" style="height: 95%;"></div></div>
-                <div class="bar-col"><div class="bar-value" style="height: 70%;"></div></div>
-                <div class="bar-col"><div class="bar-value" style="height: 50%;"></div></div>
+                <div class="bar-col" data-tooltip="Feeds: 24.4k/s" data-metric="ingest" data-val="24,410 feeds/sec"><div class="bar-value" style="height: 60%;"></div></div>
+                <div class="bar-col" data-tooltip="Risk Audits: 99.8%" data-metric="correlation" data-val="99.8% Active"><div class="bar-value" style="height: 85%;"></div></div>
+                <div class="bar-col" data-tooltip="Assets Tracked: 84" data-metric="ingest" data-val="84 tokens monitored"><div class="bar-value" style="height: 40%;"></div></div>
+                <div class="bar-col" data-tooltip="Decision Alpha: 94.2%" data-metric="correlation" data-val="94.2% Optimal"><div class="bar-value" style="height: 95%;"></div></div>
+                <div class="bar-col" data-tooltip="Latency Index: 1.2ms" data-metric="ingest" data-val="1.2ms real-time"><div class="bar-value" style="height: 70%;"></div></div>
+                <div class="bar-col" data-tooltip="Correlation Score: 99.9%" data-metric="correlation" data-val="99.9% Core Sync"><div class="bar-value" style="height: 50%;"></div></div>
               </div>
             </div>
           </div>
@@ -460,7 +460,7 @@
     <div class="container">
       <div class="text-center">
         <span class="section-badge">Visual Process Flow</span>
-        <h2>How Araiven Works</h2>
+        <h2 class="text-gradient">How Araiven Works</h2>
         <p class="section-subtitle">The six-step processing flow that translates global market inputs into wealth building outcomes.</p>
       </div>
 
@@ -542,7 +542,7 @@
         <!-- Interactive Trigger side -->
         <div class="action-intro-col">
           <span class="section-badge">Live Scenario Simulation</span>
-          <h2>Araiven in Action</h2>
+          <h2 class="text-gradient">Araiven in Action</h2>
           <p class="action-desc">
             When a major macroeconomic event hits the wire, watch how Araiven handles it instantly. Click the button to trigger a mock Federal Reserve interest rate announcement.
           </p>
@@ -560,52 +560,85 @@
         <!-- Chronological Step Cards -->
         <div class="action-timeline-col">
           <div class="timeline-wrapper">
-            <!-- Timeline Line -->
+            <!-- Timeline Line Backdrop -->
             <div class="timeline-bar"></div>
+            <!-- Timeline Active Progress overlay -->
+            <div class="timeline-bar-progress" id="timeline-progress-bar"></div>
 
             <!-- Time Step 1 -->
             <div class="timeline-item" id="time-step-1">
-              <div class="time-marker">1</div>
+              <div class="time-marker">
+                <span class="marker-num">1</span>
+                <div class="radar-pulse"></div>
+              </div>
               <div class="card-glass timeline-card">
                 <div class="timeline-time">14:00:02 EST • EVENT DETECTED</div>
                 <h4>Fed Rates Announced</h4>
                 <p>Federal Reserve reports 25bps interest rate increase. Yield volatility index spikes instantly.</p>
+                <div class="timeline-code-feed">
+                  <span class="code-line">[SYS_ALERT] FED_INTEREST_RATE = +0.25%</span>
+                  <span class="code-line">[SYS_STAT] YIELD_VOLATILITY_SPIKE: 24.5%</span>
+                </div>
               </div>
             </div>
 
             <!-- Time Step 2 -->
             <div class="timeline-item" id="time-step-2">
-              <div class="time-marker">2</div>
+              <div class="time-marker">
+                <span class="marker-num">2</span>
+                <div class="radar-pulse"></div>
+              </div>
               <div class="card-glass timeline-card">
                 <div class="timeline-time">14:00:15 EST • ANALYSIS COMPLETE</div>
                 <h4>Impact Correlated</h4>
                 <p>Araiven scans 150+ asset feeds. Detects liquidity outflow from high-risk pools towards stablecoin staking baskets.</p>
+                <div class="timeline-code-feed">
+                  <span class="code-line">[SCANNING] liquidity_pools: 154 active</span>
+                  <span class="code-line">[SYS_STAT] HIGH_RISK_OUTFLOW = $124.5M</span>
+                </div>
               </div>
             </div>
 
             <!-- Time Step 3 -->
             <div class="timeline-item" id="time-step-3">
-              <div class="time-marker">3</div>
+              <div class="time-marker">
+                <span class="marker-num">3</span>
+                <div class="radar-pulse"></div>
+              </div>
               <div class="card-glass timeline-card">
                 <div class="timeline-time">14:00:32 EST • MODEL UPDATED</div>
                 <h4>Risk Re-evaluated</h4>
                 <p>Calculates new maximum drawdown threshold. Active exposure limits automatically lowered by 5% to shield capital.</p>
+                <div class="timeline-code-feed">
+                  <span class="code-line">[CALC] max_drawdown_limit = 3.50%</span>
+                  <span class="code-line">[SYS_ACTION] EXPOSURE_BUFFER_ENFORCED = -5.00%</span>
+                </div>
               </div>
             </div>
 
             <!-- Time Step 4 -->
             <div class="timeline-item" id="time-step-4">
-              <div class="time-marker">4</div>
+              <div class="time-marker">
+                <span class="marker-num">4</span>
+                <div class="radar-pulse"></div>
+              </div>
               <div class="card-glass timeline-card">
                 <div class="timeline-time">14:01:05 EST • OPPORTUNITY FOUND</div>
                 <h4>Ethereum Staking Target</h4>
                 <p>Araiven detects a short-term yield premium on decentralized ETH pools. Expected yield return: 9.6% APY.</p>
+                <div class="timeline-code-feed">
+                  <span class="code-line">[CORRELATION] eth_staking_spread = +1.42% APY</span>
+                  <span class="code-line">[SYS_FIND] alpha_found: decentralized_eth_pool</span>
+                </div>
               </div>
             </div>
 
             <!-- Time Step 5 -->
             <div class="timeline-item" id="time-step-5">
-              <div class="time-marker">5</div>
+              <div class="time-marker">
+                <span class="marker-num">5</span>
+                <div class="radar-pulse"></div>
+              </div>
               <div class="card-glass timeline-card">
                 <div class="timeline-time">14:01:10 EST • USER NOTIFICATION</div>
                 <h4>Araiven Recommendation</h4>
@@ -638,7 +671,7 @@
     <div class="container">
       <div class="text-center">
         <span class="section-badge">Live Detection Feed</span>
-        <h2>The Araiven Opportunity Engine</h2>
+        <h2 class="text-gradient">The Araiven Opportunity Engine</h2>
         <p class="section-subtitle">Real-time asset allocations surfaced by continuous global analysis. Tap tabs to inspect.</p>
       </div>
 
@@ -764,7 +797,7 @@
         <!-- Chat Description -->
         <div class="chat-intro-col">
           <span class="section-badge">Interactive Dialogue</span>
-          <h2>Conversational Strategy, Powered by Araiven</h2>
+          <h2 class="text-gradient">Conversational Strategy, Powered by Araiven</h2>
           <p class="chat-desc">
             Araiven is the actual intelligence layer directly hooked into your portfolio's execution pipeline.
           </p>
@@ -801,7 +834,7 @@
     <div class="container">
       <div class="text-center">
         <span class="section-badge">Analytics Dashboard</span>
-        <h2>Portfolio Intelligence</h2>
+        <h2 class="text-gradient">Portfolio Intelligence</h2>
         <p class="section-subtitle">Real-time health audits, allocations, and projections audited continuously by Araiven.</p>
       </div>
 
@@ -900,7 +933,7 @@
     <div class="container">
       <div class="text-center">
         <span class="section-badge">Asset Safety & Governance</span>
-        <h2>Institutional Trust & Security</h2>
+        <h2 class="text-gradient">Institutional Trust & Security</h2>
         <p class="section-subtitle">Araiven is an analytical engine, not a custodian. Your assets remain secure inside your own brokerages.</p>
       </div>
 
@@ -949,7 +982,7 @@
     <div class="container">
       <div class="text-center">
         <span class="section-badge">Simple Pricing</span>
-        <h2>Transparent Plans for Everyone</h2>
+        <h2 class="text-gradient">Transparent Plans for Everyone</h2>
         <p class="section-subtitle">Start growing your wealth for free, then upgrade to unlocked premium AI execution when you're ready.</p>
       </div>
 
@@ -1053,7 +1086,7 @@
   <section class="final-cta-section" id="final-cta-section">
     <div class="cta-glow-bg"></div>
     <div class="container text-center">
-      <h2>Stop Watching Charts.<br>Start Building Wealth.</h2>
+      <h2 class="text-gradient">Stop Watching Charts.<br>Start Building Wealth.</h2>
       <p class="cta-subtitle">Let Araiven do the heavy lifting while you focus on what matters. Connect your first exchange securely in under 3 minutes.</p>
       <div class="cta-actions">
         <a href="#pricing" class="btn btn-primary btn-lg">Get Started Now</a>
