@@ -4172,6 +4172,13 @@ h2 {
   margin-bottom: 16px;
 }
 
+.option-icon-svg {
+  width: 28px;
+  height: 28px;
+  display: block;
+  stroke: currentColor;
+}
+
 .option-card h4 {
   font-size: 1.05rem;
   margin-bottom: 8px;
