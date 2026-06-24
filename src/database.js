@@ -231,6 +231,29 @@ export const initializeDatabase = async () => {
     );
   `);
 
+  // 14. market_tickers table (Market Data Layer v1 Cache)
+  await dbRun(`
+    CREATE TABLE IF NOT EXISTS market_tickers (
+      symbol TEXT PRIMARY KEY,
+      name TEXT NOT NULL,
+      price REAL NOT NULL,
+      change_24h REAL NOT NULL,
+      volume_24h REAL NOT NULL,
+      market_cap REAL NOT NULL,
+      last_updated INTEGER NOT NULL
+    );
+  `);
+
+  // 15. market_history table (Historical Data Cache)
+  await dbRun(`
+    CREATE TABLE IF NOT EXISTS market_history (
+      symbol TEXT NOT NULL,
+      timestamp INTEGER NOT NULL,
+      price REAL NOT NULL,
+      PRIMARY KEY (symbol, timestamp)
+    );
+  `);
+
   // Seed opportunities if empty
   const opps = await dbQuery('SELECT COUNT(*) as count FROM opportunities');
   if (opps[0].count === 0) {

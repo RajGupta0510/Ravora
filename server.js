@@ -9,6 +9,7 @@ import { getProfile, onboard, updateSettings } from './src/controllers/userContr
 import { getPortfolio, getPortfolioHistory, getTransactions } from './src/controllers/portfolioController.js';
 import { getOpportunities, getRecommendations, executeRecommendation, deployOpportunity } from './src/controllers/opportunityController.js';
 import { copilotMessage, getNotifications, markNotificationsRead, connectExchange } from './src/controllers/copilotController.js';
+import { MarketDataService } from './src/services/marketDataService.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -35,6 +36,41 @@ const apiRouter = express.Router();
 // Auth Endpoints
 apiRouter.post('/auth/register', register);
 apiRouter.post('/auth/login', login);
+
+// Market Data Layer v1 Endpoints (Public)
+apiRouter.get('/market/prices', async (req, res) => {
+  try {
+    const overview = await MarketDataService.getOverview();
+    const prices = overview.map(o => ({
+      symbol: o.symbol,
+      name: o.name,
+      price: o.price,
+      change24h: o.change24h
+    }));
+    return res.json({ prices });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+apiRouter.get('/market/overview', async (req, res) => {
+  try {
+    const overview = await MarketDataService.getOverview();
+    return res.json(overview);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+apiRouter.get('/market/assets/:symbol', async (req, res) => {
+  try {
+    const { symbol } = req.params;
+    const details = await MarketDataService.getAssetDetails(symbol);
+    return res.json(details);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+});
 
 // User Profile & Onboarding (Protected)
 apiRouter.get('/user/profile', verifyToken, getProfile);
