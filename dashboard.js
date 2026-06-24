@@ -10,7 +10,8 @@ document.addEventListener('DOMContentLoaded', () => {
       experience: 'beginner',
       capital: 132000,
       riskLevel: 1, // 0 = Conservative, 1 = Balanced, 2 = Aggressive
-      goal: 'preservation'
+      goal: 'preservation',
+      horizon: 'short'
     },
     currentScreen: 'dashboard',
     notifications: [],
@@ -59,28 +60,592 @@ document.addEventListener('DOMContentLoaded', () => {
   // API Call Helper
   // ==========================================================================
   async function apiCall(endpoint, options = {}) {
-    const token = localStorage.getItem('ravora_token');
-    const headers = {
-      'Content-Type': 'application/json',
-      ...options.headers
-    };
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
+    // Simulate slight network delay for realism
+    await new Promise(resolve => setTimeout(resolve, 150));
+
+    // Normalize endpoint (strip query parameters for routing, but keep them for extraction)
+    const urlPath = endpoint.split('?')[0];
+
+    // Handle GET /user/profile
+    if (urlPath === '/user/profile') {
+      const onboardingCompleted = localStorage.getItem('ravora_onboarding_completed') === 'true';
+      return {
+        onboardingCompleted,
+        profile: {
+          experience_level: localStorage.getItem('ravora_profile_experience') || 'beginner',
+          capital: parseInt(localStorage.getItem('ravora_profile_capital') || '132000'),
+          risk_stance: localStorage.getItem('ravora_profile_risk') || 'balanced',
+          primary_goal: localStorage.getItem('ravora_profile_goal') || 'preservation'
+        }
+      };
     }
-    const response = await fetch(API_BASE + endpoint, {
-      ...options,
-      headers
-    });
-    if (response.status === 401) {
-      localStorage.removeItem('ravora_token');
-      showAuthOverlay();
-      throw new Error('Session expired or unauthorized.');
+
+    // Handle POST /user/onboard
+    if (urlPath === '/user/onboard' && options.method === 'POST') {
+      const body = JSON.parse(options.body || '{}');
+      const riskLevels = { 0: 'conservative', 1: 'balanced', 2: 'aggressive' };
+      const riskStance = riskLevels[body.riskLevel] || 'balanced';
+
+      localStorage.setItem('ravora_profile_experience', body.experience || 'beginner');
+      localStorage.setItem('ravora_profile_capital', (body.capital || 132000).toString());
+      localStorage.setItem('ravora_profile_risk', riskStance);
+      localStorage.setItem('ravora_profile_goal', body.goal || 'preservation');
+      localStorage.setItem('ravora_profile_horizon', body.horizon || 'short');
+      localStorage.setItem('ravora_onboarding_completed', 'true');
+
+      // Initialize holdings as 100% USDC (user starts with cash reserves and rebalances to targets)
+      const capital = body.capital || 132000;
+      const initialHoldings = [
+        { asset: 'USDC Stablecoin', symbol: 'USDC', allocationPct: 100.0, amount: capital, entryPrice: 1.0, currentPrice: 1.0, change24h: 0.0 }
+      ];
+      localStorage.setItem('ravora_holdings', JSON.stringify(initialHoldings));
+
+      // Reset notifications & add default onboarding alerts
+      const initialNotifications = [
+        {
+          notificationId: 'notif-' + Math.random().toString(36).substring(2, 10),
+          channel: 'risk',
+          priority: 'medium',
+          title: 'Drawdown Protection Shield Configured',
+          body: `Araiven calculated correlation matrices and established drawdown cushion at ${body.riskLevel === 0 ? '1.50' : (body.riskLevel === 2 ? '8.50' : '3.50')}%.`,
+          isRead: false
+        },
+        {
+          notificationId: 'notif-' + Math.random().toString(36).substring(2, 10),
+          channel: 'opportunities',
+          priority: 'medium',
+          title: 'Ethereum Staking Alpha Opportunity Ingested',
+          body: 'New opportunity detected on decentralized staking pools yielding 9.6% APY.',
+          isRead: false
+        }
+      ];
+      localStorage.setItem('ravora_notifications', JSON.stringify(initialNotifications));
+
+      // Reset recommendations dynamically using engine v1
+      const initialRecommendations = generateMockRecommendations(body.riskLevel, body.goal, body.horizon || 'short', capital);
+      localStorage.setItem('ravora_recommendations', JSON.stringify(initialRecommendations));
+      localStorage.setItem('ravora_transactions', JSON.stringify([]));
+
+      return { success: true, message: 'Onboarding completed successfully.' };
     }
-    if (!response.ok) {
-      const errData = await response.json().catch(() => ({}));
-      throw new Error(errData.error || `HTTP error! status: ${response.status}`);
+
+    // Handle POST /user/settings
+    if (urlPath === '/user/settings') {
+      return { success: true };
     }
-    return response.json();
+
+    // Handle GET /portfolio
+    if (urlPath === '/portfolio') {
+      const capital = parseInt(localStorage.getItem('ravora_profile_capital') || '132000');
+      const riskStance = localStorage.getItem('ravora_profile_risk') || 'balanced';
+      const holdings = JSON.parse(localStorage.getItem('ravora_holdings') || '[]');
+      const apys = { conservative: '7.18%', balanced: '12.42%', aggressive: '26.74%' };
+      return {
+        currentBalance: capital,
+        currency: 'USD',
+        safetyScore: riskStance === 'conservative' ? 98 : (riskStance === 'balanced' ? 96 : 91),
+        annualizedYield: apys[riskStance] || '12.42%',
+        holdings
+      };
+    }
+
+    // Handle GET /portfolio/history
+    if (urlPath === '/portfolio/history') {
+      const urlParams = new URLSearchParams(endpoint.split('?')[1] || '');
+      const period = urlParams.get('period') || '24h';
+      const riskStance = localStorage.getItem('ravora_profile_risk') || 'balanced';
+      const baseDatasets = {
+        conservative: {
+          '24h': [123500, 123800, 123900, 124200, 124100, 124300, 124582],
+          '7d': [121000, 121800, 122400, 122900, 123600, 124000, 124582],
+          '30d': [118000, 119500, 120200, 121900, 122800, 123400, 124582],
+          '1y': [105000, 108000, 111000, 113000, 117000, 120000, 124582]
+        },
+        balanced: {
+          '24h': [128000, 127200, 129500, 128400, 130800, 131500, 132194],
+          '7d': [122000, 124500, 126000, 125100, 129000, 130200, 132194],
+          '30d': [115000, 118000, 122000, 121500, 127000, 129000, 132194],
+          '1y': [98000, 104000, 109000, 112000, 122000, 127000, 132194]
+        },
+        aggressive: {
+          '24h': [141000, 138000, 146000, 142000, 148500, 145000, 149425],
+          '7d': [130000, 138000, 134000, 142000, 145000, 141000, 149425],
+          '30d': [120000, 132000, 127000, 139000, 142000, 136000, 149425],
+          '1y': [88000, 102000, 95000, 118000, 134000, 126000, 149425]
+        }
+      };
+      const stanceData = baseDatasets[riskStance] || baseDatasets.balanced;
+      const basePoints = stanceData[period] || stanceData['24h'];
+      const capital = parseInt(localStorage.getItem('ravora_profile_capital') || '132000');
+      const lastBaseVal = basePoints[basePoints.length - 1];
+      const scaleFactor = lastBaseVal > 0 ? capital / lastBaseVal : 1;
+      const scaledPoints = basePoints.map(val => Math.round(val * scaleFactor * 100) / 100);
+      return {
+        period,
+        points: scaledPoints
+      };
+    }
+
+    // Handle GET /portfolio/transactions
+    if (urlPath === '/portfolio/transactions') {
+      return JSON.parse(localStorage.getItem('ravora_transactions') || '[]');
+    }
+
+    // Handle GET /opportunities
+    if (urlPath === '/opportunities') {
+      return [
+        {
+          opportunityId: 'eth-staking',
+          type: 'yield',
+          name: 'Ethereum Staking Alpha',
+          symbol: 'ETH / USD',
+          icon: 'Ξ',
+          confidenceScore: 94,
+          riskLevel: 'low',
+          expectedReturn: '8.0% - 12.0%',
+          reasoningText: 'Validator queue consolidation patterns reveal a post-upgrade yields premium on decentralized pools. Backed by institutional accumulation support lines.'
+        },
+        {
+          opportunityId: 'btc-halving',
+          type: 'momentum',
+          name: 'Bitcoin ETF Momentum Stacking',
+          symbol: 'BTC / USD',
+          icon: '₿',
+          confidenceScore: 89,
+          riskLevel: 'medium',
+          expectedReturn: '15.0% - 22.0%',
+          reasoningText: 'Spot ETF net inflows show consecutive daily acceleration, coinciding with hodler lockup peaks. Momentum targets a breakout to structural range highs.'
+        },
+        {
+          opportunityId: 'usdc-arbitrage',
+          type: 'yield',
+          name: 'Stablecoin Lending Arbitrage',
+          symbol: 'USDC / USDT / DAI',
+          icon: '$',
+          confidenceScore: 91,
+          riskLevel: 'low',
+          expectedReturn: '6.5% - 9.2%',
+          reasoningText: 'Federal Reserve rate volatility spiked arbitrage yields across Aave and Uniswap lending pools. Rotates cash reserves into peak yield efficiency.'
+        },
+        {
+          opportunityId: 'solana-liquidity',
+          type: 'momentum',
+          name: 'Solana Liquidity Staking Accumulation',
+          symbol: 'SOL / USD',
+          icon: 'S',
+          confidenceScore: 78,
+          riskLevel: 'high',
+          expectedReturn: '22.0% - 32.0%',
+          reasoningText: 'DEX trading volume indices indicate structural demand trends for Jup/Sol liquidity pairs. High variance yield with automated trailing drawdown trigger.'
+        }
+      ];
+    }
+
+    // Handle GET /opportunities/recommendations
+    if (urlPath === '/opportunities/recommendations') {
+      const recs = JSON.parse(localStorage.getItem('ravora_recommendations') || '[]');
+      return recs.filter(r => r.status === 'pending');
+    }
+
+    // Handle POST /opportunities/recommendations/:id/execute
+    if (urlPath.startsWith('/opportunities/recommendations/') && urlPath.endsWith('/execute')) {
+      const parts = urlPath.split('/');
+      const recommendationId = parts[3];
+
+      const recs = JSON.parse(localStorage.getItem('ravora_recommendations') || '[]');
+      const rec = recs.find(r => r.recommendationId === recommendationId);
+      if (!rec) {
+        throw new Error('Recommendation not found.');
+      }
+      if (rec.status !== 'pending') {
+        throw new Error('Recommendation has already been processed.');
+      }
+
+      const capital = parseInt(localStorage.getItem('ravora_profile_capital') || '132000');
+      const allocationPct = rec.suggestedAllocationPct;
+      const swapValueUSD = capital * (allocationPct / 100);
+
+      // Special handling for dynamic alignment recommendations
+      if (rec.opportunity.opportunityId && rec.opportunity.opportunityId.endsWith('-align')) {
+        let holdings = [];
+        const prices = { BTC: 64120.10, ETH: 3485.10, SOL: 134.20, USDC: 1.00, EMERG: 50.0 };
+
+        if (rec.opportunity.opportunityId === 'conservative-align') {
+          holdings = [
+            { asset: 'Bitcoin ETF Momentum Stacking', symbol: 'BTC', allocationPct: 40.0, amount: (capital * 0.40) / prices.BTC, entryPrice: prices.BTC, currentPrice: prices.BTC, change24h: 1.25 },
+            { asset: 'Ethereum Staking Alpha', symbol: 'ETH', allocationPct: 30.0, amount: (capital * 0.30) / prices.ETH, entryPrice: prices.ETH, currentPrice: prices.ETH, change24h: 1.25 },
+            { asset: 'USDC Stablecoin', symbol: 'USDC', allocationPct: 30.0, amount: (capital * 0.30) / prices.USDC, entryPrice: prices.USDC, currentPrice: prices.USDC, change24h: 0.0 }
+          ];
+        } else if (rec.opportunity.opportunityId === 'aggressive-align') {
+          holdings = [
+            { asset: 'Bitcoin ETF Momentum Stacking', symbol: 'BTC', allocationPct: 25.0, amount: (capital * 0.25) / prices.BTC, entryPrice: prices.BTC, currentPrice: prices.BTC, change24h: 1.25 },
+            { asset: 'Ethereum Staking Alpha', symbol: 'ETH', allocationPct: 25.0, amount: (capital * 0.25) / prices.ETH, entryPrice: prices.ETH, currentPrice: prices.ETH, change24h: 1.25 },
+            { asset: 'Solana Liquidity Staking Accumulation', symbol: 'SOL', allocationPct: 25.0, amount: (capital * 0.25) / prices.SOL, entryPrice: prices.SOL, currentPrice: prices.SOL, change24h: 1.25 },
+            { asset: 'Emerging Assets Basket', symbol: 'EMERG', allocationPct: 25.0, amount: (capital * 0.25) / prices.EMERG, entryPrice: prices.EMERG, currentPrice: prices.EMERG, change24h: 1.25 }
+          ];
+        } else { // moderate-align
+          holdings = [
+            { asset: 'Bitcoin ETF Momentum Stacking', symbol: 'BTC', allocationPct: 35.0, amount: (capital * 0.35) / prices.BTC, entryPrice: prices.BTC, currentPrice: prices.BTC, change24h: 1.25 },
+            { asset: 'Ethereum Staking Alpha', symbol: 'ETH', allocationPct: 35.0, amount: (capital * 0.35) / prices.ETH, entryPrice: prices.ETH, currentPrice: prices.ETH, change24h: 1.25 },
+            { asset: 'Solana Liquidity Staking Accumulation', symbol: 'SOL', allocationPct: 15.0, amount: (capital * 0.15) / prices.SOL, entryPrice: prices.SOL, currentPrice: prices.SOL, change24h: 1.25 },
+            { asset: 'USDC Stablecoin', symbol: 'USDC', allocationPct: 15.0, amount: (capital * 0.15) / prices.USDC, entryPrice: prices.USDC, currentPrice: prices.USDC, change24h: 0.0 }
+          ];
+        }
+
+        localStorage.setItem('ravora_holdings', JSON.stringify(holdings));
+
+        rec.status = 'approved';
+        localStorage.setItem('ravora_recommendations', JSON.stringify(recs));
+
+        const transactions = JSON.parse(localStorage.getItem('ravora_transactions') || '[]');
+        const fee = swapValueUSD * 0.001;
+        const txId = 'tx-' + Math.random().toString(36).substring(2, 10);
+        transactions.unshift({
+          id: txId,
+          timestamp: new Date().toISOString(),
+          type: 'portfolio_rebalance',
+          asset: `USDC / Target Alignment Stance`,
+          amount: `Rebalanced portfolio`,
+          price: `N/A`,
+          fee: `$${fee.toFixed(2)}`,
+          status: 'completed'
+        });
+        localStorage.setItem('ravora_transactions', JSON.stringify(transactions));
+
+        const notifications = JSON.parse(localStorage.getItem('ravora_notifications') || '[]');
+        notifications.unshift({
+          notificationId: 'notif-' + Math.random().toString(36).substring(2, 10),
+          channel: 'portfolio',
+          priority: 'medium',
+          title: 'Target Alignment Complete',
+          body: `Successfully aligned your portfolio holdings to the active ${rec.opportunity.riskLevel} Ravora model.`,
+          isRead: false
+        });
+        localStorage.setItem('ravora_notifications', JSON.stringify(notifications));
+
+        return {
+          status: 'cleared',
+          transactionId: txId,
+          clearedPrice: 1.0,
+          executionFee: fee,
+          timestamp: new Date().toISOString()
+        };
+      }
+
+      const prices = { ETH: 3485.10, BTC: 64120.10, SOL: 134.20, USDC: 1.00, USDS: 1.00 };
+      let targetSymbol = 'ETH';
+      if (rec.opportunity.symbol.includes('BTC')) targetSymbol = 'BTC';
+      else if (rec.opportunity.symbol.includes('SOL')) targetSymbol = 'SOL';
+      else if (rec.opportunity.symbol.includes('USDC')) targetSymbol = 'USDC';
+
+      const targetPrice = prices[targetSymbol] || 100.00;
+      let holdings = JSON.parse(localStorage.getItem('ravora_holdings') || '[]');
+
+      // Deduct from USDC or largest holding
+      let sourceAsset = holdings.find(h => h.symbol === 'USDC');
+      if (!sourceAsset || sourceAsset.amount * sourceAsset.entryPrice < swapValueUSD) {
+        let maxVal = 0;
+        holdings.forEach(h => {
+          const val = h.amount * h.entryPrice;
+          if (val > maxVal) {
+            maxVal = val;
+            sourceAsset = h;
+          }
+        });
+      }
+
+      if (!sourceAsset || (sourceAsset.amount * sourceAsset.entryPrice) < swapValueUSD) {
+        throw new Error('Insufficient funds in portfolio holdings to perform this rebalance.');
+      }
+
+      sourceAsset.amount -= swapValueUSD / sourceAsset.entryPrice;
+      sourceAsset.allocationPct = ((sourceAsset.amount * sourceAsset.entryPrice) / capital) * 100;
+
+      if (sourceAsset.amount <= 0.0001) {
+        holdings = holdings.filter(h => h.symbol !== sourceAsset.symbol);
+      }
+
+      // Add to target asset
+      const targetAsset = holdings.find(h => h.symbol === targetSymbol);
+      const targetAddAmount = swapValueUSD / targetPrice;
+      if (targetAsset) {
+        targetAsset.amount += targetAddAmount;
+        targetAsset.allocationPct = ((targetAsset.amount * targetPrice) / capital) * 100;
+      } else {
+        const targetAllocation = (swapValueUSD / capital) * 100;
+        holdings.push({
+          asset: rec.opportunity.name,
+          symbol: targetSymbol,
+          allocationPct: targetAllocation,
+          amount: targetAddAmount,
+          entryPrice: targetPrice,
+          currentPrice: targetPrice,
+          change24h: 1.25
+        });
+      }
+
+      // Save updated holdings
+      localStorage.setItem('ravora_holdings', JSON.stringify(holdings));
+
+      // Mark recommendation approved
+      rec.status = 'approved';
+      localStorage.setItem('ravora_recommendations', JSON.stringify(recs));
+
+      // Add transaction
+      const transactions = JSON.parse(localStorage.getItem('ravora_transactions') || '[]');
+      const fee = swapValueUSD * 0.001;
+      const txId = 'tx-' + Math.random().toString(36).substring(2, 10);
+      transactions.unshift({
+        id: txId,
+        timestamp: new Date().toISOString(),
+        type: 'staking_deposit',
+        asset: `${sourceAsset.symbol} / ${targetSymbol}`,
+        amount: `${targetAddAmount.toFixed(4)} ${targetSymbol}`,
+        price: `$${targetPrice.toLocaleString(undefined, { minimumFractionDigits: 2 })}`,
+        fee: `$${fee.toFixed(2)}`,
+        status: 'completed'
+      });
+      localStorage.setItem('ravora_transactions', JSON.stringify(transactions));
+
+      // Add notification
+      const notifications = JSON.parse(localStorage.getItem('ravora_notifications') || '[]');
+      notifications.unshift({
+        notificationId: 'notif-' + Math.random().toString(36).substring(2, 10),
+        channel: 'portfolio',
+        priority: 'medium',
+        title: 'Rebalance Directive Executed',
+        body: `Successfully swapped $${swapValueUSD.toLocaleString()} into ${rec.opportunity.name}.`,
+        isRead: false
+      });
+      localStorage.setItem('ravora_notifications', JSON.stringify(notifications));
+
+      return {
+        status: 'cleared',
+        transactionId: txId,
+        clearedPrice: targetPrice,
+        executionFee: fee,
+        timestamp: new Date().toISOString()
+      };
+    }
+
+    // Handle POST /opportunities/deploy
+    if (urlPath === '/opportunities/deploy' && options.method === 'POST') {
+      const body = JSON.parse(options.body || '{}');
+      const { opportunityId, amount } = body;
+
+      const opps = [
+        {
+          opportunityId: 'eth-staking',
+          name: 'Ethereum Staking Alpha',
+          symbol: 'ETH / USD',
+          icon: 'Ξ',
+          confidenceScore: 94,
+          riskLevel: 'low'
+        },
+        {
+          opportunityId: 'btc-halving',
+          name: 'Bitcoin ETF Momentum Stacking',
+          symbol: 'BTC / USD',
+          icon: '₿',
+          confidenceScore: 89,
+          riskLevel: 'medium'
+        },
+        {
+          opportunityId: 'usdc-arbitrage',
+          name: 'Stablecoin Lending Arbitrage',
+          symbol: 'USDC / USDT / DAI',
+          icon: '$',
+          confidenceScore: 91,
+          riskLevel: 'low'
+        },
+        {
+          opportunityId: 'solana-liquidity',
+          name: 'Solana Liquidity Staking Accumulation',
+          symbol: 'SOL / USD',
+          icon: 'S',
+          confidenceScore: 78,
+          riskLevel: 'high'
+        }
+      ];
+
+      const opp = opps.find(o => o.opportunityId === opportunityId);
+      if (!opp) {
+        throw new Error('Opportunity not found.');
+      }
+
+      const capital = parseInt(localStorage.getItem('ravora_profile_capital') || '132000');
+      const swapValueUSD = parseFloat(amount);
+
+      if (swapValueUSD > capital) {
+        throw new Error('Investment amount exceeds total portfolio balance.');
+      }
+
+      const prices = { ETH: 3485.10, BTC: 64120.10, SOL: 134.20, USDC: 1.00, USDS: 1.00 };
+      let targetSymbol = 'ETH';
+      if (opp.symbol.includes('BTC')) targetSymbol = 'BTC';
+      else if (opp.symbol.includes('SOL')) targetSymbol = 'SOL';
+      else if (opp.symbol.includes('USDC')) targetSymbol = 'USDC';
+
+      const targetPrice = prices[targetSymbol] || 100.00;
+      let holdings = JSON.parse(localStorage.getItem('ravora_holdings') || '[]');
+
+      // Deduct from USDC or largest holding
+      let sourceAsset = holdings.find(h => h.symbol === 'USDC');
+      if (!sourceAsset || sourceAsset.amount * sourceAsset.entryPrice < swapValueUSD) {
+        let maxVal = 0;
+        holdings.forEach(h => {
+          const val = h.amount * h.entryPrice;
+          if (val > maxVal) {
+            maxVal = val;
+            sourceAsset = h;
+          }
+        });
+      }
+
+      if (!sourceAsset || (sourceAsset.amount * sourceAsset.entryPrice) < swapValueUSD) {
+        throw new Error('Insufficient funds in holdings to deploy this opportunity.');
+      }
+
+      sourceAsset.amount -= swapValueUSD / sourceAsset.entryPrice;
+      sourceAsset.allocationPct = ((sourceAsset.amount * sourceAsset.entryPrice) / capital) * 100;
+
+      if (sourceAsset.amount <= 0.0001) {
+        holdings = holdings.filter(h => h.symbol !== sourceAsset.symbol);
+      }
+
+      // Add to target asset
+      const targetAsset = holdings.find(h => h.symbol === targetSymbol);
+      const targetAddAmount = swapValueUSD / targetPrice;
+      if (targetAsset) {
+        targetAsset.amount += targetAddAmount;
+        targetAsset.allocationPct = ((targetAsset.amount * targetPrice) / capital) * 100;
+      } else {
+        const targetAllocation = (swapValueUSD / capital) * 100;
+        holdings.push({
+          asset: opp.name,
+          symbol: targetSymbol,
+          allocationPct: targetAllocation,
+          amount: targetAddAmount,
+          entryPrice: targetPrice,
+          currentPrice: targetPrice,
+          change24h: 1.25
+        });
+      }
+
+      // Save updated holdings
+      localStorage.setItem('ravora_holdings', JSON.stringify(holdings));
+
+      // Add transaction
+      const transactions = JSON.parse(localStorage.getItem('ravora_transactions') || '[]');
+      const fee = swapValueUSD * 0.001;
+      const txId = 'tx-' + Math.random().toString(36).substring(2, 10);
+      transactions.unshift({
+        id: txId,
+        timestamp: new Date().toISOString(),
+        type: 'staking_deposit',
+        asset: `${sourceAsset.symbol} / ${targetSymbol}`,
+        amount: `${targetAddAmount.toFixed(4)} ${targetSymbol}`,
+        price: `$${targetPrice.toLocaleString(undefined, { minimumFractionDigits: 2 })}`,
+        fee: `$${fee.toFixed(2)}`,
+        status: 'completed'
+      });
+      localStorage.setItem('ravora_transactions', JSON.stringify(transactions));
+
+      // Add notification
+      const notifications = JSON.parse(localStorage.getItem('ravora_notifications') || '[]');
+      notifications.unshift({
+        notificationId: 'notif-' + Math.random().toString(36).substring(2, 10),
+        channel: 'portfolio',
+        priority: 'medium',
+        title: 'Rebalance Directive Executed',
+        body: `Successfully swapped $${swapValueUSD.toLocaleString()} into ${opp.name}.`,
+        isRead: false
+      });
+      localStorage.setItem('ravora_notifications', JSON.stringify(notifications));
+
+      return {
+        status: 'cleared',
+        transactionId: txId,
+        clearedPrice: targetPrice,
+        executionFee: fee,
+        timestamp: new Date().toISOString()
+      };
+    }
+
+    // Handle GET /notifications
+    if (urlPath === '/notifications') {
+      const notifications = JSON.parse(localStorage.getItem('ravora_notifications') || '[]');
+      return notifications;
+    }
+
+    // Handle POST /notifications/read
+    if (urlPath === '/notifications/read' && options.method === 'POST') {
+      const notifications = JSON.parse(localStorage.getItem('ravora_notifications') || '[]');
+      const unreadCount = notifications.filter(n => !n.isRead).length;
+      notifications.forEach(n => n.isRead = true);
+      localStorage.setItem('ravora_notifications', JSON.stringify(notifications));
+      return { status: 'success', markedReadCount: unreadCount };
+    }
+
+    // Handle POST /copilot/message
+    if (urlPath === '/copilot/message' && options.method === 'POST') {
+      const body = JSON.parse(options.body || '{}');
+      const message = body.message;
+      const normMsg = message.toLowerCase();
+
+      const riskStance = localStorage.getItem('ravora_profile_risk') || 'balanced';
+      const goal = localStorage.getItem('ravora_profile_goal') || 'preservation';
+      const horizon = localStorage.getItem('ravora_profile_horizon') || 'short';
+      const capital = parseInt(localStorage.getItem('ravora_profile_capital') || '132000');
+
+      let reply = '';
+      let stats = '';
+      let actions = [];
+
+      if (normMsg.includes('recommend') || normMsg.includes('align') || normMsg.includes('rebalance') || normMsg.includes('portfolio') || normMsg.includes('stance')) {
+        let allocDetails = '';
+        let confidence = '92%';
+        if (riskStance === 'conservative') {
+          allocDetails = '- **Bitcoin (BTC):** 40%\n- **Ethereum (ETH):** 30%\n- **Stablecoins (USDC):** 30%';
+          confidence = '96%';
+        } else if (riskStance === 'aggressive') {
+          allocDetails = '- **Bitcoin (BTC):** 25%\n- **Ethereum (ETH):** 25%\n- **Solana (SOL):** 25%\n- **Emerging Assets (EMERG):** 25%';
+          confidence = '88%';
+        } else { // balanced / moderate
+          allocDetails = '- **Bitcoin (BTC):** 35%\n- **Ethereum (ETH):** 35%\n- **Solana (SOL):** 15%\n- **Stablecoins (USDC):** 15%';
+          confidence = '92%';
+        }
+
+        reply = `Based on your **${goal.toUpperCase()}** milestone goal, **${riskStance.toUpperCase()}** risk profile, and **${horizon.toUpperCase()}-TERM** investment horizon, Araiven recommends the following target stance allocation:\n\n${allocDetails}\n\nThis target maximizes capital efficiency and staking yield. You can execute this rebalance directive with a single click from your main Dashboard.`;
+        stats = `Confidence Score: ${confidence} | Active Risk Score: ${riskStance.toUpperCase()}`;
+      } else if (normMsg.includes('yield') || normMsg.includes('audit')) {
+        const apyStr = riskStance === 'conservative' ? '7.18%' : (riskStance === 'aggressive' ? '26.74%' : '12.42%');
+        const details = riskStance === 'conservative'
+          ? '**USDC stable staking** (70% allocation, yielding 5.5% APY) and **USDS stable spreads** (20% allocation, yielding 6.8% APY)'
+          : (riskStance === 'aggressive'
+            ? '**Ethereum validator staking** (40% allocation, yielding 9.6% APY) and **Solana leverage spreads** (25% allocation, yielding 18.5% APY)'
+            : '**Ethereum validator staking** (45% allocation, yielding 9.6% APY) and **Stablecoin Lending pool spreads** (30% allocation, yielding 8.2% APY)');
+
+        reply = `Under your active **${riskStance.toUpperCase()}** strategy stance, Araiven is capturing compounding yield spreads across two main channels: ${details}. Both channels utilize non-custodial brokerage protocols with automated volatility cushions.`;
+        stats = `Overall Portfolio APY: ${apyStr} | Safety Index: Fully Compliant`;
+      } else if (normMsg.includes('hedge') || normMsg.includes('drawdown') || normMsg.includes('protect')) {
+        const cushion = riskStance === 'conservative' ? '1.50%' : (riskStance === 'aggressive' ? '8.50%' : '3.50%');
+        reply = `Araiven Drawdown Protection is actively guarding your assets. Under your current profile, the protective hedge buffer is set at a trailing **${cushion}** maximum variance cap. If market correlation indicators shift and volatililty targets are breached, positions will instantly hedge into stablecoin baskets.`;
+        stats = `Volatility Index: Stable | Protection cushion: ${cushion}`;
+      } else if (normMsg.includes('bitcoin') || normMsg.includes('btc') || normMsg.includes('halving') || normMsg.includes('momentum')) {
+        reply = `Araiven ETF momentum models trace continuous net inflows accumulating at structural support layers. Bitcoin is stabilizing near range support, and your portfolio currently maintains a 20% holding allocation ($${(capital * 0.20).toFixed(2)}) targeted at a breakout threshold of $72,500.`;
+        stats = `Bitcoin Allocation: 20% | Momentum Confidence Index: 89%`;
+      } else {
+        reply = `Hello! I am Araiven, your active wealth copilot. I am currently monitoring your portfolio under the **${riskStance.toUpperCase()}** strategy configuration. I analyze news sentiment, orderbook delta, and liquidity yields 24/7 to suggest optimal compounding. What aspect of your assets would you like me to audit?`;
+        stats = `Active Strategy: ${riskStance.toUpperCase()} | Total Balance: $${capital.toLocaleString()}`;
+      }
+
+      return { reply, stats, actions };
+    }
+
+    // Catch-all mock error or empty response
+    console.warn(`Unhandled API route: ${urlPath}`);
+    return {};
   }
 
   // ==========================================================================
@@ -234,28 +799,112 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  function generateMockRecommendations(riskLevel, goal, horizon, capital) {
+    let opportunityId, opportunityName, opportunitySymbol, opportunityIcon, confidence, riskName, suggestedAllocationPct, reasoningText;
+
+    if (riskLevel === 0) { // Conservative
+      opportunityId = 'conservative-align';
+      opportunityName = 'Conservative Target Alignment Stance';
+      opportunitySymbol = 'BTC (40%) / ETH (30%) / USDC (30%)';
+      opportunityIcon = '🛡️';
+      confidence = 96;
+      riskName = 'conservative';
+      suggestedAllocationPct = 70.0;
+      reasoningText = `Araiven recommends allocating 40% to BTC and 30% to ETH while retaining 30% in stablecoins. This matches your ${goal} milestone targets and ${horizon}-term horizon, maximizing safety score while defending against inflation.`;
+    } else if (riskLevel === 2) { // Aggressive
+      opportunityId = 'aggressive-align';
+      opportunityName = 'Aggressive Target Alignment Stance';
+      opportunitySymbol = 'BTC (25%) / ETH (25%) / SOL (25%) / EMERG (25%)';
+      opportunityIcon = '🔥';
+      confidence = 88;
+      riskName = 'aggressive';
+      suggestedAllocationPct = 100.0;
+      reasoningText = `Araiven suggests fully deploying reserves into high-beta assets: 25% BTC, 25% ETH, 25% SOL, and 25% Emerging Assets (e.g. NEAR/AVAX). This aggressive configuration aligns with your ${goal} milestone and ${horizon}-term horizon to capture maximum staking yield and growth spreads.`;
+    } else { // Moderate / Balanced (1)
+      opportunityId = 'moderate-align';
+      opportunityName = 'Moderate Target Alignment Stance';
+      opportunitySymbol = 'BTC (35%) / ETH (35%) / SOL (15%) / USDC (15%)';
+      opportunityIcon = '⚖️';
+      confidence = 92;
+      riskName = 'moderate';
+      suggestedAllocationPct = 85.0;
+      reasoningText = `Araiven recommends a balanced capture strategy: 35% BTC, 35% ETH, and 15% SOL, holding 15% stablecoins. This allocation optimizes steady yield premiums matching your ${goal} goals and ${horizon}-term horizon.`;
+    }
+
+    return [
+      {
+        recommendationId: 'rec-' + Math.random().toString(36).substring(2, 10),
+        opportunity: {
+          opportunityId,
+          name: opportunityName,
+          symbol: opportunitySymbol,
+          icon: opportunityIcon,
+          confidenceScore: confidence,
+          expectedReturn: riskLevel === 0 ? '8.0% - 11.5%' : (riskLevel === 2 ? '22.0% - 32.0%' : '12.0% - 18.5%'),
+          riskLevel: riskName
+        },
+        suggestedAllocationPct,
+        reasoningText,
+        status: 'pending'
+      }
+    ];
+  }
+
+  function initDefaultMockData(email) {
+    if (!localStorage.getItem('ravora_profile_experience')) {
+      localStorage.setItem('ravora_profile_experience', 'balanced');
+      localStorage.setItem('ravora_profile_capital', '132000');
+      localStorage.setItem('ravora_profile_risk', 'balanced');
+      localStorage.setItem('ravora_profile_goal', 'preservation');
+      localStorage.setItem('ravora_profile_horizon', 'medium');
+    }
+    
+    if (!localStorage.getItem('ravora_holdings')) {
+      const capital = 132000;
+      const initialHoldings = [
+        { asset: 'USDC Stablecoin', symbol: 'USDC', allocationPct: 100.0, amount: capital, entryPrice: 1.0, currentPrice: 1.0, change24h: 0.0 }
+      ];
+      localStorage.setItem('ravora_holdings', JSON.stringify(initialHoldings));
+    }
+
+    if (!localStorage.getItem('ravora_notifications')) {
+      const initialNotifications = [
+        { notificationId: 'notif-1', channel: 'risk', priority: 'medium', title: 'Drawdown Protection Shield Configured', body: 'Araiven calculated correlation matrices and established drawdown cushion at 3.50%.', isRead: false },
+        { notificationId: 'notif-2', channel: 'opportunities', priority: 'medium', title: 'Ethereum Staking Alpha Opportunity Ingested', body: 'New opportunity detected on decentralized staking pools yielding 9.6% APY.', isRead: false }
+      ];
+      localStorage.setItem('ravora_notifications', JSON.stringify(initialNotifications));
+    }
+
+    if (!localStorage.getItem('ravora_recommendations')) {
+      const initialRecommendations = generateMockRecommendations(1, 'preservation', 'medium', 132000);
+      localStorage.setItem('ravora_recommendations', JSON.stringify(initialRecommendations));
+    }
+
+    if (!localStorage.getItem('ravora_transactions')) {
+      localStorage.setItem('ravora_transactions', JSON.stringify([]));
+    }
+  }
+
   async function checkAuthState() {
-    const token = localStorage.getItem('ravora_token');
-    if (!token) {
+    const loggedIn = localStorage.getItem('ravora_logged_in') === 'true';
+    if (!loggedIn) {
       showAuthOverlay();
       return;
     }
     try {
-      // Decode JWT for username greeting
-      const base64Url = token.split('.')[1];
-      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-      const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
-      const payload = JSON.parse(jsonPayload);
-      updateUserWidget(payload.email || 'User');
+      const email = localStorage.getItem('ravora_email') || 'User';
+      updateUserWidget(email);
 
-      const data = await apiCall('/user/profile');
-      if (data.onboardingCompleted) {
+      const onboardingCompleted = localStorage.getItem('ravora_onboarding_completed') === 'true';
+      if (onboardingCompleted) {
         state.onboardingCompleted = true;
-        state.profile.experience = data.profile.experience_level;
-        state.profile.capital = data.profile.capital;
+        state.profile.experience = localStorage.getItem('ravora_profile_experience') || 'beginner';
+        state.profile.capital = parseInt(localStorage.getItem('ravora_profile_capital') || '132000');
         const riskLevels = { conservative: 0, balanced: 1, aggressive: 2 };
-        state.profile.riskLevel = riskLevels[data.profile.risk_stance] ?? 1;
-        state.profile.goal = data.profile.primary_goal;
+        const riskStance = localStorage.getItem('ravora_profile_risk') || 'balanced';
+        state.profile.riskLevel = riskLevels[riskStance] ?? 1;
+        state.profile.goal = localStorage.getItem('ravora_profile_goal') || 'preservation';
+        state.profile.horizon = localStorage.getItem('ravora_profile_horizon') || 'short';
 
         showDashboard();
         initializeDashboardUI();
@@ -277,17 +926,12 @@ document.addEventListener('DOMContentLoaded', () => {
       const password = document.getElementById('login-password').value;
 
       try {
-        const response = await fetch(API_BASE + '/auth/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, password })
-        });
-        const data = await response.json();
-        if (!response.ok) {
-          throw new Error(data.error || 'Login failed.');
-        }
-        localStorage.setItem('ravora_token', data.token);
+        localStorage.setItem('ravora_logged_in', 'true');
+        localStorage.setItem('ravora_email', email);
+        localStorage.setItem('ravora_onboarding_completed', 'true');
+        initDefaultMockData(email);
         await checkAuthState();
+        navigateTo('dashboard', true);
       } catch (err) {
         loginError.textContent = err.message;
         loginError.style.display = 'block';
@@ -303,16 +947,9 @@ document.addEventListener('DOMContentLoaded', () => {
       const password = document.getElementById('register-password').value;
 
       try {
-        const response = await fetch(API_BASE + '/auth/register', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, password })
-        });
-        const data = await response.json();
-        if (!response.ok) {
-          throw new Error(data.error || 'Registration failed.');
-        }
-        localStorage.setItem('ravora_token', data.token);
+        localStorage.setItem('ravora_logged_in', 'true');
+        localStorage.setItem('ravora_email', email);
+        localStorage.setItem('ravora_onboarding_completed', 'false');
         await checkAuthState();
       } catch (err) {
         registerError.textContent = err.message;
@@ -357,18 +994,24 @@ document.addEventListener('DOMContentLoaded', () => {
   optionCards.forEach(card => {
     card.addEventListener('click', () => {
       const parentStep = card.closest('.onboarding-step');
-      parentStep.querySelectorAll('.option-card').forEach(c => c.classList.remove('active'));
-      card.classList.add('active');
-
       const stepId = parentStep.id;
       const value = card.getAttribute('data-value');
 
-      if (stepId.includes('1')) {
-        state.profile.experience = value;
-      } else if (stepId.includes('3')) {
-        state.profile.riskLevel = parseInt(value);
-      } else if (stepId.includes('4')) {
-        state.profile.goal = value;
+      if (card.classList.contains('horizon-card')) {
+        parentStep.querySelectorAll('.horizon-card').forEach(c => c.classList.remove('active'));
+        card.classList.add('active');
+        state.profile.horizon = value;
+      } else {
+        parentStep.querySelectorAll('.option-card:not(.horizon-card)').forEach(c => c.classList.remove('active'));
+        card.classList.add('active');
+
+        if (stepId.includes('1')) {
+          state.profile.experience = value;
+        } else if (stepId.includes('3')) {
+          state.profile.riskLevel = parseInt(value);
+        } else if (stepId.includes('4')) {
+          state.profile.goal = value;
+        }
       }
     });
   });
@@ -421,7 +1064,8 @@ document.addEventListener('DOMContentLoaded', () => {
               experience: state.profile.experience,
               capital: state.profile.capital,
               riskLevel: state.profile.riskLevel,
-              goal: state.profile.goal
+              goal: state.profile.goal,
+              horizon: state.profile.horizon || 'short'
             })
           });
 

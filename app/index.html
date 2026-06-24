@@ -173,7 +173,7 @@
       <div class="onboarding-step" id="onboarding-step-4">
         <h3>What is your primary financial goal?</h3>
         <p class="step-desc">We align rebalance suggestions to target your specified milestones.</p>
-        <div class="onboarding-options-grid">
+        <div class="onboarding-options-grid" style="margin-bottom: 24px;">
           <button class="option-card active" data-value="preservation">
             <span class="option-icon">
               <svg class="option-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="21" x2="21" y2="21" /><line x1="9" y1="21" x2="9" y2="11" /><line x1="15" y1="21" x2="15" y2="11" /><path d="M12 2 3 7h18L12 2z" /><path d="M5 21V7" /><path d="M19 21V7" /></svg>
@@ -194,6 +194,32 @@
             </span>
             <h4>Maximum Compound Growth</h4>
             <p>Deploy capital towards momentum flows and long-term accumulation indices.</p>
+          </button>
+        </div>
+
+        <h3 style="margin-top: 24px;">What is your investment horizon?</h3>
+        <p class="step-desc">How long do you plan to hold your capital reserves?</p>
+        <div class="onboarding-options-grid horizon-options-grid">
+          <button class="option-card active horizon-card" data-value="short">
+            <span class="option-icon">
+              <svg class="option-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </span>
+            <h4>Short-Term</h4>
+            <p>1 - 2 Years</p>
+          </button>
+          <button class="option-card horizon-card" data-value="medium">
+            <span class="option-icon">
+              <svg class="option-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 8 14"/></svg>
+            </span>
+            <h4>Medium-Term</h4>
+            <p>3 - 5 Years</p>
+          </button>
+          <button class="option-card horizon-card" data-value="long">
+            <span class="option-icon">
+              <svg class="option-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 14 8"/></svg>
+            </span>
+            <h4>Long-Term</h4>
+            <p>5+ Years</p>
           </button>
         </div>
       </div>
