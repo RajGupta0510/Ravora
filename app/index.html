@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ravora Copilot - Premium AI Wealth Platform</title>
+  <meta name="description" content="Your active Ravora wealth copilot dashboard. Managed by Araiven Intelligence.">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body class="app-body">
+
+  <!-- Ambient Glow Blobs -->
+  <div class="ambient-glows">
+    <div class="glow-blob glow-1"></div>
+    <div class="glow-blob glow-2"></div>
+    <div class="glow-blob glow-3"></div>
+  </div>
+
+  <!-- ==========================================================================
+     User Onboarding Overlay
+     ========================================================================== -->
+  <div class="onboarding-overlay" id="onboarding-container">
+    <div class="card-glass onboarding-card">
+      <div class="onboarding-header">
+        <div class="logo">
+          <div class="logo-icon">R</div>
+          Ravora Product Onboarding
+        </div>
+        <div class="step-dots" id="onboarding-step-dots">
+          <div class="step-dot active" data-step="1"></div>
+          <div class="step-dot" data-step="2"></div>
+          <div class="step-dot" data-step="3"></div>
+          <div class="step-dot" data-step="4"></div>
+        </div>
+      </div>
+
+      <!-- Step 1: Experience Stance -->
+      <div class="onboarding-step active" id="onboarding-step-1">
+        <h3>What is your investment experience?</h3>
+        <p class="step-desc">Araiven tailors decision recommendations based on your market vocabulary and timeline goals.</p>
+        <div class="onboarding-options-grid">
+          <button class="option-card active" data-value="beginner">
+            <span class="option-icon">🌱</span>
+            <h4>Beginner</h4>
+            <p>I want simple wealth compounding. No complex charts or trading terms.</p>
+          </button>
+          <button class="option-card" data-value="intermediate">
+            <span class="option-icon">📈</span>
+            <h4>Active Investor</h4>
+            <p>I understand basic indicators and asset classes, but lack daily trading time.</p>
+          </button>
+          <button class="option-card" data-value="advanced">
+            <span class="option-icon">⚙️</span>
+            <h4>Professional</h4>
+            <p>I analyze macroeconomic correlation matrices and desire sophisticated alpha hedging.</p>
+          </button>
+        </div>
+      </div>
+
+      <!-- Step 2: Capital Amount -->
+      <div class="onboarding-step" id="onboarding-step-2">
+        <h3>Specify your capital allocation</h3>
+        <p class="step-desc">Set the capital reserves you wish Araiven to monitor and balance dynamically.</p>
+        <div class="capital-selector-box">
+          <div class="capital-val-display" id="capital-display-val">$132,000</div>
+          <input type="range" class="capital-slider" id="capital-slider" min="5000" max="500000" step="5000" value="132000">
+          <div class="capital-limits">
+            <span>$5,000 Min</span>
+            <span>$500,000+ Max</span>
+          </div>
+          <div class="preset-row">
+            <button class="btn btn-secondary btn-sm preset-btn" data-value="25000">$25,000</button>
+            <button class="btn btn-secondary btn-sm preset-btn" data-value="75000">$75,000</button>
+            <button class="btn btn-secondary btn-sm preset-btn active" data-value="132000">$132,000</button>
+            <button class="btn btn-secondary btn-sm preset-btn" data-value="250000">$250,000</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3: Drawdown Tolerance (Risk Model) -->
+      <div class="onboarding-step" id="onboarding-step-3">
+        <h3>Choose your draw-down risk model</h3>
+        <p class="step-desc">This profile defines capital protection buffers and active reallocation thresholds.</p>
+        <div class="onboarding-options-grid">
+          <button class="option-card" data-value="0">
+            <span class="option-icon text-blue">🛡️</span>
+            <h4>Conservative</h4>
+            <p>Shield assets first. Focus on low-yield arbitrage stable baskets. Max drawdown cap: 1.5%</p>
+          </button>
+          <button class="option-card active" data-value="1">
+            <span class="option-icon text-green">⚖️</span>
+            <h4>Balanced Shield</h4>
+            <p>Hedged yield accumulation. Managed exposure to Ethereum and Bitcoin. Max drawdown cap: 3.5%</p>
+          </button>
+          <button class="option-card" data-value="2">
+            <span class="option-icon text-warning">🔥</span>
+            <h4>Aggressive Swing</h4>
+            <p>Capture maximum yield spreads. Higher volatility tolerance. Max drawdown cap: 8.5%</p>
+          </button>
+        </div>
+      </div>
+
+      <!-- Step 4: Asset Stance & Goals -->
+      <div class="onboarding-step" id="onboarding-step-4">
+        <h3>What is your primary financial goal?</h3>
+        <p class="step-desc">We align rebalance suggestions to target your specified milestones.</p>
+        <div class="onboarding-options-grid">
+          <button class="option-card active" data-value="preservation">
+            <span class="option-icon">🏦</span>
+            <h4>Capital Preservation</h4>
+            <p>Outperform inflation with minimal portfolio value volatility.</p>
+          </button>
+          <button class="option-card" data-value="income">
+            <span class="option-icon">💰</span>
+            <h4>Steady Staking Income</h4>
+            <p>Capture decentralized validator staking premiums and stable lending spreads.</p>
+          </button>
+          <button class="option-card" data-value="growth">
+            <span class="option-icon">🚀</span>
+            <h4>Maximum Compound Growth</h4>
+            <p>Deploy capital towards momentum flows and long-term accumulation indices.</p>
+          </button>
+        </div>
+      </div>
+
+      <!-- Simulation Loading Screen -->
+      <div class="onboarding-step loader-step" id="onboarding-loader">
+        <div class="loader-visual-container">
+          <div class="ai-core-sphere loader-core">
+            <div class="core-torus-ring ring-x"></div>
+            <div class="core-torus-ring ring-y"></div>
+            <div class="core-layer core-nucleus"></div>
+            <div class="core-layer core-layer-middle"></div>
+          </div>
+        </div>
+        <h3 id="loader-title">Correlating Araiven Engine...</h3>
+        <div class="loader-progress-track">
+          <div class="loader-progress-bar" id="onboarding-progress-bar"></div>
+        </div>
+        <div class="loader-status" id="onboarding-status-logs">Initializing profile models...</div>
+      </div>
+
+      <div class="onboarding-footer">
+        <button class="btn btn-secondary" id="btn-onboarding-back" style="display: none;">Back</button>
+        <button class="btn btn-primary" id="btn-onboarding-next">Next Step</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+     Main Application Shell Layout
+     ========================================================================== -->
+  <div class="app-layout-container">
+    
+    <!-- Sidebar Navigation -->
+    <aside class="app-sidebar">
+      <div class="sidebar-header">
+        <a href="/" class="logo">
+          <div class="logo-icon">R</div>
+          Ravora
+        </a>
+        <div class="sidebar-badge" id="active-profile-badge">BALANCED MODEL</div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <ul class="sidebar-menu">
+          <li>
+            <button class="menu-tab-btn active" data-screen="dashboard">
+              <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+              <span>Dashboard</span>
+            </button>
+          </li>
+          <li>
+            <button class="menu-tab-btn" data-screen="watchlist">
+              <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              <span>Watchlist</span>
+            </button>
+          </li>
+          <li>
+            <button class="menu-tab-btn" data-screen="copilot">
+              <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              <span>Araiven Copilot</span>
+            </button>
+          </li>
+          <li>
+            <button class="menu-tab-btn" data-screen="opportunities">
+              <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+              <span>Opportunities</span>
+            </button>
+          </li>
+          <li>
+            <button class="menu-tab-btn" data-screen="portfolio">
+              <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
+              <span>Portfolio</span>
+            </button>
+          </li>
+          <li>
+            <button class="menu-tab-btn" data-screen="history">
+              <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="9"/></svg>
+              <span>History</span>
+            </button>
+          </li>
+          <li>
+            <button class="menu-tab-btn" data-screen="settings">
+              <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+              <span>Settings</span>
+            </button>
+          </li>
+        </ul>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="btn-sidebar-utility" id="btn-trigger-notif" aria-label="Notifications Center">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="utility-icon"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <span class="utility-badge" id="notif-badge-count">3</span>
+        </button>
+        <button class="btn-sidebar-utility" id="btn-trigger-onboarding-reset" title="Run Onboarding Guide">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="utility-icon"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        </button>
+        <div class="user-profile-widget">
+          <div class="user-avatar">RG</div>
+          <div class="user-meta">
+            <span class="user-name">Raja Gupta</span>
+            <span class="user-tier">Premium Plan</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="app-main-window">
+      
+      <!-- App Top Header Bar -->
+      <header class="app-header-bar">
+        <div class="header-greeting">
+          <h2 id="app-header-title">Portfolio Dashboard</h2>
+          <p id="app-header-subtitle">Welcome back, Raja. Araiven engine is monitoring your wealth.</p>
+        </div>
+
+        <div class="header-controls">
+          <div class="scanner-status-badge">
+            <span class="status-pulse-dot"></span>
+            <span class="status-txt">ARAIVEN SCANNING ACTIVE</span>
+          </div>
+          <button class="btn btn-secondary btn-sm" id="btn-header-manual-scan">Scan Markets</button>
+
+          <!-- Interactive Risk segmented control linked to onboarding profile -->
+          <div class="risk-segmented-control compact" id="app-risk-segmented">
+            <button class="segmented-btn btn-sm" data-value="0" id="app-risk-cons">Cons</button>
+            <button class="segmented-btn btn-sm active" data-value="1" id="app-risk-mod">Mod</button>
+            <button class="segmented-btn btn-sm" data-value="2" id="app-risk-agg">Agg</button>
+          </div>
+        </div>
+      </header>
+
+      <!-- Content Area Views -->
+      <div class="app-viewport">
+
+        <!-- ====================================================================
+           1. DASHBOARD VIEW
+           ==================================================================== -->
+        <section class="app-view-panel active" id="view-dashboard">
+          
+          <!-- Summary Cards -->
+          <div class="metrics-grid">
+            <div class="card-glass metric-card-glow">
+              <span class="metric-label">Portfolio Balance</span>
+              <h3 class="metric-val text-gradient" id="dash-balance">$132,194.10</h3>
+              <span class="metric-change positive" id="dash-change">+$14,210.60 (+12.0% 24h)</span>
+            </div>
+            <div class="card-glass metric-card-glow">
+              <span class="metric-label">Annualized Yield (APY)</span>
+              <h3 class="metric-val text-gradient" id="dash-apy">12.42%</h3>
+              <span class="metric-change neutral" id="dash-apy-sub">Optimized staking spreads</span>
+            </div>
+            <div class="card-glass metric-card-glow">
+              <span class="metric-label">Araiven Risk Exposure</span>
+              <h3 class="metric-val text-gradient" id="dash-risk">42 / 100</h3>
+              <span class="metric-change" id="dash-risk-sub" style="color: var(--success);">Balanced Protection Shield</span>
+            </div>
+            <div class="card-glass metric-card-glow">
+              <span class="metric-label">Safety Health Score</span>
+              <h3 class="metric-val text-gradient" id="dash-health">96%</h3>
+              <span class="metric-change positive" id="dash-health-sub">No volatility threats detected</span>
+            </div>
+          </div>
+
+          <!-- Main Dashboard Rows -->
+          <div class="dashboard-rows-grid">
+            
+            <!-- Portfolio Balance Chart -->
+            <div class="card-glass dashboard-chart-card">
+              <div class="card-header-row">
+                <h4>Portfolio Growth History</h4>
+                <div class="chart-toggles">
+                  <button class="btn btn-secondary btn-sm active" data-period="24h">24H</button>
+                  <button class="btn btn-secondary btn-sm" data-period="7d">7D</button>
+                  <button class="btn btn-secondary btn-sm" data-period="30d">30D</button>
+                  <button class="btn btn-secondary btn-sm" data-period="1y">1Y</button>
+                </div>
+              </div>
+              <div class="chart-container-large">
+                <svg class="large-chart-svg" id="portfolio-large-chart" viewBox="0 0 800 280">
+                  <defs>
+                    <linearGradient id="large-chart-grad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.35"/>
+                      <stop offset="50%" stop-color="#8b5cf6" stop-opacity="0.15"/>
+                      <stop offset="100%" stop-color="#d946ef" stop-opacity="0"/>
+                    </linearGradient>
+                  </defs>
+                  <path id="large-chart-area" d="M 0 280 L 800 280 Z" fill="url(#large-chart-grad)" />
+                  <path id="large-chart-line" d="" fill="none" stroke="url(#large-chart-grad)" stroke-width="3" stroke-linecap="round" />
+                  <line x1="0" y1="210" x2="800" y2="210" stroke="rgba(255,255,255,0.02)" />
+                  <line x1="0" y1="140" x2="800" y2="140" stroke="rgba(255,255,255,0.02)" />
+                  <line x1="0" y1="70" x2="800" y2="70" stroke="rgba(255,255,255,0.02)" />
+                  <circle id="large-chart-pointer" cx="0" cy="0" r="6" fill="#3b82f6" stroke="#ffffff" stroke-width="2" style="display:none;" />
+                </svg>
+              </div>
+            </div>
+
+            <!-- Active Araiven Directives & Opportunities summary -->
+            <div class="dashboard-side-cards">
+              
+              <!-- Core Recommendation / Active swap -->
+              <div class="card-glass active-directive-card">
+                <div class="card-header-row">
+                  <h4 class="text-accent-gradient">Active Araiven Directive</h4>
+                  <span class="tag-alert-green">RECOMMENDED</span>
+                </div>
+                <div class="directive-content">
+                  <h5>Allocate 8% USD reserves to ETH Staking</h5>
+                  <p>Validator accumulation spread is showing a yields premium at 9.6% APY with minimal downside. Drawdown cushion remains compliant.</p>
+                  <div class="directive-action-box">
+                    <div class="directive-stats">
+                      <div>
+                        <span>Confidence</span>
+                        <strong class="text-green">94%</strong>
+                      </div>
+                      <div>
+                        <span>Risk Stance</span>
+                        <strong class="text-blue">Conservative</strong>
+                      </div>
+                    </div>
+                    <button class="btn btn-primary" id="btn-dash-execute-directive">Approve & Execute</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Market Analysis Status -->
+              <div class="card-glass mini-status-card">
+                <h4>Engine Scanner Status</h4>
+                <div class="status-rows">
+                  <div class="status-row-item">
+                    <span>Active Scanning Feeds</span>
+                    <strong class="text-gradient">24,410 / sec</strong>
+                  </div>
+                  <div class="status-row-item">
+                    <span>Monitored Liquidity Pools</span>
+                    <strong>154 pools</strong>
+                  </div>
+                  <div class="status-row-item">
+                    <span>Drawdown Safety Cap</span>
+                    <strong style="color: var(--success);">3.50% Active</strong>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </section>
+
+        <!-- ====================================================================
+           2. WATCHLIST VIEW
+           ==================================================================== -->
+        <section class="app-view-panel" id="view-watchlist">
+          <div class="card-glass watchlist-page-card" style="max-width: 800px; margin: 0 auto; width: 100%;">
+            <div class="card-header-row" style="margin-bottom: 20px;">
+              <h4 class="text-accent-gradient">Market Watchlist</h4>
+              <span class="tag-alert-green">LIVE UPDATES</span>
+            </div>
+            <p class="step-desc">High-priority asset tickers flagged by Araiven intelligence.</p>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-top: 24px;">
+              <div class="card-glass metric-card-glow" style="padding: 20px; display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                  <strong style="font-size: 1.1rem; color: #fff;">Ethereum (ETH)</strong>
+                  <span style="display: block; font-size: 0.75rem; color: var(--text-secondary); margin-top: 4px;">Liquidity Accumulation</span>
+                </div>
+                <div style="margin-top: 20px; display: flex; justify-content: space-between; align-items: baseline;">
+                  <span style="font-size: 1.25rem; font-weight: 700; color: #fff;">$3,485.10</span>
+                  <span class="text-green">+2.15%</span>
+                </div>
+              </div>
+              <div class="card-glass metric-card-glow" style="padding: 20px; display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                  <strong style="font-size: 1.1rem; color: #fff;">Bitcoin (BTC)</strong>
+                  <span style="display: block; font-size: 0.75rem; color: var(--text-secondary); margin-top: 4px;">ETF Inflow Wave</span>
+                </div>
+                <div style="margin-top: 20px; display: flex; justify-content: space-between; align-items: baseline;">
+                  <span style="font-size: 1.25rem; font-weight: 700; color: #fff;">$64,120.10</span>
+                  <span class="text-green">+1.40%</span>
+                </div>
+              </div>
+              <div class="card-glass metric-card-glow" style="padding: 20px; display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                  <strong style="font-size: 1.1rem; color: #fff;">Solana (SOL)</strong>
+                  <span style="display: block; font-size: 0.75rem; color: var(--text-secondary); margin-top: 4px;">DEX Volume Breakout</span>
+                </div>
+                <div style="margin-top: 20px; display: flex; justify-content: space-between; align-items: baseline;">
+                  <span style="font-size: 1.25rem; font-weight: 700; color: #fff;">$134.20</span>
+                  <span class="text-error">-0.85%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ====================================================================
+           3. ARAIVEN COPILOT VIEW
+           ==================================================================== -->
+        <section class="app-view-panel" id="view-copilot">
+          <div class="copilot-grid-layout">
+            
+            <!-- Chat interaction pane -->
+            <div class="card-glass chat-interface-container">
+              <div class="chat-header-bar">
+                <div class="chat-agent-avatar">A</div>
+                <div>
+                  <h4>Araiven Decision Engine</h4>
+                  <span class="chat-agent-status">Online • Synthesizing capital flow models</span>
+                </div>
+                <div class="engine-badge">Engine V1.2</div>
+              </div>
+
+              <!-- Messages log -->
+              <div class="chat-messages-log" id="copilot-messages-log">
+                <div class="msg-bubble system">
+                  <p>Araiven Copilot initialized. I continuously scan macroeconomic event feeds, orderbooks, and liquidity flows to guard your portfolio capital and capture alpha. Ask me a question below or choose a preset query.</p>
+                </div>
+              </div>
+
+              <!-- Preset Suggestion pills -->
+              <div class="chat-query-presets">
+                <button class="chat-preset-btn" data-query="yield-audit">Analyze my current yield spread</button>
+                <button class="chat-preset-btn" data-query="hedge-stance">Review macro hedging parameters</button>
+                <button class="chat-preset-btn" data-query="btc-alloc">Evaluate Bitcoin halving momentum impact</button>
+              </div>
+
+              <!-- Chat Input bar -->
+              <div class="chat-input-row">
+                <input type="text" class="chat-text-input" id="copilot-chat-input" placeholder="Ask Araiven about asset allocations, risk coverage, or trade reasoning...">
+                <button class="btn btn-primary" id="btn-copilot-send">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px; height:16px;"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- Active Swap and Recommendation side panel -->
+            <div class="copilot-recommendation-side">
+              <div class="card-glass side-rebalance-card">
+                <div class="card-header-row">
+                  <h4>Rebalance Staking Target</h4>
+                  <span class="rebalance-status-dot active"></span>
+                </div>
+                <p class="rebalance-desc">Araiven detected a volatility liquidity premium. Stance alignment recommended:</p>
+                
+                <div class="rebalance-swap-diagram">
+                  <div class="swap-pill">
+                    <span class="swap-label">FROM</span>
+                    <strong class="swap-val">USDC Cash (8%)</strong>
+                  </div>
+                  <div class="swap-arrow">↓</div>
+                  <div class="swap-pill dest">
+                    <span class="swap-label">TO</span>
+                    <strong class="swap-val">ETH Staking Alpha</strong>
+                  </div>
+                </div>
+
+                <div class="rebalance-parameters">
+                  <div class="param-item">
+                    <span>Est. Growth</span>
+                    <strong class="text-green">+9.62% APY</strong>
+                  </div>
+                  <div class="param-item">
+                    <span>Volatility Index</span>
+                    <strong>Low Drawdown</strong>
+                  </div>
+                  <div class="param-item">
+                    <span>Safety Match</span>
+                    <strong class="text-gradient">98% Fit</strong>
+                  </div>
+                </div>
+
+                <button class="btn btn-primary btn-lg block-btn" id="btn-copilot-rebalance-execute">Execute Allocation Swap</button>
+                <div class="execution-subtext">Requires 1-click execution. Transactions cleared instantly on integrated brokerages.</div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- ====================================================================
+           4. OPPORTUNITY EXPLORER VIEW
+           ==================================================================== -->
+        <section class="app-view-panel" id="view-opportunities">
+          
+          <div class="explorer-toolbar">
+            <div class="search-box">
+              <input type="text" class="search-input" placeholder="Search opportunities..." id="explorer-search">
+            </div>
+            <div class="filter-tabs" id="explorer-filter-tabs">
+              <button class="btn btn-secondary btn-sm active" data-filter="all">All Targets</button>
+              <button class="btn btn-secondary btn-sm" data-filter="alpha">Layer 1 Alpha</button>
+              <button class="btn btn-secondary btn-sm" data-filter="yield">Stablecoin Yield</button>
+              <button class="btn btn-secondary btn-sm" data-filter="momentum">Momentum Swings</button>
+            </div>
+          </div>
+
+          <div class="opportunities-grid" id="opportunities-cards-container">
+            <!-- Opportunities are injected dynamically in dashboard.js -->
+          </div>
+
+          <!-- Slide-out opportunity detail pane -->
+          <div class="opportunity-detail-drawer" id="opportunity-detail-drawer">
+            <div class="drawer-header">
+              <h3 id="drawer-title">Opportunity Reasoning</h3>
+              <button class="drawer-close" id="btn-close-drawer">×</button>
+            </div>
+            <div class="drawer-content">
+              <div class="detail-header-block">
+                <div class="detail-icon" id="drawer-asset-icon">Ξ</div>
+                <div>
+                  <h4 id="drawer-asset-name">Ethereum Staking Alpha</h4>
+                  <span id="drawer-asset-symbol">ETH / USD</span>
+                </div>
+                <div class="detail-badge" id="drawer-badge-conf">94% Confidence</div>
+              </div>
+
+              <div class="drawer-reasoning-section">
+                <h5>Araiven Ingestion Analysis</h5>
+                <p id="drawer-reasoning-text">Validator queue dynamics are showcasing a yield premium above normal pools. Inflows are consolidating near critical support levels at $3,450.</p>
+              </div>
+
+              <div class="drawer-stats-grid">
+                <div class="stat-card">
+                  <span>Target Range</span>
+                  <strong id="drawer-stat-return">8.0% - 12.0%</strong>
+                </div>
+                <div class="stat-card">
+                  <span>Risk Parameter</span>
+                  <strong id="drawer-stat-risk">Low Drawdown</strong>
+                </div>
+                <div class="stat-card">
+                  <span>Capital Allocation</span>
+                  <strong id="drawer-stat-allocation">8.00% swap</strong>
+                </div>
+                <div class="stat-card">
+                  <span>Exposure Profile</span>
+                  <strong id="drawer-stat-stance">Balanced Shield</strong>
+                </div>
+              </div>
+
+              <div class="drawer-action-form">
+                <h5>Deploy Capital Allocation</h5>
+                <div class="form-row">
+                  <label for="drawer-amount-input">Allocation Percentage</label>
+                  <div class="input-suffix-wrapper">
+                    <input type="number" id="drawer-amount-input" class="form-input" min="1" max="100" value="8">
+                    <span class="input-suffix">%</span>
+                  </div>
+                </div>
+                <button class="btn btn-primary btn-lg block-btn" id="btn-drawer-deploy">Confirm & Deploy Allocation</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ====================================================================
+           5. PORTFOLIO INTELLIGENCE VIEW
+           ==================================================================== -->
+        <section class="app-view-panel" id="view-portfolio">
+          <div class="portfolio-grid-container">
+            
+            <!-- Left Side: Holdings Distribution -->
+            <div class="card-glass portfolio-holdings-card">
+              <h4>Current Asset Holdings</h4>
+              <div class="holdings-table-container">
+                <table class="holdings-table">
+                  <thead>
+                    <tr>
+                      <th>Asset</th>
+                      <th>Allocation</th>
+                      <th>Balance</th>
+                      <th>Avg Entry</th>
+                      <th>24h Change</th>
+                    </tr>
+                  </thead>
+                  <tbody id="portfolio-holdings-rows">
+                    <!-- Holdings rows are injected dynamically -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Right Side: Distribution visual charts -->
+            <div class="portfolio-visuals-col">
+              
+              <!-- Allocation Donut Chart -->
+              <div class="card-glass allocation-donut-card">
+                <h4>Asset Diversification</h4>
+                <div class="donut-chart-container">
+                  <svg class="donut-svg" viewBox="0 0 200 200">
+                    <circle cx="100" cy="100" r="70" fill="none" stroke="rgba(255,255,255,0.02)" stroke-width="20"/>
+                    <!-- Donut segments -->
+                    <circle cx="100" cy="100" r="70" class="donut-seg donut-eth" stroke="#3b82f6" stroke-width="20" stroke-dasharray="197.9 439.8" stroke-dashoffset="109.9"/>
+                    <circle cx="100" cy="100" r="70" class="donut-seg donut-usdc" stroke="#10b981" stroke-width="20" stroke-dasharray="131.9 439.8" stroke-dashoffset="-88"/>
+                    <circle cx="100" cy="100" r="70" class="donut-seg donut-btc" stroke="#8b5cf6" stroke-width="20" stroke-dasharray="87.9 439.8" stroke-dashoffset="-219.9"/>
+                    <circle cx="100" cy="100" r="70" class="donut-seg donut-cash" stroke="#d946ef" stroke-width="20" stroke-dasharray="22 439.8" stroke-dashoffset="-307.8"/>
+                  </svg>
+                  <div class="donut-inner-metrics">
+                    <span class="donut-label">Total Assets</span>
+                    <strong class="donut-val">$132,194.10</strong>
+                  </div>
+                </div>
+                <div class="donut-legend">
+                  <div class="legend-item"><span class="legend-dot" style="background:#3b82f6;"></span><span>ETH (45%)</span></div>
+                  <div class="legend-item"><span class="legend-dot" style="background:#10b981;"></span><span>USDC (30%)</span></div>
+                  <div class="legend-item"><span class="legend-dot" style="background:#8b5cf6;"></span><span>BTC (20%)</span></div>
+                  <div class="legend-item"><span class="legend-dot" style="background:#d946ef;"></span><span>Cash (5%)</span></div>
+                </div>
+              </div>
+
+              <!-- Risk Mitigation Status -->
+              <div class="card-glass risk-intelligence-card">
+                <h4>Drawdown Safety Guard</h4>
+                <p class="risk-desc-txt">Araiven evaluates correlation matrix dependencies hourly. Current stance details:</p>
+                <div class="risk-meter-container">
+                  <div class="risk-meter-track">
+                    <div class="risk-meter-fill" id="portfolio-risk-meter-fill" style="width: 42%;"></div>
+                  </div>
+                  <div class="risk-meter-labels">
+                    <span>Conservative (18)</span>
+                    <span class="active-val" id="portfolio-active-risk">Balanced (42)</span>
+                    <span>Aggressive (78)</span>
+                  </div>
+                </div>
+                <div class="risk-guards-feed">
+                  <div class="guard-alert-item success">
+                    <span class="guard-icon">✓</span>
+                    <div>
+                      <h5>Exchange API Connections Secured</h5>
+                      <p>Read/Write trade API enabled. Withdrawal credentials disabled (Fully Protected).</p>
+                    </div>
+                  </div>
+                  <div class="guard-alert-item active">
+                    <span class="guard-icon">🛡️</span>
+                    <div>
+                      <h5>Auto-Hedging Stated</h5>
+                      <p>If drawdown exceeds 3.50%, active exposure indices rotate into Stable baskets.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+        </section>
+
+        <!-- ====================================================================
+           6. TRADE HISTORY VIEW
+           ==================================================================== -->
+        <section class="app-view-panel" id="view-history">
+          <div class="card-glass history-table-card">
+            <div class="card-header-row">
+              <h4>Historical Transaction Ledger</h4>
+              <div class="search-box">
+                <input type="text" class="search-input" placeholder="Search transactions..." id="history-search">
+              </div>
+            </div>
+            <div class="history-table-container">
+              <table class="history-table">
+                <thead>
+                  <tr>
+                    <th>Timestamp</th>
+                    <th>Transaction Type</th>
+                    <th>Asset Detail</th>
+                    <th>Amount</th>
+                    <th>Cleared Price</th>
+                    <th>Execution fee</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="history-rows-container">
+                  <!-- History transactions are injected dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ====================================================================
+           7. NOTIFICATIONS VIEW
+           ==================================================================== -->
+        <section class="app-view-panel" id="view-notifications">
+          <div class="card-glass notifications-page-card" style="max-width: 800px; margin: 0 auto; width: 100%;">
+            <div class="card-header-row" style="margin-bottom: 20px;">
+              <h4 class="text-accent-gradient">Araiven Notifications & Safety Alerts</h4>
+              <button class="btn btn-secondary btn-sm" id="btn-page-clear-all-notifs">Clear All Alerts</button>
+            </div>
+            <div class="notif-list-container" id="page-notif-alerts-list" style="display: flex; flex-direction: column; gap: 12px; margin-top: 20px;">
+              <!-- Dynamic notifications loaded here -->
+            </div>
+          </div>
+        </section>
+
+        <!-- ====================================================================
+           8. SETTINGS VIEW
+           ==================================================================== -->
+        <section class="app-view-panel" id="view-settings">
+          <div class="card-glass settings-page-card" style="max-width: 800px; margin: 0 auto; width: 100%;">
+            <div class="card-header-row" style="margin-bottom: 20px;">
+              <h4 class="text-accent-gradient">SaaS Settings & Connections</h4>
+              <span class="tag-alert-green">SECURE API</span>
+            </div>
+            <p class="step-desc">Manage API credentials, user tiers, security settings, and rebalancing preferences.</p>
+            <div style="margin-top: 24px; display: flex; flex-direction: column; gap: 20px;">
+              <div style="display: flex; flex-direction: column; gap: 8px;">
+                <label style="font-weight: 600; color: #fff;">Integrated Brokerage APIs</label>
+                <div class="card-glass" style="padding: 16px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.06);">
+                  <div>
+                    <strong style="color: #fff;">Binance US & Coinbase Pro</strong>
+                    <span style="display: block; font-size: 0.75rem; color: var(--text-secondary); margin-top: 4px;">Read/Write API keys authenticated. Withdrawal disabled.</span>
+                  </div>
+                  <button class="btn btn-secondary btn-sm">Configure</button>
+                </div>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 8px;">
+                <label style="font-weight: 600; color: #fff;">Araiven Risk Strategy Stance</label>
+                <div class="card-glass" style="padding: 16px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.06);">
+                  <div>
+                    <strong style="color: #fff;">Trailing Drawdown Stop-Loss</strong>
+                    <span style="display: block; font-size: 0.75rem; color: var(--text-secondary); margin-top: 4px;">Automatic re-hedging activates if portfolio variance exceeds active threshold.</span>
+                  </div>
+                  <div class="status-badge active" style="margin: 0; padding: 4px 8px; border-radius: 4px; background: rgba(16, 185, 129, 0.1); color: #10b981; font-size: 0.75rem; font-weight: 600; border: 1px solid rgba(16, 185, 129, 0.2);">ENABLED</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+
+  </div>
+
+  <!-- ==========================================================================
+     Notifications Slide Drawer Center (Legacy/Alternative Quick Panel)
+     ========================================================================== -->
+  <div class="notif-drawer-overlay" id="notif-overlay"></div>
+  <div class="card-glass notif-drawer" id="notif-drawer">
+    <div class="notif-header">
+      <h4>Notifications & Safety Alerts</h4>
+      <button class="drawer-close" id="btn-close-notif">×</button>
+    </div>
+    <div class="notif-list-container" id="notif-alerts-list">
+      <!-- Notifications list injected dynamically -->
+    </div>
+    <div class="notif-footer">
+      <button class="btn btn-secondary btn-sm block-btn" id="btn-clear-all-notifs">Clear All Alerts</button>
+    </div>
+  </div>
+
+  <script src="/dashboard.js"></script>
+</body>
+</html>
