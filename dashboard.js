@@ -13,137 +13,17 @@ document.addEventListener('DOMContentLoaded', () => {
       goal: 'preservation'
     },
     currentScreen: 'dashboard',
-    notifications: [
-      {
-        id: 1,
-        title: 'Drawdown Protection Shield Configured',
-        desc: 'Araiven calculated correlation matrices and established drawdown cushion at 3.50%.',
-        time: 'Just now',
-        unread: true
-      },
-      {
-        id: 2,
-        title: 'Ethereum Staking Alpha Opportunity Ingested',
-        desc: 'New opportunity detected on decentralized staking pools yielding 9.6% APY.',
-        time: '15 mins ago',
-        unread: true
-      },
-      {
-        id: 3,
-        title: 'Exchange API Credentials Checked',
-        desc: 'Connected to Binance and Coinbase APIs successfully. Read/write trade enabled, withdrawals disabled.',
-        time: '1 hour ago',
-        unread: false
-      }
-    ],
-    trades: [
-      {
-        timestamp: '2026-06-23 18:22:15',
-        type: 'Hedge Swap',
-        asset: 'USDC / USDS Stable Basket',
-        amount: '$8,240.00',
-        price: '$1.0002',
-        fee: '$4.12',
-        status: 'Completed'
-      },
-      {
-        timestamp: '2026-06-22 10:14:02',
-        type: 'Staking Rebalance',
-        asset: 'Ethereum (ETH)',
-        amount: '2.500 ETH',
-        price: '$3,482.40',
-        fee: '$8.70',
-        status: 'Completed'
-      },
-      {
-        timestamp: '2026-06-21 14:45:50',
-        type: 'Compounding Rebalance',
-        asset: 'Bitcoin (BTC)',
-        amount: '0.125 BTC',
-        price: '$64,120.10',
-        fee: '$16.03',
-        status: 'Completed'
-      },
-      {
-        timestamp: '2026-06-19 09:30:11',
-        type: 'API Drawdown Shield',
-        asset: 'Solana (SOL) to USDC',
-        amount: '120.50 SOL',
-        price: '$134.20',
-        fee: '$8.09',
-        status: 'Hedged'
-      }
-    ],
-    opportunities: [
-      {
-        id: 'eth-staking',
-        type: 'yield',
-        name: 'Ethereum Staking Alpha',
-        symbol: 'ETH / USD',
-        icon: 'Ξ',
-        desc: 'Validator queue consolidation patterns reveal a post-upgrade yields premium on decentralized pools. Backed by institutional accumulation support lines.',
-        confidence: '94%',
-        risk: 'Low Drawdown',
-        riskClass: 'low',
-        estReturn: '8.0% - 12.0%',
-        allocation: '8.00% swap',
-        stance: 'Balanced Shield'
-      },
-      {
-        id: 'btc-halving',
-        type: 'momentum',
-        name: 'Bitcoin ETF Momentum Stacking',
-        symbol: 'BTC / USD',
-        icon: '₿',
-        desc: 'Spot ETF net inflows show consecutive daily acceleration, coinciding with hodler lockup peaks. Momentum targets a breakout to structural range highs.',
-        confidence: '89%',
-        risk: 'Medium Volatility',
-        riskClass: 'medium',
-        estReturn: '15.0% - 22.0%',
-        allocation: '12.00% swap',
-        stance: 'Hedged Swing'
-      },
-      {
-        id: 'usdc-arbitrage',
-        type: 'yield',
-        name: 'Stablecoin Lending Arbitrage',
-        symbol: 'USDC / USDT / DAI',
-        icon: '$',
-        desc: 'Federal Reserve rate volatility spiked arbitrage yields across Aave and Uniswap lending pools. Rotates cash reserves into peak yield efficiency.',
-        confidence: '91%',
-        risk: 'Minimal Risk',
-        riskClass: 'low',
-        estReturn: '6.5% - 9.2%',
-        allocation: '15.00% swap',
-        stance: 'Capital Guard'
-      },
-      {
-        id: 'solana-liquidity',
-        type: 'momentum',
-        name: 'Solana Liquidity Staking Accumulation',
-        symbol: 'SOL / USD',
-        icon: 'S',
-        desc: 'DEX trading volume indices indicate structural demand trends for Jup/Sol liquidity pairs. High variance yield with automated trailing drawdown trigger.',
-        confidence: '78%',
-        risk: 'High Volatility',
-        riskClass: 'high',
-        estReturn: '22.0% - 32.0%',
-        allocation: '6.00% swap',
-        stance: 'Aggressive Capture'
-      }
-    ]
+    notifications: [],
+    trades: [],
+    opportunities: []
   };
 
-  // Sync risk statistics configurations
   const riskConfigurations = {
     0: { // Conservative
       badgeText: 'CONSERVATIVE SHIELD',
       badgeClass: 'cons',
-      balance: '$124,582.40',
       change: '+$8,340.20 (+7.2% 24h)',
       changeClass: 'positive',
-      apy: '7.18%',
-      risk: '18 / 100',
       riskSub: 'Max Protective Guard Active',
       health: '98%',
       healthSub: 'drawdown capped at 1.50%'
@@ -151,11 +31,8 @@ document.addEventListener('DOMContentLoaded', () => {
     1: { // Balanced
       badgeText: 'BALANCED MODEL',
       badgeClass: '',
-      balance: '$132,194.10',
       change: '+$14,210.60 (+12.0% 24h)',
       changeClass: 'positive',
-      apy: '12.42%',
-      risk: '42 / 100',
       riskSub: 'Balanced Protection Shield',
       health: '96%',
       healthSub: 'drawdown capped at 3.50%'
@@ -163,61 +40,62 @@ document.addEventListener('DOMContentLoaded', () => {
     2: { // Aggressive
       badgeText: 'AGGRESSIVE CAPTURE',
       badgeClass: 'agg',
-      balance: '$149,425.80',
       change: '+$31,520.10 (+26.7% 24h)',
       changeClass: 'positive',
-      apy: '26.74%',
-      risk: '78 / 100',
       riskSub: 'High Volatility Trailing Capture',
       health: '91%',
       healthSub: 'drawdown capped at 8.50%'
     }
   };
 
-  // SVG Chart points datasets
-  const chartDatasets = {
-    0: { // Conservative
-      '24h': [123500, 123800, 123900, 124200, 124100, 124300, 124582],
-      '7d': [121000, 121800, 122400, 122900, 123600, 124000, 124582],
-      '30d': [118000, 119500, 120200, 121900, 122800, 123400, 124582],
-      '1y': [105000, 108000, 111000, 113000, 117000, 120000, 124582]
-    },
-    1: { // Balanced
-      '24h': [128000, 127200, 129500, 128400, 130800, 131500, 132194],
-      '7d': [122000, 124500, 126000, 125100, 129000, 130200, 132194],
-      '30d': [115000, 118000, 122000, 121500, 127000, 129000, 132194],
-      '1y': [98000, 104000, 109000, 112000, 122000, 127000, 132194]
-    },
-    2: { // Aggressive
-      '24h': [141000, 138000, 146000, 142000, 148500, 145000, 149425],
-      '7d': [130000, 138000, 134000, 142000, 145000, 141000, 149425],
-      '30d': [120000, 132000, 127000, 139000, 142000, 136000, 149425],
-      '1y': [88000, 102000, 95000, 118000, 134000, 126000, 149425]
-    }
-  };
+  let activePeriod = '24h';
+  let activeOpportunity = null;
+  let activeRecommendationId = null;
 
-  // Copilot preset responses
-  const copilotPresetResponses = {
-    'yield-audit': {
-      userText: 'Analyze my current yield spread',
-      aiText: 'Under your active model, Araiven is capturing compounding spreads across two major channels: **Ethereum validator staking** (45% allocation, yielding 9.6% APY) and **Stablecoin Lending pool spreads** (30% allocation, yielding 8.2% APY). Both allocations are secured via non-custodial broker channels with 24/7 liquidity availability.',
-      stats: 'Overall Portfolio APY: 12.42% | Safety Index: Fully Compliant'
-    },
-    'hedge-stance': {
-      userText: 'Review macro hedging parameters',
-      aiText: 'Araiven Drawdown Protection is currently active. The safety guard monitors correlation shifts across monitored tokens. If portfolio variance triggers a trailing draw-down threat exceeding **3.50%** in a 24-hour window, active volatile exposures automatically swap into USDC/USDS stable yielding baskets until orderbooks stabilize.',
-      stats: 'Volatility Index: Low Variance | Automatic Drawdown Cushion: 3.50%'
-    },
-    'btc-alloc': {
-      userText: 'Evaluate Bitcoin halving momentum impact',
-      aiText: 'Araiven ETF inflow models show institutional accumulation velocity increasing by **14%** over the last 48 hours. Bitcoin is demonstrating strong support at $64,000. Under your active profile, a momentum target allocation of **12%** ($15,840) is currently deployed to capture price appreciation with an exit target zone of $72,500.',
-      stats: 'Bitcoin Allocation: 20% | Momentum Confidence Index: 89%'
+  // Dynamic API Base URL detection (redirects to port 3000 if served via static servers on other ports)
+  const API_BASE = window.location.port !== '3000' ? 'http://localhost:3000/v1' : '/v1';
+
+  // ==========================================================================
+  // API Call Helper
+  // ==========================================================================
+  async function apiCall(endpoint, options = {}) {
+    const token = localStorage.getItem('ravora_token');
+    const headers = {
+      'Content-Type': 'application/json',
+      ...options.headers
+    };
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
     }
-  };
+    const response = await fetch(API_BASE + endpoint, {
+      ...options,
+      headers
+    });
+    if (response.status === 401) {
+      localStorage.removeItem('ravora_token');
+      showAuthOverlay();
+      throw new Error('Session expired or unauthorized.');
+    }
+    if (!response.ok) {
+      const errData = await response.json().catch(() => ({}));
+      throw new Error(errData.error || `HTTP error! status: ${response.status}`);
+    }
+    return response.json();
+  }
 
   // ==========================================================================
   // Element Selectors
   // ==========================================================================
+  // Auth Overlay
+  const authContainer = document.getElementById('auth-container');
+  const loginForm = document.getElementById('auth-login-form');
+  const registerForm = document.getElementById('auth-register-form');
+  const goToRegister = document.getElementById('go-to-register');
+  const goToLogin = document.getElementById('go-to-login');
+  const loginError = document.getElementById('login-error');
+  const registerError = document.getElementById('register-error');
+  const appLayoutContainer = document.querySelector('.app-layout-container');
+
   // Onboarding
   const onboardingOverlay = document.getElementById('onboarding-container');
   const onboardingSteps = document.querySelectorAll('.onboarding-step');
@@ -240,9 +118,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Global Risk segment control sync
   const appRiskSegmented = document.getElementById('app-risk-segmented');
-  const appRiskCons = document.getElementById('app-risk-cons');
-  const appRiskMod = document.getElementById('app-risk-mod');
-  const appRiskAgg = document.getElementById('app-risk-agg');
 
   // Core metrics fields
   const dashBalance = document.getElementById('dash-balance');
@@ -250,7 +125,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const dashApy = document.getElementById('dash-apy');
   const dashRisk = document.getElementById('dash-risk');
   const dashHealth = document.getElementById('dash-health');
-  const dashRiskSub = document.getElementById('dash-change'); // Wait, let's verify if IDs are correct
   const dashHealthSub = document.getElementById('dash-health-sub');
   
   // Charts
@@ -302,13 +176,150 @@ document.addEventListener('DOMContentLoaded', () => {
   const notifBadgeCount = document.getElementById('notif-badge-count');
   const btnClearAllNotifs = document.getElementById('btn-clear-all-notifs');
 
-  // Utility reset onboarding
+  // Reset Onboarding Guide utility
   const btnTriggerOnboardingReset = document.getElementById('btn-trigger-onboarding-reset');
   const btnHeaderManualScan = document.getElementById('btn-header-manual-scan');
-  const btnDashExecuteDirective = document.getElementById('btn-dash-execute-directive');
 
-  let activePeriod = '24h';
-  let activeOpportunity = null;
+  // ==========================================================================
+  // Auth Form Toggling & Listeners
+  // ==========================================================================
+  if (goToRegister) {
+    goToRegister.addEventListener('click', (e) => {
+      e.preventDefault();
+      loginForm.style.display = 'none';
+      registerForm.style.display = 'block';
+      registerError.style.display = 'none';
+    });
+  }
+
+  if (goToLogin) {
+    goToLogin.addEventListener('click', (e) => {
+      e.preventDefault();
+      registerForm.style.display = 'none';
+      loginForm.style.display = 'block';
+      loginError.style.display = 'none';
+    });
+  }
+
+  function showAuthOverlay() {
+    if (authContainer) authContainer.style.display = 'flex';
+    if (onboardingOverlay) onboardingOverlay.style.display = 'none';
+    if (appLayoutContainer) appLayoutContainer.style.display = 'none';
+  }
+
+  function showOnboardingOverlay() {
+    if (authContainer) authContainer.style.display = 'none';
+    if (onboardingOverlay) onboardingOverlay.style.display = 'flex';
+    if (appLayoutContainer) appLayoutContainer.style.display = 'none';
+    state.currentStep = 1;
+    updateOnboardingStepsVisibility();
+  }
+
+  function showDashboard() {
+    if (authContainer) authContainer.style.display = 'none';
+    if (onboardingOverlay) onboardingOverlay.style.display = 'none';
+    if (appLayoutContainer) appLayoutContainer.style.display = 'flex';
+  }
+
+  function updateUserWidget(email) {
+    const initials = email.substring(0, 2).toUpperCase();
+    const displayName = email.split('@')[0];
+    const userAvatar = document.querySelector('.user-avatar');
+    const userName = document.querySelector('.user-name');
+    const headerGreeting = document.getElementById('app-header-subtitle');
+    if (userAvatar) userAvatar.textContent = initials;
+    if (userName) userName.textContent = displayName.charAt(0).toUpperCase() + displayName.slice(1);
+    if (headerGreeting) {
+      headerGreeting.textContent = `Welcome back, ${displayName.charAt(0).toUpperCase() + displayName.slice(1)}. Araiven engine is monitoring your wealth.`;
+    }
+  }
+
+  async function checkAuthState() {
+    const token = localStorage.getItem('ravora_token');
+    if (!token) {
+      showAuthOverlay();
+      return;
+    }
+    try {
+      // Decode JWT for username greeting
+      const base64Url = token.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+      const payload = JSON.parse(jsonPayload);
+      updateUserWidget(payload.email || 'User');
+
+      const data = await apiCall('/user/profile');
+      if (data.onboardingCompleted) {
+        state.onboardingCompleted = true;
+        state.profile.experience = data.profile.experience_level;
+        state.profile.capital = data.profile.capital;
+        const riskLevels = { conservative: 0, balanced: 1, aggressive: 2 };
+        state.profile.riskLevel = riskLevels[data.profile.risk_stance] ?? 1;
+        state.profile.goal = data.profile.primary_goal;
+
+        showDashboard();
+        initializeDashboardUI();
+      } else {
+        state.onboardingCompleted = false;
+        showOnboardingOverlay();
+      }
+    } catch (e) {
+      console.error('Auth check error:', e);
+      showAuthOverlay();
+    }
+  }
+
+  if (loginForm) {
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      loginError.style.display = 'none';
+      const email = document.getElementById('login-email').value;
+      const password = document.getElementById('login-password').value;
+
+      try {
+        const response = await fetch(API_BASE + '/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.error || 'Login failed.');
+        }
+        localStorage.setItem('ravora_token', data.token);
+        await checkAuthState();
+      } catch (err) {
+        loginError.textContent = err.message;
+        loginError.style.display = 'block';
+      }
+    });
+  }
+
+  if (registerForm) {
+    registerForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      registerError.style.display = 'none';
+      const email = document.getElementById('register-email').value;
+      const password = document.getElementById('register-password').value;
+
+      try {
+        const response = await fetch(API_BASE + '/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.error || 'Registration failed.');
+        }
+        localStorage.setItem('ravora_token', data.token);
+        await checkAuthState();
+      } catch (err) {
+        registerError.textContent = err.message;
+        registerError.style.display = 'block';
+      }
+    });
+  }
 
   // ==========================================================================
   // Onboarding Logic
@@ -321,7 +332,6 @@ document.addEventListener('DOMContentLoaded', () => {
       if (stepEl) stepEl.classList.add('active');
     }
     
-    // Update step dots
     stepDots.forEach((dot, idx) => {
       if (idx + 1 === state.currentStep) {
         dot.classList.add('active');
@@ -330,14 +340,12 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    // Toggle Back button
     if (state.currentStep === 1) {
       btnOnboardingBack.style.display = 'none';
     } else {
       btnOnboardingBack.style.display = 'block';
     }
 
-    // Toggle Next Step button text
     if (state.currentStep === 4) {
       btnOnboardingNext.textContent = 'Generate My Portfolio Copilot';
     } else {
@@ -345,7 +353,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Handle option card selection in onboarding
   const optionCards = document.querySelectorAll('.option-card');
   optionCards.forEach(card => {
     card.addEventListener('click', () => {
@@ -366,7 +373,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Slider interaction
   if (capitalSlider) {
     capitalSlider.addEventListener('input', (e) => {
       const val = parseInt(e.target.value);
@@ -375,7 +381,6 @@ document.addEventListener('DOMContentLoaded', () => {
         capitalDisplayVal.textContent = `$${val.toLocaleString()}`;
       }
       
-      // Deactivate presets if value doesn't match
       presetBtns.forEach(btn => {
         if (parseInt(btn.getAttribute('data-value')) === val) {
           btn.classList.add('active');
@@ -386,7 +391,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Preset Capital Buttons
   presetBtns.forEach(btn => {
     btn.addEventListener('click', () => {
       presetBtns.forEach(b => b.classList.remove('active'));
@@ -401,21 +405,39 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Navigation handlers
   if (btnOnboardingNext) {
-    btnOnboardingNext.addEventListener('click', () => {
+    btnOnboardingNext.addEventListener('click', async () => {
       if (state.currentStep < 4) {
         state.currentStep++;
         updateOnboardingStepsVisibility();
       } else {
-        // Start Araiven Scan Simulation
-        state.currentStep = 5; // Simulation Loader state
-        onboardingSteps.forEach(step => step.classList.remove('active'));
-        if (onboardingLoader) onboardingLoader.classList.add('active');
-        if (btnOnboardingBack) btnOnboardingBack.style.display = 'none';
-        if (btnOnboardingNext) btnOnboardingNext.style.display = 'none';
-        
-        runOnboardingScanningSimulation();
+        btnOnboardingNext.disabled = true;
+        btnOnboardingNext.textContent = 'Saving Profile...';
+
+        try {
+          await apiCall('/user/onboard', {
+            method: 'POST',
+            body: JSON.stringify({
+              experience: state.profile.experience,
+              capital: state.profile.capital,
+              riskLevel: state.profile.riskLevel,
+              goal: state.profile.goal
+            })
+          });
+
+          // Start Simulation loader
+          state.currentStep = 5;
+          onboardingSteps.forEach(step => step.classList.remove('active'));
+          if (onboardingLoader) onboardingLoader.classList.add('active');
+          if (btnOnboardingBack) btnOnboardingBack.style.display = 'none';
+          if (btnOnboardingNext) btnOnboardingNext.style.display = 'none';
+          
+          runOnboardingScanningSimulation();
+        } catch (err) {
+          alert('Failed to save profile: ' + err.message);
+        } finally {
+          btnOnboardingNext.disabled = false;
+        }
       }
     });
   }
@@ -429,7 +451,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Scanning simulation progress
   function runOnboardingScanningSimulation() {
     let progress = 0;
     const interval = setInterval(() => {
@@ -442,18 +463,14 @@ document.addEventListener('DOMContentLoaded', () => {
         onboardingStatusLogs.textContent = 'Copilot Workspace Ready!';
         
         setTimeout(() => {
-          // Fade out onboarding card and container
           onboardingOverlay.classList.add('fade-out-onboarding');
           state.onboardingCompleted = true;
           
-          // Sync main dashboard states
-          syncMainAppRiskState(state.profile.riskLevel);
+          showDashboard();
           initializeDashboardUI();
         }, 800);
       } else {
         onboardingProgressBar.style.width = `${progress}%`;
-        
-        // Update logs based on progress percentage
         if (progress < 25) {
           onboardingStatusLogs.textContent = 'Injecting user risk profile parameters...';
         } else if (progress < 55) {
@@ -467,18 +484,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 250);
   }
 
-  // Reset Onboarding Guide utility
   if (btnTriggerOnboardingReset) {
     btnTriggerOnboardingReset.addEventListener('click', () => {
       state.onboardingCompleted = false;
       state.currentStep = 1;
       
-      // Reset DOM elements
       onboardingOverlay.classList.remove('fade-out-onboarding');
-      onboardingOverlay.style.display = 'flex';
+      showOnboardingOverlay();
       onboardingLoader.classList.remove('active');
       
-      // Activate step 1
       updateOnboardingStepsVisibility();
       if (btnOnboardingBack) btnOnboardingBack.style.display = 'none';
       if (btnOnboardingNext) {
@@ -489,7 +503,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ==========================================================================
-  // SPA Screen Router Navigation (History API SaaS Routing)
+  // SPA Screen Router Navigation
   // ==========================================================================
   const validScreens = ['dashboard', 'watchlist', 'copilot', 'opportunities', 'portfolio', 'history', 'notifications', 'settings'];
 
@@ -498,7 +512,6 @@ document.addEventListener('DOMContentLoaded', () => {
       screenId = 'dashboard';
     }
 
-    // Toggle Active Link states on both sidebar menu buttons and notifications bell button
     const allNavBtns = [...menuTabBtns, btnTriggerNotif];
     allNavBtns.forEach(btn => {
       const btnScreen = btn.getAttribute('data-screen') || (btn.id === 'btn-trigger-notif' ? 'notifications' : '');
@@ -509,7 +522,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    // Toggle Panels
     appViewPanels.forEach(panel => {
       panel.classList.remove('active');
       if (panel.id === `view-${screenId}`) {
@@ -520,7 +532,6 @@ document.addEventListener('DOMContentLoaded', () => {
     state.currentScreen = screenId;
     updateHeaderTitle(screenId);
 
-    // Handle custom canvas redraws or renders if needed
     if (screenId === 'dashboard') {
       drawPortfolioChart(activePeriod, state.profile.riskLevel);
     } else if (screenId === 'portfolio') {
@@ -529,19 +540,17 @@ document.addEventListener('DOMContentLoaded', () => {
         pRiskMeter.style.width = state.profile.riskLevel === 0 ? '18%' : (state.profile.riskLevel === 1 ? '42%' : '78%');
       }
     } else if (screenId === 'notifications') {
-      renderPageNotificationsFeed();
-      // Mark all as read when entering notifications view
-      state.notifications.forEach(n => n.unread = false);
-      renderNotificationsFeed();
+      // Mark notifications read on the backend
+      apiCall('/notifications/read', { method: 'POST' }).then(() => {
+        loadNotifications();
+      });
     }
 
-    // Push history state if requested
     if (pushState) {
       history.pushState({ screen: screenId }, '', '/app/' + screenId);
     }
   }
 
-  // Bind Sidebar Tab Clicks to navigateTo
   menuTabBtns.forEach(btn => {
     btn.addEventListener('click', () => {
       const targetScreen = btn.getAttribute('data-screen');
@@ -551,13 +560,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Bind Notifications bell button click to navigate to /app/notifications route
   if (btnTriggerNotif) {
-    // Replace the legacy click drawer toggle with routing navigation
     const newBtnTriggerNotif = btnTriggerNotif.cloneNode(true);
     btnTriggerNotif.parentNode.replaceChild(newBtnTriggerNotif, btnTriggerNotif);
-    
-    // re-assign selector variable to the new cloned node
     const updatedBtnTriggerNotif = document.getElementById('btn-trigger-notif');
     updatedBtnTriggerNotif.addEventListener('click', (e) => {
       e.preventDefault();
@@ -565,7 +570,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Bind browser history back/forward buttons
   window.addEventListener('popstate', (e) => {
     const pathSegments = window.location.pathname.split('/');
     let screenId = pathSegments[pathSegments.length - 1] || 'dashboard';
@@ -577,7 +581,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function updateHeaderTitle(screen) {
     const titles = {
-      dashboard: { main: 'Portfolio Dashboard', sub: 'Welcome back, Raja. Araiven engine is actively guarding your wealth.' },
+      dashboard: { main: 'Portfolio Dashboard', sub: 'Welcome back. Araiven engine is actively guarding your wealth.' },
       watchlist: { main: 'Market Watchlist', sub: 'High-priority asset tickers flagged by Araiven intelligence.' },
       copilot: { main: 'Araiven Wealth Copilot', sub: 'Ask questions, review strategy logs, and run active rebalance audits.' },
       opportunities: { main: 'Opportunity Explorer', sub: 'Real-time high-probability alpha allocation strategies compiled by Araiven.' },
@@ -592,91 +596,14 @@ document.addEventListener('DOMContentLoaded', () => {
     if (appHeaderSubtitle) appHeaderSubtitle.textContent = config.sub;
   }
 
-  // Render notifications on dedicated view page
-  function renderPageNotificationsFeed() {
-    const pageNotifList = document.getElementById('page-notif-alerts-list');
-    if (!pageNotifList) return;
-    pageNotifList.innerHTML = '';
-
-    if (state.notifications.length === 0) {
-      pageNotifList.innerHTML = '<div class="card-glass" style="padding: 40px; text-align: center; color: var(--text-secondary);">No active security alerts or notifications.</div>';
-      return;
-    }
-
-    state.notifications.forEach(n => {
-      const item = document.createElement('div');
-      item.className = 'notif-alert-item';
-      item.style.display = 'flex';
-      item.style.justifyContent = 'space-between';
-      item.style.alignItems = 'center';
-      item.style.padding = '16px';
-      item.style.marginBottom = '12px';
-      item.style.border = '1px solid rgba(255,255,255,0.06)';
-      item.style.borderRadius = '8px';
-      item.style.background = 'rgba(255, 255, 255, 0.02)';
-      
-      if (n.unread) {
-        item.style.borderColor = 'rgba(124, 58, 237, 0.25)';
-        item.style.background = 'rgba(124, 58, 237, 0.03)';
-      }
-
-      item.innerHTML = `
-        <div style="flex-grow: 1; margin-right: 16px;">
-          <h5 style="margin: 0 0 4px 0; color: #fff; font-size: 0.95rem;">${n.title}</h5>
-          <p style="margin: 0 0 6px 0; font-size: 0.8rem; color: var(--text-secondary); line-height: 1.4;">${n.desc}</p>
-          <span style="font-size: 0.7rem; color: var(--text-muted); font-family: monospace;">${n.time}</span>
-        </div>
-        <button class="notif-dismiss" data-id="${n.id}" style="background: none; border: none; color: var(--text-muted); font-size: 1.2rem; cursor: pointer; padding: 4px; line-height: 1;">×</button>
-      `;
-
-      const dismissBtn = item.querySelector('.notif-dismiss');
-      dismissBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        dismissNotification(n.id);
-        renderPageNotificationsFeed();
-      });
-
-      pageNotifList.appendChild(item);
-    });
-  }
-
-  // Bind Page Clear All button
-  const btnPageClearAllNotifs = document.getElementById('btn-page-clear-all-notifs');
-  if (btnPageClearAllNotifs) {
-    btnPageClearAllNotifs.addEventListener('click', () => {
-      state.notifications = [];
-      renderNotificationsFeed();
-      renderPageNotificationsFeed();
-    });
-  }
-
-  // Initial routing resolution
-  function resolveInitialRoute() {
-    const initRoute = sessionStorage.getItem('initialRoute');
-    if (initRoute) {
-      sessionStorage.removeItem('initialRoute');
-      navigateTo(initRoute, false);
-      history.replaceState({ screen: initRoute }, '', '/app/' + initRoute);
-    } else {
-      const pathSegments = window.location.pathname.split('/');
-      let screenId = pathSegments[pathSegments.length - 1] || 'dashboard';
-      if (screenId === 'app' || screenId === '') {
-        screenId = 'dashboard';
-      }
-      navigateTo(screenId, false);
-      history.replaceState({ screen: screenId }, '', '/app/' + screenId);
-    }
-  }
-
   // ==========================================================================
-  // Risk Synchronization Stance (Conservative, Balanced, Aggressive)
+  // Risk Synchronization Stance (DOM Only Sync Helper)
   // ==========================================================================
-  function syncMainAppRiskState(val) {
+  function syncMainAppRiskStateDOMOnly(val) {
     state.profile.riskLevel = val;
     const config = riskConfigurations[val];
     if (!config) return;
 
-    // Update active segmented button toggles in top nav bar
     const riskBtns = appRiskSegmented.querySelectorAll('.segmented-btn');
     riskBtns.forEach((btn, idx) => {
       if (idx === val) {
@@ -686,25 +613,19 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    // Update sidebar risk badge
     if (sidebarBadge) {
       sidebarBadge.textContent = config.badgeText;
       sidebarBadge.className = 'sidebar-badge';
       if (config.badgeClass) sidebarBadge.classList.add(config.badgeClass);
     }
 
-    // Sync stats inside dashboard
-    if (dashBalance) dashBalance.textContent = config.balance;
     if (dashChange) {
       dashChange.textContent = config.change;
       dashChange.className = `metric-change ${config.changeClass}`;
     }
-    if (dashApy) dashApy.textContent = config.apy;
-    if (dashRisk) dashRisk.textContent = config.risk;
     if (dashHealth) dashHealth.textContent = config.health;
     if (dashHealthSub) dashHealthSub.textContent = config.healthSub;
 
-    // Sync Portfolio tab risk meter details
     if (portfolioActiveRisk) {
       const stanceLabel = val === 0 ? 'Conservative (18)' : (val === 1 ? 'Balanced (42)' : 'Aggressive (78)');
       portfolioActiveRisk.textContent = stanceLabel;
@@ -713,33 +634,35 @@ document.addEventListener('DOMContentLoaded', () => {
       portfolioRiskMeterFill.style.width = val === 0 ? '18%' : (val === 1 ? '42%' : '78%');
     }
 
-    // Sync Donut chart weights based on profile
     syncDonutAllocationWeights(val);
-
-    // Sync holdings table rows
-    renderPortfolioHoldingsRows(val);
-
-    // Redraw Growth Chart
-    drawPortfolioChart(activePeriod, val);
   }
 
-  // Bind topbar risk selector buttons
+  // Bind topbar risk selector buttons to Backend Re-Onboard Swap
   const topRiskBtns = appRiskSegmented.querySelectorAll('.segmented-btn');
   topRiskBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', async () => {
       const val = parseInt(btn.getAttribute('data-value'));
-      syncMainAppRiskState(val);
-      
-      // Log notification of rebalance stance alteration
-      const label = val === 0 ? 'Conservative' : (val === 1 ? 'Balanced' : 'Aggressive');
-      addSystemNotification(
-        'Risk Guard Model Stance Swapped',
-        `Capital allocation adjusted to enforce the ${label} threshold limits.`
-      );
+      if (state.profile.riskLevel === val) return;
+
+      try {
+        await apiCall('/user/onboard', {
+          method: 'POST',
+          body: JSON.stringify({
+            experience: state.profile.experience,
+            capital: state.profile.capital,
+            riskLevel: val,
+            goal: state.profile.goal
+          })
+        });
+
+        state.profile.riskLevel = val;
+        await initializeDashboardUI();
+      } catch (err) {
+        console.error('Error changing risk stance:', err);
+      }
     });
   });
 
-  // Dynamic Donut chart weights
   function syncDonutAllocationWeights(riskLevel) {
     const donutSegs = {
       0: { eth: '109.9 439.8', usdc: '241.9 439.8', btc: '44 439.8', cash: '44 439.8', ethOff: '109.9', usdcOff: '-109.9', btcOff: '-351.8', cashOff: '-395.8', legend: ['ETH (25%)', 'USDC (55%)', 'BTC (10%)', 'Cash (10%)'] },
@@ -748,6 +671,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const dSet = donutSegs[riskLevel];
+    if (!dSet) return;
     const donutEth = document.querySelector('.donut-seg.donut-eth');
     const donutUsdc = document.querySelector('.donut-seg.donut-usdc');
     const donutBtc = document.querySelector('.donut-seg.donut-btc');
@@ -770,7 +694,6 @@ document.addEventListener('DOMContentLoaded', () => {
       donutCash.setAttribute('stroke-dashoffset', dSet.cashOff);
     }
 
-    // Legend text updates
     const legendItems = document.querySelectorAll('.donut-legend .legend-item span:last-child');
     if (legendItems.length >= 4) {
       legendItems[0].textContent = dSet.legend[0];
@@ -779,40 +702,45 @@ document.addEventListener('DOMContentLoaded', () => {
       legendItems[3].textContent = dSet.legend[3];
     }
 
-    // Inner center metric display balance
     const donutValDisplay = document.querySelector('.donut-inner-metrics strong');
     if (donutValDisplay) {
-      donutValDisplay.textContent = riskConfigurations[riskLevel].balance;
+      donutValDisplay.textContent = `$${state.profile.capital.toLocaleString()}`;
     }
   }
 
   // ==========================================================================
   // Dynamic Bezier SVG Area Chart Drawing
   // ==========================================================================
-  function drawPortfolioChart(period, riskLevel) {
+  async function drawPortfolioChart(period, riskLevel) {
     if (!largeChartLine || !largeChartArea) return;
     
     activePeriod = period;
-    const dataset = chartDatasets[riskLevel][period];
-    if (!dataset) return;
+    let points = [];
+    try {
+      const data = await apiCall(`/portfolio/history?period=${period}`);
+      points = data.points;
+    } catch (e) {
+      console.error('Error drawing chart:', e);
+      return;
+    }
+
+    if (points.length === 0) return;
 
     const width = 800;
     const height = 280;
     const padding = 20;
 
-    const minVal = Math.min(...dataset) * 0.998;
-    const maxVal = Math.max(...dataset) * 1.002;
-    const valRange = maxVal - minVal;
+    const minVal = Math.min(...points) * 0.998;
+    const maxVal = Math.max(...points) * 1.002;
+    const valRange = maxVal - minVal || 1;
 
-    const stepX = (width - padding * 2) / (dataset.length - 1);
-    const coords = dataset.map((val, idx) => {
+    const stepX = (width - padding * 2) / (points.length - 1);
+    const coords = points.map((val, idx) => {
       const x = padding + idx * stepX;
-      // y is inverted in SVG coordinate space
       const y = height - padding - ((val - minVal) / valRange) * (height - padding * 2);
       return { x, y };
     });
 
-    // Generate Bezier path string
     let linePath = `M ${coords[0].x} ${coords[0].y}`;
     for (let i = 0; i < coords.length - 1; i++) {
       const cpX1 = coords[i].x + stepX / 2;
@@ -822,14 +750,11 @@ document.addEventListener('DOMContentLoaded', () => {
       linePath += ` C ${cpX1} ${cpY1}, ${cpX2} ${cpY2}, ${coords[i + 1].x} ${coords[i + 1].y}`;
     }
 
-    // Generate closed Area path string
     const areaPath = `${linePath} L ${coords[coords.length - 1].x} ${height} L ${coords[0].x} ${height} Z`;
 
-    // Apply attributes to SVG paths
     largeChartLine.setAttribute('d', linePath);
     largeChartArea.setAttribute('d', areaPath);
     
-    // Update pointer dot at the final point coordinates
     const pointer = document.getElementById('large-chart-pointer');
     if (pointer) {
       pointer.setAttribute('cx', coords[coords.length - 1].x);
@@ -838,7 +763,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Chart duration tab button binds
   chartPeriodButtons.forEach(btn => {
     btn.addEventListener('click', () => {
       chartPeriodButtons.forEach(b => b.classList.remove('active'));
@@ -871,66 +795,69 @@ document.addEventListener('DOMContentLoaded', () => {
     copilotMessagesLog.scrollTop = copilotMessagesLog.scrollHeight;
   }
 
-  function simulateCopilotTypingResponse(userText, aiText, stats = '', actionHtml = '') {
-    // 1. Append User message
-    appendChatMessage('user', userText);
-
-    // 2. Append Typing indicator bubble
-    const typingBubble = document.createElement('div');
-    typingBubble.className = 'msg-bubble system typing-bubble';
-    typingBubble.innerHTML = '<p>Araiven is analyzing correlation matrices...</p>';
-    copilotMessagesLog.appendChild(typingBubble);
-    copilotMessagesLog.scrollTop = copilotMessagesLog.scrollHeight;
-
-    // 3. Remove typing bubble and append actual response
-    setTimeout(() => {
-      typingBubble.remove();
-      appendChatMessage('copilot', aiText, stats, actionHtml);
-    }, 1200);
-  }
-
-  // Preset Buttons
+  // Presets inside copilot panel click
   chatPresetBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const qKey = btn.getAttribute('data-query');
-      const response = copilotPresetResponses[qKey];
-      if (!response) return;
+    btn.addEventListener('click', async () => {
+      const qKey = btn.getAttribute('data-preset');
+      const queries = {
+        'yield-audit': 'Analyze my current yield spread',
+        'hedge-stance': 'Review macro hedging parameters',
+        'btc-alloc': 'Evaluate Bitcoin halving momentum impact'
+      };
+      const text = queries[qKey] || btn.textContent;
 
-      // Temporarily disable buttons
+      appendChatMessage('user', text);
       chatPresetBtns.forEach(b => b.disabled = true);
 
-      simulateCopilotTypingResponse(response.userText, response.aiText, response.stats);
+      // Typing animation
+      const typingBubble = document.createElement('div');
+      typingBubble.className = 'msg-bubble system typing-bubble';
+      typingBubble.innerHTML = '<div class="typing-indicator"><span></span><span></span><span></span></div>';
+      copilotMessagesLog.appendChild(typingBubble);
+      copilotMessagesLog.scrollTop = copilotMessagesLog.scrollHeight;
 
-      setTimeout(() => {
+      try {
+        const res = await apiCall('/copilot/message', {
+          method: 'POST',
+          body: JSON.stringify({ message: text })
+        });
+        typingBubble.remove();
+        appendChatMessage('system', res.reply, res.stats);
+      } catch (e) {
+        typingBubble.remove();
+        appendChatMessage('system', 'Copilot encountered an error auditing strategy parameters.');
+      } finally {
         chatPresetBtns.forEach(b => b.disabled = false);
-      }, 1300);
+      }
     });
   });
 
-  // Text Send button
+  // Text send button custom trigger
   if (btnCopilotSend && copilotChatInput) {
-    btnCopilotSend.addEventListener('click', () => {
+    btnCopilotSend.addEventListener('click', async () => {
       const text = copilotChatInput.value.trim();
       if (!text) return;
 
       copilotChatInput.value = '';
-      
-      // Determine response mapping based on keywords
-      let aiText = 'I scanned global sentiment feeds, macro indices, and your capital exposure model. Stance parameters remain locked and protected. Please specify another audit query.';
-      let stats = 'Model Sync Index: 100% | Safety Stance: Compliant';
-      
-      if (text.toLowerCase().includes('staking') || text.toLowerCase().includes('ethereum') || text.toLowerCase().includes('eth')) {
-        aiText = 'Ethereum staking validation spreads continue to yield an alpha spread at **9.62% APY**. Your active profile currently holds 45% allocation. No rebalances required.';
-        stats = 'ETH Allocation: 45% | Staking Safety Index: Excellent';
-      } else if (text.toLowerCase().includes('bitcoin') || text.toLowerCase().includes('btc')) {
-        aiText = 'Bitcoin spot ETF net volumes remain accelerated, establishing support bounds at $64,000. Trailing momentum model targets compound execution triggers at $72,500.';
-        stats = 'BTC Allocation: 20% | Momentum Index: 89%';
-      } else if (text.toLowerCase().includes('risk') || text.toLowerCase().includes('drawdown') || text.toLowerCase().includes('protect')) {
-        aiText = 'Your active protective drawdown index limit is set to **3.50%**. Under this model, if daily drawdowns exceed this margin, volatile assets rotate automatically into USDC stable yielding lending pools.';
-        stats = 'Drawdown Buffer: 3.50% | Trailing Shield: Enabled';
-      }
+      appendChatMessage('user', text);
 
-      simulateCopilotTypingResponse(text, aiText, stats);
+      const typingBubble = document.createElement('div');
+      typingBubble.className = 'msg-bubble system typing-bubble';
+      typingBubble.innerHTML = '<div class="typing-indicator"><span></span><span></span><span></span></div>';
+      copilotMessagesLog.appendChild(typingBubble);
+      copilotMessagesLog.scrollTop = copilotMessagesLog.scrollHeight;
+
+      try {
+        const res = await apiCall('/copilot/message', {
+          method: 'POST',
+          body: JSON.stringify({ message: text })
+        });
+        typingBubble.remove();
+        appendChatMessage('system', res.reply, res.stats);
+      } catch (e) {
+        typingBubble.remove();
+        appendChatMessage('system', 'Audit engine offline.');
+      }
     });
 
     copilotChatInput.addEventListener('keypress', (e) => {
@@ -942,88 +869,55 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Execute swap rebalance button in Copilot Side Panel
   if (btnCopilotRebalanceExecute) {
-    btnCopilotRebalanceExecute.addEventListener('click', () => {
+    btnCopilotRebalanceExecute.addEventListener('click', async () => {
+      if (!activeRecommendationId) {
+        alert('No pending directive rebalance is active to execute.');
+        return;
+      }
+
       btnCopilotRebalanceExecute.disabled = true;
       btnCopilotRebalanceExecute.textContent = 'Clearing Swap...';
 
-      setTimeout(() => {
-        // Log transaction in history
-        const timestamp = new Date().toISOString().replace('T', ' ').substring(0, 19);
-        state.trades.unshift({
-          timestamp,
-          type: 'Copilot Swap',
-          asset: 'USDC to ETH Staking',
-          amount: '$10,560.00',
-          price: '$3,485.10',
-          cleared: '$3,485.10',
-          fee: '$10.56',
-          status: 'Completed'
+      try {
+        const res = await apiCall(`/opportunities/recommendations/${activeRecommendationId}/execute`, {
+          method: 'POST'
         });
-
-        // Add System notification
-        addSystemNotification(
-          'Rebalance Swap Directive Executed',
-          'Successfully swapped $10,560 USDC reserves to ETH Staking Alpha.'
-        );
-
-        // Append Copilot execution complete message
-        appendChatMessage(
-          'system',
-          'Swap execution confirmed. Clear receipt: 8% USDC reserves successfully deployed into ETH Staking. Stance exposure updated.',
-          'Cleared Swap Value: $10,560.00 | Fee: $10.56'
-        );
-
-        // Update balances inside stats
-        const activeRisk = state.profile.riskLevel;
-        if (activeRisk === 1) {
-          // modify allocation metrics
-          const donutEth = document.querySelector('.donut-seg.donut-eth');
-          const donutUsdc = document.querySelector('.donut-seg.donut-usdc');
-          if (donutEth && donutUsdc) {
-            // ETH goes from 45% to 53%, USDC goes from 30% to 22%
-            donutEth.setAttribute('stroke-dasharray', '233.1 439.8');
-            donutEth.setAttribute('stroke-dashoffset', '109.9');
-            donutUsdc.setAttribute('stroke-dasharray', '96.7 439.8');
-            donutUsdc.setAttribute('stroke-dashoffset', '-123.2');
-          }
-          
-          const legendItems = document.querySelectorAll('.donut-legend .legend-item span:last-child');
-          if (legendItems.length >= 4) {
-            legendItems[0].textContent = 'ETH (53%)';
-            legendItems[1].textContent = 'USDC (22%)';
-          }
-        }
-
-        renderTradeHistoryRows();
-        renderPortfolioHoldingsRows(activeRisk);
 
         btnCopilotRebalanceExecute.textContent = 'Swap Executed';
         btnCopilotRebalanceExecute.className = 'btn btn-secondary block-btn';
-      }, 1500);
+
+        appendChatMessage(
+          'system',
+          `Swap execution confirmed. Clear receipt: ${res.transactionId} successfully cleared.`,
+          `Cleared Swap Value: Fee: $${res.executionFee.toFixed(2)}`
+        );
+
+        await initializeDashboardUI();
+      } catch (err) {
+        btnCopilotRebalanceExecute.disabled = false;
+        btnCopilotRebalanceExecute.textContent = 'Execute Rebalance';
+        alert(err.message);
+      }
     });
   }
 
   // ==========================================================================
   // Opportunity Explorer Section
   // ==========================================================================
-  function renderOpportunitiesCards(filter = 'all', searchQuery = '') {
+  function renderOpportunitiesCardsLocal(filter = 'all', searchQuery = '') {
     if (!opportunitiesCardsContainer) return;
     opportunitiesCardsContainer.innerHTML = '';
 
     const cards = state.opportunities.filter(opp => {
-      // Filter by tab type
       if (filter !== 'all') {
-        if (filter === 'alpha' && opp.type !== 'yield') return false; // wait, let's look at icons/types
-        if (filter === 'yield' && opp.id !== 'eth-staking' && opp.id !== 'usdc-arbitrage') return false;
+        if (filter === 'alpha' && opp.type !== 'yield') return false;
+        if (filter === 'yield' && opp.opportunityId !== 'eth-staking' && opp.opportunityId !== 'usdc-arbitrage') return false;
         if (filter === 'momentum' && opp.type !== 'momentum') return false;
       }
-      
-      // Filter by search query
       if (searchQuery) {
         return opp.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
                opp.symbol.toLowerCase().includes(searchQuery.toLowerCase());
       }
-
       return true;
     });
 
@@ -1035,26 +929,26 @@ document.addEventListener('DOMContentLoaded', () => {
     cards.forEach(opp => {
       const card = document.createElement('div');
       card.className = 'card-glass opportunity-card';
-      card.setAttribute('data-id', opp.id);
+      card.setAttribute('data-id', opp.opportunityId);
       
       card.innerHTML = `
         <div class="opp-badge-row">
           <span class="opp-type-tag">${opp.type === 'yield' ? 'Yield Premium' : 'Momentum Flow'}</span>
-          <span class="opp-risk-badge ${opp.riskClass}">${opp.risk}</span>
+          <span class="opp-risk-badge ${opp.riskLevel}">${opp.riskLevel}</span>
         </div>
         <div class="opp-main-info">
           <h4>${opp.name}</h4>
           <span>${opp.symbol}</span>
         </div>
-        <p class="opp-reasoning-snippet">${opp.desc.substring(0, 115)}...</p>
+        <p class="opp-reasoning-snippet">${opp.reasoningText.substring(0, 115)}...</p>
         <div class="opp-metrics-bar">
           <div class="opp-metric-col">
             <span>Est. Return</span>
-            <strong class="text-green">${opp.estReturn}</strong>
+            <strong class="text-green">${opp.expectedReturn}</strong>
           </div>
           <div class="opp-metric-col">
             <span>Confidence</span>
-            <strong class="text-gradient">${opp.confidence}</strong>
+            <strong class="text-gradient">${opp.confidenceScore}%</strong>
           </div>
         </div>
       `;
@@ -1067,7 +961,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Filter Tab Switching
   explorerFilterTabs.forEach(btn => {
     btn.addEventListener('click', () => {
       explorerFilterTabs.forEach(b => b.classList.remove('active'));
@@ -1075,20 +968,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const filter = btn.getAttribute('data-filter');
       const searchQuery = explorerSearchInput ? explorerSearchInput.value : '';
-      renderOpportunitiesCards(filter, searchQuery);
+      renderOpportunitiesCardsLocal(filter, searchQuery);
     });
   });
 
-  // Search input bind
   if (explorerSearchInput) {
     explorerSearchInput.addEventListener('input', (e) => {
       const activeFilterBtn = document.querySelector('#explorer-filter-tabs button.active');
       const filter = activeFilterBtn ? activeFilterBtn.getAttribute('data-filter') : 'all';
-      renderOpportunitiesCards(filter, e.target.value);
+      renderOpportunitiesCardsLocal(filter, e.target.value);
     });
   }
 
-  // Detail drawer opening
   function openOpportunityDetailDrawer(opp) {
     activeOpportunity = opp;
     if (!opportunityDetailDrawer) return;
@@ -1097,14 +988,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (drawerAssetName) drawerAssetName.textContent = opp.name;
     if (drawerAssetSymbol) drawerAssetSymbol.textContent = opp.symbol;
     if (drawerAssetIcon) drawerAssetIcon.textContent = opp.icon;
-    if (drawerBadgeConf) drawerBadgeConf.textContent = `${opp.confidence} Confidence`;
-    if (drawerReasoningText) drawerReasoningText.textContent = opp.desc;
-    if (drawerStatReturn) drawerStatReturn.textContent = opp.estReturn;
-    if (drawerStatRisk) drawerStatRisk.textContent = opp.risk;
-    if (drawerStatAllocation) drawerStatAllocation.textContent = opp.allocation;
-    if (drawerStatStance) drawerStatStance.textContent = opp.stance;
+    if (drawerBadgeConf) drawerBadgeConf.textContent = `${opp.confidenceScore}% Confidence`;
+    if (drawerReasoningText) drawerReasoningText.textContent = opp.reasoningText;
+    if (drawerStatReturn) drawerStatReturn.textContent = opp.expectedReturn;
+    if (drawerStatRisk) drawerStatRisk.textContent = opp.riskLevel;
+    if (drawerStatAllocation) drawerStatAllocation.textContent = 'Flexible reserves';
+    if (drawerStatStance) drawerStatStance.textContent = 'Direct compound';
 
-    // Reset button states
     if (btnDrawerDeploy) {
       btnDrawerDeploy.textContent = 'Confirm & Deploy Allocation';
       btnDrawerDeploy.disabled = false;
@@ -1114,102 +1004,51 @@ document.addEventListener('DOMContentLoaded', () => {
     opportunityDetailDrawer.classList.add('open');
   }
 
-  // Close drawer
   if (btnCloseDrawer) {
     btnCloseDrawer.addEventListener('click', () => {
       opportunityDetailDrawer.classList.remove('open');
     });
   }
 
-  // Confirm Deploy button
   if (btnDrawerDeploy) {
-    btnDrawerDeploy.addEventListener('click', () => {
+    btnDrawerDeploy.addEventListener('click', async () => {
       if (!activeOpportunity) return;
 
       const allocationPct = drawerAmountInput ? parseInt(drawerAmountInput.value) : 8;
+      const amountUSD = state.profile.capital * (allocationPct / 100);
 
       btnDrawerDeploy.disabled = true;
       btnDrawerDeploy.textContent = 'Deploying capital...';
 
-      setTimeout(() => {
-        // Log transaction in history
-        const timestamp = new Date().toISOString().replace('T', ' ').substring(0, 19);
-        const valueDeployed = (state.profile.capital * (allocationPct / 100)).toLocaleString('en-US', { style: 'currency', currency: 'USD' });
-        
-        state.trades.unshift({
-          timestamp,
-          type: 'Capital Deploy',
-          asset: activeOpportunity.name,
-          amount: `${allocationPct}% Allocation`,
-          price: 'Market Clear',
-          fee: '$12.40',
-          status: 'Completed'
+      try {
+        await apiCall('/opportunities/deploy', {
+          method: 'POST',
+          body: JSON.stringify({
+            opportunityId: activeOpportunity.opportunityId,
+            amount: amountUSD
+          })
         });
 
-        // Add System notification
-        addSystemNotification(
-          'Capital Deployment Active',
-          `Deployed ${allocationPct}% capital reserves into ${activeOpportunity.name} strategy.`
-        );
-
-        renderTradeHistoryRows();
-        
         btnDrawerDeploy.textContent = 'Allocation Deployed';
         btnDrawerDeploy.className = 'btn btn-secondary btn-lg block-btn';
-        
+
+        await initializeDashboardUI();
+
         setTimeout(() => {
           opportunityDetailDrawer.classList.remove('open');
         }, 800);
-      }, 1500);
-    });
-  }
-
-  // ==========================================================================
-  // Portfolio Holdings Rows Renderer
-  // ==========================================================================
-  function renderPortfolioHoldingsRows(riskLevel) {
-    if (!portfolioHoldingsRows) return;
-    portfolioHoldingsRows.innerHTML = '';
-
-    const holdingsData = {
-      0: [
-        { name: 'Ethereum Staking Alpha', allocation: '25%', balance: '$31,145.60', entry: '$3,410.20', change: '+3.42%', positive: true },
-        { name: 'Stablecoin Yield Basket', allocation: '55%', balance: '$68,520.32', entry: '$1.0001', change: '+0.12%', positive: true },
-        { name: 'Bitcoin ETF Index', allocation: '10%', balance: '$12,458.24', entry: '$64,250.00', change: '-1.10%', positive: false },
-        { name: 'USDC Cash Reserves', allocation: '10%', balance: '$12,458.24', entry: '$1.0000', change: '0.00%', positive: true }
-      ],
-      1: [
-        { name: 'Ethereum Staking Alpha', allocation: '45%', balance: '$59,487.34', entry: '$3,450.40', change: '+2.15%', positive: true },
-        { name: 'Stablecoin Yield Basket', allocation: '30%', balance: '$39,658.23', entry: '$1.0002', change: '+0.15%', positive: true },
-        { name: 'Bitcoin ETF Index', allocation: '20%', balance: '$26,438.82', entry: '$64,120.10', change: '+1.40%', positive: true },
-        { name: 'USDC Cash Reserves', allocation: '5%', balance: '$6,609.71', entry: '$1.0000', change: '0.00%', positive: true }
-      ],
-      2: [
-        { name: 'Ethereum Staking Alpha', allocation: '55%', balance: '$82,184.19', entry: '$3,485.10', change: '+1.02%', positive: true },
-        { name: 'Stablecoin Yield Basket', allocation: '10%', balance: '$14,942.58', entry: '$1.0000', change: '+0.05%', positive: true },
-        { name: 'Bitcoin ETF Index', allocation: '30%', balance: '$44,827.74', entry: '$63,980.50', change: '+2.50%', positive: true },
-        { name: 'USDC Cash Reserves', allocation: '5%', balance: '$7,471.29', entry: '$1.0000', change: '0.00%', positive: true }
-      ]
-    };
-
-    const rows = holdingsData[riskLevel];
-    rows.forEach(hold => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td style="font-weight:600; color:#fff;">${hold.name}</td>
-        <td><strong>${hold.allocation}</strong></td>
-        <td>${hold.balance}</td>
-        <td>${hold.entry}</td>
-        <td class="${hold.positive ? 'text-green' : 'text-error'}">${hold.change}</td>
-      `;
-      portfolioHoldingsRows.appendChild(tr);
+      } catch (err) {
+        btnDrawerDeploy.disabled = false;
+        btnDrawerDeploy.textContent = 'Confirm & Deploy Allocation';
+        alert(err.message);
+      }
     });
   }
 
   // ==========================================================================
   // Trade History Rows Renderer
   // ==========================================================================
-  function renderTradeHistoryRows(searchQuery = '') {
+  function renderTradeHistoryRowsLocal(searchQuery = '') {
     if (!historyRowsContainer) return;
     historyRowsContainer.innerHTML = '';
 
@@ -1229,8 +1068,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     filteredTrades.forEach(t => {
       const tr = document.createElement('tr');
-      
-      const badgeClass = t.status.toLowerCase(); // completed, hedged, active
+      const badgeClass = t.status.toLowerCase();
       
       tr.innerHTML = `
         <td style="font-family:monospace; font-size:0.75rem;">${t.timestamp}</td>
@@ -1245,21 +1083,20 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // History search input bind
   if (historySearchInput) {
     historySearchInput.addEventListener('input', (e) => {
-      renderTradeHistoryRows(e.target.value);
+      renderTradeHistoryRowsLocal(e.target.value);
     });
   }
 
   // ==========================================================================
   // Notifications Center Drawer System
   // ==========================================================================
-  function renderNotificationsFeed() {
+  function renderNotificationsFeedLocal() {
     if (!notifAlertsList) return;
     notifAlertsList.innerHTML = '';
 
-    const unreads = state.notifications.filter(n => n.unread).length;
+    const unreads = state.notifications.filter(n => !n.isRead).length;
     if (notifBadgeCount) {
       if (unreads > 0) {
         notifBadgeCount.textContent = unreads;
@@ -1277,65 +1114,68 @@ document.addEventListener('DOMContentLoaded', () => {
     state.notifications.forEach(n => {
       const item = document.createElement('div');
       item.className = 'notif-alert-item';
-      if (n.unread) {
+      if (!n.isRead) {
         item.style.borderColor = 'rgba(124,58,237,0.3)';
         item.style.background = 'rgba(124,58,237,0.02)';
       }
 
       item.innerHTML = `
         <h5>${n.title}</h5>
-        <p>${n.desc}</p>
-        <span class="notif-time">${n.time}</span>
-        <button class="notif-dismiss" data-id="${n.id}">×</button>
+        <p>${n.body}</p>
+        <span class="notif-time">Alert</span>
+        <button class="notif-dismiss" data-id="${n.notificationId}">×</button>
       `;
-
-      // Mark as read when hover or open
-      if (n.unread) {
-        item.addEventListener('mouseenter', () => {
-          n.unread = false;
-          renderNotificationsFeed();
-        });
-      }
-
-      // Dismiss listener
-      const dismissBtn = item.querySelector('.notif-dismiss');
-      dismissBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        dismissNotification(n.id);
-      });
 
       notifAlertsList.appendChild(item);
     });
 
-    // Sync with the dedicated Notifications view page
     renderPageNotificationsFeed();
   }
 
-  function dismissNotification(id) {
-    state.notifications = state.notifications.filter(n => n.id !== id);
-    renderNotificationsFeed();
-  }
+  function renderPageNotificationsFeed() {
+    const pageNotifList = document.getElementById('page-notif-alerts-list');
+    if (!pageNotifList) return;
+    pageNotifList.innerHTML = '';
 
-  function addSystemNotification(title, desc) {
-    state.notifications.unshift({
-      id: Date.now(),
-      title,
-      desc,
-      time: 'Just now',
-      unread: true
+    if (state.notifications.length === 0) {
+      pageNotifList.innerHTML = '<div class="card-glass" style="padding: 40px; text-align: center; color: var(--text-secondary);">No active security alerts or notifications.</div>';
+      return;
+    }
+
+    state.notifications.forEach(n => {
+      const item = document.createElement('div');
+      item.className = 'notif-alert-item';
+      item.style.display = 'flex';
+      item.style.justifyContent = 'space-between';
+      item.style.alignItems = 'center';
+      item.style.padding = '16px';
+      item.style.marginBottom = '12px';
+      item.style.border = '1px solid rgba(255,255,255,0.06)';
+      item.style.borderRadius = '8px';
+      item.style.background = 'rgba(255, 255, 255, 0.02)';
+      
+      if (!n.isRead) {
+        item.style.borderColor = 'rgba(124, 58, 237, 0.25)';
+        item.style.background = 'rgba(124, 58, 237, 0.03)';
+      }
+
+      item.innerHTML = `
+        <div style="flex-grow: 1; margin-right: 16px;">
+          <h5 style="margin: 0 0 4px 0; color: #fff; font-size: 0.95rem;">${n.title}</h5>
+          <p style="margin: 0 0 6px 0; font-size: 0.8rem; color: var(--text-secondary); line-height: 1.4;">${n.body}</p>
+          <span style="font-size: 0.7rem; color: var(--text-muted); font-family: monospace;">Alert</span>
+        </div>
+        <button class="notif-dismiss" data-id="${n.notificationId}" style="background: none; border: none; color: var(--text-muted); font-size: 1.2rem; cursor: pointer; padding: 4px; line-height: 1;">×</button>
+      `;
+
+      pageNotifList.appendChild(item);
     });
-    renderNotificationsFeed();
   }
 
-  // Toggle drawer listeners
   if (btnTriggerNotif) {
     btnTriggerNotif.addEventListener('click', () => {
       notifDrawer.classList.add('active');
       notifOverlay.classList.add('active');
-      
-      // Mark all as read when opening drawer
-      state.notifications.forEach(n => n.unread = false);
-      renderNotificationsFeed();
     });
   }
 
@@ -1353,18 +1193,32 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Clear all alerts
   if (btnClearAllNotifs) {
-    btnClearAllNotifs.addEventListener('click', () => {
-      state.notifications = [];
-      renderNotificationsFeed();
+    btnClearAllNotifs.addEventListener('click', async () => {
+      try {
+        await apiCall('/notifications/read', { method: 'POST' });
+        await loadNotifications();
+      } catch (e) {
+        console.error(e);
+      }
+    });
+  }
+
+  const btnPageClearAllNotifs = document.getElementById('btn-page-clear-all-notifs');
+  if (btnPageClearAllNotifs) {
+    btnPageClearAllNotifs.addEventListener('click', async () => {
+      try {
+        await apiCall('/notifications/read', { method: 'POST' });
+        await loadNotifications();
+      } catch (e) {
+        console.error(e);
+      }
     });
   }
 
   // ==========================================================================
   // Header Actions Binds
   // ==========================================================================
-  // Manual scan button simulation
   if (btnHeaderManualScan) {
     btnHeaderManualScan.addEventListener('click', () => {
       btnHeaderManualScan.disabled = true;
@@ -1389,98 +1243,215 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         if (dot) dot.style.background = 'var(--success)';
 
-        addSystemNotification(
-          'Manual Ingest Scan Complete',
-          'Araiven checked 150+ news streams, orderbooks, and liquidity arbitrage spreads. No exposure rebalances needed.'
-        );
+        apiCall('/notifications', {
+          method: 'GET'
+        }).then(() => {
+          loadNotifications();
+        });
       }, 2000);
     });
   }
 
-  // Execute directive in Dashboard
-  if (btnDashExecuteDirective) {
-    btnDashExecuteDirective.addEventListener('click', () => {
-      btnDashExecuteDirective.disabled = true;
-      btnDashExecuteDirective.textContent = 'Deploying Swap...';
-
-      setTimeout(() => {
-        // Log transaction in history
-        const timestamp = new Date().toISOString().replace('T', ' ').substring(0, 19);
-        state.trades.unshift({
-          timestamp,
-          type: 'Dashboard Swap',
-          asset: 'USDC to ETH Staking',
-          amount: '8% reserves ($10,560)',
-          price: 'Market Swap',
-          fee: '$10.56',
-          status: 'Completed'
+  // ==========================================================================
+  // Load UI Sub-Routines
+  // ==========================================================================
+  async function loadPortfolioData() {
+    try {
+      const data = await apiCall('/portfolio');
+      state.profile.capital = data.currentBalance;
+      
+      if (dashBalance) dashBalance.textContent = `$${data.currentBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      if (dashApy) dashApy.textContent = data.annualizedYield;
+      if (dashRisk) {
+        dashRisk.textContent = `${100 - data.safetyScore} / 100`;
+      }
+      
+      if (portfolioHoldingsRows) {
+        portfolioHoldingsRows.innerHTML = '';
+        data.holdings.forEach(h => {
+          const tr = document.createElement('tr');
+          const valUSD = h.amount * h.currentPrice;
+          tr.innerHTML = `
+            <td style="font-weight:600; color:#fff;">${h.asset}</td>
+            <td><strong>${h.allocationPct.toFixed(1)}%</strong></td>
+            <td>$${valUSD.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+            <td>$${h.entryPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+            <td class="${h.change24h >= 0 ? 'text-green' : 'text-error'}">${h.change24h >= 0 ? '+' : ''}${h.change24h.toFixed(2)}%</td>
+          `;
+          portfolioHoldingsRows.appendChild(tr);
         });
+      }
 
-        // Add System notification
-        addSystemNotification(
-          'Swap Directive Executed',
-          'Swapped 8% USDC reserves to ETH Staking Alpha opportunity successfully.'
-        );
+      // Sync inner donut center
+      const donutValDisplay = document.querySelector('.donut-inner-metrics strong');
+      if (donutValDisplay) {
+        donutValDisplay.textContent = `$${data.currentBalance.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+      }
+    } catch (e) {
+      console.error('Error loading portfolio:', e);
+    }
+  }
 
-        // Update stats
-        const activeRisk = state.profile.riskLevel;
-        if (activeRisk === 1) {
-          // Adjust allocation donut segs
-          const donutEth = document.querySelector('.donut-seg.donut-eth');
-          const donutUsdc = document.querySelector('.donut-seg.donut-usdc');
-          if (donutEth && donutUsdc) {
-            donutEth.setAttribute('stroke-dasharray', '233.1 439.8');
-            donutEth.setAttribute('stroke-dashoffset', '109.9');
-            donutUsdc.setAttribute('stroke-dasharray', '96.7 439.8');
-            donutUsdc.setAttribute('stroke-dashoffset', '-123.2');
-          }
-          const legendItems = document.querySelectorAll('.donut-legend .legend-item span:last-child');
-          if (legendItems.length >= 4) {
-            legendItems[0].textContent = 'ETH (53%)';
-            legendItems[1].textContent = 'USDC (22%)';
-          }
+  async function loadRecommendations() {
+    const card = document.querySelector('.active-directive-card');
+    if (!card) return;
+
+    try {
+      const data = await apiCall('/opportunities/recommendations');
+      if (data.length === 0) {
+        card.innerHTML = `
+          <div class="card-header-row">
+            <h4 class="text-accent-gradient">Active Araiven Directive</h4>
+            <span class="tag-alert-green" style="background: rgba(255,255,255,0.05); color: var(--text-secondary); border-color: rgba(255,255,255,0.1);">IDLE</span>
+          </div>
+          <div class="directive-content" style="padding: 20px 0; text-align: center; color: var(--text-secondary);">
+            <p>Araiven Engine is scanning markets. No active directives or swap recommendations at this time.</p>
+          </div>
+        `;
+        activeRecommendationId = null;
+        if (btnCopilotRebalanceExecute) {
+          btnCopilotRebalanceExecute.disabled = true;
+          btnCopilotRebalanceExecute.textContent = 'No Rebalance Active';
         }
+        return;
+      }
 
-        renderTradeHistoryRows();
-        renderPortfolioHoldingsRows(activeRisk);
+      const rec = data[0];
+      activeRecommendationId = rec.recommendationId;
 
-        btnDashExecuteDirective.textContent = 'Directive Deployed';
-        btnDashExecuteDirective.className = 'btn btn-secondary';
-        
-        // Hide recommended tag
-        const recTag = document.querySelector('.active-directive-card .tag-alert-green');
-        if (recTag) recTag.style.display = 'none';
-      }, 1500);
-    });
+      card.innerHTML = `
+        <div class="card-header-row">
+          <h4 class="text-accent-gradient">Active Araiven Directive</h4>
+          <span class="tag-alert-green">RECOMMENDED</span>
+        </div>
+        <div class="directive-content">
+          <h5>Allocate ${rec.suggestedAllocationPct}% reserves to ${rec.opportunity.name}</h5>
+          <p>${rec.reasoningText}</p>
+          <div class="directive-action-box">
+            <div class="directive-stats">
+              <div>
+                <span>Confidence</span>
+                <strong class="text-green">${rec.opportunity.confidenceScore}%</strong>
+              </div>
+              <div>
+                <span>Risk Level</span>
+                <strong class="text-blue" style="text-transform: capitalize;">${rec.opportunity.riskLevel}</strong>
+              </div>
+            </div>
+            <button class="btn btn-primary" id="btn-dash-execute-directive" data-id="${rec.recommendationId}">Approve & Execute</button>
+          </div>
+        </div>
+      `;
+
+      const btn = document.getElementById('btn-dash-execute-directive');
+      if (btn) {
+        btn.addEventListener('click', () => executeActiveRecommendation(rec.recommendationId));
+      }
+
+      if (btnCopilotRebalanceExecute) {
+        btnCopilotRebalanceExecute.disabled = false;
+        btnCopilotRebalanceExecute.textContent = 'Execute Stance Rebalance';
+        btnCopilotRebalanceExecute.className = 'btn btn-primary block-btn';
+      }
+    } catch (e) {
+      console.error('Error loading recommendations:', e);
+    }
+  }
+
+  async function executeActiveRecommendation(id) {
+    const btn = document.getElementById('btn-dash-execute-directive');
+    if (!btn) return;
+
+    btn.disabled = true;
+    btn.textContent = 'Deploying Swap...';
+
+    try {
+      const res = await apiCall(`/opportunities/recommendations/${id}/execute`, {
+        method: 'POST'
+      });
+
+      btn.textContent = 'Directive Deployed';
+      btn.className = 'btn btn-secondary';
+
+      appendChatMessage(
+        'system',
+        `Rebalance Swap Directive Executed. Clear receipt: ${res.transactionId} successfully cleared.`,
+        `Cleared Swap Value: Fee: $${res.executionFee.toFixed(2)}`
+      );
+
+      await initializeDashboardUI();
+    } catch (err) {
+      btn.disabled = false;
+      btn.textContent = 'Approve & Execute';
+      alert(err.message);
+    }
+  }
+
+  async function loadOpportunities() {
+    try {
+      const data = await apiCall('/opportunities');
+      state.opportunities = data;
+      const activeFilterBtn = document.querySelector('#explorer-filter-tabs button.active');
+      const filter = activeFilterBtn ? activeFilterBtn.getAttribute('data-filter') : 'all';
+      const searchVal = explorerSearchInput ? explorerSearchInput.value : '';
+      renderOpportunitiesCardsLocal(filter, searchVal);
+    } catch (e) {
+      console.error('Error loading opportunities:', e);
+    }
+  }
+
+  async function loadTradeHistory() {
+    try {
+      const data = await apiCall('/portfolio/transactions');
+      state.trades = data;
+      renderTradeHistoryRowsLocal();
+    } catch (e) {
+      console.error('Error loading trade history:', e);
+    }
+  }
+
+  async function loadNotifications() {
+    try {
+      const data = await apiCall('/notifications');
+      state.notifications = data;
+      renderNotificationsFeedLocal();
+    } catch (e) {
+      console.error('Error loading notifications:', e);
+    }
   }
 
   // ==========================================================================
   // Dashboard UI Initializer
   // ==========================================================================
-  function initializeDashboardUI() {
-    // Sync active metrics
-    syncMainAppRiskState(state.profile.riskLevel);
-    
-    // Draw chart initially
-    drawPortfolioChart('24h', state.profile.riskLevel);
-
-    // Render Explorer cards
-    renderOpportunitiesCards('all', '');
-
-    // Render holdings rows
-    renderPortfolioHoldingsRows(state.profile.riskLevel);
-
-    // Render Trade ledger
-    renderTradeHistoryRows();
-
-    // Render notification list
-    renderNotificationsFeed();
+  async function initializeDashboardUI() {
+    syncMainAppRiskStateDOMOnly(state.profile.riskLevel);
+    await loadPortfolioData();
+    await drawPortfolioChart('24h', state.profile.riskLevel);
+    await loadOpportunities();
+    await loadRecommendations();
+    await loadTradeHistory();
+    await loadNotifications();
   }
 
-  // Initialize Onboarding step views on load
-  updateOnboardingStepsVisibility();
+  function resolveInitialRoute() {
+    const initRoute = sessionStorage.getItem('initialRoute');
+    if (initRoute) {
+      sessionStorage.removeItem('initialRoute');
+      navigateTo(initRoute, false);
+      history.replaceState({ screen: initRoute }, '', '/app/' + initRoute);
+    } else {
+      const pathSegments = window.location.pathname.split('/');
+      let screenId = pathSegments[pathSegments.length - 1] || 'dashboard';
+      if (screenId === 'app' || screenId === '') {
+        screenId = 'dashboard';
+      }
+      navigateTo(screenId, false);
+      history.replaceState({ screen: screenId }, '', '/app/' + screenId);
+    }
+  }
 
-  // Resolve initial SaaS path routing
+  // Check auth state immediately on load
+  checkAuthState();
   resolveInitialRoute();
 
 });
