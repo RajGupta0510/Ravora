@@ -1,6 +1,8 @@
 import crypto from 'crypto';
 import { dbGet, dbRun, dbQuery } from '../database.js';
 import { MarketDataService } from '../services/marketDataService.js';
+import { ASSETS_TO_TRACK } from '../config/marketConfig.js';
+import { RecommendationEngine } from '../services/recommendations/recommendationEngine.js';
 
 export const getOpportunities = async (req, res) => {
   try {
@@ -11,7 +13,9 @@ export const getOpportunities = async (req, res) => {
       name: o.name,
       symbol: o.symbol,
       icon: o.icon_symbol,
+      opportunityScore: o.opportunity_score,
       confidenceScore: o.confidence_score,
+      riskScore: o.risk_score,
       riskLevel: o.risk_level,
       expectedReturn: o.expected_return,
       reasoningText: o.reasoning_text,
@@ -37,10 +41,10 @@ export const getRecommendations = async (req, res) => {
   try {
     const recs = await dbQuery(
       `SELECT r.id as recommendationId, r.suggested_allocation_pct as suggestedAllocationPct, r.status,
-              o.id as opportunityId, o.name, o.symbol, o.icon_symbol as icon, o.confidence_score as confidenceScore,
-              o.expected_return as expectedReturn, o.risk_level as riskLevel, o.reasoning_text as reasoningText,
-              o.suggested_entry, o.suggested_stop_loss, o.suggested_take_profit, o.expected_duration, o.risk_reward_ratio,
-              o.trend_direction, o.support_levels, o.resistance_levels
+              o.id as opportunityId, o.name, o.symbol, o.icon_symbol as icon, o.opportunity_score as opportunityScore,
+              o.confidence_score as confidenceScore, o.risk_score as riskScore, o.expected_return as expectedReturn,
+              o.risk_level as riskLevel, o.reasoning_text as reasoningText, o.suggested_entry, o.suggested_stop_loss,
+              o.suggested_take_profit, o.expected_duration, o.risk_reward_ratio, o.trend_direction, o.support_levels, o.resistance_levels
        FROM araiven_recommendations r
        JOIN opportunities o ON r.opportunity_id = o.id
        WHERE r.user_id = ? AND r.status = 'pending'`,
@@ -54,7 +58,9 @@ export const getRecommendations = async (req, res) => {
         name: r.name,
         symbol: r.symbol,
         icon: r.icon,
+        opportunityScore: r.opportunityScore,
         confidenceScore: r.confidenceScore,
+        riskScore: r.riskScore,
         expectedReturn: r.expectedReturn,
         riskLevel: r.riskLevel,
         suggestedEntry: r.suggested_entry,
@@ -355,5 +361,43 @@ export const deployOpportunity = async (req, res) => {
   } catch (err) {
     console.error('Error deploying opportunity:', err);
     return res.status(500).json({ error: 'Internal server error deploying opportunity.' });
+  }
+};
+
+export const scanMarkets = async (req, res) => {
+  const userId = req.user.id;
+  try {
+    console.log(`[Market Scanner] Manual scan triggered by user ${userId}`);
+
+    // Step 1: Immediately run scoring engine on existing cached data
+    // This makes the API respond fast (< 1 second) regardless of external API speed
+    await RecommendationEngine.generateRecommendations(userId);
+
+    // Step 2: Respond to the client immediately so the UI can update
+    res.json({ success: true, message: 'Araiven quantitative analysis completed. Refreshing market data in background.' });
+
+    // Step 3: Refresh external market data in the BACKGROUND (non-blocking)
+    // If Binance/CoinCap are slow/down, the UI is not affected
+    setImmediate(async () => {
+      try {
+        console.log('[Market Scanner] Background: Refreshing tickers from external APIs...');
+        await MarketDataService.updateTickers();
+
+        console.log('[Market Scanner] Background: Refreshing price history...');
+        for (const symbol of ASSETS_TO_TRACK) {
+          await MarketDataService.updateHistory(symbol);
+        }
+
+        // Run a second scoring pass now with fresh real-world data
+        await RecommendationEngine.generateRecommendations(userId);
+        console.log('[Market Scanner] Background refresh complete with fresh market data.');
+      } catch (bgErr) {
+        console.error('[Market Scanner] Background refresh error (non-critical):', bgErr.message);
+      }
+    });
+
+  } catch (err) {
+    console.error('Error during market scan:', err);
+    return res.status(500).json({ error: 'Failed to run market scanner engine: ' + err.message });
   }
 };

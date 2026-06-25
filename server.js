@@ -7,7 +7,7 @@ import { verifyToken } from './src/middleware/auth.js';
 import { register, login } from './src/controllers/authController.js';
 import { getProfile, onboard, updateSettings } from './src/controllers/userController.js';
 import { getPortfolio, getPortfolioHistory, getTransactions, closePosition } from './src/controllers/portfolioController.js';
-import { getOpportunities, getRecommendations, executeRecommendation, deployOpportunity } from './src/controllers/opportunityController.js';
+import { getOpportunities, getRecommendations, executeRecommendation, deployOpportunity, scanMarkets } from './src/controllers/opportunityController.js';
 import { copilotMessage, getNotifications, markNotificationsRead, connectExchange } from './src/controllers/copilotController.js';
 import { MarketDataService } from './src/services/marketDataService.js';
 import { RecommendationEngine } from './src/services/recommendations/recommendationEngine.js';
@@ -132,6 +132,7 @@ apiRouter.get('/opportunities', verifyToken, getOpportunities);
 apiRouter.get('/opportunities/recommendations', verifyToken, getRecommendations);
 apiRouter.post('/opportunities/recommendations/:id/execute', verifyToken, executeRecommendation);
 apiRouter.post('/opportunities/deploy', verifyToken, deployOpportunity);
+apiRouter.post('/market/scan', verifyToken, scanMarkets);
 
 // Copilot conversation (Protected)
 apiRouter.post('/copilot/message', verifyToken, copilotMessage);

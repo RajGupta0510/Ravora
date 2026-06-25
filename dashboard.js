@@ -303,128 +303,117 @@ document.addEventListener('DOMContentLoaded', () => {
       return JSON.parse(localStorage.getItem('ravora_transactions') || '[]');
     }
 
-    // Handle GET /opportunities
+    // Handle GET /opportunities — always attempt real backend first
     if (urlPath === '/opportunities') {
-      try {
-        const response = await fetch(`${API_BASE}/market/overview`);
-        if (!response.ok) throw new Error('Failed to fetch market overview');
-        const overview = await response.json();
-
-        // Map the real cached assets from the backend overview to opportunity objects
-        return overview.map(asset => {
-          let type = 'momentum';
-          let icon = '🪙';
-          let riskLevel = 'medium';
-          let estReturn = '15.0% - 22.0%';
-          let reasoningText = '';
-
-          const changeSign = asset.change24h >= 0 ? '+' : '';
-          const capText = asset.marketCap > 1e9 ? `${(asset.marketCap / 1e9).toFixed(2)}B` : `${(asset.marketCap / 1e6).toFixed(2)}M`;
-          const volText = asset.volume24h > 1e9 ? `${(asset.volume24h / 1e9).toFixed(2)}B` : `${(asset.volume24h / 1e6).toFixed(2)}M`;
-
-          if (asset.symbol === 'BTC') {
-            type = 'momentum';
-            icon = '₿';
-            riskLevel = 'medium';
-            estReturn = `${changeSign}${asset.change24h.toFixed(2)}% (24h)`;
-            reasoningText = `Bitcoin trading is highly active with a 24h volume of $${volText} and market cap of $${capText}. Momentum is calculated at ${asset.momentumScore}/100 based on price changes.`;
-          } else if (asset.symbol === 'ETH') {
-            type = 'yield';
-            icon = 'Ξ';
-            riskLevel = 'low';
-            estReturn = `${changeSign}${asset.change24h.toFixed(2)}% (24h)`;
-            reasoningText = `Ethereum exhibits high liquidity with a 24h trading volume of $${volText}. Staking yield alpha and institutional demand drive a confidence score of ${asset.confidenceScore}/100.`;
-          } else if (asset.symbol === 'SOL') {
-            type = 'momentum';
-            icon = 'S';
-            riskLevel = 'high';
-            estReturn = `${changeSign}${asset.change24h.toFixed(2)}% (24h)`;
-            reasoningText = `Solana is demonstrating strong price velocity and capital velocity with a liquidity score of ${asset.liquidityScore}/100. Trade volumes indicate structural demand trends.`;
-          } else if (asset.symbol === 'LINK') {
-            type = 'momentum';
-            icon = 'L';
-            riskLevel = 'medium';
-            estReturn = `${changeSign}${asset.change24h.toFixed(2)}% (24h)`;
-            reasoningText = `Chainlink decentralized oracle flows are showing moderate momentum. Real volume of $${volText} reflects active oracle network utility integration.`;
-          } else if (asset.symbol === 'SUI') {
-            type = 'momentum';
-            icon = 'U';
-            riskLevel = 'high';
-            estReturn = `${changeSign}${asset.change24h.toFixed(2)}% (24h)`;
-            reasoningText = `Sui blockchain transaction velocity translates to volatile momentum changes. High variance capture with dynamic correlation monitoring is recommended.`;
-          } else {
-            type = 'momentum';
-            icon = '🪙';
-            riskLevel = 'medium';
-            estReturn = `${changeSign}${asset.change24h.toFixed(2)}% (24h)`;
-            reasoningText = `${asset.name} opportunity backed by live market cap of $${capText} and 24h volume of $${volText}.`;
-          }
-
-          return {
-            opportunityId: asset.symbol.toLowerCase() + '-opportunity',
-            type,
-            name: asset.name,
-            symbol: `${asset.symbol} / USD`,
-            icon,
-            confidenceScore: asset.confidenceScore,
-            riskLevel,
-            expectedReturn: estReturn,
-            reasoningText,
-            price: asset.price,
-            change24h: asset.change24h,
-            volume24h: asset.volume24h,
-            marketCap: asset.marketCap
-          };
-        });
-      } catch (err) {
-        console.error('Error fetching real opportunities, falling back to mock:', err);
-        return [
-          {
-            opportunityId: 'eth-staking',
-            type: 'yield',
-            name: 'Ethereum Staking Alpha',
-            symbol: 'ETH / USD',
-            icon: 'Ξ',
-            confidenceScore: 94,
-            riskLevel: 'low',
-            expectedReturn: '8.0% - 12.0%',
-            reasoningText: 'Validator queue consolidation patterns reveal a post-upgrade yields premium on decentralized pools. Backed by institutional accumulation support lines.'
-          },
-          {
-            opportunityId: 'btc-halving',
-            type: 'momentum',
-            name: 'Bitcoin ETF Momentum Stacking',
-            symbol: 'BTC / USD',
-            icon: '₿',
-            confidenceScore: 89,
-            riskLevel: 'medium',
-            expectedReturn: '15.0% - 22.0%',
-            reasoningText: 'Spot ETF net inflows show consecutive daily acceleration, coinciding with hodler lockup peaks. Momentum targets a breakout to structural range highs.'
-          },
-          {
-            opportunityId: 'usdc-arbitrage',
-            type: 'yield',
-            name: 'Stablecoin Lending Arbitrage',
-            symbol: 'USDC / USDT / DAI',
-            icon: '$',
-            confidenceScore: 91,
-            riskLevel: 'low',
-            expectedReturn: '6.5% - 9.2%',
-            reasoningText: 'Federal Reserve rate volatility spiked arbitrage yields across Aave and Uniswap lending pools. Rotates cash reserves into peak yield efficiency.'
-          },
-          {
-            opportunityId: 'solana-liquidity',
-            type: 'momentum',
-            name: 'Solana Liquidity Staking Accumulation',
-            symbol: 'SOL / USD',
-            icon: 'S',
-            confidenceScore: 78,
-            riskLevel: 'high',
-            expectedReturn: '22.0% - 32.0%',
-            reasoningText: 'DEX trading volume indices indicate structural demand trends for Jup/Sol liquidity pairs. High variance yield with automated trailing drawdown trigger.'
-          }
-        ];
-      }
+      // This block is only reached if the real API fetch at the top of apiCall failed.
+      // Provide a minimum-viable static fallback with all required scoring fields.
+      return [
+        {
+          opportunityId: 'btc-halving',
+          type: 'momentum',
+          name: 'Bitcoin ETF Momentum Stacking',
+          symbol: 'BTC / USD',
+          icon: '₿',
+          opportunityScore: 72,
+          confidenceScore: 70,
+          riskScore: 38,
+          riskLevel: 'medium',
+          expectedReturn: '15.0% - 22.0%',
+          reasoningText: 'Spot ETF net inflows show consecutive daily acceleration, coinciding with hodler lockup peaks. Momentum targets a breakout to structural range highs.',
+          suggestedEntry: 0,
+          suggestedStopLoss: 0,
+          suggestedTakeProfit: 0,
+          riskRewardRatio: 'N/A',
+          expectedDuration: 'N/A',
+          trendDirection: 'Bullish',
+          supportLevels: [],
+          resistanceLevels: []
+        },
+        {
+          opportunityId: 'eth-staking',
+          type: 'yield',
+          name: 'Ethereum Staking Alpha',
+          symbol: 'ETH / USD',
+          icon: 'Ξ',
+          opportunityScore: 80,
+          confidenceScore: 78,
+          riskScore: 28,
+          riskLevel: 'low',
+          expectedReturn: '8.0% - 12.0%',
+          reasoningText: 'Validator queue consolidation patterns reveal a post-upgrade yields premium on decentralized pools. Backed by institutional accumulation support lines.',
+          suggestedEntry: 0,
+          suggestedStopLoss: 0,
+          suggestedTakeProfit: 0,
+          riskRewardRatio: 'N/A',
+          expectedDuration: 'N/A',
+          trendDirection: 'Bullish',
+          supportLevels: [],
+          resistanceLevels: []
+        },
+        {
+          opportunityId: 'solana-liquidity',
+          type: 'momentum',
+          name: 'Solana Liquidity Staking Accumulation',
+          symbol: 'SOL / USD',
+          icon: 'S',
+          opportunityScore: 65,
+          confidenceScore: 60,
+          riskScore: 62,
+          riskLevel: 'high',
+          expectedReturn: '22.0% - 32.0%',
+          reasoningText: 'DEX trading volume indices indicate structural demand trends for Jup/Sol liquidity pairs. High variance yield with automated trailing drawdown trigger.',
+          suggestedEntry: 0,
+          suggestedStopLoss: 0,
+          suggestedTakeProfit: 0,
+          riskRewardRatio: 'N/A',
+          expectedDuration: 'N/A',
+          trendDirection: 'Range',
+          supportLevels: [],
+          resistanceLevels: []
+        },
+        {
+          opportunityId: 'bnb-breakout',
+          type: 'momentum',
+          name: 'Binance Coin Ecosystem Breakout',
+          symbol: 'BNB / USD',
+          icon: 'B',
+          opportunityScore: 68,
+          confidenceScore: 63,
+          riskScore: 45,
+          riskLevel: 'medium',
+          expectedReturn: '10.0% - 18.0%',
+          reasoningText: 'Binance Coin transaction velocity indicates structural breakout momentum above local range resistance. BNB burns and ecosystem expansion provide bullish tailwind.',
+          suggestedEntry: 0,
+          suggestedStopLoss: 0,
+          suggestedTakeProfit: 0,
+          riskRewardRatio: 'N/A',
+          expectedDuration: 'N/A',
+          trendDirection: 'Bullish',
+          supportLevels: [],
+          resistanceLevels: []
+        },
+        {
+          opportunityId: 'sui-alpha',
+          type: 'momentum',
+          name: 'Sui Network Velocity Expansion',
+          symbol: 'SUI / USD',
+          icon: 'U',
+          opportunityScore: 58,
+          confidenceScore: 52,
+          riskScore: 70,
+          riskLevel: 'high',
+          expectedReturn: '18.0% - 28.0%',
+          reasoningText: 'Sui blockchain transaction velocity translates to volatile momentum changes. High variance capture with dynamic correlation monitoring is recommended.',
+          suggestedEntry: 0,
+          suggestedStopLoss: 0,
+          suggestedTakeProfit: 0,
+          riskRewardRatio: 'N/A',
+          expectedDuration: 'N/A',
+          trendDirection: 'Range',
+          supportLevels: [],
+          resistanceLevels: []
+        }
+      ];
     }
 
     // Handle GET /opportunities/recommendations
@@ -454,8 +443,8 @@ document.addEventListener('DOMContentLoaded', () => {
       // Special handling for dynamic alignment recommendations
       if (rec.opportunity.opportunityId && rec.opportunity.opportunityId.endsWith('-align')) {
         let holdings = [];
-        let prices = { BTC: 64120.10, ETH: 3485.10, SOL: 134.20, LINK: 15.40, SUI: 1.15, USDC: 1.00, EMERG: 50.0 };
-        let changes = { BTC: 1.25, ETH: 1.25, SOL: 1.25, LINK: 1.25, SUI: 1.25, USDC: 0.0, EMERG: 1.25 };
+        let prices = { BTC: 64120.10, ETH: 3485.10, SOL: 134.20, BNB: 580.10, SUI: 1.15, USDC: 1.00, EMERG: 50.0 };
+        let changes = { BTC: 1.25, ETH: 1.25, SOL: 1.25, BNB: 1.25, SUI: 1.25, USDC: 0.0, EMERG: 1.25 };
 
         try {
           const pRes = await fetch(`${API_BASE}/market/overview`);
@@ -480,8 +469,9 @@ document.addEventListener('DOMContentLoaded', () => {
           holdings = [
             { asset: 'Bitcoin', symbol: 'BTC', allocationPct: 25.0, amount: (capital * 0.25) / prices.BTC, entryPrice: prices.BTC, currentPrice: prices.BTC, change24h: changes.BTC },
             { asset: 'Ethereum', symbol: 'ETH', allocationPct: 25.0, amount: (capital * 0.25) / prices.ETH, entryPrice: prices.ETH, currentPrice: prices.ETH, change24h: changes.ETH },
-            { asset: 'Solana', symbol: 'SOL', allocationPct: 25.0, amount: (capital * 0.25) / prices.SOL, entryPrice: prices.SOL, currentPrice: prices.SOL, change24h: changes.SOL },
-            { asset: 'Sui', symbol: 'SUI', allocationPct: 25.0, amount: (capital * 0.25) / prices.SUI, entryPrice: prices.SUI, currentPrice: prices.SUI, change24h: changes.SUI }
+            { asset: 'Solana', symbol: 'SOL', allocationPct: 20.0, amount: (capital * 0.20) / prices.SOL, entryPrice: prices.SOL, currentPrice: prices.SOL, change24h: changes.SOL },
+            { asset: 'Binance Coin', symbol: 'BNB', allocationPct: 15.0, amount: (capital * 0.15) / prices.BNB, entryPrice: prices.BNB, currentPrice: prices.BNB, change24h: changes.BNB },
+            { asset: 'Sui', symbol: 'SUI', allocationPct: 15.0, amount: (capital * 0.15) / prices.SUI, entryPrice: prices.SUI, currentPrice: prices.SUI, change24h: changes.SUI }
           ];
         } else { // moderate-align
           holdings = [
@@ -535,7 +525,7 @@ document.addEventListener('DOMContentLoaded', () => {
       let targetSymbol = 'ETH';
       if (rec.opportunity.symbol.includes('BTC')) targetSymbol = 'BTC';
       else if (rec.opportunity.symbol.includes('SOL')) targetSymbol = 'SOL';
-      else if (rec.opportunity.symbol.includes('LINK')) targetSymbol = 'LINK';
+      else if (rec.opportunity.symbol.includes('BNB')) targetSymbol = 'BNB';
       else if (rec.opportunity.symbol.includes('SUI')) targetSymbol = 'SUI';
       else if (rec.opportunity.symbol.includes('USDC')) targetSymbol = 'USDC';
 
@@ -551,7 +541,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       } catch (err) {
         console.error('Error fetching live targetPrice, using mock fallback:', err);
-        const fallbackPrices = { ETH: 3485.10, BTC: 64120.10, SOL: 134.20, LINK: 15.40, SUI: 1.15, USDC: 1.00, USDS: 1.00 };
+        const fallbackPrices = { ETH: 3485.10, BTC: 64120.10, SOL: 134.20, BNB: 580.10, SUI: 1.15, USDC: 1.00, USDS: 1.00 };
         targetPrice = fallbackPrices[targetSymbol] || 100.00;
       }
 
@@ -652,13 +642,13 @@ document.addEventListener('DOMContentLoaded', () => {
       let opp = null;
       if (opportunityId.endsWith('-opportunity')) {
         const symbol = opportunityId.replace('-opportunity', '').toUpperCase();
-        let name = symbol === 'BTC' ? 'Bitcoin' : (symbol === 'ETH' ? 'Ethereum' : (symbol === 'SOL' ? 'Solana' : (symbol === 'LINK' ? 'Chainlink' : 'Sui')));
+        let name = symbol === 'BTC' ? 'Bitcoin' : (symbol === 'ETH' ? 'Ethereum' : (symbol === 'SOL' ? 'Solana' : (symbol === 'BNB' ? 'Binance Coin' : 'Sui')));
         opp = {
           opportunityId,
           name: name,
           symbol: `${symbol} / USD`,
-          icon: symbol === 'BTC' ? '₿' : (symbol === 'ETH' ? 'Ξ' : (symbol === 'SOL' ? 'S' : (symbol === 'LINK' ? 'L' : 'U'))),
-          riskLevel: symbol === 'BTC' ? 'medium' : (symbol === 'ETH' ? 'low' : (symbol === 'SOL' ? 'high' : (symbol === 'LINK' ? 'medium' : 'high')))
+          icon: symbol === 'BTC' ? '₿' : (symbol === 'ETH' ? 'Ξ' : (symbol === 'SOL' ? 'S' : (symbol === 'BNB' ? 'B' : 'U'))),
+          riskLevel: symbol === 'BTC' ? 'medium' : (symbol === 'ETH' ? 'low' : (symbol === 'SOL' ? 'high' : (symbol === 'BNB' ? 'medium' : 'high')))
         };
       } else {
         const opps = [
@@ -684,7 +674,7 @@ document.addEventListener('DOMContentLoaded', () => {
       let targetSymbol = 'ETH';
       if (opp.symbol.includes('BTC')) targetSymbol = 'BTC';
       else if (opp.symbol.includes('SOL')) targetSymbol = 'SOL';
-      else if (opp.symbol.includes('LINK')) targetSymbol = 'LINK';
+      else if (opp.symbol.includes('BNB')) targetSymbol = 'BNB';
       else if (opp.symbol.includes('SUI')) targetSymbol = 'SUI';
       else if (opp.symbol.includes('USDC')) targetSymbol = 'USDC';
 
@@ -700,7 +690,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       } catch (err) {
         console.error('Error fetching live targetPrice, using mock fallback:', err);
-        const fallbackPrices = { ETH: 3485.10, BTC: 64120.10, SOL: 134.20, LINK: 15.40, SUI: 1.15, USDC: 1.00, USDS: 1.00 };
+        const fallbackPrices = { ETH: 3485.10, BTC: 64120.10, SOL: 134.20, BNB: 580.10, SUI: 1.15, USDC: 1.00, USDS: 1.00 };
         targetPrice = fallbackPrices[targetSymbol] || 100.00;
       }
 
@@ -815,7 +805,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const horizon = localStorage.getItem('ravora_profile_horizon') || 'short';
       const capital = parseInt(localStorage.getItem('ravora_profile_capital') || '132000');
 
-      let livePrices = { BTC: 64120.10, ETH: 3485.10, SOL: 134.20, LINK: 15.40, SUI: 1.15 };
+      let livePrices = { BTC: 64120.10, ETH: 3485.10, SOL: 134.20, BNB: 580.10, SUI: 1.15 };
       try {
         const pRes = await fetch(`${API_BASE}/market/prices`);
         if (pRes.ok) {
@@ -1897,15 +1887,15 @@ document.addEventListener('DOMContentLoaded', () => {
       const opps = await apiCall('/opportunities');
       scannerRows.innerHTML = '';
       
-      const supported = ['BTC', 'ETH', 'SOL', 'LINK', 'SUI'];
+      const supported = ['BTC', 'ETH', 'SOL', 'BNB', 'SUI'];
       const assetsData = supported.map(sym => {
         const live = overview.find(o => o.symbol === sym) || { price: 0, change24h: 0 };
-        const opp = opps.find(o => o.symbol.startsWith(sym)) || { confidenceScore: 70 };
+        const opp = opps.find(o => o.symbol.startsWith(sym)) || { opportunityScore: 70, confidenceScore: 70 };
         return {
           symbol: sym,
           price: live.price,
           change24h: live.change24h,
-          oppScore: opp.confidenceScore
+          oppScore: opp.opportunityScore !== undefined ? opp.opportunityScore : opp.confidenceScore
         };
       });
 
@@ -1984,12 +1974,8 @@ document.addEventListener('DOMContentLoaded', () => {
         chartChange.className = liveChange >= 0 ? 'text-green' : 'text-error';
       }
       if (confidenceBadge) confidenceBadge.textContent = `${opp.confidenceScore}% Confidence`;
-      if (oppScore) oppScore.textContent = opp.confidenceScore;
-      
-      let riskVal = 35;
-      if (opp.riskLevel === 'low') riskVal = 20;
-      else if (opp.riskLevel === 'high') riskVal = 75;
-      if (riskScore) riskScore.textContent = riskVal;
+      if (oppScore) oppScore.textContent = opp.opportunityScore !== undefined ? opp.opportunityScore : opp.confidenceScore;
+      if (riskScore) riskScore.textContent = opp.riskScore !== undefined ? opp.riskScore : (opp.riskLevel === 'low' ? 20 : (opp.riskLevel === 'high' ? 75 : 35));
 
       if (trendVal) {
         const trend = opp.trendDirection || 'Bullish';
@@ -1997,17 +1983,18 @@ document.addEventListener('DOMContentLoaded', () => {
         trendVal.className = trend === 'Bearish' ? 'text-error' : 'text-green';
       }
 
+      const isHold = !opp.suggestedEntry || opp.suggestedEntry === 0;
       if (suggestedEntry) {
-        suggestedEntry.textContent = `$${opp.suggestedEntry.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        suggestedEntry.textContent = isHold ? 'HOLD' : `$${opp.suggestedEntry.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
       }
       if (suggestedTp) {
-        suggestedTp.textContent = `$${opp.suggestedTakeProfit.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        suggestedTp.textContent = (!opp.suggestedTakeProfit || opp.suggestedTakeProfit === 0) ? '—' : `$${opp.suggestedTakeProfit.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
       }
       if (suggestedSl) {
-        suggestedSl.textContent = `$${opp.suggestedStopLoss.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        suggestedSl.textContent = (!opp.suggestedStopLoss || opp.suggestedStopLoss === 0) ? '—' : `$${opp.suggestedStopLoss.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
       }
-      if (rrRatio) rrRatio.textContent = opp.riskRewardRatio || '2.0:1';
-      if (duration) duration.textContent = opp.expectedDuration || '3-5 days';
+      if (rrRatio) rrRatio.textContent = isHold ? 'N/A' : (opp.riskRewardRatio || '2.0:1');
+      if (duration) duration.textContent = isHold ? 'N/A' : (opp.expectedDuration || '3-5 days');
       if (reasoningText) reasoningText.textContent = opp.reasoningText;
 
       const marginInput = document.getElementById('terminal-margin-input');
@@ -2184,7 +2171,7 @@ document.addEventListener('DOMContentLoaded', () => {
           BTC: 'btc-halving',
           ETH: 'eth-staking',
           SOL: 'solana-liquidity',
-          LINK: 'link-momentum',
+          BNB: 'bnb-breakout',
           SUI: 'sui-alpha'
         };
         const opportunityId = opportunityMapping[state.selectedAsset];
@@ -2756,7 +2743,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Header Actions Binds
   // ==========================================================================
   if (btnHeaderManualScan) {
-    btnHeaderManualScan.addEventListener('click', () => {
+    btnHeaderManualScan.addEventListener('click', async () => {
       btnHeaderManualScan.disabled = true;
       btnHeaderManualScan.textContent = 'Scanning...';
       
@@ -2764,12 +2751,18 @@ document.addEventListener('DOMContentLoaded', () => {
       const dot = document.querySelector('.scanner-status-badge .status-pulse-dot');
       
       if (statusTxt) {
-        statusTxt.textContent = 'COMPILING CORRELATION MATRICES';
+        statusTxt.textContent = 'RUNNING QUANT ANALYSIS ENGINE';
         statusTxt.style.color = 'var(--accent-secondary)';
       }
       if (dot) dot.style.background = 'var(--accent-secondary)';
 
-      setTimeout(() => {
+      try {
+        await apiCall('/market/scan', { method: 'POST' });
+        await initializeDashboardUI();
+      } catch (err) {
+        console.error('Error during manual scan:', err);
+        alert('Scanner Error: ' + err.message);
+      } finally {
         btnHeaderManualScan.disabled = false;
         btnHeaderManualScan.textContent = 'Scan Markets';
         
@@ -2778,13 +2771,7 @@ document.addEventListener('DOMContentLoaded', () => {
           statusTxt.style.color = 'var(--success)';
         }
         if (dot) dot.style.background = 'var(--success)';
-
-        apiCall('/notifications', {
-          method: 'GET'
-        }).then(() => {
-          loadNotifications();
-        });
-      }, 2000);
+      }
     });
   }
 

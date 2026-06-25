@@ -1,10 +1,18 @@
 import { MarketDataProvider } from './providerInterface.js';
 import { ASSETS_TO_TRACK, COINCAP_ID_TO_SYMBOL, SYMBOL_TO_COINCAP_ID } from '../../../config/marketConfig.js';
 
+// Fetch with a 5-second timeout to prevent hanging on slow/unavailable APIs
+const fetchWithTimeout = (url, timeoutMs = 5000) => {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  return fetch(url, { signal: controller.signal })
+    .finally(() => clearTimeout(timer));
+};
+
 export class CoinCapProvider extends MarketDataProvider {
   async fetchTickers() {
     console.log('[CoinCapProvider] Fetching prices from CoinCap assets API...');
-    const response = await fetch('https://api.coincap.io/v2/assets');
+    const response = await fetchWithTimeout('https://api.coincap.io/v2/assets');
     if (!response.ok) {
       throw new Error(`CoinCap HTTP error! status: ${response.status}`);
     }
@@ -34,7 +42,7 @@ export class CoinCapProvider extends MarketDataProvider {
     if (!id) throw new Error(`Unsupported symbol for CoinCap: ${symbol}`);
 
     console.log(`[CoinCapProvider] Fetching price history for ${symbol} (${id}) from CoinCap...`);
-    const response = await fetch(`https://api.coincap.io/v2/assets/${id}/history?interval=d1`);
+    const response = await fetchWithTimeout(`https://api.coincap.io/v2/assets/${id}/history?interval=d1`);
     if (!response.ok) {
       throw new Error(`CoinCap history HTTP error! status: ${response.status}`);
     }

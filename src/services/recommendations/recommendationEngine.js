@@ -1,8 +1,8 @@
 import crypto from 'crypto';
-import { dbGet, dbRun, dbQuery } from '../database.js';
+import { dbGet, dbRun, dbQuery } from '../../database.js';
 import { MarketDataService } from '../marketDataService.js';
 import { ScoringEngine } from '../scoring/scoringEngine.js';
-import { ASSETS_TO_TRACK } from '../config/marketConfig.js';
+import { ASSETS_TO_TRACK } from '../../config/marketConfig.js';
 
 export const RecommendationEngine = {
   /**
@@ -21,7 +21,7 @@ export const RecommendationEngine = {
         BTC: { id: 'btc-halving', name: 'Bitcoin ETF Momentum Stacking', type: 'momentum', icon: '₿' },
         ETH: { id: 'eth-staking', name: 'Ethereum Staking Alpha', type: 'yield', icon: 'Ξ' },
         SOL: { id: 'solana-liquidity', name: 'Solana Liquidity Staking Accumulation', type: 'momentum', icon: 'S' },
-        LINK: { id: 'link-momentum', name: 'Chainlink Oracle Integration Breakout', type: 'momentum', icon: 'L' },
+        BNB: { id: 'bnb-breakout', name: 'Binance Coin Ecosystem Breakout', type: 'momentum', icon: 'B' },
         SUI: { id: 'sui-alpha', name: 'Sui Network Velocity Expansion', type: 'momentum', icon: 'U' }
       };
 
@@ -46,16 +46,18 @@ export const RecommendationEngine = {
 
           await dbRun(
             `INSERT INTO opportunities (
-               id, opportunity_type, name, symbol, icon_symbol, confidence_score, expected_return, risk_level, reasoning_text,
+               id, opportunity_type, name, symbol, icon_symbol, opportunity_score, confidence_score, risk_score, risk_level, expected_return, reasoning_text,
                suggested_entry, suggested_stop_loss, suggested_take_profit, expected_duration, risk_reward_ratio, trend_direction, support_levels, resistance_levels
-             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
              ON CONFLICT(id) DO UPDATE SET
                opportunity_type=excluded.opportunity_type,
                name=excluded.name,
                symbol=excluded.symbol,
+               opportunity_score=excluded.opportunity_score,
                confidence_score=excluded.confidence_score,
-               expected_return=excluded.expected_return,
+               risk_score=excluded.risk_score,
                risk_level=excluded.risk_level,
+               expected_return=excluded.expected_return,
                reasoning_text=excluded.reasoning_text,
                suggested_entry=excluded.suggested_entry,
                suggested_stop_loss=excluded.suggested_stop_loss,
@@ -67,13 +69,15 @@ export const RecommendationEngine = {
                resistance_levels=excluded.resistance_levels`,
             [
               oppMeta.id,
-              oppMeta.type,
+              scores.suggestedDirection,
               oppMeta.name,
               `${symbol} / USD`,
               oppMeta.icon,
+              scores.opportunityScore,
               scores.confidenceScore,
-              estReturnStr,
+              scores.riskScore,
               riskLevelStr,
+              estReturnStr,
               reasoningStr,
               scores.suggestedEntry,
               scores.suggestedStopLoss,
@@ -117,11 +121,11 @@ export const RecommendationEngine = {
         targetAllocations.push({ opportunityId: 'btc-halving', targetPct: 40.0, symbol: 'BTC' });
         targetAllocations.push({ opportunityId: 'eth-staking', targetPct: 30.0, symbol: 'ETH' });
       } else if (riskStance === 'aggressive') {
-        // Targets: 25% BTC, 25% ETH, 20% SOL, 15% LINK, 15% SUI
+        // Targets: 25% BTC, 25% ETH, 20% SOL, 15% BNB, 15% SUI
         targetAllocations.push({ opportunityId: 'btc-halving', targetPct: 25.0, symbol: 'BTC' });
         targetAllocations.push({ opportunityId: 'eth-staking', targetPct: 25.0, symbol: 'ETH' });
         targetAllocations.push({ opportunityId: 'solana-liquidity', targetPct: 20.0, symbol: 'SOL' });
-        targetAllocations.push({ opportunityId: 'link-momentum', targetPct: 15.0, symbol: 'LINK' });
+        targetAllocations.push({ opportunityId: 'bnb-breakout', targetPct: 15.0, symbol: 'BNB' });
         targetAllocations.push({ opportunityId: 'sui-alpha', targetPct: 15.0, symbol: 'SUI' });
       } else {
         // Balanced (default): 35% BTC, 35% ETH, 15% SOL, 15% Stable
@@ -131,8 +135,6 @@ export const RecommendationEngine = {
       }
 
       // 7. Determine recommended changes
-      // If user holds 100% stablecoins (USDC) (the onboarding default), recommend rebalancing into all targets.
-      // If they already hold some assets, we only recommend rebalances if allocation deviation > 5%.
       const isInitialStable = holdingsAllocation['USDC'] >= 95.0 || holdings.length === 1 && holdings[0].asset_symbol === 'USDC';
 
       for (const target of targetAllocations) {

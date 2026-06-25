@@ -1,10 +1,10 @@
-export const ASSETS_TO_TRACK = ['BTC', 'ETH', 'SOL', 'LINK', 'SUI'];
+export const ASSETS_TO_TRACK = ['BTC', 'ETH', 'SOL', 'BNB', 'SUI'];
 
 export const SYMBOL_TO_COINCAP_ID = {
   BTC: 'bitcoin',
   ETH: 'ethereum',
   SOL: 'solana',
-  LINK: 'chainlink',
+  BNB: 'binance-coin',
   SUI: 'sui'
 };
 
@@ -12,7 +12,7 @@ export const COINCAP_ID_TO_SYMBOL = {
   bitcoin: 'BTC',
   ethereum: 'ETH',
   solana: 'SOL',
-  chainlink: 'LINK',
+  'binance-coin': 'BNB',
   sui: 'SUI'
 };
 
@@ -20,7 +20,7 @@ export const SYMBOL_TO_BINANCE_SYMBOL = {
   BTC: 'BTCUSDT',
   ETH: 'ETHUSDT',
   SOL: 'SOLUSDT',
-  LINK: 'LINKUSDT',
+  BNB: 'BNBUSDT',
   SUI: 'SUIUSDT'
 };
 
@@ -28,7 +28,7 @@ export const BINANCE_SYMBOL_TO_SYMBOL = {
   BTCUSDT: 'BTC',
   ETHUSDT: 'ETH',
   SOLUSDT: 'SOL',
-  LINKUSDT: 'LINK',
+  BNBUSDT: 'BNB',
   SUIUSDT: 'SUI'
 };
 

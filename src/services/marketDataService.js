@@ -72,7 +72,7 @@ export const MarketDataService = {
       BTC: { name: 'Bitcoin', price: 64120.10, change24h: 1.40, volume24h: 28450200100, marketCap: 1258900400100 },
       ETH: { name: 'Ethereum', price: 3485.10, change24h: 2.15, volume24h: 14502100800, marketCap: 418500200300 },
       SOL: { name: 'Solana', price: 134.20, change24h: -0.85, volume24h: 3840100500, marketCap: 62450300100 },
-      LINK: { name: 'Chainlink', price: 15.40, change24h: 1.25, volume24h: 350200100, marketCap: 9050300100 },
+      BNB: { name: 'Binance Coin', price: 580.10, change24h: 1.25, volume24h: 1850200100, marketCap: 89050300100 },
       SUI: { name: 'Sui', price: 1.15, change24h: -3.45, volume24h: 120500600, marketCap: 2840900100 }
     };
     const now = Date.now();
@@ -138,7 +138,7 @@ export const MarketDataService = {
         BTC: 64120.10,
         ETH: 3485.10,
         SOL: 134.20,
-        LINK: 15.40,
+        BNB: 580.10,
         SUI: 1.15
       };
       const base = basePrices[symbol] || 100.0;

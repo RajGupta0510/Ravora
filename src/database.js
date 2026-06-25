@@ -167,13 +167,15 @@ export const initializeDatabase = async () => {
   await dbRun(`
     CREATE TABLE IF NOT EXISTS opportunities (
       id TEXT PRIMARY KEY,
-      opportunity_type TEXT NOT NULL,
+      opportunity_type TEXT NOT NULL, -- Storing 'LONG' | 'SHORT' | 'HOLD'
       name TEXT NOT NULL,
       symbol TEXT NOT NULL,
       icon_symbol TEXT NOT NULL,
+      opportunity_score INTEGER DEFAULT 0,
       confidence_score INTEGER NOT NULL,
-      expected_return TEXT NOT NULL,
+      risk_score INTEGER DEFAULT 0,
       risk_level TEXT NOT NULL,
+      expected_return TEXT,
       reasoning_text TEXT NOT NULL,
       suggested_entry REAL,
       suggested_stop_loss REAL,
@@ -279,11 +281,13 @@ export const initializeDatabase = async () => {
     const opportunitiesToSeed = [
       {
         id: 'eth-staking',
-        type: 'yield',
+        type: 'LONG',
         name: 'Ethereum Staking Alpha',
         symbol: 'ETH / USD',
         icon: 'Ξ',
+        oppScore: 92,
         confidence: 94,
+        riskScore: 24,
         risk: 'low',
         estReturn: '8.0% - 12.0%',
         reasoning: 'Validator queue consolidation patterns reveal a post-upgrade yields premium on decentralized pools. Backed by institutional accumulation support lines.',
@@ -298,11 +302,13 @@ export const initializeDatabase = async () => {
       },
       {
         id: 'btc-halving',
-        type: 'momentum',
+        type: 'LONG',
         name: 'Bitcoin ETF Momentum Stacking',
         symbol: 'BTC / USD',
         icon: '₿',
+        oppScore: 88,
         confidence: 89,
+        riskScore: 42,
         risk: 'medium',
         estReturn: '15.0% - 22.0%',
         reasoning: 'Spot ETF net inflows show consecutive daily acceleration, coinciding with hodler lockup peaks. Momentum targets a breakout to structural range highs.',
@@ -316,31 +322,35 @@ export const initializeDatabase = async () => {
         resistance: '[66000, 69000]'
       },
       {
-        id: 'link-momentum',
-        type: 'momentum',
-        name: 'Chainlink Oracle Integration Breakout',
-        symbol: 'LINK / USD',
-        icon: 'L',
-        confidence: 85,
+        id: 'bnb-breakout',
+        type: 'LONG',
+        name: 'Binance Coin Ecosystem Breakout',
+        symbol: 'BNB / USD',
+        icon: 'B',
+        oppScore: 85,
+        confidence: 80,
+        riskScore: 45,
         risk: 'medium',
         estReturn: '12.0% - 18.0%',
-        reasoning: 'Oracle utility volumes indicate structural breakout momentum above local range resistance.',
-        entry: 15.20,
-        stop_loss: 14.50,
-        take_profit: 17.50,
+        reasoning: 'BNB Chain transaction velocity indicates structural breakout momentum above local range resistance.',
+        entry: 580.00,
+        stop_loss: 560.00,
+        take_profit: 630.00,
         duration: '3-5 days',
-        risk_reward: '3.3:1',
+        risk_reward: '2.5:1',
         trend: 'Bullish',
-        support: '[14.80, 14.00]',
-        resistance: '[16.00, 18.00]'
+        support: '[570.00, 550.00]',
+        resistance: '[600.00, 620.00]'
       },
       {
         id: 'solana-liquidity',
-        type: 'momentum',
+        type: 'LONG',
         name: 'Solana Liquidity Staking Accumulation',
         symbol: 'SOL / USD',
         icon: 'S',
+        oppScore: 76,
         confidence: 78,
+        riskScore: 68,
         risk: 'high',
         estReturn: '22.0% - 32.0%',
         reasoning: 'DEX trading volume indices indicate structural demand trends for Jup/Sol liquidity pairs. High variance yield with automated trailing drawdown trigger.',
@@ -355,11 +365,13 @@ export const initializeDatabase = async () => {
       },
       {
         id: 'sui-alpha',
-        type: 'momentum',
+        type: 'LONG',
         name: 'Sui Network Velocity Expansion',
         symbol: 'SUI / USD',
         icon: 'U',
+        oppScore: 78,
         confidence: 79,
+        riskScore: 65,
         risk: 'high',
         estReturn: '20.0% - 30.0%',
         reasoning: 'Transaction metrics point to rapid ecosystem growth, breaking out above minor resistance levels.',
@@ -377,16 +389,16 @@ export const initializeDatabase = async () => {
     for (const opp of opportunitiesToSeed) {
       await dbRun(
         `INSERT INTO opportunities (
-          id, opportunity_type, name, symbol, icon_symbol, confidence_score, expected_return, risk_level, reasoning_text,
+          id, opportunity_type, name, symbol, icon_symbol, opportunity_score, confidence_score, risk_score, risk_level, expected_return, reasoning_text,
           suggested_entry, suggested_stop_loss, suggested_take_profit, expected_duration, risk_reward_ratio, trend_direction, support_levels, resistance_levels
-         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
-          opp.id, opp.type, opp.name, opp.symbol, opp.icon, opp.confidence, opp.estReturn, opp.risk, opp.reasoning,
+          opp.id, opp.type, opp.name, opp.symbol, opp.icon, opp.oppScore, opp.confidence, opp.riskScore, opp.risk, opp.estReturn, opp.reasoning,
           opp.entry, opp.stop_loss, opp.take_profit, opp.duration, opp.risk_reward, opp.trend, opp.support, opp.resistance
         ]
       );
     }
-  }  }
+  }
 };
 
 export default db;

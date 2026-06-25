@@ -62,3 +62,33 @@ export function calculatePercentageChange(values, lookback) {
   if (old === 0) return 0;
   return (current - old) / old;
 }
+
+/**
+ * Calculates the Relative Strength Index (RSI) of an array of closing prices
+ */
+export function calculateRSI(closes, period = 14) {
+  if (!closes || closes.length < period + 1) return 50;
+
+  let gains = 0;
+  let losses = 0;
+
+  // Initial RSI
+  for (let i = 1; i <= period; i++) {
+    const diff = closes[i] - closes[i - 1];
+    if (diff > 0) gains += diff;
+    else losses -= diff;
+  }
+
+  let avgGain = gains / period;
+  let avgLoss = losses / period;
+
+  for (let i = period + 1; i < closes.length; i++) {
+    const diff = closes[i] - closes[i - 1];
+    avgGain = (avgGain * (period - 1) + (diff > 0 ? diff : 0)) / period;
+    avgLoss = (avgLoss * (period - 1) + (diff < 0 ? -diff : 0)) / period;
+  }
+
+  if (avgLoss === 0) return 100;
+  const rs = avgGain / avgLoss;
+  return 100 - (100 / (1 + rs));
+}
