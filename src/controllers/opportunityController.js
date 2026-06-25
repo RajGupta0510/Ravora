@@ -1,5 +1,6 @@
 import crypto from 'crypto';
 import { dbGet, dbRun, dbQuery } from '../database.js';
+import { MarketDataService } from '../services/marketDataService.js';
 
 export const getOpportunities = async (req, res) => {
   try {
@@ -13,7 +14,15 @@ export const getOpportunities = async (req, res) => {
       confidenceScore: o.confidence_score,
       riskLevel: o.risk_level,
       expectedReturn: o.expected_return,
-      reasoningText: o.reasoning_text
+      reasoningText: o.reasoning_text,
+      suggestedEntry: o.suggested_entry,
+      suggestedStopLoss: o.suggested_stop_loss,
+      suggestedTakeProfit: o.suggested_take_profit,
+      expectedDuration: o.expected_duration,
+      riskRewardRatio: o.risk_reward_ratio,
+      trendDirection: o.trend_direction,
+      supportLevels: o.support_levels ? JSON.parse(o.support_levels) : [],
+      resistanceLevels: o.resistance_levels ? JSON.parse(o.resistance_levels) : []
     }));
     return res.json(formatted);
   } catch (err) {
@@ -29,7 +38,9 @@ export const getRecommendations = async (req, res) => {
     const recs = await dbQuery(
       `SELECT r.id as recommendationId, r.suggested_allocation_pct as suggestedAllocationPct, r.status,
               o.id as opportunityId, o.name, o.symbol, o.icon_symbol as icon, o.confidence_score as confidenceScore,
-              o.expected_return as expectedReturn, o.risk_level as riskLevel, o.reasoning_text as reasoningText
+              o.expected_return as expectedReturn, o.risk_level as riskLevel, o.reasoning_text as reasoningText,
+              o.suggested_entry, o.suggested_stop_loss, o.suggested_take_profit, o.expected_duration, o.risk_reward_ratio,
+              o.trend_direction, o.support_levels, o.resistance_levels
        FROM araiven_recommendations r
        JOIN opportunities o ON r.opportunity_id = o.id
        WHERE r.user_id = ? AND r.status = 'pending'`,
@@ -45,7 +56,15 @@ export const getRecommendations = async (req, res) => {
         icon: r.icon,
         confidenceScore: r.confidenceScore,
         expectedReturn: r.expectedReturn,
-        riskLevel: r.riskLevel
+        riskLevel: r.riskLevel,
+        suggestedEntry: r.suggested_entry,
+        suggestedStopLoss: r.suggested_stop_loss,
+        suggestedTakeProfit: r.suggested_take_profit,
+        expectedDuration: r.expected_duration,
+        riskRewardRatio: r.risk_reward_ratio,
+        trendDirection: r.trend_direction,
+        supportLevels: r.support_levels ? JSON.parse(r.support_levels) : [],
+        resistanceLevels: r.resistance_levels ? JSON.parse(r.resistance_levels) : []
       },
       suggestedAllocationPct: r.suggestedAllocationPct,
       reasoningText: r.reasoningText,
@@ -90,19 +109,19 @@ export const executeRecommendation = async (req, res) => {
     const allocationPct = rec.suggested_allocation_pct; // e.g. 8.00
     const swapValueUSD = currentBalance * (allocationPct / 100);
 
-    // Mock asset prices
-    const prices = {
-      ETH: 3485.10,
-      BTC: 64120.10,
-      SOL: 134.20,
-      USDC: 1.00,
-      USDS: 1.00
-    };
+    // Fetch live asset prices from cache/providers
+    const overview = await MarketDataService.getOverview();
+    const prices = { USDC: 1.00, USDS: 1.00, USDT: 1.00 };
+    overview.forEach(o => {
+      prices[o.symbol] = o.price;
+    });
 
     // Determine target symbol based on opportunity
     let targetSymbol = 'ETH';
     if (rec.opp_symbol.includes('BTC')) targetSymbol = 'BTC';
     else if (rec.opp_symbol.includes('SOL')) targetSymbol = 'SOL';
+    else if (rec.opp_symbol.includes('BNB')) targetSymbol = 'BNB';
+    else if (rec.opp_symbol.includes('SUI')) targetSymbol = 'SUI';
     else if (rec.opp_symbol.includes('USDC')) targetSymbol = 'USDC';
 
     const targetPrice = prices[targetSymbol] || 100.00;
@@ -157,8 +176,8 @@ export const executeRecommendation = async (req, res) => {
     } else {
       const targetAllocation = (swapValueUSD / currentBalance) * 100;
       await dbRun(
-        'INSERT INTO portfolio_assets (id, portfolio_id, asset_symbol, allocation_pct, balance_amount, average_entry_price) VALUES (?, ?, ?, ?, ?, ?)',
-        [crypto.randomUUID(), portfolio.id, targetSymbol, targetAllocation, targetAddAmount, targetPrice]
+        'INSERT INTO portfolio_assets (id, portfolio_id, asset_symbol, allocation_pct, balance_amount, average_entry_price, position_type, leverage) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+        [crypto.randomUUID(), portfolio.id, targetSymbol, targetAllocation, targetAddAmount, targetPrice, 'Long', 1.0]
       );
     }
 
@@ -206,7 +225,7 @@ export const executeRecommendation = async (req, res) => {
 
 export const deployOpportunity = async (req, res) => {
   const userId = req.user.id;
-  const { opportunityId, amount } = req.body;
+  const { opportunityId, amount, type, leverage } = req.body;
 
   if (!opportunityId || !amount) {
     return res.status(400).json({ error: 'Opportunity ID and amount are required.' });
@@ -234,11 +253,18 @@ export const deployOpportunity = async (req, res) => {
       return res.status(422).json({ error: 'Investment amount exceeds total portfolio balance.' });
     }
 
-    // Simulate same execution rebalance logic
-    const prices = { ETH: 3485.10, BTC: 64120.10, SOL: 134.20, USDC: 1.00, USDS: 1.00 };
+    // Fetch live asset prices from cache/providers
+    const overview = await MarketDataService.getOverview();
+    const prices = { USDC: 1.00, USDS: 1.00, USDT: 1.00 };
+    overview.forEach(o => {
+      prices[o.symbol] = o.price;
+    });
+
     let targetSymbol = 'ETH';
     if (opp.symbol.includes('BTC')) targetSymbol = 'BTC';
     else if (opp.symbol.includes('SOL')) targetSymbol = 'SOL';
+    else if (opp.symbol.includes('BNB')) targetSymbol = 'BNB';
+    else if (opp.symbol.includes('SUI')) targetSymbol = 'SUI';
     else if (opp.symbol.includes('USDC')) targetSymbol = 'USDC';
 
     const targetPrice = prices[targetSymbol] || 100.00;
@@ -288,8 +314,8 @@ export const deployOpportunity = async (req, res) => {
     } else {
       const targetAllocation = (parsedAmount / currentBalance) * 100;
       await dbRun(
-        'INSERT INTO portfolio_assets (id, portfolio_id, asset_symbol, allocation_pct, balance_amount, average_entry_price) VALUES (?, ?, ?, ?, ?, ?)',
-        [crypto.randomUUID(), portfolio.id, targetSymbol, targetAllocation, targetAddAmount, targetPrice]
+        'INSERT INTO portfolio_assets (id, portfolio_id, asset_symbol, allocation_pct, balance_amount, average_entry_price, position_type, leverage) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+        [crypto.randomUUID(), portfolio.id, targetSymbol, targetAllocation, targetAddAmount, targetPrice, type || 'Long', leverage || 1.0]
       );
     }
 

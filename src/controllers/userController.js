@@ -1,5 +1,7 @@
 import crypto from 'crypto';
 import { dbGet, dbRun, dbQuery } from '../database.js';
+import { MarketDataService } from '../services/marketDataService.js';
+import { RecommendationEngine } from '../services/recommendations/recommendationEngine.js';
 
 export const getProfile = async (req, res) => {
   const userId = req.user.id;
@@ -94,32 +96,39 @@ export const onboard = async (req, res) => {
     // Clear and build portfolio assets based on selection
     await dbRun('DELETE FROM portfolio_assets WHERE portfolio_id = ?', [portfolioId]);
 
+    // Fetch real live prices for seeding portfolio assets
+    const overview = await MarketDataService.getOverview();
+    const prices = { USDC: 1.00, USDS: 1.00, USDT: 1.00 };
+    overview.forEach(o => {
+      prices[o.symbol] = o.price;
+    });
+
     let assets = [];
     if (riskLevel === 0) { // Conservative
       assets = [
-        { symbol: 'USDC', allocation: 70.00, price: 1.00 },
-        { symbol: 'USDS', allocation: 20.00, price: 1.00 },
-        { symbol: 'ETH', allocation: 10.00, price: 3482.40 }
+        { symbol: 'USDC', allocation: 70.00, price: prices['USDC'] || 1.00 },
+        { symbol: 'USDS', allocation: 20.00, price: prices['USDS'] || 1.00 },
+        { symbol: 'ETH', allocation: 10.00, price: prices['ETH'] || 3485.10 }
       ];
     } else if (riskLevel === 2) { // Aggressive
       assets = [
-        { symbol: 'ETH', allocation: 40.00, price: 3482.40 },
-        { symbol: 'BTC', allocation: 35.00, price: 64120.10 },
-        { symbol: 'SOL', allocation: 25.00, price: 134.20 }
+        { symbol: 'ETH', allocation: 40.00, price: prices['ETH'] || 3485.10 },
+        { symbol: 'BTC', allocation: 35.00, price: prices['BTC'] || 64120.10 },
+        { symbol: 'SOL', allocation: 25.00, price: prices['SOL'] || 134.20 }
       ];
     } else { // Balanced (1)
       assets = [
-        { symbol: 'ETH', allocation: 45.00, price: 3482.40 },
-        { symbol: 'USDC', allocation: 30.00, price: 1.00 },
-        { symbol: 'BTC', allocation: 25.00, price: 64120.10 }
+        { symbol: 'ETH', allocation: 45.00, price: prices['ETH'] || 3485.10 },
+        { symbol: 'USDC', allocation: 30.00, price: prices['USDC'] || 1.00 },
+        { symbol: 'BTC', allocation: 25.00, price: prices['BTC'] || 64120.10 }
       ];
     }
 
     for (const asset of assets) {
       const balanceAmount = (capital * (asset.allocation / 100)) / asset.price;
       await dbRun(
-        'INSERT INTO portfolio_assets (id, portfolio_id, asset_symbol, allocation_pct, balance_amount, average_entry_price) VALUES (?, ?, ?, ?, ?, ?)',
-        [crypto.randomUUID(), portfolioId, asset.symbol, asset.allocation, balanceAmount, asset.price]
+        'INSERT INTO portfolio_assets (id, portfolio_id, asset_symbol, allocation_pct, balance_amount, average_entry_price, position_type, leverage) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+        [crypto.randomUUID(), portfolioId, asset.symbol, asset.allocation, balanceAmount, asset.price, 'Long', 1.0]
       );
     }
 
@@ -134,12 +143,8 @@ export const onboard = async (req, res) => {
       [crypto.randomUUID(), userId, 'opportunities', 'medium', 'Ethereum Staking Alpha Opportunity Ingested', 'New opportunity detected on decentralized staking pools yielding 9.6% APY.', 0]
     );
 
-    // 5. Seed default recommendation
-    await dbRun('DELETE FROM araiven_recommendations WHERE user_id = ?', [userId]);
-    await dbRun(
-      'INSERT INTO araiven_recommendations (id, user_id, opportunity_id, suggested_allocation_pct, status) VALUES (?, ?, ?, ?, ?)',
-      [crypto.randomUUID(), userId, 'eth-staking', 8.00, 'pending']
-    );
+    // 5. Generate quantitative recommendations using real engine v1
+    await RecommendationEngine.generateRecommendations(userId);
 
     return res.json({ success: true, message: 'Onboarding completed successfully.' });
   } catch (err) {

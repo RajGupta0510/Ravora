@@ -85,8 +85,38 @@ document.addEventListener('DOMContentLoaded', () => {
     // Simulate slight network delay for realism
     await new Promise(resolve => setTimeout(resolve, 150));
 
-    // Normalize endpoint (strip query parameters for routing, but keep them for extraction)
     const urlPath = endpoint.split('?')[0];
+    const token = localStorage.getItem('ravora_token');
+    
+    // Attempt real API call if logged in or hitting auth routes
+    const useRealAPI = token || urlPath === '/auth/login' || urlPath === '/auth/register';
+
+    if (useRealAPI) {
+      try {
+        const headers = {
+          'Content-Type': 'application/json',
+          ...(options.headers || {})
+        };
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
+        }
+
+        const response = await fetch(`${API_BASE}${endpoint}`, {
+          ...options,
+          headers
+        });
+
+        if (response.ok) {
+          return await response.json();
+        } else if (response.status === 401) {
+          localStorage.removeItem('ravora_token');
+        } else {
+          console.warn(`Real API returned status ${response.status} for ${endpoint}. Falling back to mock...`);
+        }
+      } catch (err) {
+        console.warn(`Real API fetch failed for ${endpoint}. Falling back to mock...`, err.message);
+      }
+    }
 
     // Handle GET /user/profile
     if (urlPath === '/user/profile') {
@@ -1127,12 +1157,34 @@ document.addEventListener('DOMContentLoaded', () => {
       const password = document.getElementById('login-password').value;
 
       try {
-        localStorage.setItem('ravora_logged_in', 'true');
-        localStorage.setItem('ravora_email', email);
-        localStorage.setItem('ravora_onboarding_completed', 'true');
-        initDefaultMockData(email);
-        await checkAuthState();
-        navigateTo('dashboard', true);
+        try {
+          const response = await fetch(`${API_BASE}/auth/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+          });
+          if (response.ok) {
+            const data = await response.json();
+            localStorage.setItem('ravora_token', data.token);
+            localStorage.setItem('ravora_logged_in', 'true');
+            localStorage.setItem('ravora_email', email);
+            localStorage.setItem('ravora_onboarding_completed', data.onboardingCompleted ? 'true' : 'false');
+            await checkAuthState();
+            navigateTo('dashboard', true);
+            return;
+          } else {
+            const data = await response.json().catch(() => ({}));
+            throw new Error(data.error || 'Authentication failed.');
+          }
+        } catch (apiErr) {
+          console.warn('Backend login failed, using local fallback:', apiErr.message);
+          localStorage.setItem('ravora_logged_in', 'true');
+          localStorage.setItem('ravora_email', email);
+          localStorage.setItem('ravora_onboarding_completed', 'true');
+          initDefaultMockData(email);
+          await checkAuthState();
+          navigateTo('dashboard', true);
+        }
       } catch (err) {
         loginError.textContent = err.message;
         loginError.style.display = 'block';
@@ -1148,10 +1200,31 @@ document.addEventListener('DOMContentLoaded', () => {
       const password = document.getElementById('register-password').value;
 
       try {
-        localStorage.setItem('ravora_logged_in', 'true');
-        localStorage.setItem('ravora_email', email);
-        localStorage.setItem('ravora_onboarding_completed', 'false');
-        await checkAuthState();
+        try {
+          const response = await fetch(`${API_BASE}/auth/register`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+          });
+          if (response.ok) {
+            const data = await response.json();
+            localStorage.setItem('ravora_token', data.token);
+            localStorage.setItem('ravora_logged_in', 'true');
+            localStorage.setItem('ravora_email', email);
+            localStorage.setItem('ravora_onboarding_completed', 'false');
+            await checkAuthState();
+            return;
+          } else {
+            const data = await response.json().catch(() => ({}));
+            throw new Error(data.error || 'Registration failed.');
+          }
+        } catch (apiErr) {
+          console.warn('Backend registration failed, using local fallback:', apiErr.message);
+          localStorage.setItem('ravora_logged_in', 'true');
+          localStorage.setItem('ravora_email', email);
+          localStorage.setItem('ravora_onboarding_completed', 'false');
+          await checkAuthState();
+        }
       } catch (err) {
         registerError.textContent = err.message;
         registerError.style.display = 'block';
@@ -1378,7 +1451,9 @@ document.addEventListener('DOMContentLoaded', () => {
     updateHeaderTitle(screenId);
 
     if (screenId === 'dashboard') {
-      drawPortfolioChart(activePeriod, state.profile.riskLevel);
+      updateTerminalView(state.selectedAsset || 'BTC');
+      loadTerminalPositions();
+      loadTerminalHistory();
     } else if (screenId === 'portfolio') {
       const pRiskMeter = document.getElementById('portfolio-risk-meter-fill');
       if (pRiskMeter) {
@@ -1560,95 +1635,604 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // ==========================================================================
-  // Dynamic Bezier SVG Area Chart Drawing
-  // ==========================================================================
-  async function drawPortfolioChart(period, riskLevel) {
-    if (!largeChartLine || !largeChartArea) return;
-    
-    activePeriod = period;
-    let points = [];
-    try {
-      const data = await apiCall(`/portfolio/history?period=${period}`);
-      points = data.points;
-    } catch (e) {
-      console.error('Error drawing chart:', e);
-      return;
-    }
+  function renderTerminalChart(details, opp) {
+    const chartSvg = document.getElementById('terminal-candlestick-chart');
+    if (!chartSvg) return;
 
-    if (points.length === 0) return;
+    chartSvg.innerHTML = ''; // clear previous elements
+
+    const history = details.history || [];
+    if (history.length === 0) return;
 
     const width = 800;
-    const height = 280;
-    const padding = 20;
+    const height = 320;
+    const paddingLeft = 40;
+    const paddingRight = 95;
+    const paddingTop = 40;
+    const paddingBottom = 40;
 
-    const minVal = Math.min(...points) * 0.998;
-    const maxVal = Math.max(...points) * 1.002;
-    const valRange = maxVal - minVal || 1;
+    const prices = history.map(pt => pt.close);
+    const highs = history.map(pt => pt.high);
+    const lows = history.map(pt => pt.low);
 
-    const stepX = (width - padding * 2) / (points.length - 1);
-    const coords = points.map((val, idx) => {
-      const x = padding + idx * stepX;
-      const y = height - padding - ((val - minVal) / valRange) * (height - padding * 2);
-      return { x, y };
+    // Dynamic scale limits
+    let minPrice = Math.min(...lows);
+    let maxPrice = Math.max(...highs);
+    
+    // Add extra padding to the price boundaries for line visibility
+    const paddingVal = (maxPrice - minPrice) * 0.08 || 1;
+    minPrice -= paddingVal;
+    maxPrice += paddingVal;
+
+    const priceRange = maxPrice - minPrice;
+
+    // Helper coordinates scaler
+    const scaleX = (idx) => {
+      const activeWidth = width - paddingLeft - paddingRight;
+      const stepX = activeWidth / (history.length - 1 || 1);
+      return paddingLeft + idx * stepX;
+    };
+
+    const scaleY = (val) => {
+      const activeHeight = height - paddingTop - paddingBottom;
+      return paddingTop + (1 - (val - minPrice) / priceRange) * activeHeight;
+    };
+
+    // 1. Draw SVG Background Grid Lines
+    const gridLines = 5;
+    for (let i = 0; i < gridLines; i++) {
+      const gridPrice = minPrice + (priceRange / (gridLines - 1)) * i;
+      const y = scaleY(gridPrice);
+      
+      const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      line.setAttribute('x1', paddingLeft);
+      line.setAttribute('y1', y);
+      line.setAttribute('x2', width - paddingRight);
+      line.setAttribute('y2', y);
+      line.setAttribute('stroke', 'rgba(255,255,255,0.03)');
+      line.setAttribute('stroke-width', '1');
+      chartSvg.appendChild(line);
+
+      const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      text.setAttribute('x', width - paddingRight + 6);
+      text.setAttribute('y', y + 3);
+      text.setAttribute('fill', 'rgba(255,255,255,0.3)');
+      text.setAttribute('font-size', '9');
+      text.textContent = `$${gridPrice.toLocaleString(undefined, { maximumFractionDigits: gridPrice >= 100 ? 1 : 3 })}`;
+      chartSvg.appendChild(text);
+    }
+
+    // 2. Draw Candlesticks (Wicks + Bodies)
+    const candleWidth = (width - paddingLeft - paddingRight) / history.length;
+    const barSpacing = candleWidth * 0.25;
+
+    history.forEach((pt, idx) => {
+      const cx = scaleX(idx);
+      const isBullish = pt.close >= pt.open;
+      const color = isBullish ? '#10b981' : '#f87171'; // emerald green or soft red
+
+      // Wick
+      const wick = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      wick.setAttribute('x1', cx);
+      wick.setAttribute('y1', scaleY(pt.high));
+      wick.setAttribute('x2', cx);
+      wick.setAttribute('y2', scaleY(pt.low));
+      wick.setAttribute('stroke', color);
+      wick.setAttribute('stroke-width', '1.2');
+      chartSvg.appendChild(wick);
+
+      // Body
+      const yOpen = scaleY(pt.open);
+      const yClose = scaleY(pt.close);
+      const yTop = Math.min(yOpen, yClose);
+      const yBottom = Math.max(yOpen, yClose);
+      const bodyHeight = Math.max(2, yBottom - yTop);
+      const bodyWidth = Math.max(3, candleWidth - barSpacing);
+
+      const body = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      body.setAttribute('x', cx - bodyWidth / 2);
+      body.setAttribute('y', yTop);
+      body.setAttribute('width', bodyWidth);
+      body.setAttribute('height', bodyHeight);
+      body.setAttribute('fill', isBullish ? 'rgba(16, 185, 129, 0.25)' : 'rgba(248, 113, 113, 0.25)');
+      body.setAttribute('stroke', color);
+      body.setAttribute('stroke-width', '1.2');
+      chartSvg.appendChild(body);
     });
 
-    // Cache coordinates and values for interactive cursor tracker
-    if (largeChartSvg) {
-      largeChartSvg.chartCoords = coords;
-      largeChartSvg.chartPoints = points;
+    // 3. Draw S&R Levels
+    const supports = opp.supportLevels || [];
+    const resistances = opp.resistanceLevels || [];
+
+    supports.forEach((sVal, sIdx) => {
+      if (sVal < minPrice || sVal > maxPrice) return;
+      const y = scaleY(sVal);
+
+      const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      line.setAttribute('x1', paddingLeft);
+      line.setAttribute('y1', y);
+      line.setAttribute('x2', width - paddingRight);
+      line.setAttribute('y2', y);
+      line.setAttribute('stroke', 'rgba(165, 180, 252, 0.2)');
+      line.setAttribute('stroke-width', '1');
+      line.setAttribute('stroke-dasharray', '3,3');
+      chartSvg.appendChild(line);
+
+      const txt = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      txt.setAttribute('x', paddingLeft + 5);
+      txt.setAttribute('y', y - 4);
+      txt.setAttribute('fill', 'rgba(165, 180, 252, 0.5)');
+      txt.setAttribute('font-size', '8');
+      txt.textContent = `Support S${sIdx+1}: $${sVal.toLocaleString(undefined, { maximumFractionDigits: sVal >= 100 ? 2 : 4 })}`;
+      chartSvg.appendChild(txt);
+    });
+
+    resistances.forEach((rVal, rIdx) => {
+      if (rVal < minPrice || rVal > maxPrice) return;
+      const y = scaleY(rVal);
+
+      const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      line.setAttribute('x1', paddingLeft);
+      line.setAttribute('y1', y);
+      line.setAttribute('x2', width - paddingRight);
+      line.setAttribute('y2', y);
+      line.setAttribute('stroke', 'rgba(244, 63, 94, 0.2)');
+      line.setAttribute('stroke-width', '1');
+      line.setAttribute('stroke-dasharray', '3,3');
+      chartSvg.appendChild(line);
+
+      const txt = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      txt.setAttribute('x', paddingLeft + 5);
+      txt.setAttribute('y', y - 4);
+      txt.setAttribute('fill', 'rgba(244, 63, 94, 0.5)');
+      txt.setAttribute('font-size', '8');
+      txt.textContent = `Resistance R${rIdx+1}: $${rVal.toLocaleString(undefined, { maximumFractionDigits: rVal >= 100 ? 2 : 4 })}`;
+      chartSvg.appendChild(txt);
+    });
+
+    // 4. Draw Suggested Targets (Entry, TP, SL)
+    if (opp.suggestedEntry && opp.suggestedEntry >= minPrice && opp.suggestedEntry <= maxPrice) {
+      const y = scaleY(opp.suggestedEntry);
+      
+      const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      line.setAttribute('x1', paddingLeft);
+      line.setAttribute('y1', y);
+      line.setAttribute('x2', width - paddingRight);
+      line.setAttribute('y2', y);
+      line.setAttribute('stroke', '#3b82f6');
+      line.setAttribute('stroke-width', '1.5');
+      line.setAttribute('stroke-dasharray', '4,4');
+      chartSvg.appendChild(line);
+
+      const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      label.setAttribute('x', width - paddingRight + 6);
+      label.setAttribute('y', y + 3);
+      label.setAttribute('fill', '#3b82f6');
+      label.setAttribute('font-size', '9');
+      label.setAttribute('font-weight', '600');
+      label.textContent = `ENTRY: $${opp.suggestedEntry.toLocaleString(undefined, { maximumFractionDigits: opp.suggestedEntry >= 100 ? 2 : 4 })}`;
+      chartSvg.appendChild(label);
     }
 
-    let linePath = `M ${coords[0].x} ${coords[0].y}`;
-    for (let i = 0; i < coords.length - 1; i++) {
-      const cpX1 = coords[i].x + stepX / 2;
-      const cpY1 = coords[i].y;
-      const cpX2 = coords[i].x + stepX / 2;
-      const cpY2 = coords[i + 1].y;
-      linePath += ` C ${cpX1} ${cpY1}, ${cpX2} ${cpY2}, ${coords[i + 1].x} ${coords[i + 1].y}`;
+    if (opp.suggestedTakeProfit && opp.suggestedTakeProfit >= minPrice && opp.suggestedTakeProfit <= maxPrice) {
+      const y = scaleY(opp.suggestedTakeProfit);
+      
+      const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      line.setAttribute('x1', paddingLeft);
+      line.setAttribute('y1', y);
+      line.setAttribute('x2', width - paddingRight);
+      line.setAttribute('y2', y);
+      line.setAttribute('stroke', '#10b981');
+      line.setAttribute('stroke-width', '1.5');
+      line.setAttribute('stroke-dasharray', '4,4');
+      chartSvg.appendChild(line);
+
+      const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      label.setAttribute('x', width - paddingRight + 6);
+      label.setAttribute('y', y + 3);
+      label.setAttribute('fill', '#10b981');
+      label.setAttribute('font-size', '9');
+      label.setAttribute('font-weight', '600');
+      label.textContent = `TP: $${opp.suggestedTakeProfit.toLocaleString(undefined, { maximumFractionDigits: opp.suggestedTakeProfit >= 100 ? 2 : 4 })}`;
+      chartSvg.appendChild(label);
     }
 
-    const areaPath = `${linePath} L ${coords[coords.length - 1].x} ${height} L ${coords[0].x} ${height} Z`;
+    if (opp.suggestedStopLoss && opp.suggestedStopLoss >= minPrice && opp.suggestedStopLoss <= maxPrice) {
+      const y = scaleY(opp.suggestedStopLoss);
+      
+      const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      line.setAttribute('x1', paddingLeft);
+      line.setAttribute('y1', y);
+      line.setAttribute('x2', width - paddingRight);
+      line.setAttribute('y2', y);
+      line.setAttribute('stroke', '#f87171');
+      line.setAttribute('stroke-width', '1.5');
+      line.setAttribute('stroke-dasharray', '4,4');
+      chartSvg.appendChild(line);
 
-    largeChartLine.setAttribute('d', linePath);
-    largeChartArea.setAttribute('d', areaPath);
-
-    // Animate line drawing & area fade-in
-    try {
-      const length = largeChartLine.getTotalLength();
-      largeChartLine.style.transition = 'none';
-      largeChartLine.style.strokeDasharray = `${length} ${length}`;
-      largeChartLine.style.strokeDashoffset = length;
-      largeChartLine.getBoundingClientRect(); // trigger reflow
-      largeChartLine.style.transition = 'stroke-dashoffset 1.2s cubic-bezier(0.16, 1, 0.3, 1)';
-      largeChartLine.style.strokeDashoffset = '0';
-
-      largeChartArea.style.transition = 'none';
-      largeChartArea.style.opacity = '0';
-      largeChartArea.getBoundingClientRect(); // trigger reflow
-      largeChartArea.style.transition = 'opacity 1.2s ease-in-out';
-      largeChartArea.style.opacity = '1';
-    } catch (err) {
-      console.error('Error running chart path animation:', err);
+      const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      label.setAttribute('x', width - paddingRight + 6);
+      label.setAttribute('y', y + 3);
+      label.setAttribute('fill', '#f87171');
+      label.setAttribute('font-size', '9');
+      label.setAttribute('font-weight', '600');
+      label.textContent = `SL: $${opp.suggestedStopLoss.toLocaleString(undefined, { maximumFractionDigits: opp.suggestedStopLoss >= 100 ? 2 : 4 })}`;
+      chartSvg.appendChild(label);
     }
-    
-    const pointer = document.getElementById('large-chart-pointer');
-    if (pointer) {
-      pointer.setAttribute('cx', coords[coords.length - 1].x);
-      pointer.setAttribute('cy', coords[coords.length - 1].y);
-      pointer.style.display = 'block';
+
+    // 5. Draw Visual AI Annotation Trigger
+    const lowestPt = history.slice(-15).reduce((min, p) => p.close < min.close ? p : min, history[history.length - 1]);
+    if (lowestPt) {
+      const minIdx = history.indexOf(lowestPt);
+      const cx = scaleX(minIdx);
+      const cy = scaleY(lowestPt.low);
+
+      const ring = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      ring.setAttribute('cx', cx);
+      ring.setAttribute('cy', cy);
+      ring.setAttribute('r', '12');
+      ring.setAttribute('fill', 'none');
+      ring.setAttribute('stroke', '#a5b4fc');
+      ring.setAttribute('stroke-width', '1.2');
+      ring.setAttribute('stroke-dasharray', '2,2');
+      chartSvg.appendChild(ring);
+
+      const tag = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      tag.setAttribute('x', cx + 16);
+      tag.setAttribute('y', cy + 3);
+      tag.setAttribute('fill', '#a5b4fc');
+      tag.setAttribute('font-size', '8');
+      tag.setAttribute('font-weight', '500');
+      tag.textContent = 'Araiven Accumulation Rebound Zone';
+      chartSvg.appendChild(tag);
     }
   }
 
-  chartPeriodButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-      chartPeriodButtons.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
+  async function loadScannerAssets() {
+    const scannerRows = document.getElementById('terminal-scanner-rows');
+    if (!scannerRows) return;
 
-      const period = btn.getAttribute('data-period');
-      drawPortfolioChart(period, state.profile.riskLevel);
+    try {
+      const overview = await apiCall('/market/overview');
+      const opps = await apiCall('/opportunities');
+      scannerRows.innerHTML = '';
+      
+      const supported = ['BTC', 'ETH', 'SOL', 'LINK', 'SUI'];
+      const assetsData = supported.map(sym => {
+        const live = overview.find(o => o.symbol === sym) || { price: 0, change24h: 0 };
+        const opp = opps.find(o => o.symbol.startsWith(sym)) || { confidenceScore: 70 };
+        return {
+          symbol: sym,
+          price: live.price,
+          change24h: live.change24h,
+          oppScore: opp.confidenceScore
+        };
+      });
+
+      assetsData.forEach(ad => {
+        const tr = document.createElement('tr');
+        tr.style.cursor = 'pointer';
+        tr.className = state.selectedAsset === ad.symbol ? 'scanner-row active' : 'scanner-row';
+        tr.dataset.symbol = ad.symbol;
+
+        const changeClass = ad.change24h >= 0 ? 'text-green' : 'text-error';
+        const changeSign = ad.change24h >= 0 ? '+' : '';
+        const priceFormatted = ad.price >= 100 
+          ? ad.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+          : ad.price.toLocaleString(undefined, { minimumFractionDigits: 4, maximumFractionDigits: 4 });
+
+        tr.innerHTML = `
+          <td><strong>${ad.symbol}</strong></td>
+          <td>$${priceFormatted}</td>
+          <td class="${changeClass}">${changeSign}${ad.change24h.toFixed(2)}%</td>
+          <td><span class="badge-opp-score" style="display:inline-block; padding: 2px 6px; border-radius:4px; font-weight:600; background:rgba(99,102,241,0.15); color:#a5b4fc; font-size:0.75rem;">${ad.oppScore}</span></td>
+        `;
+
+        tr.addEventListener('click', () => {
+          document.querySelectorAll('.scanner-row').forEach(row => row.classList.remove('active'));
+          tr.classList.add('active');
+          state.selectedAsset = ad.symbol;
+          updateTerminalView(ad.symbol);
+        });
+
+        scannerRows.appendChild(tr);
+      });
+    } catch (e) {
+      console.error('Error loading scanner assets:', e);
+    }
+  }
+
+  async function updateTerminalView(symbol) {
+    if (!symbol) return;
+    
+    try {
+      const details = await apiCall(`/market/assets/${symbol}`);
+      const opps = await apiCall('/opportunities');
+      const opp = opps.find(o => o.symbol.startsWith(symbol));
+
+      if (!opp) return;
+
+      const activeIcon = document.getElementById('terminal-active-icon');
+      const activeName = document.getElementById('terminal-active-name');
+      const activeSymbol = document.getElementById('terminal-active-symbol');
+      const chartPrice = document.getElementById('terminal-chart-price');
+      const chartChange = document.getElementById('terminal-chart-change');
+      const confidenceBadge = document.getElementById('terminal-confidence-badge');
+      const oppScore = document.getElementById('terminal-opp-score');
+      const riskScore = document.getElementById('terminal-risk-score');
+      const trendVal = document.getElementById('terminal-trend-val');
+      const suggestedEntry = document.getElementById('terminal-suggested-entry');
+      const suggestedTp = document.getElementById('terminal-suggested-tp');
+      const suggestedSl = document.getElementById('terminal-suggested-sl');
+      const rrRatio = document.getElementById('terminal-rr-ratio');
+      const duration = document.getElementById('terminal-duration');
+      const reasoningText = document.getElementById('terminal-reasoning-text');
+
+      const livePrice = details.price;
+      const liveChange = details.change24h;
+      
+      const priceFormatted = livePrice >= 100
+        ? livePrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+        : livePrice.toLocaleString(undefined, { minimumFractionDigits: 4, maximumFractionDigits: 4 });
+
+      if (activeIcon) activeIcon.textContent = opp.icon || '₿';
+      if (activeName) activeName.textContent = details.name;
+      if (activeSymbol) activeSymbol.textContent = `${symbol} / USD`;
+      if (chartPrice) chartPrice.textContent = `$${priceFormatted}`;
+      if (chartChange) {
+        chartChange.textContent = `${liveChange >= 0 ? '+' : ''}${liveChange.toFixed(2)}%`;
+        chartChange.className = liveChange >= 0 ? 'text-green' : 'text-error';
+      }
+      if (confidenceBadge) confidenceBadge.textContent = `${opp.confidenceScore}% Confidence`;
+      if (oppScore) oppScore.textContent = opp.confidenceScore;
+      
+      let riskVal = 35;
+      if (opp.riskLevel === 'low') riskVal = 20;
+      else if (opp.riskLevel === 'high') riskVal = 75;
+      if (riskScore) riskScore.textContent = riskVal;
+
+      if (trendVal) {
+        const trend = opp.trendDirection || 'Bullish';
+        trendVal.textContent = trend;
+        trendVal.className = trend === 'Bearish' ? 'text-error' : 'text-green';
+      }
+
+      if (suggestedEntry) {
+        suggestedEntry.textContent = `$${opp.suggestedEntry.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      }
+      if (suggestedTp) {
+        suggestedTp.textContent = `$${opp.suggestedTakeProfit.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      }
+      if (suggestedSl) {
+        suggestedSl.textContent = `$${opp.suggestedStopLoss.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      }
+      if (rrRatio) rrRatio.textContent = opp.riskRewardRatio || '2.0:1';
+      if (duration) duration.textContent = opp.expectedDuration || '3-5 days';
+      if (reasoningText) reasoningText.textContent = opp.reasoningText;
+
+      const marginInput = document.getElementById('terminal-margin-input');
+      if (marginInput) {
+        const defaultMargin = Math.round(state.profile.capital * 0.1);
+        marginInput.value = Math.max(10, Math.min(50000, defaultMargin));
+      }
+
+      const tradeTypeBtns = document.querySelectorAll('#terminal-trade-type-select button');
+      tradeTypeBtns.forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.getAttribute('data-type').toLowerCase() === (opp.type || 'long').toLowerCase()) {
+          btn.classList.add('active');
+        }
+      });
+
+      renderTerminalChart(details, opp);
+    } catch (e) {
+      console.error('Error updating terminal view:', e);
+    }
+  }
+
+  async function loadTerminalPositions() {
+    const positionsRows = document.getElementById('terminal-positions-rows');
+    if (!positionsRows) return;
+
+    try {
+      const data = await apiCall('/portfolio');
+      const holdings = data.holdings || [];
+      positionsRows.innerHTML = '';
+
+      const openPositions = holdings.filter(h => h.symbol !== 'USDC' && h.symbol !== 'USDT' && h.symbol !== 'USDS');
+
+      if (openPositions.length === 0) {
+        positionsRows.innerHTML = `
+          <tr>
+            <td colspan="8" style="text-align: center; color: var(--text-secondary); padding: 24px;">No active trade positions. Deploy a trade using the panel above.</td>
+          </tr>
+        `;
+        return;
+      }
+
+      openPositions.forEach(pos => {
+        const tr = document.createElement('tr');
+        
+        const marginUSD = pos.amount * pos.entryPrice;
+        const totalSizeUSD = marginUSD * pos.leverage;
+
+        const priceRatio = pos.currentPrice / pos.entryPrice;
+        let pnlUSD = 0;
+        if (pos.positionType.toLowerCase() === 'short') {
+          pnlUSD = marginUSD * pos.leverage * (1 - priceRatio);
+        } else {
+          pnlUSD = marginUSD * pos.leverage * (priceRatio - 1);
+        }
+
+        const pnlPct = marginUSD > 0 ? (pnlUSD / marginUSD) * 100 : 0;
+        const pnlClass = pnlUSD >= 0 ? 'text-green' : 'text-error';
+        const pnlSign = pnlUSD >= 0 ? '+' : '';
+
+        const entryFormatted = pos.entryPrice >= 100
+          ? pos.entryPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+          : pos.entryPrice.toLocaleString(undefined, { minimumFractionDigits: 4, maximumFractionDigits: 4 });
+        
+        const currentFormatted = pos.currentPrice >= 100
+          ? pos.currentPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+          : pos.currentPrice.toLocaleString(undefined, { minimumFractionDigits: 4, maximumFractionDigits: 4 });
+
+        tr.innerHTML = `
+          <td><strong>${pos.symbol} / USD</strong></td>
+          <td><span class="tag-alert-green" style="background: ${pos.positionType.toLowerCase() === 'short' ? 'rgba(239, 68, 68, 0.1)' : 'rgba(16, 185, 129, 0.1)'}; color: ${pos.positionType.toLowerCase() === 'short' ? '#f87171' : '#10b981'}; border-color: ${pos.positionType.toLowerCase() === 'short' ? 'rgba(239, 68, 68, 0.2)' : 'rgba(16, 185, 129, 0.2)'};">${pos.positionType.toUpperCase()}</span></td>
+          <td>$${totalSizeUSD.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+          <td>${pos.leverage.toFixed(1)}x</td>
+          <td>$${entryFormatted}</td>
+          <td>$${currentFormatted}</td>
+          <td class="${pnlClass}" style="font-weight: 700;">${pnlSign}$${pnlUSD.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (${pnlSign}${pnlPct.toFixed(2)}%)</td>
+          <td><button class="btn btn-secondary btn-sm btn-close-pos" data-symbol="${pos.symbol}">Close</button></td>
+        `;
+
+        tr.querySelector('.btn-close-pos').addEventListener('click', async (e) => {
+          e.stopPropagation();
+          const btn = e.target;
+          btn.disabled = true;
+          btn.textContent = 'Closing...';
+          try {
+            const res = await apiCall(`/portfolio/positions/${pos.symbol}/close`, { method: 'POST' });
+            alert(`Position closed successfully. Realized PnL: $${res.profitLoss.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`);
+            await initializeDashboardUI();
+          } catch (err) {
+            btn.disabled = false;
+            btn.textContent = 'Close';
+            alert(err.message);
+          }
+        });
+
+        positionsRows.appendChild(tr);
+      });
+    } catch (e) {
+      console.error('Error loading terminal positions:', e);
+    }
+  }
+
+  async function loadTerminalHistory() {
+    const historyRows = document.getElementById('terminal-history-rows');
+    if (!historyRows) return;
+
+    try {
+      const trades = await apiCall('/portfolio/transactions');
+      historyRows.innerHTML = '';
+
+      if (trades.length === 0) {
+        historyRows.innerHTML = `
+          <tr>
+            <td colspan="6" style="text-align: center; color: var(--text-secondary); padding: 24px;">No trade transaction history.</td>
+          </tr>
+        `;
+        return;
+      }
+
+      trades.forEach(t => {
+        const tr = document.createElement('tr');
+        const date = new Date(t.timestamp);
+        const timeStr = date.toLocaleString();
+
+        tr.innerHTML = `
+          <td>${timeStr}</td>
+          <td><strong>${t.asset}</strong></td>
+          <td>${t.amount}</td>
+          <td>${t.price}</td>
+          <td>${t.fee}</td>
+          <td><span class="status-badge active" style="margin: 0; background: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.2);">${t.type.toUpperCase().replace('_', ' ')}</span></td>
+        `;
+        historyRows.appendChild(tr);
+      });
+    } catch (e) {
+      console.error('Error loading terminal history:', e);
+    }
+  }
+
+  function initializeTerminalEvents() {
+    const levSlider = document.getElementById('terminal-leverage-slider');
+    const levDisplay = document.getElementById('terminal-leverage-display');
+    if (levSlider && levDisplay) {
+      levSlider.addEventListener('input', (e) => {
+        levDisplay.textContent = `${e.target.value}x`;
+      });
+    }
+
+    const typeBtns = document.querySelectorAll('#terminal-trade-type-select button');
+    typeBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        typeBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      });
     });
-  });
+
+    const tradeForm = document.getElementById('terminal-trade-form');
+    if (tradeForm) {
+      tradeForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const deployBtn = document.getElementById('btn-terminal-deploy');
+        if (!deployBtn) return;
+        
+        deployBtn.disabled = true;
+        deployBtn.textContent = 'Deploying...';
+
+        const amount = document.getElementById('terminal-margin-input').value;
+        const leverage = document.getElementById('terminal-leverage-slider').value;
+        const activeTypeBtn = document.querySelector('#terminal-trade-type-select button.active');
+        const type = activeTypeBtn ? activeTypeBtn.getAttribute('data-type') : 'Long';
+
+        const opportunityMapping = {
+          BTC: 'btc-halving',
+          ETH: 'eth-staking',
+          SOL: 'solana-liquidity',
+          LINK: 'link-momentum',
+          SUI: 'sui-alpha'
+        };
+        const opportunityId = opportunityMapping[state.selectedAsset];
+
+        try {
+          const res = await apiCall('/opportunities/deploy', {
+            method: 'POST',
+            body: JSON.stringify({
+              opportunityId,
+              amount,
+              type,
+              leverage
+            })
+          });
+
+          alert(`Simulated trade successfully executed!\nTransaction ID: ${res.transactionId}\nCleared Price: $${res.clearedPrice.toLocaleString()}`);
+          await initializeDashboardUI();
+        } catch (err) {
+          alert(err.message);
+        } finally {
+          deployBtn.disabled = false;
+          deployBtn.textContent = 'Deploy Opportunity Trade';
+        }
+      });
+    }
+
+    const tabBtns = document.querySelectorAll('.panel-tab-btn');
+    tabBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        tabBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        const tab = btn.getAttribute('data-tab');
+        const activeTabContent = document.getElementById('tab-active-positions');
+        const historyTabContent = document.getElementById('tab-closed-history');
+
+        if (tab === 'active-positions') {
+          if (activeTabContent) activeTabContent.style.display = 'block';
+          if (historyTabContent) historyTabContent.style.display = 'none';
+        } else {
+          if (activeTabContent) activeTabContent.style.display = 'none';
+          if (historyTabContent) historyTabContent.style.display = 'block';
+        }
+      });
+    });
+  }
+
+  // Legacy chart period buttons event listeners disabled
 
   if (largeChartSvg) {
     // Create or locate vertical tracking line inside chart SVG
@@ -2382,12 +2966,24 @@ document.addEventListener('DOMContentLoaded', () => {
   async function initializeDashboardUI() {
     syncMainAppRiskStateDOMOnly(state.profile.riskLevel);
     await loadPortfolioData();
-    await drawPortfolioChart('24h', state.profile.riskLevel);
+    
+    if (!state.selectedAsset) {
+      state.selectedAsset = 'BTC';
+    }
+
+    await loadScannerAssets();
+    await updateTerminalView(state.selectedAsset);
+    await loadTerminalPositions();
+    await loadTerminalHistory();
+
     await loadOpportunities();
     await loadRecommendations();
-    await loadTradeHistory();
     await loadNotifications();
-    await updateDashboardTopOpportunity();
+
+    if (!state.terminalEventsInitialized) {
+      initializeTerminalEvents();
+      state.terminalEventsInitialized = true;
+    }
   }
 
   async function updateDashboardTopOpportunity() {

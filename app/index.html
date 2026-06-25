@@ -268,7 +268,7 @@
           <li>
             <button class="menu-tab-btn active" data-screen="dashboard">
               <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-              <span>Dashboard</span>
+              <span>Trading Terminal</span>
             </button>
           </li>
           <li>
@@ -334,8 +334,8 @@
       <!-- App Top Header Bar -->
       <header class="app-header-bar">
         <div class="header-greeting">
-          <h2 id="app-header-title">Portfolio Dashboard</h2>
-          <p id="app-header-subtitle">Welcome back, Raja. Araiven engine is monitoring your wealth.</p>
+          <h2 id="app-header-title">Araiven Trading Terminal</h2>
+          <p id="app-header-subtitle">Welcome back, Raja. Araiven Copilot has scanned the markets for active setups.</p>
         </div>
 
         <div class="header-controls">
@@ -359,127 +359,200 @@
       <div class="app-viewport">
 
         <!-- ====================================================================
-           1. DASHBOARD VIEW
+           1. DASHBOARD VIEW (TRADING TERMINAL)
            ==================================================================== -->
         <section class="app-view-panel active" id="view-dashboard">
           
-          <!-- Summary Cards -->
-          <div class="metrics-grid">
-            <div class="card-glass metric-card-glow">
-              <span class="metric-label">Portfolio Balance</span>
-              <h3 class="metric-val" id="dash-balance" style="color: #fff;">$132,194.10</h3>
-              <span class="metric-change positive" id="dash-change">+$14,210.60 (+12.0% 24h)</span>
-            </div>
-            <div class="card-glass metric-card-glow">
-              <span class="metric-label">Annualized Yield (APY)</span>
-              <h3 class="metric-val" id="dash-apy" style="color: #fff;">12.42%</h3>
-              <span class="metric-change neutral" id="dash-apy-sub">Optimized staking spreads</span>
-            </div>
-            <div class="card-glass metric-card-glow">
-              <span class="metric-label">Araiven Risk Exposure</span>
-              <h3 class="metric-val" id="dash-risk" style="color: #fff;">42 / 100</h3>
-              <span class="metric-change" id="dash-risk-sub" style="color: var(--success);">Balanced Protection Shield</span>
-            </div>
-            <div class="card-glass metric-card-glow">
-              <span class="metric-label">Safety Health Score</span>
-              <h3 class="metric-val" id="dash-health" style="color: #fff;">96%</h3>
-              <span class="metric-change positive" id="dash-health-sub">No volatility threats detected</span>
-            </div>
-          </div>
-
-          <!-- Main Dashboard Rows -->
-          <div class="dashboard-rows-grid">
+          <div class="terminal-layout-grid">
             
-            <!-- Portfolio Balance Chart -->
-            <div class="card-glass dashboard-chart-card">
-              <div class="card-header-row">
-                <h4>Portfolio Growth History</h4>
-                <div class="chart-toggles">
-                  <button class="btn btn-secondary btn-sm active" data-period="24h">24H</button>
-                  <button class="btn btn-secondary btn-sm" data-period="7d">7D</button>
-                  <button class="btn btn-secondary btn-sm" data-period="30d">30D</button>
-                  <button class="btn btn-secondary btn-sm" data-period="1y">1Y</button>
-                </div>
+            <!-- LEFT PANEL: Market Scanner -->
+            <div class="card-glass terminal-scanner-panel">
+              <div class="panel-header">
+                <h4>Market Scanner</h4>
+                <span class="status-indicator live">LIVE DATA</span>
               </div>
-              <div class="chart-container-large">
-                <svg class="large-chart-svg" id="portfolio-large-chart" viewBox="0 0 800 280">
-                  <defs>
-                    <linearGradient id="large-chart-grad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.35"/>
-                      <stop offset="50%" stop-color="#8b5cf6" stop-opacity="0.15"/>
-                      <stop offset="100%" stop-color="#d946ef" stop-opacity="0"/>
-                    </linearGradient>
-                  </defs>
-                  <path id="large-chart-area" d="M 0 280 L 800 280 Z" fill="url(#large-chart-grad)" />
-                  <path id="large-chart-line" d="" fill="none" stroke="url(#large-chart-grad)" stroke-width="3" stroke-linecap="round" />
-                  <line x1="0" y1="210" x2="800" y2="210" stroke="rgba(255,255,255,0.02)" />
-                  <line x1="0" y1="140" x2="800" y2="140" stroke="rgba(255,255,255,0.02)" />
-                  <line x1="0" y1="70" x2="800" y2="70" stroke="rgba(255,255,255,0.02)" />
-                  <circle id="large-chart-pointer" cx="0" cy="0" r="6" fill="#3b82f6" stroke="#ffffff" stroke-width="2" style="display:none;" />
-                </svg>
+              <div class="scanner-table-wrapper">
+                <table class="scanner-table">
+                  <thead>
+                    <tr>
+                      <th>Asset</th>
+                      <th>Price</th>
+                      <th>24h Chg</th>
+                      <th>Opp Score</th>
+                    </tr>
+                  </thead>
+                  <tbody id="terminal-scanner-rows">
+                    <!-- Scanner assets injected here (BTC, ETH, SOL, LINK, SUI) -->
+                  </tbody>
+                </table>
               </div>
             </div>
 
-            <!-- Active Araiven Directives & Opportunities summary -->
-            <div class="dashboard-side-cards">
+            <!-- CENTER PANEL: Interactive Candlestick Chart -->
+            <div class="card-glass terminal-chart-panel">
+              <div class="panel-header-chart">
+                <div class="chart-active-asset-info">
+                  <span class="chart-active-icon" id="terminal-active-icon">₿</span>
+                  <div>
+                    <h4 id="terminal-active-name">Bitcoin</h4>
+                    <span id="terminal-active-symbol">BTC / USD</span>
+                  </div>
+                </div>
+                <div class="chart-actions">
+                  <div class="chart-price-display">
+                    <span id="terminal-chart-price">$64,120.10</span>
+                    <span id="terminal-chart-change" class="text-green">+1.40%</span>
+                  </div>
+                </div>
+              </div>
+              <div class="chart-viewport-container">
+                <svg id="terminal-candlestick-chart" viewBox="0 0 800 320" preserveAspectRatio="none">
+                  <!-- Candlesticks and indicators drawn dynamically -->
+                </svg>
+                <div class="chart-legend-overlay">
+                  <div class="legend-item"><span class="legend-line entry"></span><span>Entry Zone</span></div>
+                  <div class="legend-item"><span class="legend-line tp"></span><span>Take Profit</span></div>
+                  <div class="legend-item"><span class="legend-line sl"></span><span>Stop Loss</span></div>
+                  <div class="legend-item"><span class="legend-line sr"></span><span>S&R Levels</span></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- RIGHT PANEL: Araiven Analysis & Execution -->
+            <div class="card-glass terminal-analysis-panel">
+              <div class="panel-header">
+                <h4>Araiven Copilot Analysis</h4>
+                <div class="badge-confidence" id="terminal-confidence-badge">94% Confidence</div>
+              </div>
               
-              <!-- Core Recommendation / Active swap -->
-              <div class="card-glass active-directive-card">
-                <div class="card-header-row">
-                  <h4 class="text-accent-gradient">Active Araiven Directive</h4>
-                  <span class="tag-alert-green">RECOMMENDED</span>
+              <!-- Setup Scores -->
+              <div class="analysis-scores-row">
+                <div class="score-box">
+                  <span>Opp Score</span>
+                  <strong class="text-accent-gradient" id="terminal-opp-score">89</strong>
                 </div>
-                <div class="directive-content">
-                  <h5>Allocate 8% USD reserves to ETH Staking</h5>
-                  <p>Validator accumulation spread is showing a yields premium at 9.6% APY with minimal downside. Drawdown cushion remains compliant.</p>
-                  <div class="directive-action-box">
-                    <div class="directive-stats">
-                      <div>
-                        <span>Confidence</span>
-                        <strong class="text-green">94%</strong>
-                      </div>
-                      <div>
-                        <span>Risk Stance</span>
-                        <strong class="text-blue">Conservative</strong>
-                      </div>
-                    </div>
-                    <button class="btn btn-primary" id="btn-dash-execute-directive">Approve & Execute</button>
+                <div class="score-box">
+                  <span>Risk Score</span>
+                  <strong id="terminal-risk-score" style="color: #f87171;">42</strong>
+                </div>
+                <div class="score-box">
+                  <span>Trend</span>
+                  <strong id="terminal-trend-val" class="text-green">Bullish</strong>
+                </div>
+              </div>
+
+              <!-- Recommendation Parameters -->
+              <div class="analysis-parameters">
+                <h5>Suggested Order Targets</h5>
+                <div class="param-row">
+                  <span>Suggested Entry</span>
+                  <strong id="terminal-suggested-entry">$63,800.00</strong>
+                </div>
+                <div class="param-row">
+                  <span>Take Profit (TP)</span>
+                  <strong class="text-green" id="terminal-suggested-tp">$68,000.00</strong>
+                </div>
+                <div class="param-row">
+                  <span>Stop Loss (SL)</span>
+                  <strong class="text-error" id="terminal-suggested-sl">$62,000.00</strong>
+                </div>
+                <div class="param-row-split">
+                  <div>
+                    <span>Risk/Reward</span>
+                    <strong id="terminal-rr-ratio">2.3:1</strong>
+                  </div>
+                  <div>
+                    <span>Est. Duration</span>
+                    <strong id="terminal-duration">5-7 days</strong>
                   </div>
                 </div>
               </div>
 
-              <!-- Top Opportunity Card -->
-              <div class="card-glass mini-status-card" id="dash-top-opportunity-card">
-                <div class="card-header-row" style="margin-bottom: 12px;">
-                  <h5>Top Araiven Opportunity</h5>
-                  <span class="tag-alert-green" style="background: rgba(37, 99, 235, 0.1); border-color: rgba(37, 99, 235, 0.2); color: #3b82f6;">ALPHA CAPTURE</span>
-                </div>
-                <div id="dash-top-opp-content">
-                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                    <div>
-                      <strong style="font-size: 1rem; color: #fff;" id="dash-top-opp-name">Ethereum (ETH)</strong>
-                      <span style="display: block; font-size: 0.75rem; color: var(--text-secondary);" id="dash-top-opp-symbol">ETH / USD</span>
-                    </div>
-                    <div style="text-align: right;">
-                      <span style="display: block; font-size: 0.95rem; font-weight: 700; color: var(--success);" id="dash-top-opp-return">+9.6% APY</span>
-                      <span style="font-size: 0.7rem; color: var(--text-muted);">Est. Return</span>
-                    </div>
-                  </div>
-                  <p style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.4; margin-bottom: 16px;" id="dash-top-opp-reasoning">
-                    Validator queue consolidation patterns reveal a post-upgrade yields premium.
-                  </p>
-                  <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-divider); padding-top: 12px;">
-                    <div>
-                      <span style="font-size: 0.65rem; color: var(--text-muted); display: block;">Confidence Score</span>
-                      <strong style="font-size: 0.85rem; color: #fff;" id="dash-top-opp-confidence">94%</strong>
-                    </div>
-                    <button class="btn btn-secondary btn-sm" id="btn-dash-view-top-opp">Explore Alpha</button>
-                  </div>
-                </div>
+              <!-- AI Reasoning Paragraph -->
+              <div class="analysis-reasoning-box">
+                <h5>Araiven Signal Rationale</h5>
+                <p id="terminal-reasoning-text">
+                  Spot ETF net inflows show consecutive daily acceleration, coinciding with hodler lockup peaks. Momentum targets a breakout to structural range highs.
+                </p>
               </div>
 
+              <!-- Action deploy form -->
+              <div class="terminal-action-form">
+                <h5>Execute Simulated Paper Trade</h5>
+                <form id="terminal-trade-form">
+                  <div class="form-row">
+                    <label for="terminal-margin-input">Margin Size (USDC)</label>
+                    <input type="number" id="terminal-margin-input" min="10" max="50000" value="1000" class="form-input">
+                  </div>
+                  <div class="form-row">
+                    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                      <label for="terminal-leverage-slider">Leverage Multiplier</label>
+                      <span id="terminal-leverage-display" style="font-weight: 700; color: var(--accent);">5x</span>
+                    </div>
+                    <input type="range" id="terminal-leverage-slider" min="1" max="10" value="5" class="capital-slider">
+                  </div>
+                  <div class="trade-type-segmented" id="terminal-trade-type-select">
+                    <button type="button" class="trade-type-btn active" data-type="Long">LONG</button>
+                    <button type="button" class="trade-type-btn" data-type="Short">SHORT</button>
+                  </div>
+                  <button type="submit" class="btn btn-primary btn-lg block-btn" id="btn-terminal-deploy">Deploy Opportunity Trade</button>
+                </form>
+              </div>
+
+            </div>
+
+          </div>
+
+          <!-- BOTTOM PANEL: Active Positions & Transaction History -->
+          <div class="card-glass terminal-positions-panel" style="margin-top: 16px;">
+            <div class="panel-tabs">
+              <button class="panel-tab-btn active" data-tab="active-positions">Active Positions</button>
+              <button class="panel-tab-btn" data-tab="closed-history">Closed Trade History</button>
+            </div>
+            
+            <div class="tab-content active" id="tab-active-positions">
+              <div class="positions-table-wrapper">
+                <table class="positions-table">
+                  <thead>
+                    <tr>
+                      <th>Asset</th>
+                      <th>Direction</th>
+                      <th>Size (USD)</th>
+                      <th>Leverage</th>
+                      <th>Entry Price</th>
+                      <th>Current Price</th>
+                      <th>Unrealized P&L</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody id="terminal-positions-rows">
+                    <!-- Loaded dynamically -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="tab-content" id="tab-closed-history" style="display: none;">
+              <div class="positions-table-wrapper">
+                <table class="positions-table">
+                  <thead>
+                    <tr>
+                      <th>Timestamp</th>
+                      <th>Asset Pair</th>
+                      <th>Amount</th>
+                      <th>Exit Price</th>
+                      <th>Fee</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="terminal-history-rows">
+                    <!-- Loaded dynamically -->
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
+
         </section>
 
         <!-- ====================================================================

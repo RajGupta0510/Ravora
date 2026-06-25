@@ -2,14 +2,16 @@
 import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { initializeDatabase } from './src/database.js';
+import { initializeDatabase, dbQuery } from './src/database.js';
 import { verifyToken } from './src/middleware/auth.js';
 import { register, login } from './src/controllers/authController.js';
 import { getProfile, onboard, updateSettings } from './src/controllers/userController.js';
-import { getPortfolio, getPortfolioHistory, getTransactions } from './src/controllers/portfolioController.js';
+import { getPortfolio, getPortfolioHistory, getTransactions, closePosition } from './src/controllers/portfolioController.js';
 import { getOpportunities, getRecommendations, executeRecommendation, deployOpportunity } from './src/controllers/opportunityController.js';
 import { copilotMessage, getNotifications, markNotificationsRead, connectExchange } from './src/controllers/copilotController.js';
 import { MarketDataService } from './src/services/marketDataService.js';
+import { RecommendationEngine } from './src/services/recommendations/recommendationEngine.js';
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -72,6 +74,48 @@ apiRouter.get('/market/assets/:symbol', async (req, res) => {
   }
 });
 
+apiRouter.get('/market/summary', async (req, res) => {
+  try {
+    const overview = await MarketDataService.getOverview();
+    const totalMarketCap = overview.reduce((acc, curr) => acc + curr.marketCap, 0);
+    const totalVolume24h = overview.reduce((acc, curr) => acc + curr.volume24h, 0);
+    const averageChange24h = overview.length > 0 ? (overview.reduce((acc, curr) => acc + curr.change24h, 0) / overview.length) : 0;
+    
+    const btcTicker = overview.find(o => o.symbol === 'BTC');
+    const btcDominance = (btcTicker && totalMarketCap > 0) ? (btcTicker.marketCap / totalMarketCap) * 100 : 0;
+    
+    return res.json({
+      totalMarketCap,
+      totalVolume24h,
+      averageChange24h,
+      btcDominance,
+      lastUpdated: overview.length > 0 ? Math.max(...overview.map(o => o.lastUpdated)) : Date.now()
+    });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+apiRouter.get('/market/opportunities/top', async (req, res) => {
+  try {
+    const opps = await dbQuery('SELECT * FROM opportunities ORDER BY confidence_score DESC LIMIT 3');
+    const formatted = opps.map(o => ({
+      opportunityId: o.id,
+      type: o.opportunity_type,
+      name: o.name,
+      symbol: o.symbol,
+      icon: o.icon_symbol,
+      confidenceScore: o.confidence_score,
+      riskLevel: o.risk_level,
+      expectedReturn: o.expected_return,
+      reasoningText: o.reasoning_text
+    }));
+    return res.json(formatted);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+});
+
 // User Profile & Onboarding (Protected)
 apiRouter.get('/user/profile', verifyToken, getProfile);
 apiRouter.post('/user/onboard', verifyToken, onboard);
@@ -81,6 +125,7 @@ apiRouter.post('/user/settings', verifyToken, updateSettings);
 apiRouter.get('/portfolio', verifyToken, getPortfolio);
 apiRouter.get('/portfolio/history', verifyToken, getPortfolioHistory);
 apiRouter.get('/portfolio/transactions', verifyToken, getTransactions);
+apiRouter.post('/portfolio/positions/:symbol/close', verifyToken, closePosition);
 
 // Opportunities Endpoints (Protected)
 apiRouter.get('/opportunities', verifyToken, getOpportunities);
@@ -118,12 +163,45 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
+// Start background rebalancing / scoring engine
+const startEngineScheduler = () => {
+  // Run immediately on boot
+  setTimeout(async () => {
+    try {
+      console.log('[Scheduler] Executing global market analysis & recommendations update...');
+      const users = await dbQuery('SELECT id FROM users');
+      for (const u of users) {
+        await RecommendationEngine.generateRecommendations(u.id);
+      }
+      console.log('[Scheduler] Global update completed.');
+    } catch (err) {
+      console.error('[Scheduler] Error in startup update:', err);
+    }
+  }, 5000);
+
+  // Run every 10 minutes
+  setInterval(async () => {
+    try {
+      console.log('[Scheduler] Running periodic recommendations update...');
+      const users = await dbQuery('SELECT id FROM users');
+      for (const u of users) {
+        await RecommendationEngine.generateRecommendations(u.id);
+      }
+    } catch (err) {
+      console.error('[Scheduler] Error in periodic recommendations update:', err);
+    }
+  }, 10 * 60 * 1000);
+};
+
 // Bootstrapping function
 const startServer = async () => {
   try {
     console.log('Initializing local database...');
     await initializeDatabase();
     console.log('Database initialized successfully.');
+
+    // Start scheduler
+    startEngineScheduler();
 
     app.listen(PORT, () => {
       console.log(`Ravora MVP Foundation listening at http://localhost:${PORT}`);
