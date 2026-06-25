@@ -16,8 +16,30 @@ document.addEventListener('DOMContentLoaded', () => {
     currentScreen: 'dashboard',
     notifications: [],
     trades: [],
-    opportunities: []
+    opportunities: [],
+    previousBalance: 0
   };
+
+  function animateValue(obj, start, end, duration, prefix = '', suffix = '', decimals = 2) {
+    if (!obj) return;
+    const startVal = parseFloat(start) || 0;
+    const endVal = parseFloat(end) || 0;
+    if (startVal === endVal) {
+      obj.textContent = prefix + endVal.toLocaleString(undefined, { minimumFractionDigits: decimals, maximumFractionDigits: decimals }) + suffix;
+      return;
+    }
+    let startTimestamp = null;
+    const step = (timestamp) => {
+      if (!startTimestamp) startTimestamp = timestamp;
+      const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+      const currentVal = startVal + progress * (endVal - startVal);
+      obj.textContent = prefix + currentVal.toLocaleString(undefined, { minimumFractionDigits: decimals, maximumFractionDigits: decimals }) + suffix;
+      if (progress < 1) {
+        window.requestAnimationFrame(step);
+      }
+    };
+    window.requestAnimationFrame(step);
+  }
 
   const riskConfigurations = {
     0: { // Conservative
@@ -874,6 +896,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const chartPeriodButtons = document.querySelectorAll('.chart-toggles button');
   const largeChartLine = document.getElementById('large-chart-line');
   const largeChartArea = document.getElementById('large-chart-area');
+  const largeChartSvg = document.getElementById('portfolio-large-chart');
 
   // Copilot Chat
   const copilotMessagesLog = document.getElementById('copilot-messages-log');
@@ -961,7 +984,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function showDashboard() {
     if (authContainer) authContainer.style.display = 'none';
     if (onboardingOverlay) onboardingOverlay.style.display = 'none';
-    if (appLayoutContainer) appLayoutContainer.style.display = 'flex';
+    if (appLayoutContainer) appLayoutContainer.style.display = 'grid';
   }
 
   function updateUserWidget(email) {
@@ -1435,6 +1458,13 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
+    if (appRiskSegmented) {
+      appRiskSegmented.classList.remove('state-conservative', 'state-balanced', 'state-aggressive');
+      if (val === 0) appRiskSegmented.classList.add('state-conservative');
+      else if (val === 1) appRiskSegmented.classList.add('state-balanced');
+      else if (val === 2) appRiskSegmented.classList.add('state-aggressive');
+    }
+
     if (sidebarBadge) {
       sidebarBadge.textContent = config.badgeText;
       sidebarBadge.className = 'sidebar-badge';
@@ -1563,6 +1593,12 @@ document.addEventListener('DOMContentLoaded', () => {
       return { x, y };
     });
 
+    // Cache coordinates and values for interactive cursor tracker
+    if (largeChartSvg) {
+      largeChartSvg.chartCoords = coords;
+      largeChartSvg.chartPoints = points;
+    }
+
     let linePath = `M ${coords[0].x} ${coords[0].y}`;
     for (let i = 0; i < coords.length - 1; i++) {
       const cpX1 = coords[i].x + stepX / 2;
@@ -1576,6 +1612,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
     largeChartLine.setAttribute('d', linePath);
     largeChartArea.setAttribute('d', areaPath);
+
+    // Animate line drawing & area fade-in
+    try {
+      const length = largeChartLine.getTotalLength();
+      largeChartLine.style.transition = 'none';
+      largeChartLine.style.strokeDasharray = `${length} ${length}`;
+      largeChartLine.style.strokeDashoffset = length;
+      largeChartLine.getBoundingClientRect(); // trigger reflow
+      largeChartLine.style.transition = 'stroke-dashoffset 1.2s cubic-bezier(0.16, 1, 0.3, 1)';
+      largeChartLine.style.strokeDashoffset = '0';
+
+      largeChartArea.style.transition = 'none';
+      largeChartArea.style.opacity = '0';
+      largeChartArea.getBoundingClientRect(); // trigger reflow
+      largeChartArea.style.transition = 'opacity 1.2s ease-in-out';
+      largeChartArea.style.opacity = '1';
+    } catch (err) {
+      console.error('Error running chart path animation:', err);
+    }
     
     const pointer = document.getElementById('large-chart-pointer');
     if (pointer) {
@@ -1594,6 +1649,81 @@ document.addEventListener('DOMContentLoaded', () => {
       drawPortfolioChart(period, state.profile.riskLevel);
     });
   });
+
+  if (largeChartSvg) {
+    // Create or locate vertical tracking line inside chart SVG
+    let trackingLine = document.getElementById('large-chart-tracking-line');
+    if (!trackingLine) {
+      trackingLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      trackingLine.setAttribute('id', 'large-chart-tracking-line');
+      trackingLine.setAttribute('y1', '20');
+      trackingLine.setAttribute('y2', '260');
+      trackingLine.setAttribute('stroke', 'rgba(255, 255, 255, 0.15)');
+      trackingLine.setAttribute('stroke-width', '1');
+      trackingLine.setAttribute('stroke-dasharray', '4 4');
+      trackingLine.style.display = 'none';
+      largeChartSvg.appendChild(trackingLine);
+    }
+
+    largeChartSvg.addEventListener('mousemove', (e) => {
+      if (!largeChartSvg.chartCoords || !largeChartSvg.chartCoords.length || !largeChartSvg.chartPoints) return;
+      
+      const rect = largeChartSvg.getBoundingClientRect();
+      const mouseX = ((e.clientX - rect.left) / rect.width) * 800;
+      
+      let closestIdx = 0;
+      let minDiff = Infinity;
+      largeChartSvg.chartCoords.forEach((coord, idx) => {
+        const diff = Math.abs(coord.x - mouseX);
+        if (diff < minDiff) {
+          minDiff = diff;
+          closestIdx = idx;
+        }
+      });
+      
+      const closestCoord = largeChartSvg.chartCoords[closestIdx];
+      const closestValue = largeChartSvg.chartPoints[closestIdx];
+      
+      const pointer = document.getElementById('large-chart-pointer');
+      if (pointer) {
+        pointer.setAttribute('cx', closestCoord.x);
+        pointer.setAttribute('cy', closestCoord.y);
+        pointer.style.display = 'block';
+      }
+      
+      if (trackingLine) {
+        trackingLine.setAttribute('x1', closestCoord.x);
+        trackingLine.setAttribute('x2', closestCoord.x);
+        trackingLine.style.display = 'block';
+      }
+      
+      if (dashBalance) {
+        dashBalance.textContent = `$${closestValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      }
+    });
+    
+    largeChartSvg.addEventListener('mouseleave', () => {
+      const pointer = document.getElementById('large-chart-pointer');
+      if (pointer) {
+        if (largeChartSvg.chartCoords && largeChartSvg.chartCoords.length > 0) {
+          const lastCoord = largeChartSvg.chartCoords[largeChartSvg.chartCoords.length - 1];
+          pointer.setAttribute('cx', lastCoord.x);
+          pointer.setAttribute('cy', lastCoord.y);
+        } else {
+          pointer.style.display = 'none';
+        }
+      }
+      
+      if (trackingLine) {
+        trackingLine.style.display = 'none';
+      }
+      
+      if (dashBalance) {
+        // Restore actual dynamic capital balance
+        dashBalance.textContent = `$${state.profile.capital.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      }
+    });
+  }
 
   // ==========================================================================
   // Araiven Copilot Chat System
@@ -2082,7 +2212,11 @@ document.addEventListener('DOMContentLoaded', () => {
       const data = await apiCall('/portfolio');
       state.profile.capital = data.currentBalance;
       
-      if (dashBalance) dashBalance.textContent = `$${data.currentBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      if (dashBalance) {
+        const start = state.previousBalance || (data.currentBalance * 0.95);
+        animateValue(dashBalance, start, data.currentBalance, 800, '$', '', 2);
+        state.previousBalance = data.currentBalance;
+      }
       if (dashApy) dashApy.textContent = data.annualizedYield;
       if (dashRisk) {
         dashRisk.textContent = `${100 - data.safetyScore} / 100`;
@@ -2253,7 +2387,107 @@ document.addEventListener('DOMContentLoaded', () => {
     await loadRecommendations();
     await loadTradeHistory();
     await loadNotifications();
+    await updateDashboardTopOpportunity();
   }
+
+  async function updateDashboardTopOpportunity() {
+    const card = document.getElementById('dash-top-opportunity-card');
+    if (!card) return;
+
+    try {
+      const opps = await apiCall('/opportunities');
+      if (opps && opps.length > 0) {
+        // Sort by confidenceScore descending
+        const sorted = [...opps].sort((a, b) => b.confidenceScore - a.confidenceScore);
+        const topOpp = sorted[0];
+
+        const nameEl = document.getElementById('dash-top-opp-name');
+        const symbolEl = document.getElementById('dash-top-opp-symbol');
+        const returnEl = document.getElementById('dash-top-opp-return');
+        const reasoningEl = document.getElementById('dash-top-opp-reasoning');
+        const confidenceEl = document.getElementById('dash-top-opp-confidence');
+        const btnExplore = document.getElementById('btn-dash-view-top-opp');
+
+        if (nameEl) nameEl.textContent = topOpp.name;
+        if (symbolEl) symbolEl.textContent = topOpp.symbol;
+        if (returnEl) {
+          returnEl.textContent = topOpp.expectedReturn;
+          returnEl.className = (topOpp.expectedReturn.includes('-') && !topOpp.expectedReturn.includes('%')) ? 'text-error' : 'text-green';
+        }
+        if (reasoningEl) reasoningEl.textContent = topOpp.reasoningText;
+        if (confidenceEl) confidenceEl.textContent = `${topOpp.confidenceScore}%`;
+
+        if (btnExplore) {
+          const newBtn = btnExplore.cloneNode(true);
+          btnExplore.parentNode.replaceChild(newBtn, btnExplore);
+          newBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            navigateTo('opportunities', true);
+            setTimeout(() => {
+              openOpportunityDetailDrawer(topOpp);
+            }, 100);
+          });
+        }
+      }
+    } catch (err) {
+      console.error('Error updating dashboard top opportunity:', err);
+    }
+  }
+
+  async function backgroundScanRefresh() {
+    const statusTxt = document.querySelector('.scanner-status-badge .status-txt');
+    const dot = document.querySelector('.scanner-status-badge .status-pulse-dot');
+    
+    // Show active scan status in scanner badge
+    if (statusTxt) {
+      statusTxt.textContent = 'ARAIVEN STREAMING ACTIVE';
+      statusTxt.style.color = 'var(--accent-primary)';
+    }
+    if (dot) {
+      dot.style.background = 'var(--accent-primary)';
+    }
+
+    // Apply skeletons
+    const elementsToSkeleton = [
+      dashBalance,
+      dashApy,
+      dashRisk,
+      dashHealth,
+      document.getElementById('dash-top-opp-content'),
+      document.querySelector('.directive-content')
+    ].filter(el => el !== null);
+
+    elementsToSkeleton.forEach(el => el.classList.add('skeleton-pulse'));
+
+    try {
+      await loadPortfolioData();
+      await loadOpportunities();
+      await loadRecommendations();
+      await updateDashboardTopOpportunity();
+    } catch (e) {
+      console.error('Error in background scan refresh:', e);
+    } finally {
+      // Small timeout for visual confirmation of "active scanning"
+      setTimeout(() => {
+        elementsToSkeleton.forEach(el => el.classList.remove('skeleton-pulse'));
+        
+        if (statusTxt) {
+          statusTxt.textContent = 'ARAIVEN SCANNING ACTIVE';
+          statusTxt.style.color = 'var(--success)';
+        }
+        if (dot) {
+          dot.style.background = 'var(--success)';
+        }
+      }, 500);
+    }
+  }
+
+  // Set up 15-second background streaming interval
+  setInterval(() => {
+    if (state.onboardingCompleted && state.currentScreen === 'dashboard') {
+      backgroundScanRefresh();
+    }
+  }, 15000);
 
   function resolveInitialRoute() {
     const initRoute = sessionStorage.getItem('initialRoute');

@@ -97,6 +97,57 @@ export const MarketDataService = {
   /**
    * Fetches latest tickers from CoinCap API and caches them in SQLite
    */
+  async ensureTickersExist() {
+    const mockTickers = {
+      BTC: { name: 'Bitcoin', price: 64120.10, change24h: 1.40, volume24h: 28450200100, marketCap: 1258900400100 },
+      ETH: { name: 'Ethereum', price: 3485.10, change24h: 2.15, volume24h: 14502100800, marketCap: 418500200300 },
+      SOL: { name: 'Solana', price: 134.20, change24h: -0.85, volume24h: 3840100500, marketCap: 62450300100 },
+      LINK: { name: 'Chainlink', price: 15.40, change24h: 0.25, volume24h: 420900100, marketCap: 9120300400 },
+      SUI: { name: 'Sui', price: 1.15, change24h: -3.45, volume24h: 120500600, marketCap: 2840900100 }
+    };
+    const now = Date.now();
+    for (const symbol of ASSETS_TO_TRACK) {
+      const row = await dbGet('SELECT COUNT(*) as count FROM market_tickers WHERE symbol = ?', [symbol]);
+      if (!row || row.count === 0) {
+        console.log(`Seeding fallback mock ticker for ${symbol}...`);
+        const t = mockTickers[symbol];
+        await dbRun(
+          `INSERT OR REPLACE INTO market_tickers (symbol, name, price, change_24h, volume_24h, market_cap, last_updated)
+           VALUES (?, ?, ?, ?, ?, ?, ?)`,
+          [symbol, t.name, t.price, t.change24h, t.volume24h, t.marketCap, now]
+        );
+      }
+    }
+  },
+
+  async ensureHistoryExists(symbol) {
+    const row = await dbGet('SELECT COUNT(*) as count FROM market_history WHERE symbol = ?', [symbol]);
+    if (!row || row.count < 30) {
+      console.log(`Seeding fallback mock history for ${symbol}...`);
+      const now = Date.now();
+      const basePrices = {
+        BTC: 64120.10,
+        ETH: 3485.10,
+        SOL: 134.20,
+        LINK: 15.40,
+        SUI: 1.15
+      };
+      const base = basePrices[symbol] || 100.0;
+      for (let i = 29; i >= 0; i--) {
+        const timestamp = now - i * 24 * 60 * 60 * 1000;
+        const price = base * (1 + (Math.sin(i / 2) * 0.05) + ((Math.random() - 0.5) * 0.02));
+        await dbRun(
+          `INSERT OR REPLACE INTO market_history (symbol, timestamp, price)
+           VALUES (?, ?, ?)`,
+          [symbol, timestamp, price]
+        );
+      }
+    }
+  },
+
+  /**
+   * Fetches latest tickers from CoinCap API and caches them in SQLite
+   */
   async updateTickers() {
     try {
       console.log('Fetching latest prices from CoinCap...');
@@ -131,7 +182,9 @@ export const MarketDataService = {
       }
       console.log('Database market tickers cache updated.');
     } catch (error) {
-      console.error('Error updating tickers from CoinCap:', error);
+      console.error('Error updating tickers from CoinCap, checking fallback...', error);
+    } finally {
+      await this.ensureTickersExist();
     }
   },
 
@@ -165,7 +218,9 @@ export const MarketDataService = {
       }
       console.log(`Database market history cache updated for ${symbol}.`);
     } catch (error) {
-      console.error(`Error updating history for ${symbol} from CoinCap:`, error);
+      console.error(`Error updating history for ${symbol} from CoinCap, checking fallback:`, error);
+    } finally {
+      await this.ensureHistoryExists(symbol);
     }
   },
 

@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ravora Copilot - Premium AI Wealth Platform</title>
   <meta name="description" content="Your active Ravora wealth copilot dashboard. Managed by Araiven Intelligence.">
-  <link rel="stylesheet" href="/styles.css">
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=1.0">
+  <link rel="stylesheet" href="/styles.css?v=2.0">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=2.0">
 </head>
 <body class="app-body">
 
@@ -346,7 +346,8 @@
           <button class="btn btn-secondary btn-sm" id="btn-header-manual-scan">Scan Markets</button>
 
           <!-- Interactive Risk segmented control linked to onboarding profile -->
-          <div class="risk-segmented-control compact" id="app-risk-segmented">
+          <div class="risk-segmented-control compact state-balanced" id="app-risk-segmented">
+            <div class="segmented-pill"></div>
             <button class="segmented-btn btn-sm" data-value="0" id="app-risk-cons">Cons</button>
             <button class="segmented-btn btn-sm active" data-value="1" id="app-risk-mod">Mod</button>
             <button class="segmented-btn btn-sm" data-value="2" id="app-risk-agg">Agg</button>
@@ -366,22 +367,22 @@
           <div class="metrics-grid">
             <div class="card-glass metric-card-glow">
               <span class="metric-label">Portfolio Balance</span>
-              <h3 class="metric-val text-gradient" id="dash-balance">$132,194.10</h3>
+              <h3 class="metric-val" id="dash-balance" style="color: #fff;">$132,194.10</h3>
               <span class="metric-change positive" id="dash-change">+$14,210.60 (+12.0% 24h)</span>
             </div>
             <div class="card-glass metric-card-glow">
               <span class="metric-label">Annualized Yield (APY)</span>
-              <h3 class="metric-val text-gradient" id="dash-apy">12.42%</h3>
+              <h3 class="metric-val" id="dash-apy" style="color: #fff;">12.42%</h3>
               <span class="metric-change neutral" id="dash-apy-sub">Optimized staking spreads</span>
             </div>
             <div class="card-glass metric-card-glow">
               <span class="metric-label">Araiven Risk Exposure</span>
-              <h3 class="metric-val text-gradient" id="dash-risk">42 / 100</h3>
+              <h3 class="metric-val" id="dash-risk" style="color: #fff;">42 / 100</h3>
               <span class="metric-change" id="dash-risk-sub" style="color: var(--success);">Balanced Protection Shield</span>
             </div>
             <div class="card-glass metric-card-glow">
               <span class="metric-label">Safety Health Score</span>
-              <h3 class="metric-val text-gradient" id="dash-health">96%</h3>
+              <h3 class="metric-val" id="dash-health" style="color: #fff;">96%</h3>
               <span class="metric-change positive" id="dash-health-sub">No volatility threats detected</span>
             </div>
           </div>
@@ -447,21 +448,32 @@
                 </div>
               </div>
 
-              <!-- Market Analysis Status -->
-              <div class="card-glass mini-status-card">
-                <h4>Engine Scanner Status</h4>
-                <div class="status-rows">
-                  <div class="status-row-item">
-                    <span>Active Scanning Feeds</span>
-                    <strong class="text-gradient">24,410 / sec</strong>
+              <!-- Top Opportunity Card -->
+              <div class="card-glass mini-status-card" id="dash-top-opportunity-card">
+                <div class="card-header-row" style="margin-bottom: 12px;">
+                  <h5>Top Araiven Opportunity</h5>
+                  <span class="tag-alert-green" style="background: rgba(37, 99, 235, 0.1); border-color: rgba(37, 99, 235, 0.2); color: #3b82f6;">ALPHA CAPTURE</span>
+                </div>
+                <div id="dash-top-opp-content">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <div>
+                      <strong style="font-size: 1rem; color: #fff;" id="dash-top-opp-name">Ethereum (ETH)</strong>
+                      <span style="display: block; font-size: 0.75rem; color: var(--text-secondary);" id="dash-top-opp-symbol">ETH / USD</span>
+                    </div>
+                    <div style="text-align: right;">
+                      <span style="display: block; font-size: 0.95rem; font-weight: 700; color: var(--success);" id="dash-top-opp-return">+9.6% APY</span>
+                      <span style="font-size: 0.7rem; color: var(--text-muted);">Est. Return</span>
+                    </div>
                   </div>
-                  <div class="status-row-item">
-                    <span>Monitored Liquidity Pools</span>
-                    <strong>154 pools</strong>
-                  </div>
-                  <div class="status-row-item">
-                    <span>Drawdown Safety Cap</span>
-                    <strong style="color: var(--success);">3.50% Active</strong>
+                  <p style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.4; margin-bottom: 16px;" id="dash-top-opp-reasoning">
+                    Validator queue consolidation patterns reveal a post-upgrade yields premium.
+                  </p>
+                  <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-divider); padding-top: 12px;">
+                    <div>
+                      <span style="font-size: 0.65rem; color: var(--text-muted); display: block;">Confidence Score</span>
+                      <strong style="font-size: 0.85rem; color: #fff;" id="dash-top-opp-confidence">94%</strong>
+                    </div>
+                    <button class="btn btn-secondary btn-sm" id="btn-dash-view-top-opp">Explore Alpha</button>
                   </div>
                 </div>
               </div>
@@ -474,7 +486,7 @@
            2. WATCHLIST VIEW
            ==================================================================== -->
         <section class="app-view-panel" id="view-watchlist">
-          <div class="card-glass watchlist-page-card" style="max-width: 800px; margin: 0 auto; width: 100%;">
+          <div class="card-glass watchlist-page-card">
             <div class="card-header-row" style="margin-bottom: 20px;">
               <h4 class="text-accent-gradient">Market Watchlist</h4>
               <span class="tag-alert-green">LIVE UPDATES</span>
@@ -587,7 +599,7 @@
                   </div>
                   <div class="param-item">
                     <span>Safety Match</span>
-                    <strong class="text-gradient">98% Fit</strong>
+                    <strong style="color: #fff;">98% Fit</strong>
                   </div>
                 </div>
 
@@ -712,10 +724,10 @@
                   <svg class="donut-svg" viewBox="0 0 200 200">
                     <circle cx="100" cy="100" r="70" fill="none" stroke="rgba(255,255,255,0.02)" stroke-width="20"/>
                     <!-- Donut segments -->
-                    <circle cx="100" cy="100" r="70" class="donut-seg donut-eth" stroke="#3b82f6" stroke-width="20" stroke-dasharray="197.9 439.8" stroke-dashoffset="109.9"/>
+                    <circle cx="100" cy="100" r="70" class="donut-seg donut-eth" stroke="#2563eb" stroke-width="20" stroke-dasharray="197.9 439.8" stroke-dashoffset="109.9"/>
                     <circle cx="100" cy="100" r="70" class="donut-seg donut-usdc" stroke="#10b981" stroke-width="20" stroke-dasharray="131.9 439.8" stroke-dashoffset="-88"/>
-                    <circle cx="100" cy="100" r="70" class="donut-seg donut-btc" stroke="#8b5cf6" stroke-width="20" stroke-dasharray="87.9 439.8" stroke-dashoffset="-219.9"/>
-                    <circle cx="100" cy="100" r="70" class="donut-seg donut-cash" stroke="#d946ef" stroke-width="20" stroke-dasharray="22 439.8" stroke-dashoffset="-307.8"/>
+                    <circle cx="100" cy="100" r="70" class="donut-seg donut-btc" stroke="#6366f1" stroke-width="20" stroke-dasharray="87.9 439.8" stroke-dashoffset="-219.9"/>
+                    <circle cx="100" cy="100" r="70" class="donut-seg donut-cash" stroke="#475569" stroke-width="20" stroke-dasharray="22 439.8" stroke-dashoffset="-307.8"/>
                   </svg>
                   <div class="donut-inner-metrics">
                     <span class="donut-label">Total Assets</span>
@@ -723,10 +735,10 @@
                   </div>
                 </div>
                 <div class="donut-legend">
-                  <div class="legend-item"><span class="legend-dot" style="background:#3b82f6;"></span><span>ETH (45%)</span></div>
+                  <div class="legend-item"><span class="legend-dot" style="background:#2563eb;"></span><span>ETH (45%)</span></div>
                   <div class="legend-item"><span class="legend-dot" style="background:#10b981;"></span><span>USDC (30%)</span></div>
-                  <div class="legend-item"><span class="legend-dot" style="background:#8b5cf6;"></span><span>BTC (20%)</span></div>
-                  <div class="legend-item"><span class="legend-dot" style="background:#d946ef;"></span><span>Cash (5%)</span></div>
+                  <div class="legend-item"><span class="legend-dot" style="background:#6366f1;"></span><span>BTC (20%)</span></div>
+                  <div class="legend-item"><span class="legend-dot" style="background:#475569;"></span><span>Cash (5%)</span></div>
                 </div>
               </div>
 
@@ -807,7 +819,7 @@
            7. NOTIFICATIONS VIEW
            ==================================================================== -->
         <section class="app-view-panel" id="view-notifications">
-          <div class="card-glass notifications-page-card" style="max-width: 800px; margin: 0 auto; width: 100%;">
+          <div class="card-glass notifications-page-card">
             <div class="card-header-row" style="margin-bottom: 20px;">
               <h4 class="text-accent-gradient">Araiven Notifications & Safety Alerts</h4>
               <button class="btn btn-secondary btn-sm" id="btn-page-clear-all-notifs">Clear All Alerts</button>
@@ -822,7 +834,7 @@
            8. SETTINGS VIEW
            ==================================================================== -->
         <section class="app-view-panel" id="view-settings">
-          <div class="card-glass settings-page-card" style="max-width: 800px; margin: 0 auto; width: 100%;">
+          <div class="card-glass settings-page-card">
             <div class="card-header-row" style="margin-bottom: 20px;">
               <h4 class="text-accent-gradient">SaaS Settings & Connections</h4>
               <span class="tag-alert-green">SECURE API</span>
@@ -875,6 +887,6 @@
     </div>
   </div>
 
-  <script src="/dashboard.js"></script>
+  <script src="/dashboard.js?v=2.0"></script>
 </body>
 </html>
