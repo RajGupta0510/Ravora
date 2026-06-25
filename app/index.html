@@ -405,16 +405,43 @@
                   </div>
                 </div>
               </div>
-              <div class="chart-viewport-container">
-                <svg id="terminal-candlestick-chart" viewBox="0 0 800 320" preserveAspectRatio="none">
-                  <!-- Candlesticks and indicators drawn dynamically -->
-                </svg>
-                <div class="chart-legend-overlay">
-                  <div class="legend-item"><span class="legend-line entry"></span><span>Entry Zone</span></div>
-                  <div class="legend-item"><span class="legend-line tp"></span><span>Take Profit</span></div>
-                  <div class="legend-item"><span class="legend-line sl"></span><span>Stop Loss</span></div>
-                  <div class="legend-item"><span class="legend-line sr"></span><span>S&R Levels</span></div>
+              <!-- Chart Toolbar -->
+              <div class="chart-toolbar" id="chart-toolbar">
+                <div class="toolbar-group">
+                  <button class="toolbar-btn active" id="tf-1d" data-tf="1D">1D</button>
+                  <button class="toolbar-btn" id="tf-4h" data-tf="4H" disabled>4H</button>
+                  <button class="toolbar-btn" id="tf-1h" data-tf="1H" disabled>1H</button>
+                  <button class="toolbar-btn" id="tf-15m" data-tf="15M" disabled>15M</button>
                 </div>
+                <div class="toolbar-separator"></div>
+                <div class="toolbar-group">
+                  <button class="toolbar-btn" id="btn-indicators" title="Indicators" disabled>
+                    <svg viewBox="0 0 24 24" width="14" height="14"><path fill="currentColor" d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-4 6h-2v2h2v-2zm-4 4H9v2h2v-2zm4 0h-2v2h2v-2zm-8 4h2v-2H7v2zm4 0h2v-2h-2v2zm4 0h2v-2h-2v2zm4 0h2v-2h-2v2zm0-4h-2v2h2v-2zm0-4h-2v2h2v-2zm-8-4H9v2h2V5zm4 0h-2v2h2V5z"/></svg>
+                  </button>
+                  <button class="toolbar-btn" id="btn-drawings" title="Drawing Tools" disabled>
+                    <svg viewBox="0 0 24 24" width="14" height="14"><path fill="currentColor" d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+                  </button>
+                </div>
+                <div class="toolbar-separator"></div>
+                <div class="toolbar-group overlay-toggles" id="overlay-toggles">
+                  <button class="toolbar-toggle-btn active" data-overlay="targets" title="Toggle Entry/TP/SL Targets">Targets</button>
+                  <button class="toolbar-toggle-btn active" data-overlay="sr" title="Toggle Support & Resistance">S&R</button>
+                  <button class="toolbar-toggle-btn active" data-overlay="zones" title="Toggle AI Market Zones">Zones</button>
+                  <button class="toolbar-toggle-btn active" data-overlay="patterns" title="Toggle Pattern Flags">Patterns</button>
+                </div>
+                <div class="toolbar-separator"></div>
+                <div class="toolbar-group">
+                  <button class="toolbar-btn" id="btn-reset-chart" title="Reset View">
+                    <svg viewBox="0 0 24 24" width="14" height="14"><path fill="currentColor" d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
+                  </button>
+                  <button class="toolbar-btn" id="btn-screenshot-chart" title="Screenshot">
+                    <svg viewBox="0 0 24 24" width="14" height="14"><path fill="currentColor" d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+                  </button>
+                </div>
+              </div>
+
+              <div class="chart-viewport-container" style="position: relative; height: 320px; flex: 1;">
+                <div id="terminal-candlestick-chart" style="width: 100%; height: 100%;"></div>
               </div>
             </div>
 
@@ -474,6 +501,14 @@
                 <p id="terminal-reasoning-text">
                   Spot ETF net inflows show consecutive daily acceleration, coinciding with hodler lockup peaks. Momentum targets a breakout to structural range highs.
                 </p>
+              </div>
+
+              <!-- AI Chart Drawing Explanations -->
+              <div class="analysis-reasoning-box chart-explainers-box">
+                <h5>Araiven Chart Intel Explanations</h5>
+                <div id="terminal-explainers-list" class="explainers-list">
+                  <div class="explainer-item empty">Select an asset to view AI chart overlays.</div>
+                </div>
               </div>
 
               <!-- Action deploy form -->
@@ -959,6 +994,17 @@
       <button class="btn btn-secondary btn-sm block-btn" id="btn-clear-all-notifs">Clear All Alerts</button>
     </div>
   </div>
+
+  <!-- TradingView Lightweight Charts -->
+  <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
+
+  <!-- Araiven Chart Intelligence Engine -->
+  <script src="/app/chart/chartStateManager.js"></script>
+  <script src="/app/chart/realtimeDataService.js"></script>
+  <script src="/app/chart/drawingEngine.js"></script>
+  <script src="/app/chart/annotationEngine.js"></script>
+  <script src="/app/chart/overlayManager.js"></script>
+  <script src="/app/chart/chartComponent.js"></script>
 
   <script src="/dashboard.js?v=2.0"></script>
 </body>

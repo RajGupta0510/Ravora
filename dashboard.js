@@ -1,5 +1,10 @@
 document.addEventListener('DOMContentLoaded', () => {
 
+  // Initialize Chart Intelligence Engine
+  if (typeof window.initChartIntelligence === 'function') {
+    window.initChartIntelligence('terminal-candlestick-chart');
+  }
+
   // ==========================================================================
   // Core State & Realistic Data Sets
   // ==========================================================================
@@ -2011,7 +2016,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
 
-      renderTerminalChart(details, opp);
+      if (window.activeChartComponent) {
+        window.activeChartComponent.updateData(details, opp);
+        window.realtimeDataService.setActiveAsset(symbol);
+      } else {
+        renderTerminalChart(details, opp);
+      }
     } catch (e) {
       console.error('Error updating terminal view:', e);
     }

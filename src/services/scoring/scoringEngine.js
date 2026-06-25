@@ -5,7 +5,8 @@ import { VolumeAnalyzer } from './analyzers/volumeAnalyzer.js';
 import { MarketStructureAnalyzer } from './analyzers/marketStructureAnalyzer.js';
 import { PriceActionAnalyzer } from './analyzers/priceActionAnalyzer.js';
 
-// Registry of modular signal analyzers
+// Registry of modular signal analyzers.
+// Adding a new signal: create a class extending BaseAnalyzer and push it here.
 const analyzersRegistry = [
   new TrendAnalyzer(),
   new MomentumAnalyzer(),
@@ -17,123 +18,99 @@ const analyzersRegistry = [
 
 export const ScoringEngine = {
   /**
-   * Evaluates a target asset against the market and calculates quantitative scores
-   * @param {Object} ticker - Standardized ticker information
-   * @param {Object} assetDetails - Standardized asset details containing history
-   * @param {Array<Object>} allTickers - Latest tickers of all assets (for relative calculations)
-   * @returns {Object} Calculated scores and explainability details
+   * Runs all registered signal analyzers against an asset and computes composite scores.
+   * 
+   * Composite Score Formulas (per Araiven Intelligence Framework §4):
+   *   Opportunity Score = round( (TrendStrength × 0.40) + (Momentum × 0.40) + (Volume × 0.20) )
+   *   Risk Score        = round( (Volatility × 0.60) + ((100 - TrendStrength) × 0.40) )
+   *   Confidence Score  = round( (TrendStrength × 0.40) + (Volume × 0.40) + ((100 - Volatility) × 0.20) )
+   * 
+   * @param {Object} ticker - Standardized ticker { symbol, price, change24h, volume24h, marketCap }
+   * @param {Object} assetDetails - { history: [{open, high, low, close, volume, timestamp}] }
+   * @param {Array<Object>} allTickers - All tracked tickers for relative calculations
+   * @returns {Object} All scores + raw intermediate values prefixed with _
    */
   calculateAssetScores(ticker, assetDetails, allTickers = []) {
-    const results = {};
+    const analyzerResults = {};
     const reasoning = [];
 
     // Run all registered signal analyzers
     for (const analyzer of analyzersRegistry) {
       try {
         const res = analyzer.analyze(ticker, assetDetails, allTickers);
-        results[analyzer.name] = res;
+        analyzerResults[analyzer.name] = res;
         if (res.reasoning && Array.isArray(res.reasoning)) {
           reasoning.push(...res.reasoning);
         }
       } catch (err) {
-        console.error(`[ScoringEngine] Error running analyzer ${analyzer.name}:`, err);
+        console.error(`[ScoringEngine] Analyzer ${analyzer.name} failed:`, err.message);
       }
     }
 
-    // Extract values from analyzer results
-    const trendStrength = results.Trend?.trendStrength ?? 50;
-    const trendDirection = results.Trend?.trendDirection ?? 'Range';
-    
-    const volatilityScore = results.Volatility?.volatilityScore ?? 50;
-    const annVol = results.Volatility?.annualizedVolatility ?? 0.5;
+    // Extract values from analyzer results with safe defaults
+    const trendStrength     = analyzerResults.Trend?.trendStrength ?? 50;
+    const trendDirection    = analyzerResults.Trend?.trendDirection ?? 'Range';
+    const trendDeviation    = analyzerResults.Trend?.trendDeviation ?? 0;
 
-    const relativeMomentum = results.Momentum?.relativeMomentum ?? 50;
-    const rsi = results.Momentum?.rsi ?? 50;
+    const volatilityScore   = analyzerResults.Volatility?.volatilityScore ?? 50;
+    const annVol            = analyzerResults.Volatility?.annualizedVolatility ?? 0.65;
 
-    const volumeConfirmation = results.Volume?.volumeConfirmation ?? 50;
+    const relativeMomentum  = analyzerResults.Momentum?.relativeMomentum ?? 50;
+    const rsi               = analyzerResults.Momentum?.rsi ?? 50;
+    const momDifference     = analyzerResults.Momentum?.momDifference ?? 0;
 
-    const supportLevels = results.MarketStructure?.supportLevels ?? [ticker.price * 0.95, ticker.price * 0.9];
-    const resistanceLevels = results.MarketStructure?.resistanceLevels ?? [ticker.price * 1.05, ticker.price * 1.1];
+    const volumeConfirmation = analyzerResults.Volume?.volumeConfirmation ?? 50;
+    const volumeRatio        = analyzerResults.Volume?.volumeRatio ?? 1.0;
 
-    // Compute composite normalized scores
-    const opportunityScore = Math.round((trendStrength * 0.4) + (relativeMomentum * 0.4) + (volumeConfirmation * 0.2));
-    const riskScore = Math.round((volatilityScore * 0.6) + ((100 - trendStrength) * 0.4));
-    const confidenceScore = Math.round((trendStrength * 0.4) + (volumeConfirmation * 0.4) + ((100 - volatilityScore) * 0.2));
+    const supportLevels     = analyzerResults.MarketStructure?.supportLevels ?? [ticker.price * 0.95, ticker.price * 0.90];
+    const resistanceLevels  = analyzerResults.MarketStructure?.resistanceLevels ?? [ticker.price * 1.05, ticker.price * 1.10];
 
-    // Classify suggested direction (LONG, SHORT, HOLD)
-    let suggestedDirection = 'HOLD';
-    if (trendDirection === 'Bullish' && rsi >= 45 && opportunityScore >= 60) {
-      suggestedDirection = 'LONG';
-    } else if (trendDirection === 'Bearish' && rsi <= 55 && opportunityScore < 45) {
-      suggestedDirection = 'SHORT';
-    } else {
-      suggestedDirection = 'HOLD';
-    }
+    // -----------------------------------------------------------------------
+    // Composite Score Formulas — Framework §4
+    // -----------------------------------------------------------------------
 
-    // Generate trade setups based on suggested direction
-    let suggestedEntry = 0;
-    let suggestedStopLoss = 0;
-    let suggestedTakeProfit = 0;
-    let expectedDuration = 'N/A';
-    let riskRewardRatio = 'N/A';
+    // §4.1 Opportunity Score: measures how attractive the setup is
+    const opportunityScore = Math.min(100, Math.max(0,
+      Math.round((trendStrength * 0.40) + (relativeMomentum * 0.40) + (volumeConfirmation * 0.20))
+    ));
 
-    const currentPrice = ticker.price;
-    const S1 = supportLevels[0];
-    const R1 = resistanceLevels[0];
+    // §4.2 Risk Score: measures how dangerous the current conditions are
+    // (handled more fully by RiskEvaluator, but computed here for backwards compat)
+    const riskScore = Math.min(100, Math.max(0,
+      Math.round((volatilityScore * 0.60) + ((100 - trendStrength) * 0.40))
+    ));
 
-    if (suggestedDirection === 'LONG') {
-      suggestedEntry = Math.round(currentPrice * 0.995 * 100) / 100;
-      suggestedStopLoss = Math.round(S1 * 0.98 * 100) / 100;
-      suggestedTakeProfit = Math.round(R1 * 1.01 * 100) / 100;
-      
-      if (suggestedStopLoss >= suggestedEntry) suggestedStopLoss = Math.round(suggestedEntry * 0.97 * 100) / 100;
-      if (suggestedTakeProfit <= suggestedEntry) suggestedTakeProfit = Math.round(suggestedEntry * 1.08 * 100) / 100;
-
-      expectedDuration = annVol > 0.8 ? '1-2 days' : (annVol < 0.4 ? '7-10 days' : '3-5 days');
-    } else if (suggestedDirection === 'SHORT') {
-      suggestedEntry = Math.round(currentPrice * 1.005 * 100) / 100;
-      suggestedStopLoss = Math.round(R1 * 1.02 * 100) / 100;
-      suggestedTakeProfit = Math.round(S1 * 0.99 * 100) / 100;
-      
-      if (suggestedStopLoss <= suggestedEntry) suggestedStopLoss = Math.round(suggestedEntry * 1.03 * 100) / 100;
-      if (suggestedTakeProfit >= suggestedEntry) suggestedTakeProfit = Math.round(suggestedEntry * 0.92 * 100) / 100;
-
-      expectedDuration = annVol > 0.8 ? '1-2 days' : (annVol < 0.4 ? '7-10 days' : '3-5 days');
-    } else {
-      // Suggested Direction is HOLD
-      suggestedEntry = 0;
-      suggestedStopLoss = 0;
-      suggestedTakeProfit = 0;
-      expectedDuration = 'N/A';
-      reasoning.push('Consolidation signals or conflicting indicator setups warrant a defensive HOLD stance.');
-    }
-
-    if (suggestedDirection !== 'HOLD') {
-      const riskDiff = Math.abs(suggestedEntry - suggestedStopLoss);
-      const rewardDiff = Math.abs(suggestedTakeProfit - suggestedEntry);
-      if (riskDiff > 0) {
-        riskRewardRatio = `${(rewardDiff / riskDiff).toFixed(1)}:1`;
-      }
-    }
+    // §4.3 Confidence Score: measures Araiven's certainty in its own recommendation
+    const confidenceScore = Math.min(100, Math.max(0,
+      Math.round((trendStrength * 0.40) + (volumeConfirmation * 0.40) + ((100 - volatilityScore) * 0.20))
+    ));
 
     return {
-      trendStrength,
-      volatilityScore,
-      relativeMomentum,
-      volumeConfirmation,
+      // Composite scores
       opportunityScore,
       riskScore,
       confidenceScore,
-      reasoning,
+
+      // Signal scores used in composites
+      trendStrength,
       trendDirection,
+      volatilityScore,
+      relativeMomentum,
+      volumeConfirmation,
       supportLevels,
       resistanceLevels,
-      suggestedEntry,
-      suggestedStopLoss,
-      suggestedTakeProfit,
-      riskRewardRatio,
-      expectedDuration,
-      suggestedDirection
+
+      // Raw reasoning sentences (legacy support)
+      reasoning,
+
+      // Raw intermediate values exposed for OpportunityEngine modules
+      // Prefixed with _ to signal "internal use"
+      _rsi: rsi,
+      _annualizedVolatility: annVol,
+      _trendDeviation: trendDeviation,
+      _momDifference: momDifference,
+      _volumeRatio: volumeRatio
     };
   }
 };
+
