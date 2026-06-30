@@ -1,8 +1,12 @@
 document.addEventListener('DOMContentLoaded', () => {
 
   // Initialize Chart Intelligence Engine
-  if (typeof window.initChartIntelligence === 'function') {
-    window.initChartIntelligence('terminal-candlestick-chart');
+  try {
+    if (typeof window.initChartIntelligence === 'function') {
+      window.initChartIntelligence('terminal-candlestick-chart');
+    }
+  } catch (chartErr) {
+    console.error('Failed to initialize Chart Intelligence Engine:', chartErr);
   }
 
   // ==========================================================================
@@ -996,6 +1000,19 @@ document.addEventListener('DOMContentLoaded', () => {
     if (authContainer) authContainer.style.display = 'flex';
     if (onboardingOverlay) onboardingOverlay.style.display = 'none';
     if (appLayoutContainer) appLayoutContainer.style.display = 'none';
+
+    // Check URL parameters to decide which form to show by default
+    const urlParams = new URLSearchParams(window.location.search);
+    const authType = urlParams.get('auth');
+    if (authType === 'register') {
+      if (loginForm) loginForm.style.display = 'none';
+      if (registerForm) registerForm.style.display = 'block';
+      if (registerError) registerError.style.display = 'none';
+    } else {
+      if (loginForm) loginForm.style.display = 'block';
+      if (registerForm) registerForm.style.display = 'none';
+      if (loginError) loginError.style.display = 'none';
+    }
   }
 
   function showOnboardingOverlay() {
@@ -1112,8 +1129,15 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   async function checkAuthState() {
-    const loggedIn = localStorage.getItem('ravora_logged_in') === 'true';
+    const urlParams = new URLSearchParams(window.location.search);
+    const forceAuth = urlParams.has('auth');
+
+    const loggedIn = localStorage.getItem('ravora_logged_in') === 'true' && !forceAuth;
     if (!loggedIn) {
+      if (forceAuth) {
+        localStorage.removeItem('ravora_token');
+        localStorage.removeItem('ravora_logged_in');
+      }
       showAuthOverlay();
       return;
     }
@@ -1134,6 +1158,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         showDashboard();
         initializeDashboardUI();
+        resolveInitialRoute();
       } else {
         state.onboardingCompleted = false;
         showOnboardingOverlay();
@@ -3101,6 +3126,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Check auth state immediately on load
   checkAuthState();
-  resolveInitialRoute();
 
 });
