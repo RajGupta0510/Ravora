@@ -2107,18 +2107,58 @@ document.addEventListener('DOMContentLoaded', () => {
         positionSizeVal.textContent = size > 0 ? `$${size.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : 'Avoid / $0.00';
       }
 
+      const marketBiasVal = document.getElementById('terminal-market-bias');
+      const confidenceScoreVal = document.getElementById('terminal-confidence-score');
+
+      if (marketBiasVal) {
+        const bias = opp.marketBias || 'Neutral';
+        marketBiasVal.textContent = bias;
+        if (bias === 'Bearish') {
+          marketBiasVal.className = 'text-error';
+        } else if (bias === 'Bullish') {
+          marketBiasVal.className = 'text-green';
+        } else {
+          marketBiasVal.className = 'text-warning';
+        }
+      }
+
+      if (confidenceScoreVal) {
+        confidenceScoreVal.textContent = opp.confidenceScore !== undefined ? `${opp.confidenceScore}%` : '50%';
+      }
+
       const isHold = !opp.suggestedEntry || opp.suggestedEntry === 0;
       if (suggestedEntry) {
         suggestedEntry.textContent = isHold ? 'HOLD' : `$${opp.suggestedEntry.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
       }
-      if (suggestedTp) {
-        suggestedTp.textContent = (!opp.suggestedTakeProfit || opp.suggestedTakeProfit === 0) ? '—' : `$${opp.suggestedTakeProfit.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      const suggestedTp1 = document.getElementById('terminal-suggested-tp-1');
+      const suggestedTp2 = document.getElementById('terminal-suggested-tp-2');
+      const suggestedTp3 = document.getElementById('terminal-suggested-tp-3');
+
+      if (suggestedTp1) {
+        suggestedTp1.textContent = (isHold || !opp.suggestedTakeProfit1) ? '—' : `$${opp.suggestedTakeProfit1.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
       }
+      if (suggestedTp2) {
+        suggestedTp2.textContent = (isHold || !opp.suggestedTakeProfit2) ? '—' : `$${opp.suggestedTakeProfit2.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      }
+      if (suggestedTp3) {
+        suggestedTp3.textContent = (isHold || !opp.suggestedTakeProfit3) ? '—' : `$${opp.suggestedTakeProfit3.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      }
+
       if (suggestedSl) {
         suggestedSl.textContent = (!opp.suggestedStopLoss || opp.suggestedStopLoss === 0) ? '—' : `$${opp.suggestedStopLoss.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
       }
       if (rrRatio) rrRatio.textContent = isHold ? 'N/A' : (opp.riskRewardRatio || '2.0:1');
       if (duration) duration.textContent = isHold ? 'N/A' : (opp.expectedDuration || '3-5 days');
+
+      const tradeProbabilityVal = document.getElementById('terminal-trade-probability');
+      const strategyVal = document.getElementById('terminal-strategy');
+
+      if (tradeProbabilityVal) {
+        tradeProbabilityVal.textContent = isHold ? '0%' : `${opp.tradeProbability || 50}%`;
+      }
+      if (strategyVal) {
+        strategyVal.textContent = isHold ? 'None' : (opp.strategyUsed || 'Pullback');
+      }
       if (reasoningText) {
         try {
           const data = JSON.parse(opp.reasoningText);

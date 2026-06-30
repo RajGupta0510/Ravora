@@ -21,7 +21,7 @@
 
 import { ScoringEngine } from '../scoring/scoringEngine.js';
 import { evaluateRisk } from './riskEvaluator.js';
-import { generateTradePlan } from './tradePlanGenerator.js';
+import { TradePlanningService } from '../tradePlanning/tradePlanningService.js';
 import { ReasoningEngine } from './reasoningEngine.js';
 
 /**
@@ -130,14 +130,19 @@ function analyzeAsset(ticker, assetDetails, allTickers, externalSignals = {}) {
   const potentialDirection = opportunityScore >= 50 ? 'LONG' : 'SHORT';
 
   // 2. Generate potential trade plan to evaluate Risk/Reward
-  const potentialTradePlan = generateTradePlan(
-    potentialDirection,
-    ticker.price,
+  const potentialTradePlan = TradePlanningService.generateTradePlan({
+    price: ticker.price,
+    direction: potentialDirection,
     supportLevels,
     resistanceLevels,
     volatilityScore,
-    annVol
-  );
+    annualizedVolatility: annVol,
+    trendDirection,
+    trendStrength,
+    momentumScore: scoringResult._momentumScore,
+    opportunityScore,
+    confidenceScore
+  });
 
   // 3. Evaluate Risk using the pluggable Risk Engine
   const riskAssessment = evaluateRisk({
@@ -172,9 +177,13 @@ function analyzeAsset(ticker, assetDetails, allTickers, externalSignals = {}) {
     tradePlan.suggestedEntry = 0;
     tradePlan.suggestedStopLoss = 0;
     tradePlan.suggestedTakeProfit = 0;
+    tradePlan.suggestedTakeProfit1 = 0;
+    tradePlan.suggestedTakeProfit2 = 0;
+    tradePlan.suggestedTakeProfit3 = 0;
     tradePlan.riskRewardRatio = 'N/A';
     tradePlan.expectedDuration = 'N/A';
     tradePlan.tradeQuality = 'Avoid';
+    tradePlan.probability = 0;
   } else {
     // Override trade quality with the more comprehensive Risk Engine classification
     tradePlan.tradeQuality = riskAssessment.tradeQuality;
@@ -242,6 +251,7 @@ function analyzeAsset(ticker, assetDetails, allTickers, externalSignals = {}) {
     riskScore: riskAssessment.riskScore,
     confidenceScore,
     riskLevel: riskAssessment.riskLevel,
+    marketBias: scoringResult.marketBias,
 
     // Momentum
     momentumScore: scoringResult._momentumScore,
@@ -269,6 +279,11 @@ function analyzeAsset(ticker, assetDetails, allTickers, externalSignals = {}) {
     suggestedEntry: tradePlan.suggestedEntry,
     suggestedStopLoss: tradePlan.suggestedStopLoss,
     suggestedTakeProfit: tradePlan.suggestedTakeProfit,
+    suggestedTakeProfit1: tradePlan.suggestedTakeProfit1,
+    suggestedTakeProfit2: tradePlan.suggestedTakeProfit2,
+    suggestedTakeProfit3: tradePlan.suggestedTakeProfit3,
+    tradeProbability: tradePlan.probability,
+    strategyUsed: tradePlan.strategyUsed,
     riskRewardRatio: tradePlan.riskRewardRatio,
     expectedDuration: tradePlan.expectedDuration,
     tradeQuality: tradePlan.tradeQuality,

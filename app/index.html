@@ -479,9 +479,15 @@
                   <span>Suggested Entry</span>
                   <strong id="terminal-suggested-entry">$63,800.00</strong>
                 </div>
-                <div class="param-row">
-                  <span>Take Profit (TP)</span>
-                  <strong class="text-green" id="terminal-suggested-tp">$68,000.00</strong>
+                <div class="param-row" style="height: auto; flex-direction: column; align-items: flex-start; gap: 4px;">
+                  <span>Take Profits (TP1 / TP2 / TP3)</span>
+                  <div style="display: flex; gap: 6px; width: 100%; justify-content: space-between; margin-top: 2px;">
+                    <strong class="text-green" id="terminal-suggested-tp-1">$64,500.00</strong>
+                    <span style="color: var(--text-secondary); font-weight: 700;">/</span>
+                    <strong class="text-green" id="terminal-suggested-tp-2">$66,500.00</strong>
+                    <span style="color: var(--text-secondary); font-weight: 700;">/</span>
+                    <strong class="text-green" id="terminal-suggested-tp-3">$68,200.00</strong>
+                  </div>
                 </div>
                 <div class="param-row">
                   <span>Stop Loss (SL)</span>
@@ -527,6 +533,26 @@
                   <div>
                     <span>Rec. Position Size</span>
                     <strong id="terminal-position-size">$13,200.00</strong>
+                  </div>
+                </div>
+                <div class="param-row-split" style="border-top: 1px dashed rgba(255,255,255,0.06); padding-top: 8px; margin-top: 8px;">
+                  <div>
+                    <span>Market Bias</span>
+                    <strong id="terminal-market-bias" class="text-green">Bullish</strong>
+                  </div>
+                  <div>
+                    <span>Confidence Score</span>
+                    <strong id="terminal-confidence-score">78%</strong>
+                  </div>
+                </div>
+                <div class="param-row-split" style="border-top: 1px dashed rgba(255,255,255,0.06); padding-top: 8px; margin-top: 8px;">
+                  <div>
+                    <span>Trade Probability</span>
+                    <strong id="terminal-trade-probability" class="text-green">74%</strong>
+                  </div>
+                  <div>
+                    <span>Strategy</span>
+                    <strong id="terminal-strategy">Pullback</strong>
                   </div>
                 </div>
               </div>

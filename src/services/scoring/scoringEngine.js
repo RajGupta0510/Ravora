@@ -5,6 +5,7 @@ import { VolumeAnalyzer } from './analyzers/volumeAnalyzer.js';
 import { MarketStructureAnalyzer } from './analyzers/marketStructureAnalyzer.js';
 import { PriceActionAnalyzer } from './analyzers/priceActionAnalyzer.js';
 import { SupportResistanceAnalyzer } from './analyzers/supportResistanceAnalyzer.js';
+import { ScoringService } from './scoringService.js';
 
 // Registry of modular signal analyzers.
 // Adding a new signal: create a class extending BaseAnalyzer and push it here.
@@ -68,13 +69,23 @@ export const ScoringEngine = {
     const resistanceLevels  = analyzerResults.MarketStructure?.resistanceLevels ?? [ticker.price * 1.05, ticker.price * 1.10];
 
     // -----------------------------------------------------------------------
-    // Composite Score Formulas — Framework §4
+    // Modular Scoring Service Evaluation
     // -----------------------------------------------------------------------
+    const scoringResult = ScoringService.evaluateScores({
+      trendDirection,
+      trendStrength,
+      momentumDirection: analyzerResults.Momentum?.momentumDirection ?? 'Neutral',
+      momentumScore: analyzerResults.Momentum?.momentumScore ?? 50,
+      structureBias: analyzerResults.MarketStructure?.structureBias ?? 'Neutral',
+      structureStrength: analyzerResults.MarketStructure?.structureStrength ?? 50,
+      distanceToSupport: analyzerResults.SupportResistance?.distanceToSupport ?? 5.0,
+      distanceToResistance: analyzerResults.SupportResistance?.distanceToResistance ?? 5.0,
+      supportStrength: analyzerResults.SupportResistance?.supportStrength ?? 50,
+      resistanceStrength: analyzerResults.SupportResistance?.resistanceStrength ?? 50
+    });
 
-    // §4.1 Opportunity Score: measures how attractive the setup is
-    const opportunityScore = Math.min(100, Math.max(0,
-      Math.round((trendStrength * 0.40) + (relativeMomentum * 0.40) + (volumeConfirmation * 0.20))
-    ));
+    const opportunityScore = scoringResult.opportunityScore;
+    const confidenceScore = scoringResult.confidenceScore;
 
     // §4.2 Risk Score: measures how dangerous the current conditions are
     // (handled more fully by RiskEvaluator, but computed here for backwards compat)
@@ -82,16 +93,13 @@ export const ScoringEngine = {
       Math.round((volatilityScore * 0.60) + ((100 - trendStrength) * 0.40))
     ));
 
-    // §4.3 Confidence Score: measures Araiven's certainty in its own recommendation
-    const confidenceScore = Math.min(100, Math.max(0,
-      Math.round((trendStrength * 0.40) + (volumeConfirmation * 0.40) + ((100 - volatilityScore) * 0.20))
-    ));
-
     return {
       // Composite scores
       opportunityScore,
       riskScore,
       confidenceScore,
+      marketBias: scoringResult.marketBias,
+      scoringSummary: scoringResult.summary,
 
       // Signal scores used in composites
       trendStrength,
