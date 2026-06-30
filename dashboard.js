@@ -973,6 +973,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Reset Onboarding Guide utility
   const btnTriggerOnboardingReset = document.getElementById('btn-trigger-onboarding-reset');
+  const btnTriggerSettingsOnboarding = document.getElementById('btn-trigger-settings-onboarding');
   const btnHeaderManualScan = document.getElementById('btn-header-manual-scan');
 
   // ==========================================================================
@@ -1403,6 +1404,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => {
           onboardingOverlay.classList.add('fade-out-onboarding');
           state.onboardingCompleted = true;
+          localStorage.setItem('ravora_onboarding_completed', 'true');
           
           showDashboard();
           initializeDashboardUI();
@@ -1422,22 +1424,28 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 250);
   }
 
+  function triggerOnboardingReset() {
+    state.onboardingCompleted = false;
+    state.currentStep = 1;
+    localStorage.setItem('ravora_onboarding_completed', 'false');
+    
+    onboardingOverlay.classList.remove('fade-out-onboarding');
+    showOnboardingOverlay();
+    onboardingLoader.classList.remove('active');
+    
+    updateOnboardingStepsVisibility();
+    if (btnOnboardingBack) btnOnboardingBack.style.display = 'none';
+    if (btnOnboardingNext) {
+      btnOnboardingNext.style.display = 'block';
+      btnOnboardingNext.textContent = 'Next Step';
+    }
+  }
+
   if (btnTriggerOnboardingReset) {
-    btnTriggerOnboardingReset.addEventListener('click', () => {
-      state.onboardingCompleted = false;
-      state.currentStep = 1;
-      
-      onboardingOverlay.classList.remove('fade-out-onboarding');
-      showOnboardingOverlay();
-      onboardingLoader.classList.remove('active');
-      
-      updateOnboardingStepsVisibility();
-      if (btnOnboardingBack) btnOnboardingBack.style.display = 'none';
-      if (btnOnboardingNext) {
-        btnOnboardingNext.style.display = 'block';
-        btnOnboardingNext.textContent = 'Next Step';
-      }
-    });
+    btnTriggerOnboardingReset.addEventListener('click', triggerOnboardingReset);
+  }
+  if (btnTriggerSettingsOnboarding) {
+    btnTriggerSettingsOnboarding.addEventListener('click', triggerOnboardingReset);
   }
 
   // ==========================================================================
@@ -2010,7 +2018,13 @@ document.addEventListener('DOMContentLoaded', () => {
       if (trendVal) {
         const trend = opp.trendDirection || 'Bullish';
         trendVal.textContent = trend;
-        trendVal.className = trend === 'Bearish' ? 'text-error' : 'text-green';
+        if (trend === 'Bearish') {
+          trendVal.className = 'text-error';
+        } else if (trend === 'Bullish') {
+          trendVal.className = 'text-green';
+        } else {
+          trendVal.className = 'text-warning'; // Yellow for Sideways/Range
+        }
       }
 
       const isHold = !opp.suggestedEntry || opp.suggestedEntry === 0;

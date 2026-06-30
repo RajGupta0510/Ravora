@@ -177,7 +177,12 @@ function analyzeAsset(ticker, assetDetails, allTickers, externalSignals = {}) {
   }
 
   // Assemble raw analyzer results for the reasoning generator
-  const trendResult = { trendDirection, trendStrength, trendDeviation: scoringResult._trendDeviation };
+  const trendResult = { 
+    trendDirection, 
+    trendStrength, 
+    trendDeviation: scoringResult._trendDeviation,
+    explanation: scoringResult._trendExplanation
+  };
   const momentumResult = { rsi, momDifference: scoringResult._momDifference, relativeMomentum };
   const volumeResult = { volumeRatio: scoringResult._volumeRatio, volumeConfirmation };
   const volatilityResult = { annualizedVolatility: annVol, volatilityScore };

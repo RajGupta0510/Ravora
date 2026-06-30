@@ -108,6 +108,7 @@ export const ScoringEngine = {
       _rsi: rsi,
       _annualizedVolatility: annVol,
       _trendDeviation: trendDeviation,
+      _trendExplanation: analyzerResults.Trend?.reasoning?.[0],
       _momDifference: momDifference,
       _volumeRatio: volumeRatio
     };

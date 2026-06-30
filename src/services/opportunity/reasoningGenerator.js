@@ -76,6 +76,9 @@ export function generateReasoning(params) {
 
 function buildTrendBlock(trendResult) {
   if (!trendResult) return '';
+  if (trendResult.explanation) {
+    return `[TREND] ${trendResult.explanation}`;
+  }
   const { trendDirection, trendStrength, trendDeviation } = trendResult;
   const pct = trendDeviation ? (Math.abs(trendDeviation) * 100).toFixed(1) : '0.0';
 
