@@ -2204,8 +2204,32 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       const isHold = !opp.suggestedEntry || opp.suggestedEntry === 0;
+      
+      const activeFields = document.getElementById('terminal-active-trade-plan-fields');
+      const noTradePlan = document.getElementById('terminal-no-trade-plan');
+      const noTradeTitle = document.getElementById('terminal-no-trade-title');
+      const noTradeReason = document.getElementById('terminal-no-trade-reason');
+
+      if (isHold) {
+        if (activeFields) activeFields.style.display = 'none';
+        if (noTradePlan) noTradePlan.style.display = 'block';
+        
+        const rec = opp.recommendation || 'HOLD';
+        if (noTradeTitle) {
+          noTradeTitle.textContent = rec === 'WAIT' ? 'Setup Pending Confirmation' : 'No Active Trade Setup';
+        }
+        if (noTradeReason) {
+          noTradeReason.textContent = rec === 'WAIT'
+            ? "Araiven is waiting for structural confirmation or momentum alignment before planning entry."
+            : "No trade setup currently meets Araiven's minimum confidence requirements.";
+        }
+      } else {
+        if (activeFields) activeFields.style.display = 'block';
+        if (noTradePlan) noTradePlan.style.display = 'none';
+      }
+
       if (suggestedEntry) {
-        suggestedEntry.textContent = isHold ? 'HOLD' : `$${opp.suggestedEntry.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        suggestedEntry.textContent = isHold ? (opp.recommendation || 'HOLD') : `$${opp.suggestedEntry.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
       }
       const suggestedTp1 = document.getElementById('terminal-suggested-tp-1');
       const suggestedTp2 = document.getElementById('terminal-suggested-tp-2');

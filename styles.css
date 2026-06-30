@@ -5854,7 +5854,7 @@ h2 {
    ========================================================================== */
 .terminal-layout-grid {
   display: grid;
-  grid-template-columns: 280px 1fr 340px;
+  grid-template-columns: 420px 1fr 340px;
   gap: 16px;
   align-items: start;
   width: 100%;
@@ -5917,19 +5917,21 @@ h2 {
 }
 
 .scanner-table th {
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   padding: 8px 4px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  white-space: nowrap;
 }
 
 .scanner-table td {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   padding: 10px 4px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.02);
   color: var(--text-secondary);
+  white-space: nowrap;
 }
 
 .scanner-row:hover {
@@ -6404,7 +6406,7 @@ h2 {
 /* Responsive Adjustments for Terminal Grid */
 @media (max-width: 1280px) {
   .terminal-layout-grid {
-    grid-template-columns: 240px 1fr;
+    grid-template-columns: 380px 1fr;
   }
   .terminal-analysis-panel {
     grid-column: span 2;
