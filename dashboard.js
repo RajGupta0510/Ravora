@@ -2064,6 +2064,24 @@ document.addEventListener('DOMContentLoaded', () => {
         structureStrengthVal.textContent = `${strength}%`;
       }
 
+      const nearestSupportVal = document.getElementById('terminal-nearest-support');
+      const distanceSupportVal = document.getElementById('terminal-distance-support');
+      const nearestResistanceVal = document.getElementById('terminal-nearest-resistance');
+      const distanceResistanceVal = document.getElementById('terminal-distance-resistance');
+
+      if (nearestSupportVal) {
+        nearestSupportVal.textContent = opp.nearestSupport ? `$${opp.nearestSupport.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '—';
+      }
+      if (distanceSupportVal) {
+        distanceSupportVal.textContent = opp.distanceToSupport !== undefined ? `${opp.distanceToSupport}% away` : '—';
+      }
+      if (nearestResistanceVal) {
+        nearestResistanceVal.textContent = opp.nearestResistance ? `$${opp.nearestResistance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '—';
+      }
+      if (distanceResistanceVal) {
+        distanceResistanceVal.textContent = opp.distanceToResistance !== undefined ? `${opp.distanceToResistance}% away` : '—';
+      }
+
       const isHold = !opp.suggestedEntry || opp.suggestedEntry === 0;
       if (suggestedEntry) {
         suggestedEntry.textContent = isHold ? 'HOLD' : `$${opp.suggestedEntry.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
