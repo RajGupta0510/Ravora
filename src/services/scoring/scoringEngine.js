@@ -4,6 +4,7 @@ import { VolatilityAnalyzer } from './analyzers/volatilityAnalyzer.js';
 import { VolumeAnalyzer } from './analyzers/volumeAnalyzer.js';
 import { MarketStructureAnalyzer } from './analyzers/marketStructureAnalyzer.js';
 import { PriceActionAnalyzer } from './analyzers/priceActionAnalyzer.js';
+import { SupportResistanceAnalyzer } from './analyzers/supportResistanceAnalyzer.js';
 
 // Registry of modular signal analyzers.
 // Adding a new signal: create a class extending BaseAnalyzer and push it here.
@@ -13,7 +14,8 @@ const analyzersRegistry = [
   new VolatilityAnalyzer(),
   new VolumeAnalyzer(),
   new MarketStructureAnalyzer(),
-  new PriceActionAnalyzer()
+  new PriceActionAnalyzer(),
+  new SupportResistanceAnalyzer()
 ];
 
 export const ScoringEngine = {
@@ -116,7 +118,16 @@ export const ScoringEngine = {
       _momentumExplanation: analyzerResults.Momentum?.reasoning?.[0] ?? '',
       _structureBias: analyzerResults.MarketStructure?.structureBias ?? 'Neutral',
       _structureStrength: analyzerResults.MarketStructure?.structureStrength ?? 50,
-      _structureExplanation: analyzerResults.MarketStructure?.reasoning?.[0] ?? ''
+      _structureExplanation: analyzerResults.MarketStructure?.reasoning?.[0] ?? '',
+      _supportLevels: analyzerResults.SupportResistance?.supportLevels ?? [ticker.price * 0.95, ticker.price * 0.90],
+      _resistanceLevels: analyzerResults.SupportResistance?.resistanceLevels ?? [ticker.price * 1.05, ticker.price * 1.10],
+      _nearestSupport: analyzerResults.SupportResistance?.nearestSupport ?? (ticker.price * 0.95),
+      _nearestResistance: analyzerResults.SupportResistance?.nearestResistance ?? (ticker.price * 1.05),
+      _distanceToSupport: analyzerResults.SupportResistance?.distanceToSupport ?? 5.0,
+      _distanceToResistance: analyzerResults.SupportResistance?.distanceToResistance ?? 5.0,
+      _supportStrength: analyzerResults.SupportResistance?.supportStrength ?? 50,
+      _resistanceStrength: analyzerResults.SupportResistance?.resistanceStrength ?? 50,
+      _supportResistanceExplanation: analyzerResults.SupportResistance?.reasoning?.[0] ?? ''
     };
   }
 };

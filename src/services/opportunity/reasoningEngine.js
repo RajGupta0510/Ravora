@@ -40,6 +40,8 @@ export const ReasoningEngine = {
       momentumResult = {},
       volumeResult = {},
       volatilityResult = {},
+      structureResult = {},
+      supportResistanceResult = {},
       riskAssessment = {},
       tradePlan = {}
     } = params;
@@ -75,7 +77,10 @@ export const ReasoningEngine = {
       whyThisAsset += momentumResult.explanation + " ";
     }
     if (structureResult.explanation) {
-      whyThisAsset += structureResult.explanation;
+      whyThisAsset += structureResult.explanation + " ";
+    }
+    if (supportResistanceResult.explanation) {
+      whyThisAsset += supportResistanceResult.explanation;
     }
 
     // 3. Why now?
@@ -114,6 +119,10 @@ export const ReasoningEngine = {
     }
     if (structureResult.bias) {
       supportingEvidence.push(`Market Structure is classified as ${structureResult.bias} with a strength rating of ${structureResult.strength}/100.`);
+    }
+    if (supportResistanceResult.nearestSupport && supportResistanceResult.nearestResistance) {
+      supportingEvidence.push(`Nearest Support: $${supportResistanceResult.nearestSupport.toLocaleString()} (${supportResistanceResult.distanceToSupport}% distance).`);
+      supportingEvidence.push(`Nearest Resistance: $${supportResistanceResult.nearestResistance.toLocaleString()} (${supportResistanceResult.distanceToResistance}% distance).`);
     }
     if (tradePlan.riskRewardRatio && tradePlan.riskRewardRatio !== 'N/A') {
       supportingEvidence.push(`The trade plan yields a favorable Risk/Reward ratio of ${tradePlan.riskRewardRatio} with a Quality rating of '${tradePlan.tradeQuality || 'B'}'.`);

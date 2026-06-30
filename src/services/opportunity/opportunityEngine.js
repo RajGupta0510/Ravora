@@ -198,6 +198,17 @@ function analyzeAsset(ticker, assetDetails, allTickers, externalSignals = {}) {
     strength: scoringResult._structureStrength,
     explanation: scoringResult._structureExplanation
   };
+  const supportResistanceResult = {
+    supportLevels: scoringResult._supportLevels,
+    resistanceLevels: scoringResult._resistanceLevels,
+    nearestSupport: scoringResult._nearestSupport,
+    nearestResistance: scoringResult._nearestResistance,
+    distanceToSupport: scoringResult._distanceToSupport,
+    distanceToResistance: scoringResult._distanceToResistance,
+    supportStrength: scoringResult._supportStrength,
+    resistanceStrength: scoringResult._resistanceStrength,
+    explanation: scoringResult._supportResistanceExplanation
+  };
 
   return {
     // Identity
@@ -220,6 +231,16 @@ function analyzeAsset(ticker, assetDetails, allTickers, externalSignals = {}) {
     // Market Structure
     structureBias: scoringResult._structureBias,
     structureStrength: scoringResult._structureStrength,
+
+    // Support & Resistance
+    supportLevels: scoringResult._supportLevels,
+    resistanceLevels: scoringResult._resistanceLevels,
+    nearestSupport: scoringResult._nearestSupport,
+    nearestResistance: scoringResult._nearestResistance,
+    distanceToSupport: scoringResult._distanceToSupport,
+    distanceToResistance: scoringResult._distanceToResistance,
+    supportStrength: scoringResult._supportStrength,
+    resistanceStrength: scoringResult._resistanceStrength,
 
     // Direction
     direction,
@@ -246,6 +267,7 @@ function analyzeAsset(ticker, assetDetails, allTickers, externalSignals = {}) {
     _volumeResult: volumeResult,
     _volatilityResult: volatilityResult,
     _structureResult: structureResult,
+    _supportResistanceResult: supportResistanceResult,
     _riskAssessment: riskAssessment
   };
 }
@@ -287,6 +309,8 @@ export async function runOpportunityEngine(tickers, getAssetDetails, externalSig
       momentumResult: result._momentumResult,
       volumeResult: result._volumeResult,
       volatilityResult: result._volatilityResult,
+      structureResult: result._structureResult,
+      supportResistanceResult: result._supportResistanceResult,
       riskAssessment: result._riskAssessment,
       tradePlan: {
         suggestedEntry: result.suggestedEntry,
@@ -301,8 +325,7 @@ export async function runOpportunityEngine(tickers, getAssetDetails, externalSig
     const reasoning = JSON.stringify(structuredExplanation);
 
     // Strip internal raw analyzer fields before returning
-    const { _trendResult, _momentumResult, _volumeResult, _volatilityResult, _structureResult, _riskAssessment, ...cleanResult } = result;
-
+    const { _trendResult, _momentumResult, _volumeResult, _volatilityResult, _structureResult, _supportResistanceResult, _riskAssessment, ...cleanResult } = result;
     return { ...cleanResult, reasoningText: reasoning };
   });
 
