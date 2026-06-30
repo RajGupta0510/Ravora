@@ -126,21 +126,37 @@ function analyzeAsset(ticker, assetDetails, allTickers, externalSignals = {}) {
   const rsi = scoringResult._rsi ?? 50;
   const annVol = scoringResult._annualizedVolatility ?? 0.65;
 
-  // -----------------------------------------------------------------------
-  // Stage 9–10: Risk Evaluation (with veto rules)
-  // Future: pass externalSignals here for Funding Rates / News risk boost
-  // -----------------------------------------------------------------------
+  // 1. Determine Potential Direction (without veto check)
+  const potentialDirection = opportunityScore >= 50 ? 'LONG' : 'SHORT';
+
+  // 2. Generate potential trade plan to evaluate Risk/Reward
+  const potentialTradePlan = generateTradePlan(
+    potentialDirection,
+    ticker.price,
+    supportLevels,
+    resistanceLevels,
+    volatilityScore,
+    annVol
+  );
+
+  // 3. Evaluate Risk using the pluggable Risk Engine
   const riskAssessment = evaluateRisk({
     volatilityScore,
+    annualizedVolatility: annVol,
     trendStrength,
-    confidenceScore,
+    trendDirection,
+    momentumDirection: scoringResult._momentumDirection,
+    structureBias: scoringResult._structureBias,
     opportunityScore,
-    suggestedDirection: 'TBD'
+    confidenceScore,
+    suggestedDirection: potentialDirection,
+    suggestedEntry: potentialTradePlan.suggestedEntry,
+    suggestedStopLoss: potentialTradePlan.suggestedStopLoss,
+    suggestedTakeProfit: potentialTradePlan.suggestedTakeProfit,
+    riskRewardRatio: potentialTradePlan.riskRewardRatio
   }, externalSignals);
 
-  // -----------------------------------------------------------------------
-  // Stage 12: Direction Decision
-  // -----------------------------------------------------------------------
+  // 4. Decide Final Direction
   const direction = decideDirection(
     trendDirection,
     rsi,
@@ -150,16 +166,19 @@ function analyzeAsset(ticker, assetDetails, allTickers, externalSignals = {}) {
     riskAssessment.isVetoed
   );
 
-  // -----------------------------------------------------------------------
-  // Stage 13: Trade Plan Generation
-  // -----------------------------------------------------------------------
-  const tradePlan = generateTradePlan(
-    direction,
-    ticker.price,
-    supportLevels,
-    resistanceLevels,
-    annVol
-  );
+  // 5. Finalize Trade Plan based on direction and veto
+  const tradePlan = { ...potentialTradePlan };
+  if (direction === 'WAIT' || direction === 'HOLD') {
+    tradePlan.suggestedEntry = 0;
+    tradePlan.suggestedStopLoss = 0;
+    tradePlan.suggestedTakeProfit = 0;
+    tradePlan.riskRewardRatio = 'N/A';
+    tradePlan.expectedDuration = 'N/A';
+    tradePlan.tradeQuality = 'Avoid';
+  } else {
+    // Override trade quality with the more comprehensive Risk Engine classification
+    tradePlan.tradeQuality = riskAssessment.tradeQuality;
+  }
 
   // -----------------------------------------------------------------------
   // Expected return estimate (directional, evidence-based)
@@ -253,6 +272,7 @@ function analyzeAsset(ticker, assetDetails, allTickers, externalSignals = {}) {
     riskRewardRatio: tradePlan.riskRewardRatio,
     expectedDuration: tradePlan.expectedDuration,
     tradeQuality: tradePlan.tradeQuality,
+    recommendedPositionSize: riskAssessment.recommendedPositionSize,
 
     // Market Context
     trendDirection,

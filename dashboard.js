@@ -2013,7 +2013,12 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       if (confidenceBadge) confidenceBadge.textContent = `${opp.confidenceScore}% Confidence`;
       if (oppScore) oppScore.textContent = opp.opportunityScore !== undefined ? opp.opportunityScore : opp.confidenceScore;
-      if (riskScore) riskScore.textContent = opp.riskScore !== undefined ? opp.riskScore : (opp.riskLevel === 'low' ? 20 : (opp.riskLevel === 'high' ? 75 : 35));
+      if (riskScore) {
+        const scoreVal = opp.riskScore !== undefined ? opp.riskScore : 35;
+        const rawLevel = opp.riskLevel || 'medium';
+        const levelVal = rawLevel.charAt(0).toUpperCase() + rawLevel.slice(1);
+        riskScore.textContent = `${scoreVal} (${levelVal})`;
+      }
 
       if (trendVal) {
         const trend = opp.trendDirection || 'Bullish';
@@ -2080,6 +2085,26 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       if (distanceResistanceVal) {
         distanceResistanceVal.textContent = opp.distanceToResistance !== undefined ? `${opp.distanceToResistance}% away` : '—';
+      }
+
+      const tradeQualityVal = document.getElementById('terminal-trade-quality');
+      const positionSizeVal = document.getElementById('terminal-position-size');
+
+      if (tradeQualityVal) {
+        const q = opp.tradeQuality || 'Average';
+        tradeQualityVal.textContent = q;
+        if (q === 'Excellent' || q === 'Good') {
+          tradeQualityVal.className = 'text-green';
+        } else if (q === 'Average') {
+          tradeQualityVal.className = 'text-warning';
+        } else {
+          tradeQualityVal.className = 'text-error';
+        }
+      }
+
+      if (positionSizeVal) {
+        const size = opp.recommendedPositionSize !== undefined ? opp.recommendedPositionSize : 0;
+        positionSizeVal.textContent = size > 0 ? `$${size.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : 'Avoid / $0.00';
       }
 
       const isHold = !opp.suggestedEntry || opp.suggestedEntry === 0;
