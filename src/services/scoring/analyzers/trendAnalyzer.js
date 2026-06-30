@@ -1,5 +1,5 @@
 import { BaseAnalyzer } from './baseAnalyzer.js';
-import { TrendEngine } from '../../trend/trendEngine.js';
+import { TrendService } from '../../trend/trendService.js';
 
 export class TrendAnalyzer extends BaseAnalyzer {
   constructor() {
@@ -8,7 +8,7 @@ export class TrendAnalyzer extends BaseAnalyzer {
 
   analyze(ticker, assetDetails, allTickers = []) {
     const history = assetDetails.history || [];
-    const trendResult = TrendEngine.analyzeTrend(ticker.price, history);
+    const trendResult = TrendService.analyzeTrend(ticker.price, history);
 
     return {
       trendStrength: trendResult.trendStrength,
