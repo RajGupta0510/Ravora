@@ -1,0 +1,9 @@
+# Local Database
+ravora.db
+
+# Dependencies
+node_modules/
+
+# OS temporary files
+.DS_Store
+Thumbs.db
