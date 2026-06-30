@@ -2219,9 +2219,45 @@ document.addEventListener('DOMContentLoaded', () => {
           noTradeTitle.textContent = rec === 'WAIT' ? 'Setup Pending Confirmation' : 'No Active Trade Setup';
         }
         if (noTradeReason) {
-          noTradeReason.textContent = rec === 'WAIT'
-            ? "Araiven is waiting for structural confirmation or momentum alignment before planning entry."
-            : "No trade setup currently meets Araiven's minimum confidence requirements.";
+          const reasons = [];
+          if (opp.trendDirection === 'Sideways' || opp.trendDirection === 'Unknown') {
+            reasons.push('Price inside consolidation');
+          }
+          if (opp.momentumDirection === 'Neutral' || opp.momentumDirection === 'Weakening') {
+            reasons.push('Weak momentum');
+          }
+          if (!opp.riskRewardRatio || opp.riskRewardRatio === 'N/A' || parseFloat(opp.riskRewardRatio) < 2.0) {
+            reasons.push('Poor risk/reward ratio');
+          }
+          if (rec === 'WAIT') {
+            reasons.push('Waiting for trend confirmation');
+          }
+          if (reasons.length === 0) {
+            reasons.push("Market conditions do not satisfy Araiven's minimum confidence requirements");
+          }
+
+          try {
+            const data = JSON.parse(opp.reasoningText);
+            noTradeReason.innerHTML = `
+              <p style="margin: 0 0 8px 0;">${data.summary || "Current market conditions do not satisfy Araiven's minimum confidence requirements."}</p>
+              <div style="text-align: left; display: inline-block; margin-top: 6px; width: 100%;">
+                <span style="font-weight: 700; font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase; display: block; margin-bottom: 4px;">Key Factors:</span>
+                <ul style="margin: 0; padding-left: 14px; font-size: 0.72rem; color: var(--text-secondary); line-height: 1.4;">
+                  ${reasons.map(r => `<li style="margin-bottom: 2px;">${r}</li>`).join('')}
+                </ul>
+              </div>
+            `;
+          } catch (e) {
+            noTradeReason.innerHTML = `
+              <p style="margin: 0 0 8px 0;">Current market conditions do not satisfy Araiven's minimum confidence requirements.</p>
+              <div style="text-align: left; display: inline-block; margin-top: 6px; width: 100%;">
+                <span style="font-weight: 700; font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase; display: block; margin-bottom: 4px;">Key Factors:</span>
+                <ul style="margin: 0; padding-left: 14px; font-size: 0.72rem; color: var(--text-secondary); line-height: 1.4;">
+                  ${reasons.map(r => `<li style="margin-bottom: 2px;">${r}</li>`).join('')}
+                </ul>
+              </div>
+            `;
+          }
         }
       } else {
         if (activeFields) activeFields.style.display = 'block';
@@ -2267,7 +2303,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="structured-reasoning-summary" style="font-size: 0.85rem; line-height: 1.4; color: #fff; font-weight: 500; margin-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 10px;">
               ${data.summary}
             </div>
-            <div class="reasoning-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 12px;">
+            <div class="reasoning-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 16px; margin-top: 12px;">
               <div class="reasoning-col">
                 <h6 style="color: var(--accent-secondary); margin: 0 0 6px 0; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">Why This Asset?</h6>
                 <p style="font-size: 0.75rem; line-height: 1.4; color: var(--text-secondary); margin: 0;">${data.whyThisAsset}</p>
@@ -2283,7 +2319,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 ${data.supportingEvidence.map(e => `<li style="margin-bottom: 3px;">${e}</li>`).join('')}
               </ul>
             </div>
-            <div class="reasoning-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 12px; border-top: 1px dashed rgba(255,255,255,0.06); padding-top: 10px;">
+            <div class="reasoning-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 16px; margin-top: 12px; border-top: 1px dashed rgba(255,255,255,0.06); padding-top: 10px;">
               <div class="reasoning-col">
                 <h6 style="color: #f43f5e; margin: 0 0 6px 0; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">Potential Risks</h6>
                 <p style="font-size: 0.75rem; line-height: 1.4; color: var(--text-secondary); margin: 0;">${data.potentialRisks}</p>
