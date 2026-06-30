@@ -379,6 +379,9 @@
                       <th>Price</th>
                       <th>24h Chg</th>
                       <th>Opp Score</th>
+                      <th>Conf</th>
+                      <th>Rec</th>
+                      <th>Trend</th>
                     </tr>
                   </thead>
                   <tbody id="terminal-scanner-rows">
@@ -449,7 +452,10 @@
             <div class="card-glass terminal-analysis-panel">
               <div class="panel-header">
                 <h4>Araiven Copilot Analysis</h4>
-                <div class="badge-confidence" id="terminal-confidence-badge">94% Confidence</div>
+                <div class="badge-container" style="display: flex; gap: 8px; align-items: center;">
+                  <div class="badge-confidence" id="terminal-confidence-badge">94% Confidence</div>
+                  <div id="terminal-recommendation-badge" style="display: inline-block; padding: 2px 8px; border-radius: 4px; font-weight: 700; font-size: 0.75rem; background: rgba(16,185,129,0.15); color: #10b981;">LONG</div>
+                </div>
               </div>
               
               <!-- Setup Scores -->

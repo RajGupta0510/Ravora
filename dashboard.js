@@ -335,6 +335,7 @@ document.addEventListener('DOMContentLoaded', () => {
           riskRewardRatio: 'N/A',
           expectedDuration: 'N/A',
           trendDirection: 'Bullish',
+          recommendation: 'LONG',
           supportLevels: [],
           resistanceLevels: []
         },
@@ -356,6 +357,7 @@ document.addEventListener('DOMContentLoaded', () => {
           riskRewardRatio: 'N/A',
           expectedDuration: 'N/A',
           trendDirection: 'Bullish',
+          recommendation: 'LONG',
           supportLevels: [],
           resistanceLevels: []
         },
@@ -376,7 +378,8 @@ document.addEventListener('DOMContentLoaded', () => {
           suggestedTakeProfit: 0,
           riskRewardRatio: 'N/A',
           expectedDuration: 'N/A',
-          trendDirection: 'Range',
+          trendDirection: 'Sideways',
+          recommendation: 'WAIT',
           supportLevels: [],
           resistanceLevels: []
         },
@@ -398,6 +401,7 @@ document.addEventListener('DOMContentLoaded', () => {
           riskRewardRatio: 'N/A',
           expectedDuration: 'N/A',
           trendDirection: 'Bullish',
+          recommendation: 'LONG',
           supportLevels: [],
           resistanceLevels: []
         },
@@ -406,7 +410,7 @@ document.addEventListener('DOMContentLoaded', () => {
           type: 'momentum',
           name: 'Sui Network Velocity Expansion',
           symbol: 'SUI / USD',
-          icon: 'U',
+          icon: '💧',
           opportunityScore: 58,
           confidenceScore: 52,
           riskScore: 70,
@@ -418,7 +422,8 @@ document.addEventListener('DOMContentLoaded', () => {
           suggestedTakeProfit: 0,
           riskRewardRatio: 'N/A',
           expectedDuration: 'N/A',
-          trendDirection: 'Range',
+          trendDirection: 'Sideways',
+          recommendation: 'WAIT',
           supportLevels: [],
           resistanceLevels: []
         }
@@ -1928,14 +1933,25 @@ document.addEventListener('DOMContentLoaded', () => {
       const supported = ['BTC', 'ETH', 'SOL', 'BNB', 'SUI'];
       const assetsData = supported.map(sym => {
         const live = overview.find(o => o.symbol === sym) || { price: 0, change24h: 0 };
-        const opp = opps.find(o => o.symbol.startsWith(sym)) || { opportunityScore: 70, confidenceScore: 70 };
+        const opp = opps.find(o => o.symbol.startsWith(sym)) || {
+          opportunityScore: 50,
+          confidenceScore: 50,
+          recommendation: 'HOLD',
+          trendDirection: 'Sideways'
+        };
         return {
           symbol: sym,
           price: live.price,
           change24h: live.change24h,
-          oppScore: opp.opportunityScore !== undefined ? opp.opportunityScore : opp.confidenceScore
+          oppScore: opp.opportunityScore,
+          confScore: opp.confidenceScore,
+          recommendation: opp.recommendation || 'HOLD',
+          trend: opp.trendDirection || 'Sideways'
         };
       });
+
+      // Sort assets by Opportunity Score descending
+      assetsData.sort((a, b) => b.oppScore - a.oppScore);
 
       assetsData.forEach(ad => {
         const tr = document.createElement('tr');
@@ -1949,11 +1965,24 @@ document.addEventListener('DOMContentLoaded', () => {
           ? ad.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
           : ad.price.toLocaleString(undefined, { minimumFractionDigits: 4, maximumFractionDigits: 4 });
 
+        // Color coding for Recommendation
+        let recClass = 'text-warning';
+        if (ad.recommendation === 'LONG') recClass = 'text-green';
+        else if (ad.recommendation === 'SHORT') recClass = 'text-error';
+
+        // Color coding for Trend
+        let trendClass = 'text-warning';
+        if (ad.trend === 'Bullish') trendClass = 'text-green';
+        else if (ad.trend === 'Bearish') trendClass = 'text-error';
+
         tr.innerHTML = `
           <td><strong>${ad.symbol}</strong></td>
           <td>$${priceFormatted}</td>
           <td class="${changeClass}">${changeSign}${ad.change24h.toFixed(2)}%</td>
           <td><span class="badge-opp-score" style="display:inline-block; padding: 2px 6px; border-radius:4px; font-weight:600; background:rgba(99,102,241,0.15); color:#a5b4fc; font-size:0.75rem;">${ad.oppScore}</span></td>
+          <td>${ad.confScore}%</td>
+          <td class="${recClass}" style="font-weight:700;">${ad.recommendation}</td>
+          <td class="${trendClass}">${ad.trend}</td>
         `;
 
         tr.addEventListener('click', () => {
@@ -1986,6 +2015,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const chartPrice = document.getElementById('terminal-chart-price');
       const chartChange = document.getElementById('terminal-chart-change');
       const confidenceBadge = document.getElementById('terminal-confidence-badge');
+      const recommendationBadge = document.getElementById('terminal-recommendation-badge');
       const oppScore = document.getElementById('terminal-opp-score');
       const riskScore = document.getElementById('terminal-risk-score');
       const trendVal = document.getElementById('terminal-trend-val');
@@ -2012,6 +2042,20 @@ document.addEventListener('DOMContentLoaded', () => {
         chartChange.className = liveChange >= 0 ? 'text-green' : 'text-error';
       }
       if (confidenceBadge) confidenceBadge.textContent = `${opp.confidenceScore}% Confidence`;
+      if (recommendationBadge) {
+        const rec = opp.recommendation || 'HOLD';
+        recommendationBadge.textContent = rec;
+        if (rec === 'LONG') {
+          recommendationBadge.style.background = 'rgba(16, 185, 129, 0.15)';
+          recommendationBadge.style.color = '#10b981';
+        } else if (rec === 'SHORT') {
+          recommendationBadge.style.background = 'rgba(239, 68, 68, 0.15)';
+          recommendationBadge.style.color = '#ef4444';
+        } else {
+          recommendationBadge.style.background = 'rgba(245, 158, 11, 0.15)';
+          recommendationBadge.style.color = '#f59e0b';
+        }
+      }
       if (oppScore) oppScore.textContent = opp.opportunityScore !== undefined ? opp.opportunityScore : opp.confidenceScore;
       if (riskScore) {
         const scoreVal = opp.riskScore !== undefined ? opp.riskScore : 35;
