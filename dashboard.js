@@ -2696,7 +2696,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const openPositions = await apiCall('/paper/positions');
       positionsRows.innerHTML = '';
 
-      if (openPositions.length === 0) {
+      if (!Array.isArray(openPositions) || openPositions.length === 0) {
         positionsRows.innerHTML = `
           <tr>
             <td colspan="10" style="text-align: center; color: var(--text-secondary); padding: 24px;">No active trade positions. Deploy a trade using the panel above.</td>
@@ -2766,7 +2766,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const trades = await apiCall('/paper/history');
       historyRows.innerHTML = '';
 
-      if (trades.length === 0) {
+      if (!Array.isArray(trades) || trades.length === 0) {
         historyRows.innerHTML = `
           <tr>
             <td colspan="11" style="text-align: center; color: var(--text-secondary); padding: 24px;">No trade transaction history.</td>
