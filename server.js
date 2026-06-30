@@ -170,6 +170,9 @@ const startEngineScheduler = () => {
   setTimeout(async () => {
     try {
       console.log('[Scheduler] Executing global market analysis & recommendations update...');
+      // Always run the global scan first to populate the opportunities table
+      await RecommendationEngine.generateRecommendations();
+
       const users = await dbQuery('SELECT id FROM users');
       for (const u of users) {
         await RecommendationEngine.generateRecommendations(u.id);
@@ -184,6 +187,9 @@ const startEngineScheduler = () => {
   setInterval(async () => {
     try {
       console.log('[Scheduler] Running periodic recommendations update...');
+      // Always run the global scan first
+      await RecommendationEngine.generateRecommendations();
+
       const users = await dbQuery('SELECT id FROM users');
       for (const u of users) {
         await RecommendationEngine.generateRecommendations(u.id);

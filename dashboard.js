@@ -312,6 +312,30 @@ document.addEventListener('DOMContentLoaded', () => {
       return JSON.parse(localStorage.getItem('ravora_transactions') || '[]');
     }
 
+    // Handle GET /market/overview
+    if (urlPath === '/market/overview') {
+      return [
+        { symbol: 'BTC', name: 'Bitcoin', price: 64120.10, change24h: 1.40, volume24h: 28450200100, marketCap: 1258900400100 },
+        { symbol: 'ETH', name: 'Ethereum', price: 3485.10, change24h: 2.15, volume24h: 14502100800, marketCap: 418500200300 },
+        { symbol: 'SOL', name: 'Solana', price: 134.20, change24h: -0.85, volume24h: 3840100500, marketCap: 62450300100 },
+        { symbol: 'BNB', name: 'Binance Coin', price: 580.10, change24h: 1.25, volume24h: 1850200100, marketCap: 89050300100 },
+        { symbol: 'SUI', name: 'Sui', price: 1.15, change24h: -3.45, volume24h: 120500600, marketCap: 2840900100 }
+      ];
+    }
+
+    // Handle GET /market/assets/:symbol
+    if (urlPath.startsWith('/market/assets/')) {
+      const sym = urlPath.split('/').pop().toUpperCase();
+      const mockAssets = {
+        BTC: { symbol: 'BTC', name: 'Bitcoin', price: 64120.10, change24h: 1.40, volume24h: 28450200100, marketCap: 1258900400100 },
+        ETH: { symbol: 'ETH', name: 'Ethereum', price: 3485.10, change24h: 2.15, volume24h: 14502100800, marketCap: 418500200300 },
+        SOL: { symbol: 'SOL', name: 'Solana', price: 134.20, change24h: -0.85, volume24h: 3840100500, marketCap: 62450300100 },
+        BNB: { symbol: 'BNB', name: 'Binance Coin', price: 580.10, change24h: 1.25, volume24h: 1850200100, marketCap: 89050300100 },
+        SUI: { symbol: 'SUI', name: 'Sui', price: 1.15, change24h: -3.45, volume24h: 120500600, marketCap: 2840900100 }
+      };
+      return mockAssets[sym] || { symbol: sym, name: sym, price: 100.0, change24h: 0.0 };
+    }
+
     // Handle GET /opportunities — always attempt real backend first
     if (urlPath === '/opportunities') {
       // This block is only reached if the real API fetch at the top of apiCall failed.
@@ -1138,13 +1162,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
     const forceAuth = urlParams.has('auth');
 
-    const loggedIn = localStorage.getItem('ravora_logged_in') === 'true' && !forceAuth;
-    if (!loggedIn) {
-      if (forceAuth) {
-        localStorage.removeItem('ravora_token');
-        localStorage.removeItem('ravora_logged_in');
-      }
-      showAuthOverlay();
+    const loggedIn = localStorage.getItem('ravora_logged_in') === 'true';
+    const loginTime = localStorage.getItem('ravora_login_time');
+    const threeDays = 3 * 24 * 60 * 60 * 1000;
+    const timeDiff = loginTime ? (Date.now() - parseInt(loginTime)) : null;
+    
+    const isSessionValid = loggedIn && loginTime && (timeDiff < threeDays) && !forceAuth;
+
+    console.log('[Auth Debug - App] loggedIn:', loggedIn, 'loginTime:', loginTime, 'timeDiff:', timeDiff, 'forceAuth:', forceAuth, 'isSessionValid:', isSessionValid);
+
+    if (!isSessionValid) {
+      console.log('[Auth Debug - App] Session is invalid. Clearing credentials and redirecting to /?auth=login...');
+      localStorage.removeItem('ravora_token');
+      localStorage.removeItem('ravora_logged_in');
+      localStorage.removeItem('ravora_login_time');
+      localStorage.removeItem('ravora_email');
+      
+      // Redirect back to landing page with login modal open
+      window.location.href = '/?auth=login';
       return;
     }
     try {
@@ -1195,6 +1230,7 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.setItem('ravora_logged_in', 'true');
             localStorage.setItem('ravora_email', email);
             localStorage.setItem('ravora_onboarding_completed', data.onboardingCompleted ? 'true' : 'false');
+            window.history.replaceState({}, document.title, window.location.pathname);
             await checkAuthState();
             navigateTo('dashboard', true);
             return;
@@ -1208,6 +1244,7 @@ document.addEventListener('DOMContentLoaded', () => {
           localStorage.setItem('ravora_email', email);
           localStorage.setItem('ravora_onboarding_completed', 'true');
           initDefaultMockData(email);
+          window.history.replaceState({}, document.title, window.location.pathname);
           await checkAuthState();
           navigateTo('dashboard', true);
         }
@@ -1238,6 +1275,7 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.setItem('ravora_logged_in', 'true');
             localStorage.setItem('ravora_email', email);
             localStorage.setItem('ravora_onboarding_completed', 'false');
+            window.history.replaceState({}, document.title, window.location.pathname);
             await checkAuthState();
             return;
           } else {
@@ -1249,6 +1287,7 @@ document.addEventListener('DOMContentLoaded', () => {
           localStorage.setItem('ravora_logged_in', 'true');
           localStorage.setItem('ravora_email', email);
           localStorage.setItem('ravora_onboarding_completed', 'false');
+          window.history.replaceState({}, document.title, window.location.pathname);
           await checkAuthState();
         }
       } catch (err) {
@@ -2203,99 +2242,275 @@ document.addEventListener('DOMContentLoaded', () => {
         confidenceScoreVal.textContent = opp.confidenceScore !== undefined ? `${opp.confidenceScore}%` : '50%';
       }
 
-      const isHold = !opp.suggestedEntry || opp.suggestedEntry === 0;
-      
-      const activeFields = document.getElementById('terminal-active-trade-plan-fields');
-      const noTradePlan = document.getElementById('terminal-no-trade-plan');
-      const noTradeTitle = document.getElementById('terminal-no-trade-title');
-      const noTradeReason = document.getElementById('terminal-no-trade-reason');
+      // Resolve 3-State Layout
+      const state1Active = document.getElementById('terminal-state-active-trade');
+      const state2NoTrade = document.getElementById('terminal-state-no-trade');
+      const state3Insufficient = document.getElementById('terminal-state-insufficient-data');
 
-      if (isHold) {
-        if (activeFields) activeFields.style.display = 'none';
-        if (noTradePlan) noTradePlan.style.display = 'block';
-        
-        const rec = opp.recommendation || 'HOLD';
-        if (noTradeTitle) {
-          noTradeTitle.textContent = rec === 'WAIT' ? 'Setup Pending Confirmation' : 'No Active Trade Setup';
+      let activeState = 1;
+      if (!opp || opp.opportunityScore === 0 || opp.confidenceScore === 0 || opp.strategyUsed === 'Insufficient Data') {
+        activeState = 3;
+      } else if (opp.recommendation === 'WAIT' || opp.recommendation === 'HOLD') {
+        activeState = 2;
+      } else {
+        activeState = 1;
+      }
+
+      if (state1Active) state1Active.style.display = activeState === 1 ? 'block' : 'none';
+      if (state2NoTrade) state2NoTrade.style.display = activeState === 2 ? 'block' : 'none';
+      if (state3Insufficient) state3Insufficient.style.display = activeState === 3 ? 'block' : 'none';
+
+      if (activeState === 1) {
+        // STATE 1: LONG / SHORT Active Trade Setup
+        const recBadge = document.getElementById('state1-recommendation-badge');
+        const qualityBadge = document.getElementById('state1-quality-badge');
+        const entryEl = document.getElementById('state1-entry');
+        const slEl = document.getElementById('state1-sl');
+        const tp1El = document.getElementById('state1-tp1');
+        const tp2El = document.getElementById('state1-tp2');
+        const tp3El = document.getElementById('state1-tp3');
+        const rrEl = document.getElementById('state1-rr');
+        const durEl = document.getElementById('state1-duration');
+        const probEl = document.getElementById('state1-probability');
+        const structEl = document.getElementById('state1-structure');
+        const suppEl = document.getElementById('state1-support');
+        const confEl = document.getElementById('state1-confidence');
+        const resEl = document.getElementById('state1-resistance');
+        const explBox = document.getElementById('state1-explanation-box');
+
+        const rec = opp.recommendation || 'LONG';
+        if (recBadge) {
+          recBadge.textContent = rec;
+          if (rec === 'SHORT') {
+            recBadge.style.background = 'linear-gradient(135deg, #dc2626 0%, #7c3aed 100%)';
+            recBadge.style.color = '#fff';
+          } else {
+            recBadge.style.background = 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)';
+            recBadge.style.color = '#fff';
+          }
         }
-        if (noTradeReason) {
-          const reasons = [];
-          if (opp.trendDirection === 'Sideways' || opp.trendDirection === 'Unknown') {
-            reasons.push('Price inside consolidation');
-          }
-          if (opp.momentumDirection === 'Neutral' || opp.momentumDirection === 'Weakening') {
-            reasons.push('Weak momentum');
-          }
-          if (!opp.riskRewardRatio || opp.riskRewardRatio === 'N/A' || parseFloat(opp.riskRewardRatio) < 2.0) {
-            reasons.push('Poor risk/reward ratio');
-          }
-          if (rec === 'WAIT') {
-            reasons.push('Waiting for trend confirmation');
-          }
-          if (reasons.length === 0) {
-            reasons.push("Market conditions do not satisfy Araiven's minimum confidence requirements");
-          }
 
+        if (qualityBadge) {
+          const qual = opp.tradeQuality || 'Good';
+          qualityBadge.textContent = `${qual} Quality`;
+          if (qual === 'High' || qual === 'Good') {
+            qualityBadge.style.background = 'rgba(16, 185, 129, 0.1)';
+            qualityBadge.style.color = '#10b981';
+            qualityBadge.style.borderColor = 'rgba(16, 185, 129, 0.2)';
+          } else {
+            qualityBadge.style.background = 'rgba(245, 158, 11, 0.1)';
+            qualityBadge.style.color = '#f59e0b';
+            qualityBadge.style.borderColor = 'rgba(245, 158, 11, 0.2)';
+          }
+        }
+
+        if (entryEl) entryEl.textContent = `$${(opp.suggestedEntry || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        if (slEl) slEl.textContent = `$${(opp.suggestedStopLoss || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        if (tp1El) tp1El.textContent = `$${(opp.suggestedTakeProfit1 || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        if (tp2El) tp2El.textContent = `$${(opp.suggestedTakeProfit2 || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        if (tp3El) tp3El.textContent = `$${(opp.suggestedTakeProfit3 || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        if (rrEl) rrEl.textContent = opp.riskRewardRatio || '2.0:1';
+        if (durEl) durEl.textContent = opp.expectedDuration || '3-5 days';
+        if (probEl) probEl.textContent = `${opp.tradeProbability || 50}%`;
+        if (structEl) {
+          structEl.textContent = opp.marketBias || opp.trendDirection || 'Bullish';
+          structEl.className = (opp.marketBias || opp.trendDirection) === 'Bearish' ? 'text-error' : 'text-green';
+        }
+        if (suppEl) {
+          const dist = opp.distanceToSupport !== undefined ? ` (${opp.distanceToSupport.toFixed(1)}% away)` : '';
+          suppEl.textContent = `$${(opp.nearestSupport || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}${dist}`;
+        }
+        if (confEl) confEl.textContent = `${opp.confidenceScore || 50}%`;
+        if (resEl) {
+          const dist = opp.distanceToResistance !== undefined ? ` (${opp.distanceToResistance.toFixed(1)}% away)` : '';
+          resEl.textContent = `$${(opp.nearestResistance || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}${dist}`;
+        }
+
+        if (explBox) {
           try {
             const data = JSON.parse(opp.reasoningText);
-            noTradeReason.innerHTML = `
-              <p style="margin: 0 0 8px 0;">${data.summary || "Current market conditions do not satisfy Araiven's minimum confidence requirements."}</p>
-              <div style="text-align: left; display: inline-block; margin-top: 6px; width: 100%;">
-                <span style="font-weight: 700; font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase; display: block; margin-bottom: 4px;">Key Factors:</span>
-                <ul style="margin: 0; padding-left: 14px; font-size: 0.72rem; color: var(--text-secondary); line-height: 1.4;">
-                  ${reasons.map(r => `<li style="margin-bottom: 2px;">${r}</li>`).join('')}
-                </ul>
-              </div>
-            `;
+            explBox.textContent = data.summary || `This setup is supported by a ${opp.trendDirection.toLowerCase()} trend, ${opp.momentumDirection.toLowerCase()} momentum, and a recent structure bias of ${(opp.marketBias || 'neutral').toLowerCase()}.`;
           } catch (e) {
-            noTradeReason.innerHTML = `
-              <p style="margin: 0 0 8px 0;">Current market conditions do not satisfy Araiven's minimum confidence requirements.</p>
-              <div style="text-align: left; display: inline-block; margin-top: 6px; width: 100%;">
-                <span style="font-weight: 700; font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase; display: block; margin-bottom: 4px;">Key Factors:</span>
-                <ul style="margin: 0; padding-left: 14px; font-size: 0.72rem; color: var(--text-secondary); line-height: 1.4;">
-                  ${reasons.map(r => `<li style="margin-bottom: 2px;">${r}</li>`).join('')}
-                </ul>
-              </div>
-            `;
+            explBox.textContent = `This setup is supported by a ${opp.trendDirection.toLowerCase()} trend, ${opp.momentumDirection.toLowerCase()} momentum, and a recent structure bias of ${(opp.marketBias || 'neutral').toLowerCase()}.`;
           }
         }
-      } else {
-        if (activeFields) activeFields.style.display = 'block';
-        if (noTradePlan) noTradePlan.style.display = 'none';
+      } else if (activeState === 2) {
+        // STATE 2: HOLD / WAIT Opportunity Status Card
+        const statusBadge = document.getElementById('state2-status-badge');
+        const reasonBox = document.getElementById('state2-reason-box');
+        const trendEl = document.getElementById('state2-trend');
+        const momEl = document.getElementById('state2-momentum');
+        const riskEl = document.getElementById('state2-risk');
+        const confEl = document.getElementById('state2-confidence');
+        const trigText = document.getElementById('state2-trigger-text');
+
+        const rec = opp.recommendation || 'HOLD';
+        if (statusBadge) {
+          statusBadge.textContent = rec === 'WAIT' ? 'SETUP PENDING' : 'NO ACTIVE SETUP';
+          if (rec === 'WAIT') {
+            statusBadge.style.background = 'rgba(245, 158, 11, 0.15)';
+            statusBadge.style.color = '#f59e0b';
+          } else {
+            statusBadge.style.background = 'rgba(156, 163, 175, 0.15)';
+            statusBadge.style.color = '#9ca3af';
+          }
+        }
+
+        const recTextEl = document.getElementById('state2-rec-text');
+        if (recTextEl) {
+          recTextEl.textContent = rec;
+          if (rec === 'WAIT') {
+            recTextEl.style.color = '#f59e0b';
+          } else {
+            recTextEl.style.color = '#9ca3af';
+          }
+        }
+
+        if (reasonBox) {
+          const reasons = [];
+          if (opp.trendDirection === 'Sideways' || opp.trendDirection === 'Unknown') {
+            reasons.push('Price is trading inside a consolidation range.');
+          }
+          if (opp.momentumDirection === 'Neutral' || opp.momentumDirection === 'Weakening') {
+            reasons.push('Momentum is weakening.');
+          }
+          if (!opp.riskRewardRatio || opp.riskRewardRatio === 'N/A' || parseFloat(opp.riskRewardRatio) < 2.0) {
+            reasons.push('Risk/Reward is below the minimum threshold.');
+          }
+          if (rec === 'WAIT') {
+            reasons.push('Waiting for structural confirmation above resistance.');
+          }
+          if (reasons.length === 0) {
+            reasons.push("Market conditions do not satisfy Araiven's minimum confidence requirements.");
+          }
+
+          let reasonHtml = `<p style="margin: 0 0 8px 0; font-weight: 600; color: #f59e0b; font-size: 0.72rem;">`;
+          reasonHtml += rec === 'WAIT' ? 'Araiven is waiting for trend confirmation:' : 'Current market conditions do not satisfy minimum requirements:';
+          reasonHtml += `</p><ul style="margin: 0; padding-left: 14px; line-height: 1.5; font-size: 0.7rem; color: var(--text-secondary);">`;
+          reasons.forEach(r => {
+            reasonHtml += `<li style="margin-bottom: 2px;">${r}</li>`;
+          });
+          reasonHtml += `</ul>`;
+          reasonBox.innerHTML = reasonHtml;
+        }
+
+        if (trendEl) trendEl.textContent = opp.trendDirection || 'Neutral';
+        if (momEl) momEl.textContent = opp.momentumDirection || 'Neutral';
+        if (riskEl) {
+          riskEl.textContent = opp.riskLevel || 'Medium';
+          riskEl.className = opp.riskLevel === 'Low' ? 'text-green' : (opp.riskLevel === 'Medium' ? 'text-warning' : 'text-error');
+        }
+        if (confEl) confEl.textContent = `${opp.confidenceScore || 50}%`;
+
+        if (trigText) {
+          if (rec === 'WAIT') {
+            trigText.textContent = `Generate a LONG signal after a confirmed breakout above $${(opp.nearestResistance || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}.`;
+          } else {
+            trigText.textContent = `Awaiting structural shift. Monitor support at $${(opp.nearestSupport || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })} and resistance at $${(opp.nearestResistance || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}.`;
+        }
       }
 
-      if (suggestedEntry) {
-        suggestedEntry.textContent = isHold ? (opp.recommendation || 'HOLD') : `$${opp.suggestedEntry.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-      }
-      const suggestedTp1 = document.getElementById('terminal-suggested-tp-1');
-      const suggestedTp2 = document.getElementById('terminal-suggested-tp-2');
-      const suggestedTp3 = document.getElementById('terminal-suggested-tp-3');
+      // Update Decision Timeline Elements
+      const analysisUpdated = document.getElementById('timeline-analysis-updated');
+      const signalGenerated = document.getElementById('timeline-signal-generated');
+      const statusDot = document.getElementById('timeline-status-dot');
+      const statusText = document.getElementById('timeline-status-text');
 
-      if (suggestedTp1) {
-        suggestedTp1.textContent = (isHold || !opp.suggestedTakeProfit1) ? '—' : `$${opp.suggestedTakeProfit1.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      const now = new Date();
+      const formatUTC = (date) => {
+        return date.toISOString().replace('T', ' ').substring(11, 19) + ' UTC';
+      };
+
+      if (analysisUpdated) {
+        analysisUpdated.textContent = formatUTC(now);
       }
-      if (suggestedTp2) {
-        suggestedTp2.textContent = (isHold || !opp.suggestedTakeProfit2) ? '—' : `$${opp.suggestedTakeProfit2.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-      }
-      if (suggestedTp3) {
-        suggestedTp3.textContent = (isHold || !opp.suggestedTakeProfit3) ? '—' : `$${opp.suggestedTakeProfit3.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      if (signalGenerated) {
+        // Signal generated is slightly before analysis update
+        const sigTime = new Date(now.getTime() - 24000); // 24 seconds ago
+        signalGenerated.textContent = formatUTC(sigTime);
       }
 
-      if (suggestedSl) {
-        suggestedSl.textContent = (!opp.suggestedStopLoss || opp.suggestedStopLoss === 0) ? '—' : `$${opp.suggestedStopLoss.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      if (statusDot && statusText) {
+        const rec = opp ? opp.recommendation : 'HOLD';
+        if (rec === 'LONG' || rec === 'SHORT') {
+          statusDot.style.backgroundColor = '#10b981'; // Green
+          statusText.style.color = '#10b981';
+          statusText.textContent = 'High Confidence Setup';
+        } else if (rec === 'WAIT') {
+          statusDot.style.backgroundColor = '#f59e0b'; // Yellow
+          statusText.style.color = '#f59e0b';
+          statusText.textContent = 'Waiting for Confirmation';
+        } else if (rec === 'HOLD') {
+          statusDot.style.backgroundColor = '#9ca3af'; // Gray
+          statusText.style.color = '#9ca3af';
+          statusText.textContent = 'Monitoring Markets';
+        } else {
+          statusDot.style.backgroundColor = '#ef4444'; // Red
+          statusText.style.color = '#ef4444';
+        }
       }
-      if (rrRatio) rrRatio.textContent = isHold ? 'N/A' : (opp.riskRewardRatio || '2.0:1');
-      if (duration) duration.textContent = isHold ? 'N/A' : (opp.expectedDuration || '3-5 days');
 
-      const tradeProbabilityVal = document.getElementById('terminal-trade-probability');
-      const strategyVal = document.getElementById('terminal-strategy');
+      // Helper function to update the AI Status Pill
+      const updateStatusPill = (pillId, rec, riskScore, confidenceScore) => {
+        const pill = document.getElementById(pillId);
+        if (!pill) return;
+        
+        const dot = pill.querySelector('.ai-status-dot');
+        const text = pill.querySelector('.ai-status-text');
+        if (!dot || !text) return;
+        
+        let status = 'Scanning Markets';
+        let color = '#60a5fa'; // Blue
+        let dotColor = '#3b82f6';
+        let bg = 'rgba(59, 130, 246, 0.08)';
+        let border = 'rgba(59, 130, 246, 0.15)';
+        
+        if (riskScore >= 70) {
+          status = 'High-Risk Conditions';
+          color = '#f87171'; // Red
+          dotColor = '#ef4444';
+          bg = 'rgba(239, 68, 68, 0.08)';
+          border = 'rgba(239, 68, 68, 0.15)';
+        } else if ((rec === 'LONG' || rec === 'SHORT') && confidenceScore >= 75) {
+          status = 'High-Confidence Setup';
+          color = '#a5b4fc'; // Purple
+          dotColor = '#8b5cf6';
+          bg = 'rgba(139, 92, 246, 0.08)';
+          border = 'rgba(139, 92, 246, 0.15)';
+        } else if (rec === 'LONG' || rec === 'SHORT') {
+          status = 'Live Analysis';
+          color = '#34d399'; // Green
+          dotColor = '#10b981';
+          bg = 'rgba(16, 185, 129, 0.08)';
+          border = 'rgba(16, 185, 129, 0.15)';
+        } else if (rec === 'WAIT') {
+          status = 'Waiting for Confirmation';
+          color = '#fbbf24'; // Yellow
+          dotColor = '#f59e0b';
+          bg = 'rgba(245, 158, 11, 0.08)';
+          border = 'rgba(245, 158, 11, 0.15)';
+        } else if (rec === 'HOLD') {
+          status = 'Market Consolidating';
+          color = '#60a5fa'; // Blue
+          dotColor = '#3b82f6';
+          bg = 'rgba(59, 130, 246, 0.08)';
+          border = 'rgba(59, 130, 246, 0.15)';
+        }
+        
+        text.textContent = status;
+        pill.style.color = color;
+        pill.style.background = bg;
+        pill.style.borderColor = border;
+        dot.style.backgroundColor = dotColor;
+      };
 
-      if (tradeProbabilityVal) {
-        tradeProbabilityVal.textContent = isHold ? '0%' : `${opp.tradeProbability || 50}%`;
-      }
-      if (strategyVal) {
-        strategyVal.textContent = isHold ? 'None' : (opp.strategyUsed || 'Pullback');
-      }
+      const recVal = opp ? opp.recommendation : 'HOLD';
+      const riskVal = opp ? opp.riskScore : 35;
+      const confVal = opp ? opp.confidenceScore : 50;
+
+      updateStatusPill('state1-ai-status-pill', recVal, riskVal, confVal);
+      updateStatusPill('state2-ai-status-pill', recVal, riskVal, confVal);
+    }
       if (reasoningText) {
         try {
           const data = JSON.parse(opp.reasoningText);
@@ -3434,6 +3649,55 @@ document.addEventListener('DOMContentLoaded', () => {
       navigateTo(screenId, false);
       history.replaceState({ screen: screenId }, '', '/app/' + screenId);
     }
+  }
+
+  // Real-time Decision Timeline Timer
+  let secondsSinceRefresh = 0;
+  let secondsToNextAnalysis = 30;
+
+  function startTimelineTimer() {
+    setInterval(() => {
+      secondsSinceRefresh++;
+      secondsToNextAnalysis--;
+
+      const dataRefreshed = document.getElementById('timeline-data-refreshed');
+      const nextAnalysis = document.getElementById('timeline-next-analysis');
+
+      if (dataRefreshed) {
+        dataRefreshed.textContent = `${secondsSinceRefresh} second${secondsSinceRefresh !== 1 ? 's' : ''} ago`;
+      }
+      if (nextAnalysis) {
+        nextAnalysis.textContent = `In ${secondsToNextAnalysis} second${secondsToNextAnalysis !== 1 ? 's' : ''}`;
+      }
+
+      if (secondsToNextAnalysis <= 0) {
+        secondsToNextAnalysis = 30;
+        secondsSinceRefresh = 0;
+        
+        // Silent background refresh
+        if (state.activeSymbol) {
+          loadScannerAssets().catch(console.error);
+          updateTerminalView(state.activeSymbol).catch(console.error);
+        }
+      }
+    }, 1000);
+  }
+
+  // Start the timeline timer
+  startTimelineTimer();
+
+  // Handle Logout
+  const btnLogout = document.getElementById('btn-logout');
+  if (btnLogout) {
+    btnLogout.addEventListener('click', () => {
+      localStorage.removeItem('ravora_token');
+      localStorage.removeItem('ravora_logged_in');
+      localStorage.removeItem('ravora_login_time');
+      localStorage.removeItem('ravora_email');
+      
+      // Redirect back to landing page
+      window.location.href = '/';
+    });
   }
 
   // Check auth state immediately on load

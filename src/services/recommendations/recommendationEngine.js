@@ -119,6 +119,12 @@ export const RecommendationEngine = {
         );
       }
 
+      // If no userId is provided, we only wanted to update the global opportunities
+      if (!userId) {
+        console.log('[RecommendationEngine] Global market opportunities updated.');
+        return;
+      }
+
       // 4. Fetch user's risk stance
       const riskProfile = await dbGet('SELECT * FROM risk_profiles WHERE user_id = ?', [userId]);
       if (!riskProfile) return;

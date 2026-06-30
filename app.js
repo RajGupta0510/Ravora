@@ -732,4 +732,193 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // ==========================================================================
+  // Auth Modal & Redirect Logic
+  // ==========================================================================
+  const authModal = document.getElementById('auth-modal');
+  const authClose = document.getElementById('auth-modal-close');
+  const btnSignIn = document.getElementById('btn-login-nav');
+  const btnGetStartedNav = document.getElementById('btn-get-started-nav');
+  const heroCtaPrimary = document.getElementById('hero-cta-primary');
+  const pricingCtaBtns = document.querySelectorAll('.pricing-card .btn');
+
+  const loginContainer = document.getElementById('auth-login-container');
+  const registerContainer = document.getElementById('auth-register-container');
+  const switchToSignup = document.getElementById('switch-to-signup');
+  const switchToLogin = document.getElementById('switch-to-login');
+
+  const landingLoginForm = document.getElementById('landing-login-form');
+  const landingRegisterForm = document.getElementById('landing-register-form');
+  const landingLoginError = document.getElementById('landing-login-error');
+  const landingRegisterError = document.getElementById('landing-register-error');
+
+  const openAuth = (mode = 'login') => {
+    if (!authModal) return;
+    authModal.classList.add('active');
+    if (mode === 'login') {
+      if (loginContainer) loginContainer.style.display = 'block';
+      if (registerContainer) registerContainer.style.display = 'none';
+    } else {
+      if (loginContainer) loginContainer.style.display = 'none';
+      if (registerContainer) registerContainer.style.display = 'block';
+    }
+  };
+
+  const closeAuth = () => {
+    if (authModal) authModal.classList.remove('active');
+  };
+
+  // Close modal when clicking on the overlay background
+  if (authModal) {
+    authModal.addEventListener('click', (e) => {
+      if (e.target === authModal) {
+        closeAuth();
+      }
+    });
+  }
+
+  // Intercept click on Sign In and Get Started to show modal instead of redirect
+  if (btnSignIn) {
+    btnSignIn.addEventListener('click', (e) => {
+      e.preventDefault();
+      openAuth('login');
+    });
+  }
+  if (btnGetStartedNav) {
+    btnGetStartedNav.addEventListener('click', (e) => {
+      e.preventDefault();
+      openAuth('register');
+    });
+  }
+  if (heroCtaPrimary) {
+    heroCtaPrimary.addEventListener('click', (e) => {
+      e.preventDefault();
+      openAuth('register');
+    });
+  }
+  pricingCtaBtns.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      openAuth('register');
+    });
+  });
+
+  if (authClose) authClose.addEventListener('click', closeAuth);
+  if (switchToSignup) {
+    switchToSignup.addEventListener('click', (e) => {
+      e.preventDefault();
+      openAuth('register');
+    });
+  }
+  if (switchToLogin) {
+    switchToLogin.addEventListener('click', (e) => {
+      e.preventDefault();
+      openAuth('login');
+    });
+  }
+
+  // Resolve API and redirect paths dynamically based on port/protocol
+  const isLocalFile = window.location.protocol === 'file:';
+  const isDifferentPort = window.location.port !== '3000' && window.location.port !== '';
+  const API_BASE = (isLocalFile || isDifferentPort) ? 'http://localhost:3000/v1' : '/v1';
+  const REDIRECT_BASE = (isLocalFile || isDifferentPort) ? 'http://localhost:3000/app/' : '/app/';
+
+  // Handle Login submission
+  if (landingLoginForm) {
+    landingLoginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (landingLoginError) landingLoginError.style.display = 'none';
+      const email = document.getElementById('landing-login-email').value;
+      const password = document.getElementById('landing-login-password').value;
+
+      try {
+        try {
+          const res = await fetch(`${API_BASE}/auth/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+          });
+          if (res.ok) {
+            const data = await res.json();
+            localStorage.setItem('ravora_token', data.token);
+            localStorage.setItem('ravora_logged_in', 'true');
+            localStorage.setItem('ravora_login_time', Date.now().toString());
+            localStorage.setItem('ravora_email', email);
+            localStorage.setItem('ravora_onboarding_completed', data.onboardingCompleted ? 'true' : 'false');
+            window.location.href = REDIRECT_BASE;
+            return;
+          } else {
+            const data = await res.json().catch(() => ({}));
+            throw new Error(data.error || 'Authentication failed.');
+          }
+        } catch (apiErr) {
+          console.warn('Backend login failed, using local fallback:', apiErr.message);
+          localStorage.setItem('ravora_logged_in', 'true');
+          localStorage.setItem('ravora_login_time', Date.now().toString());
+          localStorage.setItem('ravora_email', email);
+          localStorage.setItem('ravora_onboarding_completed', 'true');
+          window.location.href = REDIRECT_BASE;
+        }
+      } catch (err) {
+        if (landingLoginError) {
+          landingLoginError.textContent = err.message;
+          landingLoginError.style.display = 'block';
+        }
+      }
+    });
+  }
+
+  // Handle Registration submission
+  if (landingRegisterForm) {
+    landingRegisterForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (landingRegisterError) landingRegisterError.style.display = 'none';
+      const email = document.getElementById('landing-register-email').value;
+      const password = document.getElementById('landing-register-password').value;
+
+      try {
+        try {
+          const res = await fetch(`${API_BASE}/auth/register`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+          });
+          if (res.ok) {
+            const data = await res.json();
+            localStorage.setItem('ravora_token', data.token);
+            localStorage.setItem('ravora_logged_in', 'true');
+            localStorage.setItem('ravora_login_time', Date.now().toString());
+            localStorage.setItem('ravora_email', email);
+            localStorage.setItem('ravora_onboarding_completed', 'false');
+            window.location.href = REDIRECT_BASE;
+            return;
+          } else {
+            const data = await res.json().catch(() => ({}));
+            throw new Error(data.error || 'Registration failed.');
+          }
+        } catch (apiErr) {
+          console.warn('Backend registration failed, using local fallback:', apiErr.message);
+          localStorage.setItem('ravora_logged_in', 'true');
+          localStorage.setItem('ravora_login_time', Date.now().toString());
+          localStorage.setItem('ravora_email', email);
+          localStorage.setItem('ravora_onboarding_completed', 'false');
+          window.location.href = REDIRECT_BASE;
+        }
+      } catch (err) {
+        if (landingRegisterError) {
+          landingRegisterError.textContent = err.message;
+          landingRegisterError.style.display = 'block';
+        }
+      }
+    });
+  }
+
+  // Check URL parameters on load to auto-open modal if redirected from app
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('auth') === 'login') {
+    openAuth('login');
+  } else if (urlParams.get('auth') === 'register') {
+    openAuth('register');
+  }
+
 });
