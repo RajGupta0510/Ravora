@@ -415,10 +415,12 @@
               <!-- Chart Toolbar -->
               <div class="chart-toolbar" id="chart-toolbar">
                 <div class="toolbar-group">
+                  <button class="toolbar-btn" id="tf-1m" data-tf="1m">1m</button>
+                  <button class="toolbar-btn" id="tf-5m" data-tf="5m">5m</button>
+                  <button class="toolbar-btn" id="tf-15m" data-tf="15m">15m</button>
+                  <button class="toolbar-btn" id="tf-1h" data-tf="1H">1H</button>
+                  <button class="toolbar-btn" id="tf-4h" data-tf="4H">4H</button>
                   <button class="toolbar-btn active" id="tf-1d" data-tf="1D">1D</button>
-                  <button class="toolbar-btn" id="tf-4h" data-tf="4H" disabled>4H</button>
-                  <button class="toolbar-btn" id="tf-1h" data-tf="1H" disabled>1H</button>
-                  <button class="toolbar-btn" id="tf-15m" data-tf="15M" disabled>15M</button>
                 </div>
                 <div class="toolbar-separator"></div>
                 <div class="toolbar-group">
@@ -447,7 +449,7 @@
                 </div>
               </div>
 
-              <div class="chart-viewport-container" style="position: relative; height: 320px; flex: 1;">
+              <div class="chart-viewport-container" style="position: relative; flex: 1;">
                 <div id="terminal-candlestick-chart" style="width: 100%; height: 100%;"></div>
               </div>
             </div>
@@ -721,9 +723,12 @@
 
           <!-- BOTTOM PANEL: Active Positions & Transaction History -->
           <div class="card-glass terminal-positions-panel" style="margin-top: 16px;">
-            <div class="panel-tabs">
-              <button class="panel-tab-btn active" data-tab="active-positions">Active Positions</button>
-              <button class="panel-tab-btn" data-tab="closed-history">Closed Trade History</button>
+            <div class="panel-tabs" style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+              <div style="display: flex; gap: 8px;">
+                <button class="panel-tab-btn active" data-tab="active-positions">Active Positions</button>
+                <button class="panel-tab-btn" data-tab="closed-history">Closed Trade History</button>
+              </div>
+              <button class="btn btn-secondary btn-sm" id="btn-close-all-trades" style="border-color: rgba(239, 68, 68, 0.4); color: #f87171;">Close All Trades</button>
             </div>
             
             <div class="tab-content active" id="tab-active-positions">
@@ -733,11 +738,13 @@
                     <tr>
                       <th>Asset</th>
                       <th>Direction</th>
-                      <th>Size (USD)</th>
-                      <th>Leverage</th>
-                      <th>Entry Price</th>
+                      <th>Entry</th>
                       <th>Current Price</th>
+                      <th>Position Size</th>
+                      <th>Leverage</th>
                       <th>Unrealized P&L</th>
+                      <th>Duration</th>
+                      <th>Current Status</th>
                       <th>Action</th>
                     </tr>
                   </thead>
@@ -753,12 +760,17 @@
                 <table class="positions-table">
                   <thead>
                     <tr>
-                      <th>Timestamp</th>
-                      <th>Asset Pair</th>
-                      <th>Amount</th>
-                      <th>Exit Price</th>
-                      <th>Fee</th>
-                      <th>Status</th>
+                      <th>Close Time</th>
+                      <th>Asset</th>
+                      <th>Direction</th>
+                      <th>Entry</th>
+                      <th>Exit</th>
+                      <th>Profit/Loss</th>
+                      <th>Duration</th>
+                      <th>Reason Closed</th>
+                      <th>Win/Loss</th>
+                      <th>Confidence</th>
+                      <th>Opp Score</th>
                     </tr>
                   </thead>
                   <tbody id="terminal-history-rows">
@@ -1190,13 +1202,14 @@
   <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
 
   <!-- Araiven Chart Intelligence Engine -->
-  <script src="/app/chart/chartStateManager.js"></script>
-  <script src="/app/chart/realtimeDataService.js"></script>
-  <script src="/app/chart/drawingEngine.js"></script>
-  <script src="/app/chart/annotationEngine.js"></script>
-  <script src="/app/chart/overlayManager.js"></script>
-  <script src="/app/chart/chartComponent.js"></script>
+  <script src="chart/chartStateManager.js"></script>
+  <script src="chart/realtimeDataService.js"></script>
+  <script src="chart/drawingEngine.js"></script>
+  <script src="chart/annotationEngine.js"></script>
+  <script src="chart/overlayManager.js"></script>
+  <script src="chart/chartOverlayService.js"></script>
+  <script src="chart/chartComponent.js"></script>
 
-  <script src="/dashboard.js?v=2.0"></script>
+  <script src="/dashboard.js?v=3.0"></script>
 </body>
 </html>

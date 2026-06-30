@@ -193,8 +193,10 @@ class ChartComponent {
     }));
     this.volumeSeries.setData(volumes);
 
-    // Update horizontal price lines (TP, SL, Entry)
-    this.updatePriceLines(state);
+    // Update AI overlays (Entry, SL, TP, Support, Resistance, Trend)
+    if (window.chartOverlayService) {
+      window.chartOverlayService.applyOverlays(this.chart, this.candleSeries, state);
+    }
 
     // Redraw Canvas overlays
     setTimeout(() => {
@@ -202,52 +204,6 @@ class ChartComponent {
       this.drawOverlays();
       this.updateExplainersList(state);
     }, 50);
-  }
-
-  updatePriceLines(state) {
-    // Clear old lines
-    this.priceLines.forEach(line => this.candleSeries.removePriceLine(line));
-    this.priceLines = [];
-
-    if (!state.toggles.targets || !state.opp) return;
-
-    const { suggestedEntry, suggestedTakeProfit, suggestedStopLoss } = state.opp;
-
-    if (suggestedEntry > 0) {
-      const line = this.candleSeries.createPriceLine({
-        price: suggestedEntry,
-        color: '#3b82f6',
-        lineWidth: 1.5,
-        lineStyle: LightweightCharts.LineStyle.Dashed,
-        axisLabelVisible: true,
-        title: 'Entry Target'
-      });
-      this.priceLines.push(line);
-    }
-
-    if (suggestedTakeProfit > 0) {
-      const line = this.candleSeries.createPriceLine({
-        price: suggestedTakeProfit,
-        color: '#10b981',
-        lineWidth: 1.5,
-        lineStyle: LightweightCharts.LineStyle.Dashed,
-        axisLabelVisible: true,
-        title: 'Take Profit'
-      });
-      this.priceLines.push(line);
-    }
-
-    if (suggestedStopLoss > 0) {
-      const line = this.candleSeries.createPriceLine({
-        price: suggestedStopLoss,
-        color: '#ef4444',
-        lineWidth: 1.5,
-        lineStyle: LightweightCharts.LineStyle.Dashed,
-        axisLabelVisible: true,
-        title: 'Stop Loss'
-      });
-      this.priceLines.push(line);
-    }
   }
 
   handleRealtimeTick(tick) {

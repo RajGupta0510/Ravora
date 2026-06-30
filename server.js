@@ -9,8 +9,10 @@ import { getProfile, onboard, updateSettings } from './src/controllers/userContr
 import { getPortfolio, getPortfolioHistory, getTransactions, closePosition } from './src/controllers/portfolioController.js';
 import { getOpportunities, getRecommendations, executeRecommendation, deployOpportunity, scanMarkets } from './src/controllers/opportunityController.js';
 import { copilotMessage, getNotifications, markNotificationsRead, connectExchange } from './src/controllers/copilotController.js';
+import { openPaperPosition, getActivePaperPositions, closePaperPosition, closeAllPaperPositions, getPaperTradeHistory } from './src/controllers/paperTradingController.js';
 import { MarketDataService } from './src/services/marketDataService.js';
 import { RecommendationEngine } from './src/services/recommendations/recommendationEngine.js';
+import { PaperTradingService } from './src/services/paperTradingService.js';
 
 
 const __filename = fileURLToPath(import.meta.url);
@@ -67,7 +69,8 @@ apiRouter.get('/market/overview', async (req, res) => {
 apiRouter.get('/market/assets/:symbol', async (req, res) => {
   try {
     const { symbol } = req.params;
-    const details = await MarketDataService.getAssetDetails(symbol);
+    const { timeframe } = req.query;
+    const details = await MarketDataService.getAssetDetails(symbol, timeframe || '1D');
     return res.json(details);
   } catch (error) {
     return res.status(500).json({ error: error.message });
@@ -131,8 +134,14 @@ apiRouter.post('/portfolio/positions/:symbol/close', verifyToken, closePosition)
 apiRouter.get('/opportunities', verifyToken, getOpportunities);
 apiRouter.get('/opportunities/recommendations', verifyToken, getRecommendations);
 apiRouter.post('/opportunities/recommendations/:id/execute', verifyToken, executeRecommendation);
-apiRouter.post('/opportunities/deploy', verifyToken, deployOpportunity);
+apiRouter.post('/opportunities/deploy', verifyToken, openPaperPosition); // Paper Trading
 apiRouter.post('/market/scan', verifyToken, scanMarkets);
+
+// Paper Trading Endpoints (Protected)
+apiRouter.get('/paper/positions', verifyToken, getActivePaperPositions);
+apiRouter.delete('/paper/positions', verifyToken, closeAllPaperPositions);
+apiRouter.delete('/paper/positions/:id', verifyToken, closePaperPosition);
+apiRouter.get('/paper/history', verifyToken, getPaperTradeHistory);
 
 // Copilot conversation (Protected)
 apiRouter.post('/copilot/message', verifyToken, copilotMessage);
@@ -209,6 +218,9 @@ const startServer = async () => {
 
     // Start scheduler
     startEngineScheduler();
+
+    // Start Paper Trading background monitoring loop
+    PaperTradingService.startMonitoringLoop(5000);
 
     app.listen(PORT, () => {
       console.log(`Ravora MVP Foundation listening at http://localhost:${PORT}`);

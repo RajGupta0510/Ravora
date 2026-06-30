@@ -9,6 +9,22 @@ document.addEventListener('DOMContentLoaded', () => {
     console.error('Failed to initialize Chart Intelligence Engine:', chartErr);
   }
 
+  // Bind Timeframe Toolbar Clicks
+  const tfButtons = document.querySelectorAll('.chart-toolbar .toolbar-group:first-child button');
+  tfButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      tfButtons.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      
+      const tf = btn.getAttribute('data-tf') || '1D';
+      window.chartStateManager.timeframe = tf;
+      
+      if (state.selectedAsset) {
+        updateTerminalView(state.selectedAsset, tf).catch(console.error);
+      }
+    });
+  });
+
   // ==========================================================================
   // Core State & Realistic Data Sets
   // ==========================================================================
@@ -1166,10 +1182,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const loggedIn = localStorage.getItem('ravora_logged_in') === 'true';
     const loginTime = localStorage.getItem('ravora_login_time');
-    const threeDays = 3 * 24 * 60 * 60 * 1000;
+    const token = localStorage.getItem('ravora_token');
+    const sevenDays = 7 * 24 * 60 * 60 * 1000;
     const timeDiff = loginTime ? (Date.now() - parseInt(loginTime)) : null;
     
-    const isSessionValid = loggedIn && loginTime && (timeDiff < threeDays) && !forceAuth;
+    const isSessionValid = loggedIn && loginTime && token && (timeDiff < sevenDays) && !forceAuth;
 
     console.log('[Auth Debug - App] loggedIn:', loggedIn, 'loginTime:', loginTime, 'timeDiff:', timeDiff, 'forceAuth:', forceAuth, 'isSessionValid:', isSessionValid);
 
@@ -1179,6 +1196,7 @@ document.addEventListener('DOMContentLoaded', () => {
       localStorage.removeItem('ravora_logged_in');
       localStorage.removeItem('ravora_login_time');
       localStorage.removeItem('ravora_email');
+      localStorage.removeItem('ravora_onboarding_completed');
       
       // Redirect back to landing page with login modal open
       window.location.href = '/?auth=login';
@@ -1229,35 +1247,41 @@ document.addEventListener('DOMContentLoaded', () => {
       const password = document.getElementById('login-password').value;
 
       try {
+        let response;
         try {
-          const response = await fetch(`${API_BASE}/auth/login`, {
+          response = await fetch(`${API_BASE}/auth/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password })
           });
-          if (response.ok) {
-            const data = await response.json();
-            localStorage.setItem('ravora_token', data.token);
-            localStorage.setItem('ravora_logged_in', 'true');
-            localStorage.setItem('ravora_email', email);
-            localStorage.setItem('ravora_onboarding_completed', data.onboardingCompleted ? 'true' : 'false');
-            window.history.replaceState({}, document.title, window.location.pathname);
-            await checkAuthState();
-            navigateTo('dashboard', true);
-            return;
-          } else {
-            const data = await response.json().catch(() => ({}));
-            throw new Error(data.error || 'Authentication failed.');
-          }
-        } catch (apiErr) {
-          console.warn('Backend login failed, using local fallback:', apiErr.message);
+        } catch (netErr) {
+          console.warn('Backend login failed (network), using local fallback:', netErr.message);
+          localStorage.setItem('ravora_token', 'mock-jwt-token-fallback');
           localStorage.setItem('ravora_logged_in', 'true');
+          localStorage.setItem('ravora_login_time', Date.now().toString());
           localStorage.setItem('ravora_email', email);
           localStorage.setItem('ravora_onboarding_completed', 'true');
           initDefaultMockData(email);
           window.history.replaceState({}, document.title, window.location.pathname);
           await checkAuthState();
           navigateTo('dashboard', true);
+          return;
+        }
+
+        if (response.ok) {
+          const data = await response.json();
+          localStorage.setItem('ravora_token', data.token);
+          localStorage.setItem('ravora_logged_in', 'true');
+          localStorage.setItem('ravora_login_time', Date.now().toString());
+          localStorage.setItem('ravora_email', email);
+          localStorage.setItem('ravora_onboarding_completed', (data.user && data.user.onboardingCompleted) ? 'true' : 'false');
+          window.history.replaceState({}, document.title, window.location.pathname);
+          await checkAuthState();
+          navigateTo('dashboard', true);
+          return;
+        } else {
+          const data = await response.json().catch(() => ({}));
+          throw new Error(data.error || 'Authentication failed.');
         }
       } catch (err) {
         loginError.textContent = err.message;
@@ -1274,32 +1298,38 @@ document.addEventListener('DOMContentLoaded', () => {
       const password = document.getElementById('register-password').value;
 
       try {
+        let response;
         try {
-          const response = await fetch(`${API_BASE}/auth/register`, {
+          response = await fetch(`${API_BASE}/auth/register`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password })
           });
-          if (response.ok) {
-            const data = await response.json();
-            localStorage.setItem('ravora_token', data.token);
-            localStorage.setItem('ravora_logged_in', 'true');
-            localStorage.setItem('ravora_email', email);
-            localStorage.setItem('ravora_onboarding_completed', 'false');
-            window.history.replaceState({}, document.title, window.location.pathname);
-            await checkAuthState();
-            return;
-          } else {
-            const data = await response.json().catch(() => ({}));
-            throw new Error(data.error || 'Registration failed.');
-          }
-        } catch (apiErr) {
-          console.warn('Backend registration failed, using local fallback:', apiErr.message);
+        } catch (netErr) {
+          console.warn('Backend registration failed (network), using local fallback:', netErr.message);
+          localStorage.setItem('ravora_token', 'mock-jwt-token-fallback');
           localStorage.setItem('ravora_logged_in', 'true');
+          localStorage.setItem('ravora_login_time', Date.now().toString());
           localStorage.setItem('ravora_email', email);
           localStorage.setItem('ravora_onboarding_completed', 'false');
           window.history.replaceState({}, document.title, window.location.pathname);
           await checkAuthState();
+          return;
+        }
+
+        if (response.ok) {
+          const data = await response.json();
+          localStorage.setItem('ravora_token', data.token);
+          localStorage.setItem('ravora_logged_in', 'true');
+          localStorage.setItem('ravora_login_time', Date.now().toString());
+          localStorage.setItem('ravora_email', email);
+          localStorage.setItem('ravora_onboarding_completed', 'false');
+          window.history.replaceState({}, document.title, window.location.pathname);
+          await checkAuthState();
+          return;
+        } else {
+          const data = await response.json().catch(() => ({}));
+          throw new Error(data.error || 'Registration failed.');
         }
       } catch (err) {
         registerError.textContent = err.message;
@@ -1598,7 +1628,7 @@ document.addEventListener('DOMContentLoaded', () => {
     updateHeaderTitle(screenId);
 
     if (screenId === 'dashboard') {
-      updateTerminalView(state.selectedAsset || 'BTC');
+      updateTerminalView(state.selectedAsset || 'BTC', window.chartStateManager.timeframe);
       loadTerminalPositions();
       loadTerminalHistory();
     } else if (screenId === 'portfolio') {
@@ -2103,7 +2133,7 @@ document.addEventListener('DOMContentLoaded', () => {
           document.querySelectorAll('.scanner-row').forEach(row => row.classList.remove('active'));
           tr.classList.add('active');
           state.selectedAsset = ad.symbol;
-          updateTerminalView(ad.symbol);
+          updateTerminalView(ad.symbol, window.chartStateManager.timeframe);
         });
 
         scannerRows.appendChild(tr);
@@ -2113,11 +2143,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  async function updateTerminalView(symbol) {
+  async function updateTerminalView(symbol, timeframe = null) {
     if (!symbol) return;
     
+    if (!timeframe) {
+      timeframe = window.chartStateManager.timeframe || '1D';
+    }
+    
     try {
-      const details = await apiCall(`/market/assets/${symbol}`);
+      const details = await apiCall(`/market/assets/${symbol}?timeframe=${timeframe}`);
       const opps = await apiCall('/opportunities');
       const opp = opps.find(o => o.symbol.startsWith(symbol)) || {
         opportunityScore: 0,
@@ -2645,7 +2679,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (window.activeChartComponent) {
         window.activeChartComponent.updateData(details, opp);
-        window.realtimeDataService.setActiveAsset(symbol);
+        window.realtimeDataService.setActiveAsset(symbol, timeframe);
       } else {
         renderTerminalChart(details, opp);
       }
@@ -2659,16 +2693,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!positionsRows) return;
 
     try {
-      const data = await apiCall('/portfolio');
-      const holdings = data.holdings || [];
+      const openPositions = await apiCall('/paper/positions');
       positionsRows.innerHTML = '';
-
-      const openPositions = holdings.filter(h => h.symbol !== 'USDC' && h.symbol !== 'USDT' && h.symbol !== 'USDS');
 
       if (openPositions.length === 0) {
         positionsRows.innerHTML = `
           <tr>
-            <td colspan="8" style="text-align: center; color: var(--text-secondary); padding: 24px;">No active trade positions. Deploy a trade using the panel above.</td>
+            <td colspan="10" style="text-align: center; color: var(--text-secondary); padding: 24px;">No active trade positions. Deploy a trade using the panel above.</td>
           </tr>
         `;
         return;
@@ -2677,20 +2708,11 @@ document.addEventListener('DOMContentLoaded', () => {
       openPositions.forEach(pos => {
         const tr = document.createElement('tr');
         
-        const marginUSD = pos.amount * pos.entryPrice;
+        const marginUSD = pos.positionSize;
         const totalSizeUSD = marginUSD * pos.leverage;
 
-        const priceRatio = pos.currentPrice / pos.entryPrice;
-        let pnlUSD = 0;
-        if (pos.positionType.toLowerCase() === 'short') {
-          pnlUSD = marginUSD * pos.leverage * (1 - priceRatio);
-        } else {
-          pnlUSD = marginUSD * pos.leverage * (priceRatio - 1);
-        }
-
-        const pnlPct = marginUSD > 0 ? (pnlUSD / marginUSD) * 100 : 0;
-        const pnlClass = pnlUSD >= 0 ? 'text-green' : 'text-error';
-        const pnlSign = pnlUSD >= 0 ? '+' : '';
+        const pnlClass = pos.unrealizedPnL >= 0 ? 'text-green' : 'text-error';
+        const pnlSign = pos.unrealizedPnL >= 0 ? '+' : '';
 
         const entryFormatted = pos.entryPrice >= 100
           ? pos.entryPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
@@ -2702,13 +2724,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
         tr.innerHTML = `
           <td><strong>${pos.symbol} / USD</strong></td>
-          <td><span class="tag-alert-green" style="background: ${pos.positionType.toLowerCase() === 'short' ? 'rgba(239, 68, 68, 0.1)' : 'rgba(16, 185, 129, 0.1)'}; color: ${pos.positionType.toLowerCase() === 'short' ? '#f87171' : '#10b981'}; border-color: ${pos.positionType.toLowerCase() === 'short' ? 'rgba(239, 68, 68, 0.2)' : 'rgba(16, 185, 129, 0.2)'};">${pos.positionType.toUpperCase()}</span></td>
-          <td>$${totalSizeUSD.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-          <td>${pos.leverage.toFixed(1)}x</td>
+          <td><span class="tag-alert-green" style="background: ${pos.direction.toLowerCase() === 'short' ? 'rgba(239, 68, 68, 0.1)' : 'rgba(16, 185, 129, 0.1)'}; color: ${pos.direction.toLowerCase() === 'short' ? '#f87171' : '#10b981'}; border-color: ${pos.direction.toLowerCase() === 'short' ? 'rgba(239, 68, 68, 0.2)' : 'rgba(16, 185, 129, 0.2)'};">${pos.direction.toUpperCase()}</span></td>
           <td>$${entryFormatted}</td>
           <td>$${currentFormatted}</td>
-          <td class="${pnlClass}" style="font-weight: 700;">${pnlSign}$${pnlUSD.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (${pnlSign}${pnlPct.toFixed(2)}%)</td>
-          <td><button class="btn btn-secondary btn-sm btn-close-pos" data-symbol="${pos.symbol}">Close</button></td>
+          <td>$${totalSizeUSD.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+          <td>${pos.leverage.toFixed(1)}x</td>
+          <td class="${pnlClass}" style="font-weight: 700;">${pnlSign}$${pos.unrealizedPnL.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (${pnlSign}${pos.percentageReturn.toFixed(2)}%)</td>
+          <td>${pos.duration}</td>
+          <td><span class="status-badge" style="background: rgba(99,102,241,0.15); color: #a5b4fc; border: 1px solid rgba(99,102,241,0.2); margin: 0; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: 600;">${pos.status}</span></td>
+          <td><button class="btn btn-secondary btn-sm btn-close-pos" data-id="${pos.id}">Close</button></td>
         `;
 
         tr.querySelector('.btn-close-pos').addEventListener('click', async (e) => {
@@ -2717,7 +2741,7 @@ document.addEventListener('DOMContentLoaded', () => {
           btn.disabled = true;
           btn.textContent = 'Closing...';
           try {
-            const res = await apiCall(`/portfolio/positions/${pos.symbol}/close`, { method: 'POST' });
+            const res = await apiCall(`/paper/positions/${pos.id}`, { method: 'DELETE' });
             alert(`Position closed successfully. Realized PnL: $${res.profitLoss.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`);
             await initializeDashboardUI();
           } catch (err) {
@@ -2739,13 +2763,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!historyRows) return;
 
     try {
-      const trades = await apiCall('/portfolio/transactions');
+      const trades = await apiCall('/paper/history');
       historyRows.innerHTML = '';
 
       if (trades.length === 0) {
         historyRows.innerHTML = `
           <tr>
-            <td colspan="6" style="text-align: center; color: var(--text-secondary); padding: 24px;">No trade transaction history.</td>
+            <td colspan="11" style="text-align: center; color: var(--text-secondary); padding: 24px;">No trade transaction history.</td>
           </tr>
         `;
         return;
@@ -2753,16 +2777,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
       trades.forEach(t => {
         const tr = document.createElement('tr');
-        const date = new Date(t.timestamp);
-        const timeStr = date.toLocaleString();
+        const closeDate = new Date(t.closeTime);
+        const closeTimeStr = closeDate.toLocaleString();
+
+        const pnlClass = t.profitLoss >= 0 ? 'text-green' : 'text-error';
+        const pnlSign = t.profitLoss >= 0 ? '+' : '';
+
+        const entryFormatted = t.entryPrice >= 100
+          ? t.entryPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+          : t.entryPrice.toLocaleString(undefined, { minimumFractionDigits: 4, maximumFractionDigits: 4 });
+        
+        const exitFormatted = t.exitPrice >= 100
+          ? t.exitPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+          : t.exitPrice.toLocaleString(undefined, { minimumFractionDigits: 4, maximumFractionDigits: 4 });
 
         tr.innerHTML = `
-          <td>${timeStr}</td>
-          <td><strong>${t.asset}</strong></td>
-          <td>${t.amount}</td>
-          <td>${t.price}</td>
-          <td>${t.fee}</td>
-          <td><span class="status-badge active" style="margin: 0; background: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.2);">${t.type.toUpperCase().replace('_', ' ')}</span></td>
+          <td>${closeTimeStr}</td>
+          <td><strong>${t.symbol} / USD</strong></td>
+          <td><span class="tag-alert-green" style="background: ${t.direction.toLowerCase() === 'short' ? 'rgba(239, 68, 68, 0.1)' : 'rgba(16, 185, 129, 0.1)'}; color: ${t.direction.toLowerCase() === 'short' ? '#f87171' : '#10b981'}; border-color: ${t.direction.toLowerCase() === 'short' ? 'rgba(239, 68, 68, 0.2)' : 'rgba(16, 185, 129, 0.2)'};">${t.direction.toUpperCase()}</span></td>
+          <td>$${entryFormatted}</td>
+          <td>$${exitFormatted}</td>
+          <td class="${pnlClass}" style="font-weight: 700;">${pnlSign}$${t.profitLoss.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+          <td>${t.duration}</td>
+          <td>${t.reasonClosed}</td>
+          <td><span class="tag-alert-green" style="background: ${t.winLoss === 'LOSS' ? 'rgba(239, 68, 68, 0.1)' : 'rgba(16, 185, 129, 0.1)'}; color: ${t.winLoss === 'LOSS' ? '#f87171' : '#10b981'}; border-color: ${t.winLoss === 'LOSS' ? 'rgba(239, 68, 68, 0.2)' : 'rgba(16, 185, 129, 0.2)'};">${t.winLoss}</span></td>
+          <td>${t.confidence}%</td>
+          <td><span class="badge-opp-score" style="display:inline-block; padding: 2px 6px; border-radius:4px; font-weight:600; background:rgba(99,102,241,0.15); color:#a5b4fc; font-size:0.75rem;">${t.opportunityScore}</span></td>
         `;
         historyRows.appendChild(tr);
       });
@@ -2787,6 +2827,25 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.classList.add('active');
       });
     });
+
+    const btnCloseAll = document.getElementById('btn-close-all-trades');
+    if (btnCloseAll) {
+      btnCloseAll.addEventListener('click', async () => {
+        if (!confirm('Are you sure you want to close all active simulated positions?')) return;
+        btnCloseAll.disabled = true;
+        btnCloseAll.textContent = 'Closing All...';
+        try {
+          await apiCall('/paper/positions', { method: 'DELETE' });
+          alert('All simulated positions closed successfully.');
+          await initializeDashboardUI();
+        } catch (err) {
+          alert(err.message);
+        } finally {
+          btnCloseAll.disabled = false;
+          btnCloseAll.textContent = 'Close All Trades';
+        }
+      });
+    }
 
     const tradeForm = document.getElementById('terminal-trade-form');
     if (tradeForm) {
@@ -3596,7 +3655,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     await loadScannerAssets();
-    await updateTerminalView(state.selectedAsset);
+    await updateTerminalView(state.selectedAsset, window.chartStateManager.timeframe);
     await loadTerminalPositions();
     await loadTerminalHistory();
 
@@ -3750,9 +3809,9 @@ document.addEventListener('DOMContentLoaded', () => {
         secondsSinceRefresh = 0;
         
         // Silent background refresh
-        if (state.activeSymbol) {
+        if (state.selectedAsset) {
           loadScannerAssets().catch(console.error);
-          updateTerminalView(state.activeSymbol).catch(console.error);
+          updateTerminalView(state.selectedAsset, window.chartStateManager.timeframe).catch(console.error);
         }
       }
     }, 1000);
@@ -3769,6 +3828,7 @@ document.addEventListener('DOMContentLoaded', () => {
       localStorage.removeItem('ravora_logged_in');
       localStorage.removeItem('ravora_login_time');
       localStorage.removeItem('ravora_email');
+      localStorage.removeItem('ravora_onboarding_completed');
       
       // Redirect back to landing page
       window.location.href = '/';

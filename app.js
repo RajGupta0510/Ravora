@@ -832,32 +832,36 @@ document.addEventListener('DOMContentLoaded', () => {
       const password = document.getElementById('landing-login-password').value;
 
       try {
+        let res;
         try {
-          const res = await fetch(`${API_BASE}/auth/login`, {
+          res = await fetch(`${API_BASE}/auth/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password })
           });
-          if (res.ok) {
-            const data = await res.json();
-            localStorage.setItem('ravora_token', data.token);
-            localStorage.setItem('ravora_logged_in', 'true');
-            localStorage.setItem('ravora_login_time', Date.now().toString());
-            localStorage.setItem('ravora_email', email);
-            localStorage.setItem('ravora_onboarding_completed', (data.user && data.user.onboardingCompleted) ? 'true' : 'false');
-            window.location.href = REDIRECT_BASE;
-            return;
-          } else {
-            const data = await res.json().catch(() => ({}));
-            throw new Error(data.error || 'Authentication failed.');
-          }
-        } catch (apiErr) {
-          console.warn('Backend login failed, using local fallback:', apiErr.message);
+        } catch (netErr) {
+          console.warn('Backend login failed (network), using local fallback:', netErr.message);
+          localStorage.setItem('ravora_token', 'mock-jwt-token-fallback');
           localStorage.setItem('ravora_logged_in', 'true');
           localStorage.setItem('ravora_login_time', Date.now().toString());
           localStorage.setItem('ravora_email', email);
           localStorage.setItem('ravora_onboarding_completed', 'true');
           window.location.href = REDIRECT_BASE;
+          return;
+        }
+
+        if (res.ok) {
+          const data = await res.json();
+          localStorage.setItem('ravora_token', data.token);
+          localStorage.setItem('ravora_logged_in', 'true');
+          localStorage.setItem('ravora_login_time', Date.now().toString());
+          localStorage.setItem('ravora_email', email);
+          localStorage.setItem('ravora_onboarding_completed', (data.user && data.user.onboardingCompleted) ? 'true' : 'false');
+          window.location.href = REDIRECT_BASE;
+          return;
+        } else {
+          const data = await res.json().catch(() => ({}));
+          throw new Error(data.error || 'Authentication failed.');
         }
       } catch (err) {
         if (landingLoginError) {
@@ -877,32 +881,36 @@ document.addEventListener('DOMContentLoaded', () => {
       const password = document.getElementById('landing-register-password').value;
 
       try {
+        let res;
         try {
-          const res = await fetch(`${API_BASE}/auth/register`, {
+          res = await fetch(`${API_BASE}/auth/register`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password })
           });
-          if (res.ok) {
-            const data = await res.json();
-            localStorage.setItem('ravora_token', data.token);
-            localStorage.setItem('ravora_logged_in', 'true');
-            localStorage.setItem('ravora_login_time', Date.now().toString());
-            localStorage.setItem('ravora_email', email);
-            localStorage.setItem('ravora_onboarding_completed', 'false');
-            window.location.href = REDIRECT_BASE;
-            return;
-          } else {
-            const data = await res.json().catch(() => ({}));
-            throw new Error(data.error || 'Registration failed.');
-          }
-        } catch (apiErr) {
-          console.warn('Backend registration failed, using local fallback:', apiErr.message);
+        } catch (netErr) {
+          console.warn('Backend registration failed (network), using local fallback:', netErr.message);
+          localStorage.setItem('ravora_token', 'mock-jwt-token-fallback');
           localStorage.setItem('ravora_logged_in', 'true');
           localStorage.setItem('ravora_login_time', Date.now().toString());
           localStorage.setItem('ravora_email', email);
           localStorage.setItem('ravora_onboarding_completed', 'false');
           window.location.href = REDIRECT_BASE;
+          return;
+        }
+
+        if (res.ok) {
+          const data = await res.json();
+          localStorage.setItem('ravora_token', data.token);
+          localStorage.setItem('ravora_logged_in', 'true');
+          localStorage.setItem('ravora_login_time', Date.now().toString());
+          localStorage.setItem('ravora_email', email);
+          localStorage.setItem('ravora_onboarding_completed', 'false');
+          window.location.href = REDIRECT_BASE;
+          return;
+        } else {
+          const data = await res.json().catch(() => ({}));
+          throw new Error(data.error || 'Registration failed.');
         }
       } catch (err) {
         if (landingRegisterError) {

@@ -183,7 +183,7 @@ export const MarketDataService = {
   /**
    * Retrieves specific asset details along with historical data points
    */
-  async getAssetDetails(symbol) {
+  async getAssetDetails(symbol, timeframe = '1D') {
     const normSymbol = symbol.toUpperCase();
     if (!ASSETS_TO_TRACK.includes(normSymbol)) {
       throw new Error(`Asset ${symbol} is not supported.`);
@@ -197,38 +197,56 @@ export const MarketDataService = {
       throw new Error(`Ticker details not found for ${normSymbol}`);
     }
 
-    // Verify history data staleness
-    const historyCount = await dbGet('SELECT COUNT(*) as count FROM market_history WHERE symbol = ?', [normSymbol]);
-    const latestHistory = await dbGet('SELECT MAX(timestamp) as latest FROM market_history WHERE symbol = ?', [normSymbol]);
-    
-    const now = Date.now();
-    const isHistoryStale = !historyCount || historyCount.count < 30 || !latestHistory || !latestHistory.latest || (now - latestHistory.latest > HISTORY_TTL_MS);
+    let historyPoints = [];
 
-    if (isHistoryStale) {
-      await this.updateHistory(normSymbol);
+    // For 1D timeframe, use the local database cache
+    if (timeframe === '1D') {
+      const historyCount = await dbGet('SELECT COUNT(*) as count FROM market_history WHERE symbol = ?', [normSymbol]);
+      const latestHistory = await dbGet('SELECT MAX(timestamp) as latest FROM market_history WHERE symbol = ?', [normSymbol]);
+      
+      const now = Date.now();
+      const isHistoryStale = !historyCount || historyCount.count < 30 || !latestHistory || !latestHistory.latest || (now - latestHistory.latest > HISTORY_TTL_MS);
+
+      if (isHistoryStale) {
+        await this.updateHistory(normSymbol);
+      }
+
+      historyPoints = await dbQuery(
+        'SELECT timestamp, open, high, low, close, volume FROM market_history WHERE symbol = ? ORDER BY timestamp ASC',
+        [normSymbol]
+      );
+    } else {
+      // Map timeframe to Binance interval
+      const intervalMap = {
+        '1m': '1m',
+        '5m': '5m',
+        '15m': '15m',
+        '1H': '1h',
+        '4H': '4h'
+      };
+      const interval = intervalMap[timeframe] || '1h';
+      try {
+        historyPoints = await binanceProvider.fetchHistory(normSymbol, interval, 100);
+      } catch (err) {
+        console.error(`Failed to fetch live history for ${normSymbol} (${timeframe}):`, err.message);
+        // Fallback to daily cache if Binance fails
+        historyPoints = await dbQuery(
+          'SELECT timestamp, open, high, low, close, volume FROM market_history WHERE symbol = ? ORDER BY timestamp ASC',
+          [normSymbol]
+        );
+      }
     }
-
-    const historyPoints = await dbQuery(
-      'SELECT timestamp, open, high, low, close, volume FROM market_history WHERE symbol = ? ORDER BY timestamp ASC',
-      [normSymbol]
-    );
 
     return {
       symbol: ticker.symbol,
       name: ticker.name,
       price: ticker.price,
       change24h: ticker.change_24h,
+      high24h: ticker.high_24h,
+      low24h: ticker.low_24h,
       volume24h: ticker.volume_24h,
-      marketCap: ticker.market_cap,
-      lastUpdated: ticker.last_updated,
-      history: historyPoints.map(pt => ({
-        timestamp: pt.timestamp,
-        open: pt.open,
-        high: pt.high,
-        low: pt.low,
-        close: pt.close,
-        volume: pt.volume
-      }))
+      safetyScore: ticker.safety_score || 95.5,
+      history: historyPoints
     };
   }
 };

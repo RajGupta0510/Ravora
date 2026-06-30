@@ -19,13 +19,13 @@ class RealtimeDataService {
     return () => this.callbacks.delete(callback);
   }
 
-  setActiveAsset(symbol) {
+  setActiveAsset(symbol, timeframe = '1D') {
     this.activeSymbol = symbol;
     this.disconnect();
-    this.connectWebSocket(symbol);
+    this.connectWebSocket(symbol, timeframe);
   }
 
-  connectWebSocket(symbol) {
+  connectWebSocket(symbol, timeframe = '1D') {
     const binanceSymbols = {
       BTC: 'btcusdt',
       ETH: 'ethusdt',
@@ -40,9 +40,19 @@ class RealtimeDataService {
       return;
     }
 
+    const intervalMap = {
+      '1m': '1m',
+      '5m': '5m',
+      '15m': '15m',
+      '1H': '1h',
+      '4H': '4h',
+      '1D': '1d'
+    };
+    const interval = intervalMap[timeframe] || '1d';
+
     try {
-      console.log(`[RealtimeDataService] Connecting to Binance WebSocket for ${symbol}...`);
-      this.socket = new WebSocket(`wss://stream.binance.com:9443/ws/${streamName}@kline_1d`);
+      console.log(`[RealtimeDataService] Connecting to Binance WebSocket for ${symbol} @kline_${interval}...`);
+      this.socket = new WebSocket(`wss://stream.binance.com:9443/ws/${streamName}@kline_${interval}`);
 
       this.socket.onmessage = (e) => {
         const msg = JSON.parse(e.data);

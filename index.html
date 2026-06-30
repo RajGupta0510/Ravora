@@ -12,9 +12,10 @@
       try {
         const loggedIn = localStorage.getItem('ravora_logged_in') === 'true';
         const loginTime = localStorage.getItem('ravora_login_time');
-        const threeDays = 3 * 24 * 60 * 60 * 1000;
+        const token = localStorage.getItem('ravora_token');
+        const sevenDays = 7 * 24 * 60 * 60 * 1000;
         const timeDiff = loginTime ? (Date.now() - parseInt(loginTime)) : null;
-        const isValid = loggedIn && loginTime && (timeDiff < threeDays);
+        const isValid = loggedIn && loginTime && token && (timeDiff < sevenDays);
         
         console.log('[Auth Debug - Landing] loggedIn:', loggedIn, 'loginTime:', loginTime, 'timeDiff:', timeDiff, 'isValid:', isValid);
         
@@ -27,6 +28,7 @@
           localStorage.removeItem('ravora_logged_in');
           localStorage.removeItem('ravora_login_time');
           localStorage.removeItem('ravora_email');
+          localStorage.removeItem('ravora_onboarding_completed');
         }
       } catch (e) {
         console.warn('LocalStorage is not accessible:', e);
@@ -1275,6 +1277,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=3.0"></script>
+  <script src="app.js?v=4.0"></script>
 </body>
 </html>

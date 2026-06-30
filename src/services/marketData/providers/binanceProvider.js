@@ -39,12 +39,12 @@ export class BinanceProvider extends MarketDataProvider {
     });
   }
 
-  async fetchHistory(symbol) {
+  async fetchHistory(symbol, interval = '1d', limit = 100) {
     const binanceSymbol = SYMBOL_TO_BINANCE_SYMBOL[symbol];
     if (!binanceSymbol) throw new Error(`Unsupported symbol for Binance: ${symbol}`);
 
-    console.log(`[BinanceProvider] Fetching daily OHLCV klines for ${symbol} from Binance...`);
-    const response = await fetchWithTimeout(`https://api.binance.com/api/v3/klines?symbol=${binanceSymbol}&interval=1d&limit=30`);
+    console.log(`[BinanceProvider] Fetching OHLCV klines for ${symbol} (${interval}) from Binance...`);
+    const response = await fetchWithTimeout(`https://api.binance.com/api/v3/klines?symbol=${binanceSymbol}&interval=${interval}&limit=${limit}`);
     if (!response.ok) {
       throw new Error(`Binance klines HTTP error! status: ${response.status}`);
     }

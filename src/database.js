@@ -257,6 +257,50 @@ export const initializeDatabase = async () => {
     );
   `);
 
+  // 13a. paper_positions table
+  await dbRun(`
+    CREATE TABLE IF NOT EXISTS paper_positions (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL,
+      asset_symbol TEXT NOT NULL,
+      direction TEXT NOT NULL,
+      entry_price REAL NOT NULL,
+      position_size REAL NOT NULL,
+      leverage REAL DEFAULT 1.0,
+      stop_loss REAL,
+      take_profit_1 REAL,
+      take_profit_2 REAL,
+      take_profit_3 REAL,
+      open_time TEXT DEFAULT CURRENT_TIMESTAMP,
+      recommendation_confidence INTEGER,
+      opportunity_score INTEGER,
+      status TEXT DEFAULT 'OPEN',
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    );
+  `);
+
+  // 13b. paper_trade_history table
+  await dbRun(`
+    CREATE TABLE IF NOT EXISTS paper_trade_history (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL,
+      asset_symbol TEXT NOT NULL,
+      direction TEXT NOT NULL,
+      entry_price REAL NOT NULL,
+      exit_price REAL NOT NULL,
+      position_size REAL NOT NULL,
+      leverage REAL DEFAULT 1.0,
+      profit_loss REAL NOT NULL,
+      open_time TEXT NOT NULL,
+      close_time TEXT DEFAULT CURRENT_TIMESTAMP,
+      reason_closed TEXT NOT NULL,
+      win_loss TEXT NOT NULL,
+      recommendation_confidence INTEGER,
+      opportunity_score INTEGER,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    );
+  `);
+
   // 14. market_tickers table (Market Data Layer v1 Cache)
   await dbRun(`DROP TABLE IF EXISTS market_tickers;`);
   await dbRun(`
