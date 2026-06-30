@@ -844,7 +844,7 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.setItem('ravora_logged_in', 'true');
             localStorage.setItem('ravora_login_time', Date.now().toString());
             localStorage.setItem('ravora_email', email);
-            localStorage.setItem('ravora_onboarding_completed', data.onboardingCompleted ? 'true' : 'false');
+            localStorage.setItem('ravora_onboarding_completed', (data.user && data.user.onboardingCompleted) ? 'true' : 'false');
             window.location.href = REDIRECT_BASE;
             return;
           } else {
