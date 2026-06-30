@@ -1,5 +1,5 @@
 import { BaseAnalyzer } from './baseAnalyzer.js';
-import { MomentumEngine } from '../../momentum/momentumEngine.js';
+import { MomentumService } from '../../momentum/momentumService.js';
 
 export class MomentumAnalyzer extends BaseAnalyzer {
   constructor() {
@@ -8,7 +8,7 @@ export class MomentumAnalyzer extends BaseAnalyzer {
 
   analyze(ticker, assetDetails, allTickers = []) {
     const history = assetDetails.history || [];
-    const momentumResult = MomentumEngine.analyzeMomentum(ticker.price, history);
+    const momentumResult = MomentumService.analyzeMomentum(ticker.price, history);
 
     return {
       rsi: momentumResult.rsi,
