@@ -49,8 +49,10 @@ export const RecommendationEngine = {
         await dbRun(
           `INSERT INTO opportunities (
              id, opportunity_type, name, symbol, icon_symbol, opportunity_score, confidence_score, risk_score, risk_level, expected_return, reasoning_text,
-             suggested_entry, suggested_stop_loss, suggested_take_profit, expected_duration, risk_reward_ratio, trend_direction, support_levels, resistance_levels
-           ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+             suggested_entry, suggested_stop_loss, suggested_take_profit, suggested_take_profit_1, suggested_take_profit_2, suggested_take_profit_3,
+             expected_duration, risk_reward_ratio, trend_direction, trend_strength, support_levels, resistance_levels,
+             trade_probability, strategy_used, trade_quality, nearest_support, nearest_resistance, distance_to_support, distance_to_resistance, market_bias
+           ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
            ON CONFLICT(id) DO UPDATE SET
              opportunity_type=excluded.opportunity_type,
              name=excluded.name,
@@ -64,11 +66,23 @@ export const RecommendationEngine = {
              suggested_entry=excluded.suggested_entry,
              suggested_stop_loss=excluded.suggested_stop_loss,
              suggested_take_profit=excluded.suggested_take_profit,
+             suggested_take_profit_1=excluded.suggested_take_profit_1,
+             suggested_take_profit_2=excluded.suggested_take_profit_2,
+             suggested_take_profit_3=excluded.suggested_take_profit_3,
              expected_duration=excluded.expected_duration,
              risk_reward_ratio=excluded.risk_reward_ratio,
              trend_direction=excluded.trend_direction,
+             trend_strength=excluded.trend_strength,
              support_levels=excluded.support_levels,
-             resistance_levels=excluded.resistance_levels`,
+             resistance_levels=excluded.resistance_levels,
+             trade_probability=excluded.trade_probability,
+             strategy_used=excluded.strategy_used,
+             trade_quality=excluded.trade_quality,
+             nearest_support=excluded.nearest_support,
+             nearest_resistance=excluded.nearest_resistance,
+             distance_to_support=excluded.distance_to_support,
+             distance_to_resistance=excluded.distance_to_resistance,
+             market_bias=excluded.market_bias`,
           [
             opp.opportunityId,
             opp.direction,
@@ -84,11 +98,23 @@ export const RecommendationEngine = {
             opp.suggestedEntry,
             opp.suggestedStopLoss,
             opp.suggestedTakeProfit,
+            opp.suggestedTakeProfit1,
+            opp.suggestedTakeProfit2,
+            opp.suggestedTakeProfit3,
             opp.expectedDuration,
             opp.riskRewardRatio,
             opp.trendDirection,
+            opp.trendStrength,
             JSON.stringify(opp.supportLevels),
-            JSON.stringify(opp.resistanceLevels)
+            JSON.stringify(opp.resistanceLevels),
+            opp.tradeProbability,
+            opp.strategyUsed,
+            opp.tradeQuality,
+            opp.nearestSupport,
+            opp.nearestResistance,
+            opp.distanceToSupport,
+            opp.distanceToResistance,
+            opp.marketBias
           ]
         );
       }

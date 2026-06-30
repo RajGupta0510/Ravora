@@ -180,11 +180,23 @@ export const initializeDatabase = async () => {
       suggested_entry REAL,
       suggested_stop_loss REAL,
       suggested_take_profit REAL,
+      suggested_take_profit_1 REAL,
+      suggested_take_profit_2 REAL,
+      suggested_take_profit_3 REAL,
       expected_duration TEXT,
       risk_reward_ratio TEXT,
       trend_direction TEXT,
+      trend_strength INTEGER,
       support_levels TEXT,
       resistance_levels TEXT,
+      trade_probability INTEGER,
+      strategy_used TEXT,
+      trade_quality TEXT,
+      nearest_support REAL,
+      nearest_resistance REAL,
+      distance_to_support REAL,
+      distance_to_resistance REAL,
+      market_bias TEXT,
       created_at TEXT DEFAULT CURRENT_TIMESTAMP
     );
   `);
@@ -390,11 +402,49 @@ export const initializeDatabase = async () => {
       await dbRun(
         `INSERT INTO opportunities (
           id, opportunity_type, name, symbol, icon_symbol, opportunity_score, confidence_score, risk_score, risk_level, expected_return, reasoning_text,
-          suggested_entry, suggested_stop_loss, suggested_take_profit, expected_duration, risk_reward_ratio, trend_direction, support_levels, resistance_levels
-         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          suggested_entry, suggested_stop_loss, suggested_take_profit, suggested_take_profit_1, suggested_take_profit_2, suggested_take_profit_3,
+          expected_duration, risk_reward_ratio, trend_direction, trend_strength, support_levels, resistance_levels,
+          trade_probability, strategy_used, trade_quality, nearest_support, nearest_resistance, distance_to_support, distance_to_resistance, market_bias
+         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
-          opp.id, opp.type, opp.name, opp.symbol, opp.icon, opp.oppScore, opp.confidence, opp.riskScore, opp.risk, opp.estReturn, opp.reasoning,
-          opp.entry, opp.stop_loss, opp.take_profit, opp.duration, opp.risk_reward, opp.trend, opp.support, opp.resistance
+          opp.id,
+          opp.type,
+          opp.name,
+          opp.symbol,
+          opp.icon,
+          opp.oppScore,
+          opp.confidence,
+          opp.riskScore,
+          opp.risk,
+          opp.estReturn,
+          JSON.stringify({
+            summary: opp.reasoning,
+            whyThisAsset: `Strong structural support and high opportunity score of ${opp.oppScore}.`,
+            whyNow: `Ecosystem indicators and trend strength confirm a high-probability entry point.`,
+            supportingEvidence: [`Volume expansion confirmed`, `Trend bias: ${opp.trend}`],
+            potentialRisks: [`General market volatility drawdown`],
+            suggestedAction: opp.type
+          }),
+          opp.entry,
+          opp.stop_loss,
+          opp.take_profit,
+          opp.entry > 0 ? Math.round(opp.entry * 1.02 * 100) / 100 : 0,
+          opp.entry > 0 ? Math.round(opp.entry * 1.05 * 100) / 100 : 0,
+          opp.entry > 0 ? Math.round(opp.entry * 1.08 * 100) / 100 : 0,
+          opp.duration,
+          opp.risk_reward,
+          opp.trend,
+          80,
+          opp.support,
+          opp.resistance,
+          75,
+          'Pullback',
+          'Good',
+          opp.entry > 0 ? Math.round(opp.entry * 0.98 * 100) / 100 : 0,
+          opp.entry > 0 ? Math.round(opp.entry * 1.05 * 100) / 100 : 0,
+          1.5,
+          2.5,
+          opp.trend
         ]
       );
     }

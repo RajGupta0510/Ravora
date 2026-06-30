@@ -2005,9 +2005,42 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       const details = await apiCall(`/market/assets/${symbol}`);
       const opps = await apiCall('/opportunities');
-      const opp = opps.find(o => o.symbol.startsWith(symbol));
-
-      if (!opp) return;
+      const opp = opps.find(o => o.symbol.startsWith(symbol)) || {
+        opportunityScore: 0,
+        confidenceScore: 0,
+        riskScore: 0,
+        riskLevel: 'unknown',
+        trendDirection: 'Unknown',
+        momentumScore: 0,
+        momentumDirection: 'Unknown',
+        structureBias: 'Unknown',
+        structureStrength: 0,
+        nearestSupport: 0,
+        nearestResistance: 0,
+        distanceToSupport: 0,
+        distanceToResistance: 0,
+        tradeQuality: 'Unknown',
+        recommendedPositionSize: 0,
+        marketBias: 'Unknown',
+        suggestedEntry: 0,
+        suggestedTakeProfit1: 0,
+        suggestedTakeProfit2: 0,
+        suggestedTakeProfit3: 0,
+        suggestedStopLoss: 0,
+        riskRewardRatio: 'N/A',
+        expectedDuration: 'N/A',
+        tradeProbability: 0,
+        strategyUsed: 'Insufficient Data',
+        reasoningText: JSON.stringify({
+          summary: 'Trade setup currently unavailable. Insufficient market data.',
+          whyThisAsset: 'Waiting for additional historical OHLCV data to build structure.',
+          whyNow: 'Market structure is currently ill-defined.',
+          supportingEvidence: ['Underlying engines require more data points'],
+          potentialRisks: ['High uncertainty due to lack of signals'],
+          suggestedAction: 'WAIT'
+        }),
+        recommendation: 'WAIT'
+      };
 
       const activeIcon = document.getElementById('terminal-active-icon');
       const activeName = document.getElementById('terminal-active-name');

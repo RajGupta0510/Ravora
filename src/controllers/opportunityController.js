@@ -10,6 +10,7 @@ export const getOpportunities = async (req, res) => {
     const formatted = opps.map(o => ({
       opportunityId: o.id,
       type: o.opportunity_type,
+      recommendation: o.opportunity_type, // Stored as opportunity_type in the DB
       name: o.name,
       symbol: o.symbol,
       icon: o.icon_symbol,
@@ -22,11 +23,23 @@ export const getOpportunities = async (req, res) => {
       suggestedEntry: o.suggested_entry,
       suggestedStopLoss: o.suggested_stop_loss,
       suggestedTakeProfit: o.suggested_take_profit,
+      suggestedTakeProfit1: o.suggested_take_profit_1,
+      suggestedTakeProfit2: o.suggested_take_profit_2,
+      suggestedTakeProfit3: o.suggested_take_profit_3,
       expectedDuration: o.expected_duration,
       riskRewardRatio: o.risk_reward_ratio,
       trendDirection: o.trend_direction,
+      trendStrength: o.trend_strength,
       supportLevels: o.support_levels ? JSON.parse(o.support_levels) : [],
-      resistanceLevels: o.resistance_levels ? JSON.parse(o.resistance_levels) : []
+      resistanceLevels: o.resistance_levels ? JSON.parse(o.resistance_levels) : [],
+      tradeProbability: o.trade_probability,
+      strategyUsed: o.strategy_used,
+      tradeQuality: o.trade_quality,
+      nearestSupport: o.nearest_support,
+      nearestResistance: o.nearest_resistance,
+      distanceToSupport: o.distance_to_support,
+      distanceToResistance: o.distance_to_resistance,
+      marketBias: o.market_bias
     }));
     return res.json(formatted);
   } catch (err) {
