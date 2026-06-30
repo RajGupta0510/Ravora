@@ -1,21 +1,5 @@
 import { DecisionService } from '../decision/decisionService.js';
-
-/**
- * Asset metadata: static properties not derived from market data.
- * Add new assets here as the platform expands.
- */
-const ASSET_METADATA = {
-  BTC: { name: 'Bitcoin', icon: '₿', opportunityId: 'btc-halving', type: 'momentum' },
-  ETH: { name: 'Ethereum', icon: 'Ξ', opportunityId: 'eth-staking', type: 'momentum' },
-  SOL: { name: 'Solana', icon: 'S', opportunityId: 'solana-liquidity', type: 'momentum' },
-  BNB: { name: 'Binance Coin', icon: 'B', opportunityId: 'bnb-breakout', type: 'momentum' },
-  ADA: { name: 'Cardano', icon: '₳', opportunityId: 'ada-smart', type: 'momentum' },
-  XRP: { name: 'Ripple', icon: '✕', opportunityId: 'xrp-ledger', type: 'momentum' },
-  DOT: { name: 'Polkadot', icon: '●', opportunityId: 'dot-parachain', type: 'momentum' },
-  DOGE: { name: 'Dogecoin', icon: 'Ð', opportunityId: 'doge-meme', type: 'momentum' },
-  LINK: { name: 'Chainlink', icon: '⬡', opportunityId: 'link-oracle', type: 'momentum' },
-  SUI: { name: 'Sui', icon: '💧', opportunityId: 'sui-move', type: 'momentum' }
-};
+import { ASSET_METADATA } from '../../config/marketConfig.js';
 
 /**
  * Main entry point for the Opportunity Engine.

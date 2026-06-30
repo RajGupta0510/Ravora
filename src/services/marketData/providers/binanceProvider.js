@@ -1,5 +1,5 @@
 import { MarketDataProvider } from './providerInterface.js';
-import { ASSETS_TO_TRACK, SYMBOL_TO_BINANCE_SYMBOL, BINANCE_SYMBOL_TO_SYMBOL } from '../../../config/marketConfig.js';
+import { SUPPORTED_ASSETS, ASSETS_TO_TRACK, SYMBOL_TO_BINANCE_SYMBOL, BINANCE_SYMBOL_TO_SYMBOL } from '../../../config/marketConfig.js';
 
 // Fetch with a 5-second timeout to prevent hanging on slow/unavailable APIs
 const fetchWithTimeout = (url, timeoutMs = 5000) => {
@@ -20,13 +20,10 @@ export class BinanceProvider extends MarketDataProvider {
     }
     const tickers = await response.json();
     
-    const assetNames = {
-      BTC: 'Bitcoin',
-      ETH: 'Ethereum',
-      SOL: 'Solana',
-      BNB: 'Binance Coin',
-      SUI: 'Sui'
-    };
+    const assetNames = SUPPORTED_ASSETS.reduce((acc, a) => {
+      acc[a.symbol] = a.name;
+      return acc;
+    }, {});
 
     return tickers.map(t => {
       const symbol = BINANCE_SYMBOL_TO_SYMBOL[t.symbol];

@@ -1,5 +1,5 @@
 import { dbGet, dbRun, dbQuery } from '../database.js';
-import { ASSETS_TO_TRACK, TICKER_TTL_MS, HISTORY_TTL_MS } from '../config/marketConfig.js';
+import { SUPPORTED_ASSETS, ASSETS_TO_TRACK, TICKER_TTL_MS, HISTORY_TTL_MS } from '../config/marketConfig.js';
 import { CoinCapProvider } from './marketData/providers/coinCapProvider.js';
 import { BinanceProvider } from './marketData/providers/binanceProvider.js';
 
@@ -68,13 +68,16 @@ export const MarketDataService = {
   },
 
   async ensureTickersExist() {
-    const mockTickers = {
-      BTC: { name: 'Bitcoin', price: 64120.10, change24h: 1.40, volume24h: 28450200100, marketCap: 1258900400100 },
-      ETH: { name: 'Ethereum', price: 3485.10, change24h: 2.15, volume24h: 14502100800, marketCap: 418500200300 },
-      SOL: { name: 'Solana', price: 134.20, change24h: -0.85, volume24h: 3840100500, marketCap: 62450300100 },
-      BNB: { name: 'Binance Coin', price: 580.10, change24h: 1.25, volume24h: 1850200100, marketCap: 89050300100 },
-      SUI: { name: 'Sui', price: 1.15, change24h: -3.45, volume24h: 120500600, marketCap: 2840900100 }
-    };
+    const mockTickers = SUPPORTED_ASSETS.reduce((acc, a) => {
+      acc[a.symbol] = {
+        name: a.name,
+        price: a.fallbackPrice,
+        change24h: 1.25,
+        volume24h: a.fallbackVolume,
+        marketCap: a.fallbackMarketCap
+      };
+      return acc;
+    }, {});
     const now = Date.now();
     for (const symbol of ASSETS_TO_TRACK) {
       const row = await dbGet('SELECT COUNT(*) as count FROM market_tickers WHERE symbol = ?', [symbol]);
@@ -134,14 +137,8 @@ export const MarketDataService = {
     if (!row || row.count < 30) {
       console.log(`[MarketDataService] Seeding fallback mock history for ${symbol}...`);
       const now = Date.now();
-      const basePrices = {
-        BTC: 64120.10,
-        ETH: 3485.10,
-        SOL: 134.20,
-        BNB: 580.10,
-        SUI: 1.15
-      };
-      const base = basePrices[symbol] || 100.0;
+      const asset = SUPPORTED_ASSETS.find(a => a.symbol === symbol);
+      const base = asset ? asset.fallbackPrice : 100.0;
       for (let i = 29; i >= 0; i--) {
         const timestamp = now - i * 24 * 60 * 60 * 1000;
         const open = base * (1 + (Math.sin(i / 2) * 0.05) + ((Math.random() - 0.5) * 0.02));

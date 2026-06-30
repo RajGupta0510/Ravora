@@ -1930,7 +1930,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const opps = await apiCall('/opportunities');
       scannerRows.innerHTML = '';
       
-      const supported = ['BTC', 'ETH', 'SOL', 'BNB', 'SUI'];
+      const supported = overview.length > 0 ? overview.map(o => o.symbol) : ['BTC', 'ETH', 'SOL', 'BNB', 'SUI'];
       const assetsData = supported.map(sym => {
         const live = overview.find(o => o.symbol === sym) || { price: 0, change24h: 0 };
         const opp = opps.find(o => o.symbol.startsWith(sym)) || {
