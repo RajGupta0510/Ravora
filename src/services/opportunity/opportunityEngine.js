@@ -22,7 +22,7 @@
 import { ScoringEngine } from '../scoring/scoringEngine.js';
 import { evaluateRisk } from './riskEvaluator.js';
 import { generateTradePlan } from './tradePlanGenerator.js';
-import { generateReasoning } from './reasoningGenerator.js';
+import { ReasoningEngine } from './reasoningEngine.js';
 
 /**
  * Asset metadata: static properties not derived from market data.
@@ -183,7 +183,12 @@ function analyzeAsset(ticker, assetDetails, allTickers, externalSignals = {}) {
     trendDeviation: scoringResult._trendDeviation,
     explanation: scoringResult._trendExplanation
   };
-  const momentumResult = { rsi, momDifference: scoringResult._momDifference, relativeMomentum };
+  const momentumResult = { 
+    rsi, 
+    momDifference: scoringResult._momDifference, 
+    relativeMomentum,
+    explanation: scoringResult._momentumExplanation
+  };
   const volumeResult = { volumeRatio: scoringResult._volumeRatio, volumeConfirmation };
   const volatilityResult = { annualizedVolatility: annVol, volatilityScore };
   const structureResult = { supportLevels, resistanceLevels };
@@ -201,6 +206,10 @@ function analyzeAsset(ticker, assetDetails, allTickers, externalSignals = {}) {
     riskScore: riskAssessment.riskScore,
     confidenceScore,
     riskLevel: riskAssessment.riskLevel,
+
+    // Momentum
+    momentumScore: scoringResult._momentumScore,
+    momentumDirection: scoringResult._momentumDirection,
 
     // Direction
     direction,
@@ -259,24 +268,27 @@ export async function runOpportunityEngine(tickers, getAssetDetails, externalSig
 
   // Stage 14: Generate reasoning now that we have all results for cross-asset comparison
   const resultsWithReasoning = rawResults.map(result => {
-    const reasoning = generateReasoning({
+    const structuredExplanation = ReasoningEngine.generateStructuredExplanation({
       symbol: result.symbol,
       direction: result.direction,
+      opportunityScore: result.opportunityScore,
+      confidenceScore: result.confidenceScore,
       trendResult: result._trendResult,
       momentumResult: result._momentumResult,
       volumeResult: result._volumeResult,
       volatilityResult: result._volatilityResult,
-      structureResult: result._structureResult,
       riskAssessment: result._riskAssessment,
-      opportunityScore: result.opportunityScore,
-      confidenceScore: result.confidenceScore,
       tradePlan: {
         suggestedEntry: result.suggestedEntry,
         suggestedStopLoss: result.suggestedStopLoss,
-        suggestedTakeProfit: result.suggestedTakeProfit
-      },
-      allOpportunities: rawResults.map(r => ({ symbol: r.symbol, opportunityScore: r.opportunityScore }))
+        suggestedTakeProfit: result.suggestedTakeProfit,
+        riskRewardRatio: result.riskRewardRatio,
+        expectedDuration: result.expectedDuration,
+        tradeQuality: result.tradeQuality
+      }
     });
+
+    const reasoning = JSON.stringify(structuredExplanation);
 
     // Strip internal raw analyzer fields before returning
     const { _trendResult, _momentumResult, _volumeResult, _volatilityResult, _structureResult, _riskAssessment, ...cleanResult } = result;

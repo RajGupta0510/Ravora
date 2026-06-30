@@ -2027,6 +2027,23 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
 
+      const momentumVal = document.getElementById('terminal-momentum-val');
+      if (momentumVal) {
+        const score = opp.momentumScore !== undefined ? opp.momentumScore : 50;
+        const dir = opp.momentumDirection || 'Neutral';
+        momentumVal.textContent = `${score}`;
+        if (dir === 'Strengthening') {
+          momentumVal.className = 'text-green';
+          momentumVal.title = `Strengthening momentum (Score: ${score})`;
+        } else if (dir === 'Weakening') {
+          momentumVal.className = 'text-error';
+          momentumVal.title = `Weakening momentum (Score: ${score})`;
+        } else {
+          momentumVal.className = 'text-warning';
+          momentumVal.title = `Neutral momentum (Score: ${score})`;
+        }
+      }
+
       const isHold = !opp.suggestedEntry || opp.suggestedEntry === 0;
       if (suggestedEntry) {
         suggestedEntry.textContent = isHold ? 'HOLD' : `$${opp.suggestedEntry.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -2039,7 +2056,48 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       if (rrRatio) rrRatio.textContent = isHold ? 'N/A' : (opp.riskRewardRatio || '2.0:1');
       if (duration) duration.textContent = isHold ? 'N/A' : (opp.expectedDuration || '3-5 days');
-      if (reasoningText) reasoningText.textContent = opp.reasoningText;
+      if (reasoningText) {
+        try {
+          const data = JSON.parse(opp.reasoningText);
+          reasoningText.innerHTML = `
+            <div class="structured-reasoning-summary" style="font-size: 0.85rem; line-height: 1.4; color: #fff; font-weight: 500; margin-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 10px;">
+              ${data.summary}
+            </div>
+            <div class="reasoning-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 12px;">
+              <div class="reasoning-col">
+                <h6 style="color: var(--accent-secondary); margin: 0 0 6px 0; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">Why This Asset?</h6>
+                <p style="font-size: 0.75rem; line-height: 1.4; color: var(--text-secondary); margin: 0;">${data.whyThisAsset}</p>
+              </div>
+              <div class="reasoning-col">
+                <h6 style="color: var(--accent-secondary); margin: 0 0 6px 0; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">Why Now?</h6>
+                <p style="font-size: 0.75rem; line-height: 1.4; color: var(--text-secondary); margin: 0;">${data.whyNow}</p>
+              </div>
+            </div>
+            <div class="reasoning-full-width" style="margin-top: 12px; border-top: 1px dashed rgba(255,255,255,0.06); padding-top: 10px;">
+              <h6 style="color: var(--accent-secondary); margin: 0 0 6px 0; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">Supporting Evidence</h6>
+              <ul style="font-size: 0.75rem; color: var(--text-secondary); padding-left: 14px; margin: 0; line-height: 1.4;">
+                ${data.supportingEvidence.map(e => `<li style="margin-bottom: 3px;">${e}</li>`).join('')}
+              </ul>
+            </div>
+            <div class="reasoning-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 12px; border-top: 1px dashed rgba(255,255,255,0.06); padding-top: 10px;">
+              <div class="reasoning-col">
+                <h6 style="color: #f43f5e; margin: 0 0 6px 0; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">Potential Risks</h6>
+                <p style="font-size: 0.75rem; line-height: 1.4; color: var(--text-secondary); margin: 0;">${data.potentialRisks}</p>
+              </div>
+              <div class="reasoning-col">
+                <h6 style="color: #f43f5e; margin: 0 0 6px 0; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">Invalidation Trigger</h6>
+                <p style="font-size: 0.75rem; line-height: 1.4; color: var(--text-secondary); margin: 0;">${data.invalidationTrigger}</p>
+              </div>
+            </div>
+            <div class="reasoning-full-width" style="margin-top: 12px; border-top: 1px dashed rgba(255,255,255,0.06); padding-top: 10px;">
+              <h6 style="color: #10b981; margin: 0 0 6px 0; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">Suggested Action</h6>
+              <p style="font-size: 0.75rem; line-height: 1.4; color: #fff; font-weight: 500; margin: 0;">${data.suggestedAction}</p>
+            </div>
+          `;
+        } catch (e) {
+          reasoningText.textContent = opp.reasoningText;
+        }
+      }
 
       const marginInput = document.getElementById('terminal-margin-input');
       if (marginInput) {

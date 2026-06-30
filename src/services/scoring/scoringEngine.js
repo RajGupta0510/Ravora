@@ -110,7 +110,10 @@ export const ScoringEngine = {
       _trendDeviation: trendDeviation,
       _trendExplanation: analyzerResults.Trend?.reasoning?.[0],
       _momDifference: momDifference,
-      _volumeRatio: volumeRatio
+      _volumeRatio: volumeRatio,
+      _momentumScore: analyzerResults.Momentum?.momentumScore ?? 50,
+      _momentumDirection: analyzerResults.Momentum?.momentumDirection ?? 'Neutral',
+      _momentumExplanation: analyzerResults.Momentum?.reasoning?.[0] ?? ''
     };
   }
 };
