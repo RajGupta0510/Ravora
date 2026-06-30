@@ -113,7 +113,10 @@ export const ScoringEngine = {
       _volumeRatio: volumeRatio,
       _momentumScore: analyzerResults.Momentum?.momentumScore ?? 50,
       _momentumDirection: analyzerResults.Momentum?.momentumDirection ?? 'Neutral',
-      _momentumExplanation: analyzerResults.Momentum?.reasoning?.[0] ?? ''
+      _momentumExplanation: analyzerResults.Momentum?.reasoning?.[0] ?? '',
+      _structureBias: analyzerResults.MarketStructure?.structureBias ?? 'Neutral',
+      _structureStrength: analyzerResults.MarketStructure?.structureStrength ?? 50,
+      _structureExplanation: analyzerResults.MarketStructure?.reasoning?.[0] ?? ''
     };
   }
 };

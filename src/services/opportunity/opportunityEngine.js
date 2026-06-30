@@ -191,7 +191,13 @@ function analyzeAsset(ticker, assetDetails, allTickers, externalSignals = {}) {
   };
   const volumeResult = { volumeRatio: scoringResult._volumeRatio, volumeConfirmation };
   const volatilityResult = { annualizedVolatility: annVol, volatilityScore };
-  const structureResult = { supportLevels, resistanceLevels };
+  const structureResult = { 
+    supportLevels, 
+    resistanceLevels,
+    bias: scoringResult._structureBias,
+    strength: scoringResult._structureStrength,
+    explanation: scoringResult._structureExplanation
+  };
 
   return {
     // Identity
@@ -210,6 +216,10 @@ function analyzeAsset(ticker, assetDetails, allTickers, externalSignals = {}) {
     // Momentum
     momentumScore: scoringResult._momentumScore,
     momentumDirection: scoringResult._momentumDirection,
+
+    // Market Structure
+    structureBias: scoringResult._structureBias,
+    structureStrength: scoringResult._structureStrength,
 
     // Direction
     direction,

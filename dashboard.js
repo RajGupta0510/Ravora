@@ -2044,6 +2044,26 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
 
+      const structureBiasVal = document.getElementById('terminal-structure-bias');
+      const structureStrengthVal = document.getElementById('terminal-structure-strength');
+
+      if (structureBiasVal) {
+        const bias = opp.structureBias || 'Neutral';
+        structureBiasVal.textContent = bias;
+        if (bias === 'Bearish') {
+          structureBiasVal.className = 'text-error';
+        } else if (bias === 'Bullish') {
+          structureBiasVal.className = 'text-green';
+        } else {
+          structureBiasVal.className = 'text-warning';
+        }
+      }
+
+      if (structureStrengthVal) {
+        const strength = opp.structureStrength !== undefined ? opp.structureStrength : 50;
+        structureStrengthVal.textContent = `${strength}%`;
+      }
+
       const isHold = !opp.suggestedEntry || opp.suggestedEntry === 0;
       if (suggestedEntry) {
         suggestedEntry.textContent = isHold ? 'HOLD' : `$${opp.suggestedEntry.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;

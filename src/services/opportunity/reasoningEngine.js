@@ -72,7 +72,10 @@ export const ReasoningEngine = {
       whyThisAsset += trendResult.explanation + " ";
     }
     if (momentumResult.explanation) {
-      whyThisAsset += momentumResult.explanation;
+      whyThisAsset += momentumResult.explanation + " ";
+    }
+    if (structureResult.explanation) {
+      whyThisAsset += structureResult.explanation;
     }
 
     // 3. Why now?
@@ -99,7 +102,6 @@ export const ReasoningEngine = {
       whyNow = `High-timeframe indicators are conflicting, and volatility remains within neutral bounds. There is no immediate edge to justify deploying capital.`;
     }
 
-    // 4. Supporting Evidence
     const supportingEvidence = [];
     if (trendResult.trendStrength) {
       supportingEvidence.push(`Trend Strength is scored at ${trendResult.trendStrength}/100, indicating a ${trendResult.trendDirection.toLowerCase()} market phase.`);
@@ -109,6 +111,9 @@ export const ReasoningEngine = {
     }
     if (volumeResult.volumeRatio) {
       supportingEvidence.push(`24h trading volume ratio is running at ${volumeResult.volumeRatio.toFixed(2)}x of the 30-day historical average.`);
+    }
+    if (structureResult.bias) {
+      supportingEvidence.push(`Market Structure is classified as ${structureResult.bias} with a strength rating of ${structureResult.strength}/100.`);
     }
     if (tradePlan.riskRewardRatio && tradePlan.riskRewardRatio !== 'N/A') {
       supportingEvidence.push(`The trade plan yields a favorable Risk/Reward ratio of ${tradePlan.riskRewardRatio} with a Quality rating of '${tradePlan.tradeQuality || 'B'}'.`);
