@@ -1383,12 +1383,21 @@ document.addEventListener('DOMContentLoaded', () => {
   // ==========================================================================
   // Onboarding Logic
   // ==========================================================================
+  // ==========================================================================
+  // Onboarding Logic
+  // ==========================================================================
   function updateOnboardingStepsVisibility() {
-    onboardingSteps.forEach(step => step.classList.remove('active'));
+    onboardingSteps.forEach(step => {
+      step.classList.remove('active');
+      step.style.display = 'none';
+    });
     
-    if (state.currentStep <= 5) {
+    if (state.currentStep <= 6) {
       const stepEl = document.getElementById(`onboarding-step-${state.currentStep}`);
-      if (stepEl) stepEl.classList.add('active');
+      if (stepEl) {
+        stepEl.classList.add('active');
+        stepEl.style.display = 'flex';
+      }
     }
     
     stepDots.forEach((dot, idx) => {
@@ -1399,16 +1408,30 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    if (state.currentStep === 1) {
+    const stepText = document.getElementById('onboarding-step-text');
+    if (stepText) {
+      stepText.textContent = `Step ${state.currentStep} of 6`;
+    }
+
+    if (state.currentStep === 1 || state.currentStep === 6) {
       btnOnboardingBack.style.display = 'none';
     } else {
       btnOnboardingBack.style.display = 'block';
     }
 
-    if (state.currentStep === 5) {
-      btnOnboardingNext.textContent = 'Enter Trading Workspace';
-    } else if (state.currentStep === 4) {
-      btnOnboardingNext.textContent = 'Generate My Portfolio Copilot';
+    const skipActionBtn = document.getElementById('btn-onboarding-skip-action');
+    if (skipActionBtn) {
+      if (state.currentStep === 6) {
+        skipActionBtn.style.display = 'none';
+      } else {
+        skipActionBtn.style.display = 'block';
+      }
+    }
+
+    if (state.currentStep === 1) {
+      btnOnboardingNext.textContent = 'Get Started';
+    } else if (state.currentStep === 6) {
+      btnOnboardingNext.textContent = 'Launch Trading Workspace';
     } else {
       btnOnboardingNext.textContent = 'Next Step';
     }
@@ -1417,30 +1440,67 @@ document.addEventListener('DOMContentLoaded', () => {
   const optionCards = document.querySelectorAll('.option-card');
   optionCards.forEach(card => {
     card.addEventListener('click', () => {
+      if (card.disabled || card.classList.contains('disabled')) return;
+
       const parentStep = card.closest('.onboarding-step');
       if (!parentStep) return;
       const stepId = parentStep.id;
       const value = card.getAttribute('data-value');
 
-      if (stepId.includes('onboarding-step-4')) {
-        // Step 4 is Preferred Markets (Multi-select)
+      if (stepId.includes('onboarding-step-3')) {
+        // Step 3 is Markets (Crypto is active)
         card.classList.toggle('active');
-        const activeMarkets = [];
-        parentStep.querySelectorAll('.option-card.active').forEach(c => {
-          activeMarkets.push(c.getAttribute('data-value'));
-        });
-        state.profile.preferredMarkets = activeMarkets;
       } else {
-        // Step 2 and Step 3 are Single select
+        // Step 2 & 4 are single select
         parentStep.querySelectorAll('.option-card').forEach(c => c.classList.remove('active'));
         card.classList.add('active');
 
         if (stepId.includes('onboarding-step-2')) {
           state.profile.experience = value;
-        } else if (stepId.includes('onboarding-step-3')) {
-          state.profile.riskLevel = parseInt(value);
+        } else if (stepId.includes('onboarding-step-4')) {
+          state.profile.goal = value;
         }
       }
+    });
+  });
+
+  const skipOnboarding = async () => {
+    state.onboardingCompleted = true;
+    localStorage.setItem('ravora_onboarding_completed', 'true');
+    localStorage.setItem('ravora_profile_experience', state.profile.experience || 'intermediate');
+    localStorage.setItem('ravora_profile_goal', state.profile.goal || 'swing');
+    
+    try {
+      await apiCall('/user/onboard', {
+        method: 'POST',
+        body: JSON.stringify({
+          experience: state.profile.experience || 'intermediate',
+          capital: 132000,
+          riskLevel: 1,
+          goal: state.profile.goal || 'swing'
+        })
+      });
+    } catch(e) {
+      console.warn('Backend save skipped (local fallback):', e.message);
+    }
+
+    if (onboardingOverlay) {
+      onboardingOverlay.classList.add('fade-out-onboarding');
+      setTimeout(() => {
+        onboardingOverlay.style.display = 'none';
+        onboardingOverlay.classList.remove('fade-out-onboarding');
+        showDashboard();
+        initializeDashboardUI();
+      }, 500);
+    }
+  };
+
+  // Wire up Skip buttons
+  const skipBtns = document.querySelectorAll('.btn-onboarding-skip');
+  skipBtns.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      skipOnboarding();
     });
   });
 
@@ -1450,80 +1510,72 @@ document.addEventListener('DOMContentLoaded', () => {
         state.currentStep++;
         updateOnboardingStepsVisibility();
       } else if (state.currentStep === 4) {
-        // Trigger loading simulation
+        // Trigger scanning simulation loading overlay
         if (btnOnboardingNext) {
           btnOnboardingNext.disabled = true;
           btnOnboardingNext.textContent = 'Compiling Profile...';
         }
         if (btnOnboardingBack) btnOnboardingBack.style.display = 'none';
         
-        onboardingSteps.forEach(step => step.classList.remove('active'));
-        if (onboardingLoader) onboardingLoader.classList.add('active');
+        onboardingSteps.forEach(step => {
+          step.classList.remove('active');
+          step.style.display = 'none';
+        });
+        if (onboardingLoader) {
+          onboardingLoader.classList.add('active');
+          onboardingLoader.style.display = 'flex';
+        }
         
         runOnboardingScanningSimulation();
       } else if (state.currentStep === 5) {
+        state.currentStep = 6;
+        updateOnboardingStepsVisibility();
+      } else if (state.currentStep === 6) {
         // Complete Onboarding
-        if (state.isProductTour) {
-          // If it's a product tour, just close it and do not save
+        if (btnOnboardingNext) {
+          btnOnboardingNext.disabled = true;
+          btnOnboardingNext.textContent = 'Entering Workspace...';
+        }
+        
+        try {
+          await apiCall('/user/onboard', {
+            method: 'POST',
+            body: JSON.stringify({
+              experience: state.profile.experience,
+              capital: 132000,
+              riskLevel: 1, // Default risk level
+              goal: state.profile.goal || 'swing'
+            })
+          });
+          
+          state.onboardingCompleted = true;
+          localStorage.setItem('ravora_onboarding_completed', 'true');
+          localStorage.setItem('ravora_profile_experience', state.profile.experience);
+          localStorage.setItem('ravora_profile_goal', state.profile.goal || 'swing');
+          
           onboardingOverlay.classList.add('fade-out-onboarding');
           setTimeout(() => {
             onboardingOverlay.style.display = 'none';
             onboardingOverlay.classList.remove('fade-out-onboarding');
-            state.isProductTour = false;
-            
-            // Restore actual settings in state.profile
-            state.profile.experience = localStorage.getItem('ravora_profile_experience') || 'beginner';
-            const riskLevels = { conservative: 0, balanced: 1, aggressive: 2 };
-            const riskStance = localStorage.getItem('ravora_profile_risk') || 'balanced';
-            state.profile.riskLevel = riskLevels[riskStance] ?? 1;
-            try {
-              const marketsStr = localStorage.getItem('ravora_preferred_markets');
-              if (marketsStr) {
-                state.profile.preferredMarkets = JSON.parse(marketsStr);
-              }
-            } catch (e) {
-              console.warn('Failed to restore preferred markets after tour:', e);
-            }
+            showDashboard();
+            initializeDashboardUI();
           }, 500);
-        } else {
-          // Actual onboarding: Save to backend and localStorage
-          if (btnOnboardingNext) {
-            btnOnboardingNext.disabled = true;
-            btnOnboardingNext.textContent = 'Entering Workspace...';
-          }
+        } catch (err) {
+          // Local fallback in case backend is offline
+          state.onboardingCompleted = true;
+          localStorage.setItem('ravora_onboarding_completed', 'true');
+          localStorage.setItem('ravora_profile_experience', state.profile.experience);
+          localStorage.setItem('ravora_profile_goal', state.profile.goal || 'swing');
           
-          try {
-            await apiCall('/user/onboard', {
-              method: 'POST',
-              body: JSON.stringify({
-                experience: state.profile.experience,
-                capital: 132000, // Default capital
-                riskLevel: state.profile.riskLevel,
-                goal: 'growth' // Default goal
-              })
-            });
-            
-            // Save state and local storage
-            state.onboardingCompleted = true;
-            localStorage.setItem('ravora_onboarding_completed', 'true');
-            localStorage.setItem('ravora_profile_experience', state.profile.experience);
-            const riskStances = { 0: 'conservative', 1: 'balanced', 2: 'aggressive' };
-            localStorage.setItem('ravora_profile_risk', riskStances[state.profile.riskLevel] || 'balanced');
-            localStorage.setItem('ravora_preferred_markets', JSON.stringify(state.profile.preferredMarkets));
-            
-            onboardingOverlay.classList.add('fade-out-onboarding');
-            setTimeout(() => {
-              onboardingOverlay.style.display = 'none';
-              onboardingOverlay.classList.remove('fade-out-onboarding');
-              
-              showDashboard();
-              initializeDashboardUI();
-            }, 500);
-          } catch (err) {
-            alert('Failed to save onboarding configuration: ' + err.message);
-          } finally {
-            if (btnOnboardingNext) btnOnboardingNext.disabled = false;
-          }
+          onboardingOverlay.classList.add('fade-out-onboarding');
+          setTimeout(() => {
+            onboardingOverlay.style.display = 'none';
+            onboardingOverlay.classList.remove('fade-out-onboarding');
+            showDashboard();
+            initializeDashboardUI();
+          }, 500);
+        } finally {
+          if (btnOnboardingNext) btnOnboardingNext.disabled = false;
         }
       }
     });
@@ -1532,7 +1584,11 @@ document.addEventListener('DOMContentLoaded', () => {
   if (btnOnboardingBack) {
     btnOnboardingBack.addEventListener('click', () => {
       if (state.currentStep > 1) {
-        state.currentStep--;
+        if (state.currentStep === 5) {
+          state.currentStep = 4;
+        } else {
+          state.currentStep--;
+        }
         updateOnboardingStepsVisibility();
       }
     });
@@ -1541,7 +1597,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function runOnboardingScanningSimulation() {
     let progress = 0;
     const interval = setInterval(() => {
-      progress += Math.floor(Math.random() * 12) + 4;
+      progress += Math.floor(Math.random() * 12) + 6;
       if (progress >= 100) {
         progress = 100;
         clearInterval(interval);
@@ -1550,32 +1606,16 @@ document.addEventListener('DOMContentLoaded', () => {
         onboardingStatusLogs.textContent = 'Copilot Workspace Ready!';
         
         setTimeout(() => {
-          if (onboardingLoader) onboardingLoader.classList.remove('active');
+          if (onboardingLoader) {
+            onboardingLoader.classList.remove('active');
+            onboardingLoader.style.display = 'none';
+          }
           
-          // Move to Step 5: Summary
+          // Move to Step 5: Workspace Intro
           state.currentStep = 5;
           updateOnboardingStepsVisibility();
           
-          // Populate Step 5 Summary Fields
-          const summaryExp = document.getElementById('summary-experience');
-          const summaryRisk = document.getElementById('summary-risk');
-          const summaryMarkets = document.getElementById('summary-markets');
-          
-          if (summaryExp) {
-            summaryExp.textContent = state.profile.experience;
-          }
-          if (summaryRisk) {
-            const riskLabels = { 0: 'Conservative', 1: 'Balanced', 2: 'Aggressive' };
-            summaryRisk.textContent = riskLabels[state.profile.riskLevel] || 'Balanced';
-          }
-          if (summaryMarkets) {
-            summaryMarkets.textContent = state.profile.preferredMarkets.join(', ');
-          }
-          
-          if (btnOnboardingBack) btnOnboardingBack.style.display = 'none'; // No back button on summary step
           if (btnOnboardingNext) {
-            btnOnboardingNext.style.display = 'block';
-            btnOnboardingNext.textContent = 'Enter Trading Workspace';
             btnOnboardingNext.disabled = false;
           }
         }, 800);
@@ -1591,7 +1631,7 @@ document.addEventListener('DOMContentLoaded', () => {
           onboardingStatusLogs.textContent = 'Compiling customized Araiven trade planner...';
         }
       }
-    }, 150);
+    }, 120);
   }
 
   function startProductTour() {
@@ -1610,23 +1650,26 @@ document.addEventListener('DOMContentLoaded', () => {
         if (val === state.profile.experience) card.classList.add('active');
         else card.classList.remove('active');
       } else if (stepId.includes('onboarding-step-3')) {
-        if (parseInt(val) === state.profile.riskLevel) card.classList.add('active');
+        if (val === 'crypto') card.classList.add('active');
         else card.classList.remove('active');
       } else if (stepId.includes('onboarding-step-4')) {
-        if (state.profile.preferredMarkets.includes(val)) card.classList.add('active');
+        if (val === (state.profile.goal || 'swing')) card.classList.add('active');
         else card.classList.remove('active');
       }
     });
     
     onboardingOverlay.classList.remove('fade-out-onboarding');
     showOnboardingOverlay();
-    if (onboardingLoader) onboardingLoader.classList.remove('active');
+    if (onboardingLoader) {
+      onboardingLoader.classList.remove('active');
+      onboardingLoader.style.display = 'none';
+    }
     
     updateOnboardingStepsVisibility();
     if (btnOnboardingBack) btnOnboardingBack.style.display = 'none';
     if (btnOnboardingNext) {
       btnOnboardingNext.style.display = 'block';
-      btnOnboardingNext.textContent = 'Next Step';
+      btnOnboardingNext.textContent = 'Get Started';
       btnOnboardingNext.disabled = false;
     }
   }

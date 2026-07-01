@@ -76,33 +76,49 @@
   <!-- ==========================================================================
      User Onboarding Overlay
      ========================================================================== -->
+  <!-- ==========================================================================
+     User Onboarding Overlay
+     ========================================================================== -->
   <div class="onboarding-overlay" id="onboarding-container" style="display: none;">
-    <div class="card-glass onboarding-card">
+    <div class="card-glass onboarding-card" style="max-width: 800px; width: 100%;">
       <div class="onboarding-header">
         <div class="logo">
-          <div class="logo-icon">R</div>
-          Ravora Product Onboarding
+          <div class="logo-icon" style="background: var(--gradient-primary); color: #fff; font-weight: 700; width: 28px; height: 28px; border-radius: 4px; display: flex; align-items: center; justify-content: center;">R</div>
+          <span>Onboarding Copilot</span>
         </div>
-        <div class="step-dots" id="onboarding-step-dots">
-          <div class="step-dot active" data-step="1"></div>
-          <div class="step-dot" data-step="2"></div>
-          <div class="step-dot" data-step="3"></div>
-          <div class="step-dot" data-step="4"></div>
-          <div class="step-dot" data-step="5"></div>
+        <div style="display: flex; align-items: center; gap: 16px;">
+          <div id="onboarding-step-text" style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">Step 1 of 6</div>
+          <div class="step-dots" id="onboarding-step-dots">
+            <div class="step-dot active" data-step="1"></div>
+            <div class="step-dot" data-step="2"></div>
+            <div class="step-dot" data-step="3"></div>
+            <div class="step-dot" data-step="4"></div>
+            <div class="step-dot" data-step="5"></div>
+            <div class="step-dot" data-step="6"></div>
+          </div>
         </div>
       </div>
 
-      <!-- Step 1: Welcome to Ravora -->
+      <!-- Step 1: Welcome -->
       <div class="onboarding-step active" id="onboarding-step-1">
-        <h3>Welcome to Ravora</h3>
-        <p class="step-desc">Ravora is powered by Araiven, an institutional-grade AI engine that continuously scans global digital asset markets, manages risk exposures, and creates personalized, high-confidence trade setups.</p>
-        <div style="display: flex; justify-content: center; margin-top: 30px; margin-bottom: 20px;">
-          <div class="ai-core-sphere" style="animation: pulse 3s infinite ease-in-out; width: 100px; height: 100px; border-radius: 50%; background: radial-gradient(circle, rgba(99, 102, 241, 0.2) 0%, rgba(168, 85, 247, 0.05) 70%); border: 1px solid rgba(168, 85, 247, 0.3); box-shadow: 0 0 30px rgba(168, 85, 247, 0.1); display: flex; align-items: center; justify-content: center; position: relative;">
-            <svg viewBox="0 0 24 24" fill="none" stroke="url(#gradient-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 48px; height: 48px;"><polygon points="12 2 2 7 12 12 22 7 12 2" /><polyline points="2 17 12 22 22 17" /><polyline points="2 12 12 17 22 12" /></svg>
+        <h2 style="font-family: var(--font-display); font-size: 2.2rem; font-weight: 700; color: #fff; margin-bottom: 12px; line-height: 1.25;">Welcome to Ravora.</h2>
+        <h3 style="font-family: var(--font-body); font-size: 1.25rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 20px;">Meet Araiven, your AI Trading Analyst.</h3>
+        <p class="step-desc" style="max-width: 580px; margin-bottom: 32px; font-size: 0.95rem; line-height: 1.6;">
+          Araiven coordinates real-time market data feeds, designs active execution strategies, and guides capital allocations dynamically. Let's align your profile options in 60 seconds.
+        </p>
+        
+        <div style="display: flex; justify-content: center; margin-bottom: 24px;">
+          <div class="ai-core-sphere" style="animation: pulse-dot 3s infinite ease-in-out; width: 110px; height: 110px; border-radius: 50%; background: radial-gradient(circle, rgba(99, 102, 241, 0.2) 0%, rgba(168, 85, 247, 0.05) 70%); border: 1px solid rgba(168, 85, 247, 0.35); box-shadow: 0 0 40px rgba(168, 85, 247, 0.15); display: flex; align-items: center; justify-content: center; position: relative;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="url(#onboarding-primary-grad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 52px; height: 52px;">
+              <polygon points="12 2 2 7 12 12 22 7 12 2" />
+              <polyline points="2 17 12 22 22 17" />
+              <polyline points="2 12 12 17 22 12" />
+            </svg>
             <defs>
-              <linearGradient id="gradient-primary" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#a855f7" />
-                <stop offset="100%" stop-color="#6366f1" />
+              <linearGradient id="onboarding-primary-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#2563EB" />
+                <stop offset="50%" stop-color="#4F46E5" />
+                <stop offset="100%" stop-color="#7C3AED" />
               </linearGradient>
             </defs>
           </div>
@@ -110,115 +126,145 @@
       </div>
 
       <!-- Step 2: Trading Experience -->
-      <div class="onboarding-step" id="onboarding-step-2">
-        <h3>Choose your trading experience</h3>
-        <p class="step-desc">We adjust our technical reporting and trade plan detail level based on your experience.</p>
+      <div class="onboarding-step" id="onboarding-step-2" style="display: none;">
+        <h3 style="font-family: var(--font-display); font-size: 1.5rem; font-weight: 700; color: #fff; margin-bottom: 6px;">Choose your trading experience</h3>
+        <p class="step-desc" style="margin-bottom: 24px; font-size: 0.85rem; color: var(--text-secondary);">We adjust explainers, charts, and technical calculations to match your trading background.</p>
+        
         <div class="onboarding-options-grid">
           <button class="option-card active" data-value="beginner">
-            <span class="option-icon">
-              <svg class="option-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22v-7a4 4 0 0 0-4-4H5" /><path d="M16 8a6 6 0 0 0-6 6v7" /><path d="M12 10a6 6 0 0 1 6-6h3v1a6 6 0 0 1-6 6Z" /><path d="M5 11a6 6 0 0 1 6-6h2a6 6 0 0 1-6 6Z" /></svg>
-            </span>
+            <span class="option-icon">🌱</span>
             <h4>Beginner</h4>
             <p>I want simple wealth compounding. No complex charts or trading terms.</p>
           </button>
           <button class="option-card" data-value="intermediate">
-            <span class="option-icon">
-              <svg class="option-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17" /><polyline points="16 7 22 7 22 13" /></svg>
-            </span>
+            <span class="option-icon">📈</span>
             <h4>Intermediate</h4>
             <p>I understand basic indicators and asset classes, but lack daily trading time.</p>
           </button>
           <button class="option-card" data-value="advanced">
-            <span class="option-icon">
-              <svg class="option-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14" /><line x1="4" y1="10" x2="4" y2="3" /><line x1="12" y1="21" x2="12" y2="12" /><line x1="12" y1="8" x2="12" y2="3" /><line x1="20" y1="21" x2="20" y2="16" /><line x1="20" y1="12" x2="20" y2="3" /><line x1="2" y1="14" x2="6" y2="14" /><line x1="10" y1="8" x2="14" y2="8" /><line x1="18" y1="16" x2="22" y2="16" /></svg>
-            </span>
+            <span class="option-icon">⚙️</span>
             <h4>Advanced</h4>
             <p>I analyze macroeconomic correlation matrices and desire sophisticated alpha hedging.</p>
           </button>
         </div>
-      </div>
-
-      <!-- Step 3: Drawdown Tolerance (Risk Model) -->
-      <div class="onboarding-step" id="onboarding-step-3">
-        <h3>Select your drawdown risk stance</h3>
-        <p class="step-desc">This profile defines capital protection buffers and active reallocation thresholds.</p>
-        <div class="onboarding-options-grid">
-          <button class="option-card" data-value="0">
-            <span class="option-icon text-blue">
-              <svg class="option-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
-            </span>
-            <h4>Conservative</h4>
-            <p>Shield assets first. Focus on low-risk stables. Max drawdown cap: 1.5%</p>
-          </button>
-          <button class="option-card active" data-value="1">
-            <span class="option-icon text-green">
-              <svg class="option-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 16 3-8 3 8c-.87.65-2.24 1-3 1s-2.13-.35-3-1Z" /><path d="m2 16 3-8 3 8c-.87.65-2.24 1-3 1s-2.13-.35-3-1Z" /><path d="M7 21h10" /><path d="M12 3v18" /><path d="M12 7h10" /><path d="M3 7h9" /></svg>
-            </span>
-            <h4>Balanced</h4>
-            <p>Hedged yield accumulation. Managed exposure to ETH and BTC. Max drawdown cap: 3.5%</p>
-          </button>
-          <button class="option-card" data-value="2">
-            <span class="option-icon text-warning">
-              <svg class="option-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z" /></svg>
-            </span>
-            <h4>Aggressive</h4>
-            <p>Capture maximum yield spreads. Higher volatility tolerance. Max drawdown cap: 8.5%</p>
-          </button>
+        <div style="font-size: 0.76rem; color: var(--text-muted); text-align: left; padding: 12px; border-left: 2px solid var(--primary); background: rgba(37, 99, 235, 0.03); margin-top: 10px;">
+          <strong>Why we ask:</strong> Araiven personalizes terminology and indicators based on this setting. You can change this at any time in Workspace settings.
         </div>
       </div>
 
-      <!-- Step 4: Preferred Markets (Multi-select) -->
-      <div class="onboarding-step" id="onboarding-step-4">
-        <h3>Select your preferred markets</h3>
-        <p class="step-desc">Select one or more assets you wish Araiven to prioritize for active trade scans.</p>
-        <div class="onboarding-options-grid" style="grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 16px;">
-          <button class="option-card active" data-value="BTC">
+      <!-- Step 3: Preferred Markets -->
+      <div class="onboarding-step" id="onboarding-step-3" style="display: none;">
+        <h3 style="font-family: var(--font-display); font-size: 1.5rem; font-weight: 700; color: #fff; margin-bottom: 6px;">Select your preferred markets</h3>
+        <p class="step-desc" style="margin-bottom: 24px; font-size: 0.85rem; color: var(--text-secondary);">Select the assets you wish Araiven to prioritize for active trade scans.</p>
+        
+        <div class="onboarding-options-grid" style="grid-template-columns: repeat(4, 1fr);">
+          <button class="option-card active" data-value="crypto">
             <span class="option-icon" style="color: #f7931a;">₿</span>
-            <h4>BTC</h4>
-            <p style="font-size: 0.75rem; margin-top: 4px;">Bitcoin</p>
+            <h4>Crypto</h4>
+            <p>Bitcoin, Ethereum, and digital assets.</p>
           </button>
-          <button class="option-card active" data-value="ETH">
-            <span class="option-icon" style="color: #627eea;">Ξ</span>
-            <h4>ETH</h4>
-            <p style="font-size: 0.75rem; margin-top: 4px;">Ethereum</p>
+          <button class="option-card disabled" data-value="stocks" disabled style="opacity: 0.4; cursor: not-allowed;">
+            <span class="option-icon">🏢</span>
+            <h4>Stocks</h4>
+            <p style="font-size: 0.72rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Coming Soon</p>
           </button>
-          <button class="option-card" data-value="SOL">
-            <span class="option-icon" style="color: #14f195;">S</span>
-            <h4>SOL</h4>
-            <p style="font-size: 0.75rem; margin-top: 4px;">Solana</p>
+          <button class="option-card disabled" data-value="forex" disabled style="opacity: 0.4; cursor: not-allowed;">
+            <span class="option-icon">🌍</span>
+            <h4>Forex</h4>
+            <p style="font-size: 0.72rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Coming Soon</p>
           </button>
-          <button class="option-card" data-value="BNB">
-            <span class="option-icon" style="color: #f3ba2f;">B</span>
-            <h4>BNB</h4>
-            <p style="font-size: 0.75rem; margin-top: 4px;">Binance Coin</p>
+          <button class="option-card disabled" data-value="indices" disabled style="opacity: 0.4; cursor: not-allowed;">
+            <span class="option-icon">📊</span>
+            <h4>Indices</h4>
+            <p style="font-size: 0.72rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Coming Soon</p>
           </button>
-          <button class="option-card" data-value="SUI">
-            <span class="option-icon" style="color: #6fbcf0;">💧</span>
-            <h4>SUI</h4>
-            <p style="font-size: 0.75rem; margin-top: 4px;">Sui</p>
-          </button>
+        </div>
+        <div style="font-size: 0.76rem; color: var(--text-muted); text-align: left; padding: 12px; border-left: 2px solid var(--primary); background: rgba(37, 99, 235, 0.03); margin-top: 10px;">
+          <strong>Future Expansion:</strong> Ravora is expanding asset scanning. Currently, only Crypto is active in our simulated sandbox trading system.
         </div>
       </div>
 
-      <!-- Step 5: Dashboard Ready -->
-      <div class="onboarding-step" id="onboarding-step-5">
-        <h3>Your Copilot is Ready</h3>
-        <p class="step-desc">Your personalized Araiven configuration is complete. We've initialized your risk profile and set up your active asset scanner.</p>
-        <div class="card-glass" style="padding: 20px; margin-top: 24px; border: 1px solid rgba(255, 255, 255, 0.08); text-align: left;">
-          <h4 style="color: #fff; margin-bottom: 16px; font-family: var(--font-display); font-size: 1.1rem;">Configuration Summary</h4>
-          <div style="display: flex; flex-direction: column; gap: 12px; font-size: 0.85rem;">
-            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 8px;">
-              <span style="color: var(--text-secondary);">Trading Experience:</span>
-              <span id="summary-experience" style="color: #fff; font-weight: 600; text-transform: capitalize;">Beginner</span>
-            </div>
-            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 8px;">
-              <span style="color: var(--text-secondary);">Risk Stance:</span>
-              <span id="summary-risk" style="color: #fff; font-weight: 600; text-transform: capitalize;">Balanced</span>
-            </div>
-            <div style="display: flex; justify-content: space-between; padding-bottom: 4px;">
-              <span style="color: var(--text-secondary);">Preferred Markets:</span>
-              <span id="summary-markets" style="color: #fff; font-weight: 600; text-align: right; max-width: 60%; word-break: break-word;">BTC, ETH</span>
-            </div>
+      <!-- Step 4: Trading Goals -->
+      <div class="onboarding-step" id="onboarding-step-4" style="display: none;">
+        <h3 style="font-family: var(--font-display); font-size: 1.5rem; font-weight: 700; color: #fff; margin-bottom: 6px;">Define your trading goals</h3>
+        <p class="step-desc" style="margin-bottom: 24px; font-size: 0.85rem; color: var(--text-secondary);">Select the style of activity you want Araiven to focus on.</p>
+        
+        <div class="onboarding-options-grid" style="grid-template-columns: repeat(4, 1fr);">
+          <button class="option-card active" data-value="daily">
+            <span class="option-icon">⚡</span>
+            <h4>Daily Trading</h4>
+            <p>Capture intra-day market swings.</p>
+          </button>
+          <button class="option-card" data-value="swing">
+            <span class="option-icon">🌊</span>
+            <h4>Swing Trading</h4>
+            <p>Hold positions over days or weeks.</p>
+          </button>
+          <button class="option-card" data-value="long_term">
+            <span class="option-icon">🐖</span>
+            <h4>Long-Term</h4>
+            <p>Compound interest and stable growth.</p>
+          </button>
+          <button class="option-card" data-value="learning">
+            <span class="option-icon">📖</span>
+            <h4>Learning</h4>
+            <p>Study Araiven's models and math.</p>
+          </button>
+        </div>
+        <div style="font-size: 0.76rem; color: var(--text-muted); text-align: left; padding: 12px; border-left: 2px solid var(--primary); background: rgba(37, 99, 235, 0.03); margin-top: 10px;">
+          <strong>AI Recommendations:</strong> This configuration helps Araiven prioritize setup signals that align with your timing horizons.
+        </div>
+      </div>
+
+      <!-- Step 5: Workspace Introduction -->
+      <div class="onboarding-step" id="onboarding-step-5" style="display: none;">
+        <h3 style="font-family: var(--font-display); font-size: 1.5rem; font-weight: 700; color: #fff; margin-bottom: 6px;">Workspace Introduction</h3>
+        <p class="step-desc" style="margin-bottom: 24px; font-size: 0.85rem; color: var(--text-secondary);">Your trading panel is divided into four key interactive areas.</p>
+        
+        <div class="onboarding-options-grid" style="grid-template-columns: repeat(4, 1fr); gap: 16px;">
+          <div class="card-glass" style="padding: 16px; border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; text-align: left;">
+            <div style="font-size: 1.5rem; margin-bottom: 12px; color: var(--primary);">🔍</div>
+            <h4 style="font-size: 0.92rem; color: #fff; margin-bottom: 6px;">AI Market Scanner</h4>
+            <p style="font-size: 0.76rem; color: var(--text-secondary); line-height: 1.45; margin: 0;">Auto-scans global price feeds for peak opportunity scores.</p>
+          </div>
+          
+          <div class="card-glass" style="padding: 16px; border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; text-align: left;">
+            <div style="font-size: 1.5rem; margin-bottom: 12px; color: var(--success);">📊</div>
+            <h4 style="font-size: 0.92rem; color: #fff; margin-bottom: 6px;">Chart Workspace</h4>
+            <p style="font-size: 0.76rem; color: var(--text-secondary); line-height: 1.45; margin: 0;">High-fidelity candles linked to support/resistance levels.</p>
+          </div>
+          
+          <div class="card-glass" style="padding: 16px; border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; text-align: left;">
+            <div style="font-size: 1.5rem; margin-bottom: 12px; color: var(--ai-accent);">🧠</div>
+            <h4 style="font-size: 0.92rem; color: #fff; margin-bottom: 6px;">Araiven Analysis</h4>
+            <p style="font-size: 0.76rem; color: var(--text-secondary); line-height: 1.45; margin: 0;">Natural language insights breaking down market dynamics.</p>
+          </div>
+          
+          <div class="card-glass" style="padding: 16px; border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; text-align: left;">
+            <div style="font-size: 1.5rem; margin-bottom: 12px; color: var(--warning);">⚡</div>
+            <h4 style="font-size: 0.92rem; color: #fff; margin-bottom: 6px;">Execution Plan</h4>
+            <p style="font-size: 0.76rem; color: var(--text-secondary); line-height: 1.45; margin: 0;">Multi-stage Entry, Stop Loss, and Take Profit target ladders.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 6: Ready -->
+      <div class="onboarding-step" id="onboarding-step-6" style="display: none;">
+        <h2 style="font-family: var(--font-display); font-size: 2.2rem; font-weight: 700; color: #fff; margin-bottom: 12px; line-height: 1.25;">You're all set.</h2>
+        <h3 style="font-family: var(--font-body); font-size: 1.25rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 24px;">Araiven is ready to start analyzing markets.</h3>
+        
+        <div style="display: flex; justify-content: center; margin-bottom: 32px;">
+          <div class="ai-core-sphere" style="animation: pulse-dot 4s infinite ease-in-out; width: 120px; height: 120px; border-radius: 50%; background: radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, rgba(6, 182, 212, 0.03) 70%); border: 1px solid rgba(16, 185, 129, 0.35); box-shadow: 0 0 40px rgba(16, 185, 129, 0.15); display: flex; align-items: center; justify-content: center; position: relative;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="url(#onboarding-success-grad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 56px; height: 56px;">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+              <polyline points="22 4 12 14.01 9 11.01" />
+            </svg>
+            <defs>
+              <linearGradient id="onboarding-success-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#10B981" />
+                <stop offset="100%" stop-color="#06B6D4" />
+              </linearGradient>
+            </defs>
           </div>
         </div>
       </div>
@@ -241,8 +287,11 @@
       </div>
 
       <div class="onboarding-footer">
-        <button class="btn btn-secondary" id="btn-onboarding-back" style="display: none;">Back</button>
-        <button class="btn btn-primary" id="btn-onboarding-next">Next Step</button>
+        <div style="display: flex; gap: 12px; align-items: center;">
+          <button class="btn btn-secondary" id="btn-onboarding-back" style="display: none;">Back</button>
+          <button class="btn btn-ghost btn-onboarding-skip" id="btn-onboarding-skip-action" style="font-size: 0.85rem; font-weight: 600; padding: 0 16px;">Skip</button>
+        </div>
+        <button class="btn btn-primary" id="btn-onboarding-next" style="min-width: 140px;">Get Started</button>
       </div>
     </div>
   </div>
