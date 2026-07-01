@@ -6423,3 +6423,146 @@ h2 {
     height: auto;
   }
 }
+
+/* ==========================================================================
+   Ravora Layout Architecture Redesign Overrides
+   ========================================================================== */
+
+/* Main App Layout Grid columns adjustment */
+.app-layout-container {
+  grid-template-columns: auto 1fr !important;
+}
+
+/* Sidebar dynamic width & transition */
+.app-sidebar {
+  width: 88px !important;
+  padding: 32px 14px !important;
+  transition: width 0.2s cubic-bezier(0.4, 0, 0.2, 1), padding 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  box-sizing: border-box !important;
+  align-items: center !important;
+}
+
+.app-sidebar .sidebar-header .logo span,
+.app-sidebar .sidebar-badge,
+.app-sidebar .sidebar-menu span,
+.app-sidebar .user-meta,
+.app-sidebar #btn-logout {
+  display: none !important;
+  opacity: 0 !important;
+}
+
+/* Expanded state on hover */
+.app-sidebar:hover {
+  width: 220px !important;
+  padding: 32px 24px !important;
+  align-items: stretch !important;
+}
+
+.app-sidebar:hover .sidebar-header .logo span,
+.app-sidebar:hover .sidebar-badge,
+.app-sidebar:hover .sidebar-menu span,
+.app-sidebar:hover .user-meta {
+  display: inline-block !important;
+  opacity: 1 !important;
+}
+
+.app-sidebar:hover .user-meta {
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.app-sidebar:hover #btn-logout {
+  display: block !important;
+  opacity: 1 !important;
+}
+
+.app-sidebar .user-profile-widget {
+  justify-content: center !important;
+  gap: 0 !important;
+}
+
+.app-sidebar:hover .user-profile-widget {
+  justify-content: space-between !important;
+  gap: 10px !important;
+}
+
+/* Center-align menu icon when collapsed, stretch when expanded */
+.app-sidebar .menu-tab-btn {
+  justify-content: center !important;
+  padding: 12px !important;
+}
+
+.app-sidebar:hover .menu-tab-btn {
+  justify-content: flex-start !important;
+  padding: 12px 16px !important;
+}
+
+/* Workspace Grid structure */
+.terminal-layout-grid {
+  display: grid !important;
+  grid-template-columns: 18% 57% 25% !important;
+  grid-template-rows: auto auto !important;
+  gap: 16px !important;
+  width: 100% !important;
+  align-items: stretch !important;
+}
+
+/* Left Column: Market Discovery */
+.terminal-scanner-panel {
+  padding: 12px !important;
+  height: 680px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+}
+
+/* Hide extra columns in Market Discovery on desktop */
+@media (min-width: 1025px) {
+  .scanner-table th:nth-child(4), .scanner-table td:nth-child(4),
+  .scanner-table th:nth-child(5), .scanner-table td:nth-child(5),
+  .scanner-table th:nth-child(7), .scanner-table td:nth-child(7) {
+    display: none !important;
+  }
+}
+
+/* Center Column: Chart Workspace */
+.terminal-chart-panel {
+  padding: 12px !important;
+  height: 680px !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+/* Right Column: AI Decision Workspace */
+.terminal-analysis-panel {
+  display: flex !important;
+  flex-direction: column !important;
+  height: 680px !important;
+  overflow: hidden !important;
+  padding: 12px !important;
+}
+
+.analysis-scroll-content {
+  flex: 1 !important;
+  overflow-y: auto !important;
+  margin-bottom: 12px !important;
+}
+
+/* Bottom Tabbed Workspace */
+.terminal-positions-panel {
+  grid-column: 1 / span 3 !important;
+  height: 220px !important;
+  margin-top: 0 !important; /* Managed by grid gap */
+  transition: height 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+}
+
+.terminal-positions-panel.collapsed {
+  height: 48px !important;
+}
+
+.terminal-positions-panel.collapsed .tab-content-wrapper {
+  display: none !important;
+}

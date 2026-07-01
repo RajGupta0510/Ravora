@@ -257,7 +257,7 @@
       <div class="sidebar-header">
         <a href="/" class="logo">
           <div class="logo-icon">R</div>
-          Ravora
+          <span>Ravora</span>
         </a>
         <div class="sidebar-badge" id="active-profile-badge">BALANCED MODEL</div>
       </div>
@@ -267,7 +267,13 @@
           <li>
             <button class="menu-tab-btn active" data-screen="dashboard">
               <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-              <span>Trading Terminal</span>
+              <span>Workspace</span>
+            </button>
+          </li>
+          <li>
+            <button class="menu-tab-btn" data-screen="dashboard">
+              <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+              <span>Markets</span>
             </button>
           </li>
           <li>
@@ -277,15 +283,9 @@
             </button>
           </li>
           <li>
-            <button class="menu-tab-btn" data-screen="copilot">
-              <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-              <span>Araiven Copilot</span>
-            </button>
-          </li>
-          <li>
             <button class="menu-tab-btn" data-screen="opportunities">
               <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-              <span>Opportunities</span>
+              <span>AI Opportunities</span>
             </button>
           </li>
           <li>
@@ -298,6 +298,12 @@
             <button class="menu-tab-btn" data-screen="history">
               <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="9"/></svg>
               <span>History</span>
+            </button>
+          </li>
+          <li>
+            <button class="menu-tab-btn" data-screen="copilot">
+              <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              <span>Copilot</span>
             </button>
           </li>
           <li>
@@ -369,13 +375,33 @@
           
           <div class="terminal-layout-grid">
             
-            <!-- LEFT PANEL: Market Scanner -->
+            <!-- LEFT PANEL: Market Discovery -->
             <div class="card-glass terminal-scanner-panel">
-              <div class="panel-header">
-                <h4>Market Scanner</h4>
-                <span class="status-indicator live">LIVE DATA</span>
+              <div class="panel-header" style="flex-direction: column; align-items: stretch; gap: 8px; border-bottom: none; padding-bottom: 0;">
+                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                  <h4 style="margin: 0; font-size: 0.9rem;">Market Discovery</h4>
+                  <span class="status-indicator live">LIVE</span>
+                </div>
+                
+                <!-- Search input -->
+                <div style="position: relative; width: 100%;">
+                  <input type="text" id="scanner-search-input" placeholder="Search assets..." style="width: 100%; padding: 8px 12px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; color: #fff; font-size: 0.75rem; box-sizing: border-box;">
+                </div>
+                
+                <!-- Watchlist Toggle and Filters -->
+                <div style="display: flex; justify-content: space-between; gap: 8px; width: 100%; box-sizing: border-box;">
+                  <button class="btn btn-secondary btn-sm" id="btn-toggle-watchlist" style="flex: 1; padding: 6px 10px; font-size: 0.7rem; justify-content: center; height: 32px; font-weight: 600;">
+                    Watchlist
+                  </button>
+                  <select id="scanner-filter-select" style="flex: 1; padding: 6px 10px; background: rgba(8, 12, 28, 0.8); border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; color: var(--text-secondary); font-size: 0.7rem; cursor: pointer; height: 32px; font-weight: 600;">
+                    <option value="all">All Setup Types</option>
+                    <option value="long">LONG Only</option>
+                    <option value="short">SHORT Only</option>
+                    <option value="wait">WAIT / HOLD</option>
+                  </select>
+                </div>
               </div>
-              <div class="scanner-table-wrapper">
+              <div class="scanner-table-wrapper" style="margin-top: 12px;">
                 <table class="scanner-table">
                   <thead>
                     <tr>
@@ -454,313 +480,285 @@
               </div>
             </div>
 
-            <!-- RIGHT PANEL: Araiven Analysis & Execution -->
-            <div class="card-glass terminal-analysis-panel">
-              <div class="panel-header">
-                <h4>Araiven Copilot Analysis</h4>
+            <!-- RIGHT COLUMN: AI Decision Workspace -->
+            <div class="card-glass terminal-analysis-panel" style="display: flex; flex-direction: column; height: 680px; overflow: hidden; padding: 12px;">
+              
+              <!-- SECTION 1: Recommendation & Confidence -->
+              <div class="panel-header" style="border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 10px; margin-bottom: 10px; flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                <h4 style="margin: 0; font-size: 0.95rem;">Araiven Analysis</h4>
                 <div class="badge-container" style="display: flex; gap: 8px; align-items: center;">
                   <div class="badge-confidence" id="terminal-confidence-badge">94% Confidence</div>
                   <div id="terminal-recommendation-badge" style="display: inline-block; padding: 2px 8px; border-radius: 4px; font-weight: 700; font-size: 0.75rem; background: rgba(16,185,129,0.15); color: #10b981;">LONG</div>
                 </div>
               </div>
               
-              <!-- Setup Scores -->
-              <div class="analysis-scores-row">
-                <div class="score-box">
-                  <span>Opp Score</span>
-                  <strong class="text-accent-gradient" id="terminal-opp-score">89</strong>
-                </div>
-                <div class="score-box">
-                  <span>Risk Score</span>
-                  <strong id="terminal-risk-score" style="color: #f87171;">42</strong>
-                </div>
-                <div class="score-box">
-                  <span>Trend</span>
-                  <strong id="terminal-trend-val" class="text-green">Bullish</strong>
-                </div>
-                <div class="score-box">
-                  <span>Momentum</span>
-                  <strong id="terminal-momentum-val" class="text-green">50</strong>
-                </div>
-              </div>
-
-              <!-- State 1: Active Trade Setup (LONG/SHORT) -->
-              <div id="terminal-state-active-trade" class="analysis-parameters" style="display: block;">
-                <div class="param-header-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 8px;">
-                  <h5 style="margin: 0; font-size: 0.75rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Araiven Trade Plan</h5>
-                  <div style="display: flex; gap: 6px; align-items: center;">
-                    <span id="state1-ai-status-pill" style="display: inline-flex; align-items: center; gap: 4px; font-size: 0.62rem; font-weight: 700; background: rgba(99, 102, 241, 0.08); color: #a5b4fc; border: 1px solid rgba(99, 102, 241, 0.15); padding: 2px 6px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.02em;">
-                      <span class="ai-status-dot" style="width: 5px; height: 5px; border-radius: 50%; background-color: #8b5cf6; display: inline-block;"></span>
-                      <span class="ai-status-text">Scanning Markets</span>
-                    </span>
-                    <span id="state1-recommendation-badge" style="padding: 4px 10px; border-radius: 4px; font-weight: 800; font-size: 0.7rem; text-transform: uppercase; background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%); color: #fff; letter-spacing: 0.05em;">LONG</span>
-                    <span id="state1-quality-badge" style="font-size: 0.65rem; font-weight: 700; background: rgba(99, 102, 241, 0.08); color: #a5b4fc; border: 1px solid rgba(99, 102, 241, 0.15); padding: 2px 8px; border-radius: 4px;">Good Quality</span>
-                  </div>
-                </div>
-
-                <!-- Primary Financial Values -->
-                <div class="param-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 12px;">
-                  <div class="param-cell" style="background: rgba(255,255,255,0.015); padding: 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.04); display: flex; flex-direction: column;">
-                    <span style="font-size: 0.62rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; font-weight: 500; letter-spacing: 0.02em;">Suggested Entry</span>
-                    <strong id="state1-entry" style="font-size: 1.05rem; color: #fff; font-weight: 700;">$63,800.00</strong>
-                  </div>
-                  <div class="param-cell" style="background: rgba(255,255,255,0.015); padding: 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.04); display: flex; flex-direction: column;">
-                    <span style="font-size: 0.62rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; font-weight: 500; letter-spacing: 0.02em;">Stop Loss (SL)</span>
-                    <strong id="state1-sl" style="font-size: 1.05rem; color: #f87171; font-weight: 700;">$62,000.00</strong>
-                  </div>
-                </div>
-
-                <div class="param-cell" style="background: rgba(255,255,255,0.015); padding: 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.04); margin-bottom: 12px; display: flex; flex-direction: column;">
-                  <span style="font-size: 0.62rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px; font-weight: 500; letter-spacing: 0.02em;">Take Profit Targets</span>
-                  <div style="display: flex; gap: 4px; justify-content: space-between; align-items: center; flex-wrap: wrap;">
-                    <div style="display: flex; flex-direction: column; flex: 1; min-width: 65px;">
-                      <span style="font-size: 0.55rem; color: var(--text-muted); text-transform: uppercase;">TP1</span>
-                      <strong class="text-green" id="state1-tp1" style="font-size: 0.85rem; font-weight: 700;">$64,500.00</strong>
-                    </div>
-                    <div style="color: rgba(255,255,255,0.15); font-weight: 300; font-size: 1.2rem; align-self: center;">/</div>
-                    <div style="display: flex; flex-direction: column; flex: 1; min-width: 65px; text-align: center;">
-                      <span style="font-size: 0.55rem; color: var(--text-muted); text-transform: uppercase;">TP2</span>
-                      <strong class="text-green" id="state1-tp2" style="font-size: 0.85rem; font-weight: 700;">$66,500.00</strong>
-                    </div>
-                    <div style="color: rgba(255,255,255,0.15); font-weight: 300; font-size: 1.2rem; align-self: center;">/</div>
-                    <div style="display: flex; flex-direction: column; flex: 1; min-width: 65px; text-align: right;">
-                      <span style="font-size: 0.55rem; color: var(--text-muted); text-transform: uppercase;">TP3</span>
-                      <strong class="text-green" id="state1-tp3" style="font-size: 0.85rem; font-weight: 700;">$68,200.00</strong>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Plan Metrics Grid -->
-                <div class="param-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 12px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 10px;">
-                  <div>
-                    <span style="font-size: 0.58rem; color: var(--text-muted); text-transform: uppercase; display: block; letter-spacing: 0.02em;">Risk/Reward</span>
-                    <strong id="state1-rr" style="font-size: 0.8rem; color: #fff; font-weight: 600; display: block; margin-top: 2px;">2.3:1</strong>
-                  </div>
-                  <div>
-                    <span style="font-size: 0.58rem; color: var(--text-muted); text-transform: uppercase; display: block; letter-spacing: 0.02em;">Holding Time</span>
-                    <strong id="state1-duration" style="font-size: 0.8rem; color: #fff; font-weight: 600; display: block; margin-top: 2px;">5-7 days</strong>
-                  </div>
-                  <div>
-                    <span style="font-size: 0.58rem; color: var(--text-muted); text-transform: uppercase; display: block; letter-spacing: 0.02em;">Probability</span>
-                    <strong id="state1-probability" style="font-size: 0.8rem; color: #10b981; font-weight: 600; display: block; margin-top: 2px;">74%</strong>
-                  </div>
-                </div>
-
-                <!-- Market Intelligence Grid -->
-                <div class="param-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 10px; margin-bottom: 12px;">
-                  <div>
-                    <span style="font-size: 0.58rem; color: var(--text-muted); text-transform: uppercase; display: block; letter-spacing: 0.02em;">Market Structure</span>
-                    <strong id="state1-structure" style="font-size: 0.8rem; color: #10b981; font-weight: 600; display: block; margin-top: 2px;">Bullish</strong>
-                  </div>
-                  <div>
-                    <span style="font-size: 0.58rem; color: var(--text-muted); text-transform: uppercase; display: block; letter-spacing: 0.02em;">Nearest Support</span>
-                    <strong id="state1-support" style="font-size: 0.8rem; color: #60a5fa; font-weight: 600; display: block; margin-top: 2px;">$61,200.00</strong>
-                  </div>
-                </div>
-
-                <div class="param-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 10px; margin-bottom: 12px;">
-                  <div>
-                    <span style="font-size: 0.58rem; color: var(--text-muted); text-transform: uppercase; display: block; letter-spacing: 0.02em;">Confidence Score</span>
-                    <strong id="state1-confidence" style="font-size: 0.8rem; color: #fff; font-weight: 600; display: block; margin-top: 2px; background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">78%</strong>
-                  </div>
-                  <div>
-                    <span style="font-size: 0.58rem; color: var(--text-muted); text-transform: uppercase; display: block; letter-spacing: 0.02em;">Nearest Resistance</span>
-                    <strong id="state1-resistance" style="font-size: 0.8rem; color: #f472b6; font-weight: 600; display: block; margin-top: 2px;">$66,500.00</strong>
-                  </div>
-                </div>
-
-                <!-- AI Decision Summary -->
-                <div style="margin-top: 14px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 12px;">
-                  <h6 style="margin: 0 0 6px 0; font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700;">AI Decision Summary</h6>
-                  <div id="state1-explanation-box" style="padding: 10px; border-radius: 6px; background: rgba(255,255,255,0.01); border-left: 2px solid #8b5cf6; font-size: 0.72rem; line-height: 1.45; color: var(--text-secondary);">
-                    Araiven detected a bullish continuation structure supported by strengthening momentum and increasing buying pressure. Price recently reclaimed support, providing a favorable 2.8:1 risk/reward opportunity.
-                  </div>
-                </div>
-              </div>
-
-              <!-- State 2: Hold/Wait Opportunity Status Card -->
-              <div id="terminal-state-no-trade" class="analysis-parameters" style="display: none;">
-                <div class="param-header-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 8px;">
-                  <h5 style="margin: 0; font-size: 0.75rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Araiven Trade Plan</h5>
-                  <div style="display: flex; gap: 6px; align-items: center;">
-                    <span id="state2-ai-status-pill" style="display: inline-flex; align-items: center; gap: 4px; font-size: 0.62rem; font-weight: 700; background: rgba(99, 102, 241, 0.08); color: #a5b4fc; border: 1px solid rgba(99, 102, 241, 0.15); padding: 2px 6px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.02em;">
-                      <span class="ai-status-dot" style="width: 5px; height: 5px; border-radius: 50%; background-color: #8b5cf6; display: inline-block;"></span>
-                      <span class="ai-status-text">Scanning Markets</span>
-                    </span>
-                    <span id="state2-status-badge" style="display: inline-block; padding: 4px 10px; border-radius: 4px; font-weight: 800; font-size: 0.7rem; text-transform: uppercase; background: rgba(245, 158, 11, 0.15); color: #f59e0b; letter-spacing: 0.05em;">NO ACTIVE SETUP</span>
-                  </div>
-                </div>
-
-                <div style="background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.04); border-radius: 6px; padding: 12px; margin-bottom: 12px;">
-                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                    <span style="font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Current Recommendation</span>
-                    <strong id="state2-rec-text" style="font-size: 0.75rem; color: #f59e0b; font-weight: 700; text-transform: uppercase;">HOLD</strong>
-                  </div>
-                  <div id="state2-reason-box" style="color: var(--text-secondary); font-size: 0.72rem; line-height: 1.45;">
-                    <!-- Bullet list of factors injected here by JS -->
-                  </div>
-                </div>
-
-                <!-- Market Snapshot -->
-                <div style="border-top: 1px solid rgba(255,255,255,0.06); padding-top: 10px; margin-bottom: 12px;">
-                  <h6 style="margin: 0 0 8px 0; font-size: 0.62rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700;">Market Snapshot</h6>
+              <!-- SCROLLABLE CONTENT (Sections 2, 3, 4, 5) -->
+              <div class="analysis-scroll-content" style="flex: 1; overflow-y: auto; padding-right: 4px; margin-bottom: 10px; box-sizing: border-box;">
+                
+                <!-- SECTION 2: AI Summary (Max 3 sentences) & Shared Reasoning -->
+                <div class="analysis-section" style="margin-bottom: 14px;">
+                  <h6 style="margin: 0 0 6px 0; font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700;">AI Summary</h6>
                   
-                  <div class="param-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 8px;">
-                    <div>
-                      <span style="font-size: 0.58rem; color: var(--text-muted); text-transform: uppercase; display: block;">Trend</span>
-                      <strong id="state2-trend" style="font-size: 0.78rem; color: #fff; font-weight: 600; display: block; margin-top: 2px;">Sideways</strong>
+                  <!-- Inside LONG/SHORT: state1 explanation box -->
+                  <div id="state1-summary-container" style="display: block;">
+                    <div id="state1-explanation-box" style="padding: 10px; border-radius: 6px; background: rgba(255,255,255,0.01); border-left: 2px solid #8b5cf6; font-size: 0.72rem; line-height: 1.45; color: var(--text-secondary); margin-bottom: 8px;">
+                      Araiven detected a bullish continuation structure supported by strengthening momentum and increasing buying pressure. Price recently reclaimed support, providing a favorable 2.8:1 risk/reward opportunity.
                     </div>
-                    <div>
-                      <span style="font-size: 0.58rem; color: var(--text-muted); text-transform: uppercase; display: block;">Momentum</span>
-                      <strong id="state2-momentum" style="font-size: 0.78rem; color: #fff; font-weight: 600; display: block; margin-top: 2px;">Neutral</strong>
+                  </div>
+                  
+                  <!-- Inside HOLD/WAIT: state2 explanation box -->
+                  <div id="state2-summary-container" style="display: none;">
+                    <div id="state2-reason-box" style="color: var(--text-secondary); font-size: 0.72rem; line-height: 1.45; padding: 10px; border-radius: 6px; background: rgba(255,255,255,0.01); border-left: 2px solid #f59e0b; margin-bottom: 8px;">
+                      <!-- Bullet list of factors injected by JS -->
                     </div>
                   </div>
 
-                  <div class="param-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
-                    <div>
-                      <span style="font-size: 0.58rem; color: var(--text-muted); text-transform: uppercase; display: block;">Risk Level</span>
-                      <strong id="state2-risk" style="font-size: 0.78rem; color: #fff; font-weight: 600; display: block; margin-top: 2px;">Medium</strong>
-                    </div>
-                    <div>
-                      <span style="font-size: 0.58rem; color: var(--text-muted); text-transform: uppercase; display: block;">Confidence</span>
-                      <strong id="state2-confidence" style="font-size: 0.78rem; color: #fff; font-weight: 600; display: block; margin-top: 2px; background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">50%</strong>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Expected Trigger -->
-                <div id="state2-trigger-box" style="padding: 10px; border-radius: 6px; background: rgba(59, 130, 246, 0.03); border-left: 2px solid #3b82f6; font-size: 0.72rem; line-height: 1.45; color: #fff; font-weight: 500; margin-top: 12px;">
-                  <span style="font-weight: 700; font-size: 0.62rem; color: #60a5fa; text-transform: uppercase; display: block; margin-bottom: 3px; letter-spacing: 0.02em;">Expected Trigger</span>
-                  <span id="state2-trigger-text">A LONG setup will be generated after a confirmed breakout above resistance with increasing volume.</span>
-                </div>
-              </div>
-
-              <!-- State 3: Insufficient Data -->
-              <div id="terminal-state-insufficient-data" class="analysis-parameters" style="display: none; padding: 24px; text-align: center; background: rgba(239, 68, 68, 0.03); border: 1px dashed rgba(239, 68, 68, 0.15); border-radius: 8px;">
-                <div style="width: 32px; height: 32px; margin: 0 auto 12px auto; color: #ef4444; opacity: 0.8;">
-                  <svg viewBox="0 0 24 24" width="100%" height="100%"><path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
-                </div>
-                <h5 style="margin: 0 0 6px 0; font-size: 0.8rem; color: #ef4444; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Araiven Trade Plan</h5>
-                <p style="margin: 0 0 10px 0; font-size: 0.75rem; color: #fff; font-weight: 600;">Market analysis unavailable.</p>
-                <p style="margin: 0; font-size: 0.7rem; color: var(--text-secondary); line-height: 1.45;">Araiven requires additional confirmed market data before generating a professional trading plan.</p>
-              </div>
-
-              <!-- Decision Timeline (Shared across all states) -->
-              <div id="terminal-decision-timeline" class="analysis-parameters" style="margin-top: 12px; padding: 12px; border-top: 1px solid rgba(255,255,255,0.06); background: transparent; border-radius: 0;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                  <h6 style="margin: 0; font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700;">Decision Timeline</h6>
-                  <div style="display: flex; align-items: center; gap: 5px;">
-                    <span id="timeline-status-dot" style="width: 6px; height: 6px; border-radius: 50%; background-color: #9ca3af; display: inline-block;"></span>
-                    <span id="timeline-status-text" style="font-size: 0.65rem; font-weight: 700; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.02em;">Monitoring Markets</span>
+                  <!-- AI Reasoning Paragraph (Shared) -->
+                  <div class="analysis-reasoning-box" style="padding: 8px 10px; background: rgba(255,255,255,0.01); border-radius: 6px; font-size: 0.7rem; color: var(--text-secondary); line-height: 1.4;">
+                    <p id="terminal-reasoning-text" style="margin: 0;">
+                      Spot ETF net inflows show consecutive daily acceleration, coinciding with hodler lockup peaks. Momentum targets a breakout to structural range highs.
+                    </p>
                   </div>
                 </div>
                 
-                <div class="timeline-items" style="display: flex; flex-direction: column; gap: 8px; border-left: 1px dashed rgba(255,255,255,0.08); padding-left: 12px; margin-left: 3px;">
-                  <div class="timeline-item" style="display: flex; justify-content: space-between; align-items: center; font-size: 0.68rem; position: relative;">
-                    <span style="color: var(--text-muted);">Analysis Updated</span>
-                    <strong id="timeline-analysis-updated" style="color: #fff; font-weight: 500;">14:32:18 UTC</strong>
+                <!-- SECTION 3: Trade Plan (LONG/SHORT parameters or HOLD/WAIT triggers) -->
+                <div class="analysis-section" style="margin-bottom: 14px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 12px;">
+                  <h6 style="margin: 0 0 8px 0; font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700;">Araiven Trade Plan</h6>
+                  
+                  <!-- State 1 Parameters -->
+                  <div id="terminal-state-active-trade" class="analysis-parameters" style="display: block;">
+                    <!-- Entry/SL row -->
+                    <div class="param-header-row" style="display: flex; gap: 12px; margin-bottom: 10px;">
+                      <div style="flex: 1; display: flex; flex-direction: column; background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.04); border-radius: 6px; padding: 8px 10px;">
+                        <span style="font-size: 0.55rem; color: var(--text-muted); text-transform: uppercase;">Entry Price</span>
+                        <strong class="text-accent-gradient" id="state1-entry" style="font-size: 0.85rem; font-weight: 700; margin-top: 2px;">$64,120.00</strong>
+                      </div>
+                      <div style="flex: 1; display: flex; flex-direction: column; background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.04); border-radius: 6px; padding: 8px 10px;">
+                        <span style="font-size: 0.55rem; color: var(--text-muted); text-transform: uppercase;">Stop Loss</span>
+                        <strong class="text-error" id="state1-sl" style="font-size: 0.85rem; font-weight: 700; margin-top: 2px;">$62,800.00</strong>
+                      </div>
+                    </div>
+                    
+                    <!-- TP row -->
+                    <div style="background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.04); border-radius: 6px; padding: 10px; margin-bottom: 12px;">
+                      <span style="font-size: 0.55rem; color: var(--text-muted); text-transform: uppercase; display: block; margin-bottom: 6px;">Take Profit Targets</span>
+                      <div style="display: flex; justify-content: space-between; align-items: center; gap: 4px;">
+                        <div style="display: flex; flex-direction: column; flex: 1; text-align: left;">
+                          <span style="font-size: 0.55rem; color: var(--text-muted); text-transform: uppercase;">TP1</span>
+                          <strong class="text-green" id="state1-tp1" style="font-size: 0.8rem; font-weight: 700;">$65,200.00</strong>
+                        </div>
+                        <div style="color: rgba(255,255,255,0.1); font-size: 1rem;">/</div>
+                        <div style="display: flex; flex-direction: column; flex: 1; text-align: center;">
+                          <span style="font-size: 0.55rem; color: var(--text-muted); text-transform: uppercase;">TP2</span>
+                          <strong class="text-green" id="state1-tp2" style="font-size: 0.8rem; font-weight: 700;">$66,500.00</strong>
+                        </div>
+                        <div style="color: rgba(255,255,255,0.1); font-size: 1rem;">/</div>
+                        <div style="display: flex; flex-direction: column; flex: 1; text-align: right;">
+                          <span style="font-size: 0.55rem; color: var(--text-muted); text-transform: uppercase;">TP3</span>
+                          <strong class="text-green" id="state1-tp3" style="font-size: 0.8rem; font-weight: 700;">$68,200.00</strong>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <!-- Risk/Reward and Duration -->
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 8px;">
+                      <div>
+                        <span style="font-size: 0.58rem; color: var(--text-muted); text-transform: uppercase; display: block;">Risk/Reward</span>
+                        <strong id="state1-rr" style="font-size: 0.78rem; color: #fff; font-weight: 600; display: block; margin-top: 2px;">2.3:1</strong>
+                      </div>
+                      <div>
+                        <span style="font-size: 0.58rem; color: var(--text-muted); text-transform: uppercase; display: block;">Duration</span>
+                        <strong id="state1-duration" style="font-size: 0.78rem; color: #fff; font-weight: 600; display: block; margin-top: 2px;">5-7 days</strong>
+                      </div>
+                      <div>
+                        <span style="font-size: 0.58rem; color: var(--text-muted); text-transform: uppercase; display: block;">Probability</span>
+                        <strong id="state1-probability" style="font-size: 0.78rem; color: #10b981; font-weight: 600; display: block; margin-top: 2px;">74%</strong>
+                      </div>
+                    </div>
                   </div>
-                  <div class="timeline-item" style="display: flex; justify-content: space-between; align-items: center; font-size: 0.68rem; position: relative;">
-                    <span style="color: var(--text-muted);">Signal Generated</span>
-                    <strong id="timeline-signal-generated" style="color: #fff; font-weight: 500;">14:31:54 UTC</strong>
+                  
+                  <!-- State 2 (HOLD/WAIT) -->
+                  <div id="terminal-state-no-trade" class="analysis-parameters" style="display: none;">
+                    <div id="state2-trigger-box" style="padding: 10px; border-radius: 6px; background: rgba(59, 130, 246, 0.03); border-left: 2px solid #3b82f6; font-size: 0.72rem; line-height: 1.45; color: #fff; font-weight: 500;">
+                      <span style="font-weight: 700; font-size: 0.62rem; color: #60a5fa; text-transform: uppercase; display: block; margin-bottom: 3px; letter-spacing: 0.02em;">Expected Trigger</span>
+                      <span id="state2-trigger-text">A LONG setup will be generated after a confirmed breakout above resistance with increasing volume.</span>
+                    </div>
                   </div>
-                  <div class="timeline-item" style="display: flex; justify-content: space-between; align-items: center; font-size: 0.68rem; position: relative;">
-                    <span style="color: var(--text-muted);">Market Data Refreshed</span>
-                    <strong id="timeline-data-refreshed" style="color: #fff; font-weight: 500;">0 seconds ago</strong>
-                  </div>
-                  <div class="timeline-item" style="display: flex; justify-content: space-between; align-items: center; font-size: 0.68rem; position: relative;">
-                    <span style="color: var(--text-muted);">Next Analysis</span>
-                    <strong id="timeline-next-analysis" style="color: #60a5fa; font-weight: 500;">In 30 seconds</strong>
-                  </div>
-                  <div class="timeline-item" style="display: flex; justify-content: space-between; align-items: center; font-size: 0.68rem; position: relative;">
-                    <span style="color: var(--text-muted);">Market Session</span>
-                    <strong style="color: var(--text-secondary); font-weight: 500;">Crypto • 24/7 Active</strong>
+                  
+                  <!-- State 3 (Insufficient Data) -->
+                  <div id="terminal-state-insufficient-data" class="analysis-parameters" style="display: none; padding: 16px; text-align: center; background: rgba(239, 68, 68, 0.03); border: 1px dashed rgba(239, 68, 68, 0.15); border-radius: 6px;">
+                    <p style="margin: 0; font-size: 0.7rem; color: var(--text-secondary); line-height: 1.4;">Araiven requires additional market data before generating a trading plan.</p>
                   </div>
                 </div>
-              </div>
+                
+                <!-- SECTION 4: Market Structure & Drawing Explanations -->
+                <div class="analysis-section" style="margin-bottom: 14px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 12px;">
+                  <h6 style="margin: 0 0 8px 0; font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700;">Market Structure</h6>
+                  
+                  <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px 16px; margin-bottom: 12px;">
+                    <div>
+                      <span style="font-size: 0.58rem; color: var(--text-muted); text-transform: uppercase; display: block;">Trend</span>
+                      <strong id="terminal-trend-val" class="text-green" style="font-size: 0.78rem; font-weight: 600; display: block; margin-top: 2px;">Bullish</strong>
+                    </div>
+                    <div>
+                      <span style="font-size: 0.58rem; color: var(--text-muted); text-transform: uppercase; display: block;">Momentum</span>
+                      <strong id="terminal-momentum-val" class="text-green" style="font-size: 0.78rem; font-weight: 600; display: block; margin-top: 2px;">50</strong>
+                    </div>
+                    <div>
+                      <span style="font-size: 0.58rem; color: var(--text-muted); text-transform: uppercase; display: block;">Support</span>
+                      <strong id="state1-support" style="font-size: 0.78rem; color: #60a5fa; font-weight: 600; display: block; margin-top: 2px;">$61,200.00</strong>
+                    </div>
+                    <div>
+                      <span style="font-size: 0.58rem; color: var(--text-muted); text-transform: uppercase; display: block;">Resistance</span>
+                      <strong id="state1-resistance" style="font-size: 0.78rem; color: #f472b6; font-weight: 600; display: block; margin-top: 2px;">$66,500.00</strong>
+                    </div>
+                  </div>
 
-              <!-- AI Reasoning Paragraph -->
-              <div class="analysis-reasoning-box">
-                <p id="terminal-reasoning-text">
-                  Spot ETF net inflows show consecutive daily acceleration, coinciding with hodler lockup peaks. Momentum targets a breakout to structural range highs.
-                </p>
-              </div>
-
-              <!-- AI Chart Drawing Explanations -->
-              <div class="analysis-reasoning-box chart-explainers-box">
-                <h5>Araiven Chart Intel Explanations</h5>
-                <div id="terminal-explainers-list" class="explainers-list">
-                  <div class="explainer-item empty">Select an asset to view AI chart overlays.</div>
+                  <!-- AI Chart Drawing Explanations (Relocated here) -->
+                  <div class="analysis-reasoning-box chart-explainers-box" style="margin-top: 10px; padding: 10px; background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.04); border-radius: 6px;">
+                    <h5 style="margin: 0 0 6px 0; font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Araiven Chart Intel Explanations</h5>
+                    <div id="terminal-explainers-list" class="explainers-list" style="font-size: 0.7rem; color: var(--text-secondary); line-height: 1.4;">
+                      <div class="explainer-item empty">Select an asset to view AI chart overlays.</div>
+                    </div>
+                  </div>
                 </div>
+                
+                <!-- SECTION 5: Decision Timeline -->
+                <div class="analysis-section" id="terminal-decision-timeline" class="analysis-parameters" style="margin-bottom: 6px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 12px; background: transparent; border-radius: 0;">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <h6 style="margin: 0; font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700;">Decision Timeline</h6>
+                    <div style="display: flex; align-items: center; gap: 5px;">
+                      <span id="timeline-status-dot" style="width: 5px; height: 5px; border-radius: 50%; background-color: #9ca3af; display: inline-block;"></span>
+                      <span id="timeline-status-text" style="font-size: 0.65rem; font-weight: 700; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.02em;">Monitoring Markets</span>
+                    </div>
+                  </div>
+                  
+                  <div class="timeline-items" style="display: flex; flex-direction: column; gap: 6px; border-left: 1px dashed rgba(255,255,255,0.08); padding-left: 10px; margin-left: 3px;">
+                    <div class="timeline-item" style="display: flex; justify-content: space-between; align-items: center; font-size: 0.68rem; position: relative;">
+                      <span style="color: var(--text-muted);">Updated</span>
+                      <strong id="timeline-analysis-updated" style="color: #fff; font-weight: 500;">14:32:18 UTC</strong>
+                    </div>
+                    <div class="timeline-item" style="display: flex; justify-content: space-between; align-items: center; font-size: 0.68rem; position: relative;">
+                      <span style="color: var(--text-muted);">Generated</span>
+                      <strong id="timeline-signal-generated" style="color: #fff; font-weight: 500;">14:31:54 UTC</strong>
+                    </div>
+                    <div class="timeline-item" style="display: flex; justify-content: space-between; align-items: center; font-size: 0.68rem; position: relative;">
+                      <span style="color: var(--text-muted);">Next Scan</span>
+                      <strong id="timeline-next-analysis" style="color: #60a5fa; font-weight: 500;">In 30 seconds</strong>
+                    </div>
+                  </div>
+                </div>
+                
               </div>
-
-              <!-- Action deploy container -->
-              <div class="terminal-action-form" id="terminal-action-container">
+              
+              <!-- SECTION 6: Sticky Footer (Deploy Trade) -->
+              <div class="terminal-action-form" id="terminal-action-container" style="border-top: 1px solid rgba(255,255,255,0.06); padding-top: 12px; margin-top: auto; flex-shrink: 0; background: transparent; width: 100%;">
                 <!-- Dynamically populated based on Araiven recommendation -->
               </div>
-
+              
             </div>
 
-          </div>
-
-          <!-- BOTTOM PANEL: Active Positions & Transaction History -->
-          <div class="card-glass terminal-positions-panel" style="margin-top: 16px;">
-            <div class="panel-tabs" style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
-              <div style="display: flex; gap: 8px;">
-                <button class="panel-tab-btn active" data-tab="active-positions">Active Positions</button>
-                <button class="panel-tab-btn" data-tab="closed-history">Closed Trade History</button>
+            <!-- BOTTOM PANEL: Tabbed Workspace -->
+            <div class="card-glass terminal-positions-panel collapsed">
+              <div class="panel-header-tabs" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 16px; border-bottom: 1px solid rgba(255,255,255,0.06); flex-shrink: 0; min-height: 48px; box-sizing: border-box; width: 100%;">
+                <div class="panel-tabs" style="display: flex; gap: 16px;">
+                  <button class="panel-tab-btn active" data-tab="active-positions">Positions</button>
+                  <button class="panel-tab-btn" data-tab="simulated-orders">Orders</button>
+                  <button class="panel-tab-btn" data-tab="closed-history">History</button>
+                  <button class="panel-tab-btn" data-tab="copilot-performance">Performance</button>
+                </div>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                  <button class="btn btn-secondary btn-sm" id="btn-close-all-trades" style="padding: 6px 12px; font-size: 0.75rem; border-color: rgba(239, 68, 68, 0.4); color: #f87171;">Close All Trades</button>
+                  <button id="btn-toggle-bottom-panel" class="btn-sidebar-utility" style="padding: 4px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 4px; color: var(--text-secondary); cursor: pointer;" title="Toggle Bottom Panel">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" id="bottom-panel-toggle-icon" style="margin: 0; display: block;"><polyline points="6 9 12 15 18 9"/></svg>
+                  </button>
+                </div>
               </div>
-              <button class="btn btn-secondary btn-sm" id="btn-close-all-trades" style="border-color: rgba(239, 68, 68, 0.4); color: #f87171;">Close All Trades</button>
-            </div>
-            
-            <div class="tab-content active" id="tab-active-positions">
-              <div class="positions-table-wrapper">
-                <table class="positions-table">
-                  <thead>
-                    <tr>
-                      <th>Asset</th>
-                      <th>Direction</th>
-                      <th>Entry</th>
-                      <th>Current Price</th>
-                      <th>Position Size</th>
-                      <th>Leverage</th>
-                      <th>Unrealized P&L</th>
-                      <th>Duration</th>
-                      <th>Current Status</th>
-                      <th>Action</th>
-                    </tr>
-                  </thead>
-                  <tbody id="terminal-positions-rows">
-                    <!-- Loaded dynamically -->
-                  </tbody>
-                </table>
+              
+              <div class="tab-content-wrapper" style="flex: 1; overflow-y: auto; padding: 12px 16px; box-sizing: border-box; width: 100%;">
+                <!-- Positions Content -->
+                <div class="tab-content active" id="tab-active-positions" style="display: block;">
+                  <div class="positions-table-wrapper">
+                    <table class="positions-table">
+                      <thead>
+                        <tr>
+                          <th>Asset</th>
+                          <th>Direction</th>
+                          <th>Entry Price</th>
+                          <th>Current Price</th>
+                          <th>Position Size</th>
+                          <th>Leverage</th>
+                          <th>Unrealized P&L</th>
+                          <th>Duration</th>
+                          <th>Current Status</th>
+                          <th>Action</th>
+                        </tr>
+                      </thead>
+                      <tbody id="terminal-positions-rows">
+                        <!-- Filled by JS -->
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                
+                <!-- Orders Content (Mock) -->
+                <div class="tab-content" id="tab-simulated-orders" style="display: none;">
+                  <div style="text-align: center; color: var(--text-secondary); padding: 32px 16px; font-size: 0.8rem;">
+                    <p style="margin: 0 0 4px 0; font-weight: 600; color: #fff;">No active simulated orders.</p>
+                    <p style="margin: 0; font-size: 0.75rem;">All market orders are executed instantly via the Deploy Trade flow.</p>
+                  </div>
+                </div>
+                
+                <!-- History Content -->
+                <div class="tab-content" id="tab-closed-history" style="display: none;">
+                  <div class="positions-table-wrapper">
+                    <table class="positions-table">
+                      <thead>
+                        <tr>
+                          <th>Date</th>
+                          <th>Asset</th>
+                          <th>Direction</th>
+                          <th>Entry</th>
+                          <th>Exit</th>
+                          <th>Profit/Loss</th>
+                          <th>Duration</th>
+                          <th>Close Reason</th>
+                          <th>Outcome</th>
+                          <th>Confidence</th>
+                          <th>Score</th>
+                        </tr>
+                      </thead>
+                      <tbody id="terminal-history-rows">
+                        <!-- Filled by JS -->
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                
+                <!-- Performance Content (Mock stats) -->
+                <div class="tab-content" id="tab-copilot-performance" style="display: none;">
+                  <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; padding: 10px 0;">
+                    <div style="background: rgba(255,255,255,0.015); border: 1px solid rgba(255,255,255,0.04); border-radius: 8px; padding: 12px; text-align: center;">
+                      <span style="font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; display: block;">Copilot Win Rate</span>
+                      <strong style="font-size: 1.15rem; color: #10b981; font-weight: 700; display: block; margin-top: 4px;">74.2%</strong>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.015); border: 1px solid rgba(255,255,255,0.04); border-radius: 8px; padding: 12px; text-align: center;">
+                      <span style="font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; display: block;">Total Net P&L</span>
+                      <strong style="font-size: 1.15rem; color: #10b981; font-weight: 700; display: block; margin-top: 4px;">+$14,231.50</strong>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.015); border: 1px solid rgba(255,255,255,0.04); border-radius: 8px; padding: 12px; text-align: center;">
+                      <span style="font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; display: block;">Profit Factor</span>
+                      <strong style="font-size: 1.15rem; color: #3b82f6; font-weight: 700; display: block; margin-top: 4px;">2.48</strong>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.015); border: 1px solid rgba(255,255,255,0.04); border-radius: 8px; padding: 12px; text-align: center;">
+                      <span style="font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; display: block;">Sharpe Ratio</span>
+                      <strong style="font-size: 1.15rem; color: #a5b4fc; font-weight: 700; display: block; margin-top: 4px;">2.15</strong>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
-            <div class="tab-content" id="tab-closed-history" style="display: none;">
-              <div class="positions-table-wrapper">
-                <table class="positions-table">
-                  <thead>
-                    <tr>
-                      <th>Close Time</th>
-                      <th>Asset</th>
-                      <th>Direction</th>
-                      <th>Entry</th>
-                      <th>Exit</th>
-                      <th>Profit/Loss</th>
-                      <th>Duration</th>
-                      <th>Reason Closed</th>
-                      <th>Win/Loss</th>
-                      <th>Confidence</th>
-                      <th>Opp Score</th>
-                    </tr>
-                  </thead>
-                  <tbody id="terminal-history-rows">
-                    <!-- Loaded dynamically -->
-                  </tbody>
-                </table>
-              </div>
-            </div>
           </div>
 
         </section>
@@ -1222,6 +1220,6 @@
   <script src="chart/chartOverlayService.js"></script>
   <script src="chart/chartComponent.js"></script>
 
-  <script src="/dashboard.js?v=4.0"></script>
+  <script src="/dashboard.js?v=5.0"></script>
 </body>
 </html>

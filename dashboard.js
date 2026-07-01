@@ -1611,7 +1611,27 @@ document.addEventListener('DOMContentLoaded', () => {
     allNavBtns.forEach(btn => {
       const btnScreen = btn.getAttribute('data-screen') || (btn.id === 'btn-trigger-notif' ? 'notifications' : '');
       if (btnScreen === screenId) {
-        btn.classList.add('active');
+        if (screenId === 'dashboard') {
+          // Highlight only the clicked button or default to Workspace
+          const clickedBtn = window.event && (window.event.currentTarget || (window.event.target && window.event.target.closest('.menu-tab-btn')));
+          if (clickedBtn && clickedBtn.getAttribute && clickedBtn.getAttribute('data-screen') === 'dashboard') {
+            if (btn === clickedBtn) {
+              btn.classList.add('active');
+            } else {
+              btn.classList.remove('active');
+            }
+          } else {
+            // Default to first dashboard button (Workspace)
+            const btnSpan = btn.querySelector('span');
+            if (btnSpan && btnSpan.textContent.trim() === 'Workspace') {
+              btn.classList.add('active');
+            } else {
+              btn.classList.remove('active');
+            }
+          }
+        } else {
+          btn.classList.add('active');
+        }
       } else {
         btn.classList.remove('active');
       }
@@ -2974,18 +2994,114 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.classList.add('active');
 
         const tab = btn.getAttribute('data-tab');
-        const activeTabContent = document.getElementById('tab-active-positions');
-        const historyTabContent = document.getElementById('tab-closed-history');
+        
+        // Hide all tab content elements
+        const contents = [
+          'tab-active-positions',
+          'tab-simulated-orders',
+          'tab-closed-history',
+          'tab-copilot-performance'
+        ];
+        contents.forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.style.display = 'none';
+        });
 
-        if (tab === 'active-positions') {
-          if (activeTabContent) activeTabContent.style.display = 'block';
-          if (historyTabContent) historyTabContent.style.display = 'none';
-        } else {
-          if (activeTabContent) activeTabContent.style.display = 'none';
-          if (historyTabContent) historyTabContent.style.display = 'block';
+        // Show the target tab content element
+        let targetId = 'tab-active-positions';
+        if (tab === 'simulated-orders') targetId = 'tab-simulated-orders';
+        else if (tab === 'closed-history') targetId = 'tab-closed-history';
+        else if (tab === 'copilot-performance') targetId = 'tab-copilot-performance';
+        
+        const targetEl = document.getElementById(targetId);
+        if (targetEl) targetEl.style.display = 'block';
+
+        // Auto-expand the bottom panel if it is collapsed
+        const bottomPanel = document.querySelector('.terminal-positions-panel');
+        const toggleIcon = document.getElementById('bottom-panel-toggle-icon');
+        if (bottomPanel && bottomPanel.classList.contains('collapsed')) {
+          bottomPanel.classList.remove('collapsed');
+          if (toggleIcon) {
+            toggleIcon.innerHTML = '<polyline points="18 15 12 9 6 15"/>'; // Up arrow
+          }
         }
       });
     });
+
+    const toggleBottomBtn = document.getElementById('btn-toggle-bottom-panel');
+    const bottomPanel = document.querySelector('.terminal-positions-panel');
+    const toggleIcon = document.getElementById('bottom-panel-toggle-icon');
+
+    if (toggleBottomBtn && bottomPanel) {
+      toggleBottomBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isCollapsed = bottomPanel.classList.toggle('collapsed');
+        if (toggleIcon) {
+          toggleIcon.innerHTML = isCollapsed 
+            ? '<polyline points="6 9 12 15 18 9"/>' 
+            : '<polyline points="18 15 12 9 6 15"/>';
+        }
+      });
+    }
+
+    const searchInput = document.getElementById('scanner-search-input');
+    const filterSelect = document.getElementById('scanner-filter-select');
+    const toggleWatchlist = document.getElementById('btn-toggle-watchlist');
+
+    function filterScannerRows() {
+      const query = searchInput ? searchInput.value.toLowerCase() : '';
+      const filter = filterSelect ? filterSelect.value : 'all';
+      
+      document.querySelectorAll('.scanner-row').forEach(row => {
+        const symbol = row.dataset.symbol.toLowerCase();
+        
+        const recEl = row.querySelector('td:nth-child(6)');
+        const rec = recEl ? recEl.textContent.trim().toLowerCase() : '';
+        
+        let matchesSearch = symbol.includes(query);
+        let matchesFilter = true;
+        if (filter === 'long' && rec !== 'long') matchesFilter = false;
+        if (filter === 'short' && rec !== 'short') matchesFilter = false;
+        if (filter === 'wait' && (rec !== 'wait' && rec !== 'hold')) matchesFilter = false;
+        
+        if (matchesSearch && matchesFilter) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+    }
+
+    if (searchInput) searchInput.addEventListener('input', filterScannerRows);
+    if (filterSelect) filterSelect.addEventListener('change', filterScannerRows);
+
+    let showingWatchlistOnly = false;
+    if (toggleWatchlist) {
+      toggleWatchlist.addEventListener('click', () => {
+        showingWatchlistOnly = !showingWatchlistOnly;
+        if (showingWatchlistOnly) {
+          toggleWatchlist.classList.add('active');
+          toggleWatchlist.style.background = 'rgba(59, 130, 246, 0.2)';
+          toggleWatchlist.style.borderColor = '#3b82f6';
+          toggleWatchlist.style.color = '#fff';
+        } else {
+          toggleWatchlist.classList.remove('active');
+          toggleWatchlist.style.background = '';
+          toggleWatchlist.style.borderColor = '';
+          toggleWatchlist.style.color = '';
+        }
+        
+        document.querySelectorAll('.scanner-row').forEach(row => {
+          const symbol = row.dataset.symbol;
+          const isWatchlisted = ['BTC', 'ETH'].includes(symbol);
+          if (showingWatchlistOnly && !isWatchlisted) {
+            row.style.display = 'none';
+          } else {
+            row.style.display = '';
+          }
+        });
+      });
+    }
   }
 
   // Legacy chart period buttons event listeners disabled
