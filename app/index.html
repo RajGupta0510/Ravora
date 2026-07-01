@@ -500,14 +500,14 @@
               <div class="scanner-table-wrapper" style="flex: 1; overflow-y: auto; width: 100%; box-sizing: border-box; margin-top: 4px;">
                 <table class="scanner-table" style="width: 100%; border-collapse: collapse;">
                   <thead>
-                    <tr style="display: none;">
-                      <th>Asset</th>
-                      <th>Price</th>
-                      <th>24h Chg</th>
-                      <th>Opp Score</th>
-                      <th>Conf</th>
-                      <th>Rec</th>
-                      <th>Trend</th>
+                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.06);">
+                      <th style="font-size: 0.62rem; color: var(--text-muted); padding: 6px 12px; font-weight: 700; text-transform: uppercase; text-align: left;">Asset</th>
+                      <th style="font-size: 0.62rem; color: var(--text-muted); padding: 6px 8px; font-weight: 700; text-transform: uppercase; text-align: right;">Price</th>
+                      <th style="font-size: 0.62rem; color: var(--text-muted); padding: 6px 8px; font-weight: 700; text-transform: uppercase; text-align: right;">24H</th>
+                      <th style="font-size: 0.62rem; color: var(--text-muted); padding: 6px 8px; font-weight: 700; text-transform: uppercase; text-align: center;">Score</th>
+                      <th style="font-size: 0.62rem; color: var(--text-muted); padding: 6px 8px; font-weight: 700; text-transform: uppercase; text-align: center;">Conf</th>
+                      <th style="font-size: 0.62rem; color: var(--text-muted); padding: 6px 8px; font-weight: 700; text-transform: uppercase; text-align: center;">Rec</th>
+                      <th style="font-size: 0.62rem; color: var(--text-muted); padding: 6px 12px; font-weight: 700; text-transform: uppercase; text-align: right;">Trend</th>
                     </tr>
                   </thead>
                   <tbody id="terminal-scanner-rows">
@@ -576,37 +576,43 @@
               </div>
               
               <!-- COMPACT PROFESSIONAL TOOLBAR (Height: 40px) -->
-              <div class="chart-toolbar" id="chart-toolbar" style="height: 40px; min-height: 40px; display: flex; align-items: center; justify-content: space-between; padding: 0 12px; background: rgba(255,255,255,0.005); border-bottom: 1px solid rgba(255,255,255,0.06); flex-shrink: 0; box-sizing: border-box; width: 100%;">
-                <div style="display: flex; align-items: center; gap: 10px;">
-                  <!-- Timeframes Group -->
-                  <div class="toolbar-group" style="display: flex; gap: 4px;">
-                    <button class="toolbar-btn" id="tf-1m" data-tf="1m" style="padding: 3px 8px; font-size: 0.68rem; font-weight: 600;">1m</button>
-                    <button class="toolbar-btn" id="tf-5m" data-tf="5m" style="padding: 3px 8px; font-size: 0.68rem; font-weight: 600;">5m</button>
-                    <button class="toolbar-btn" id="tf-15m" data-tf="15m" style="padding: 3px 8px; font-size: 0.68rem; font-weight: 600;">15m</button>
-                    <button class="toolbar-btn" id="tf-1h" data-tf="1H" style="padding: 3px 8px; font-size: 0.68rem; font-weight: 600;">1H</button>
-                    <button class="toolbar-btn" id="tf-4h" data-tf="4H" style="padding: 3px 8px; font-size: 0.68rem; font-weight: 600;">4H</button>
-                    <button class="toolbar-btn active" id="tf-1d" data-tf="1D" style="padding: 3px 8px; font-size: 0.68rem; font-weight: 600;">1D</button>
-                  </div>
-                  
-                  <div class="toolbar-separator" style="width: 1px; height: 16px; background: rgba(255,255,255,0.08); margin: 0 4px;"></div>
-                  
-                  <!-- Overlays Toggles -->
-                  <div class="toolbar-group overlay-toggles" id="overlay-toggles" style="display: flex; gap: 6px;">
-                    <button class="toolbar-toggle-btn active" data-overlay="targets" style="padding: 3px 8px; font-size: 0.68rem; font-weight: 600;" title="Toggle Entry/TP/SL Targets">Targets</button>
-                    <button class="toolbar-toggle-btn active" data-overlay="sr" style="padding: 3px 8px; font-size: 0.68rem; font-weight: 600;" title="Toggle Support & Resistance">S&R</button>
-                    <button class="toolbar-toggle-btn active" data-overlay="zones" style="padding: 3px 8px; font-size: 0.68rem; font-weight: 600;" title="Toggle AI Market Zones">Zones</button>
-                    <button class="toolbar-toggle-btn active" data-overlay="patterns" style="padding: 3px 8px; font-size: 0.68rem; font-weight: 600;" title="Toggle Pattern Flags">Patterns</button>
-                  </div>
+              <div class="chart-toolbar" id="chart-toolbar" style="height: 40px; min-height: 40px; display: flex; align-items: center; justify-content: flex-start; padding: 0 12px; background: rgba(255,255,255,0.005); border-bottom: 1px solid rgba(255,255,255,0.06); flex-shrink: 0; box-sizing: border-box; width: 100%; gap: 10px;">
+                <!-- 1. Timeframes Group -->
+                <div class="toolbar-group" style="display: flex; gap: 4px;">
+                  <button class="toolbar-btn" id="tf-1m" data-tf="1m" style="padding: 3px 8px; font-size: 0.68rem; font-weight: 600;">1m</button>
+                  <button class="toolbar-btn" id="tf-5m" data-tf="5m" style="padding: 3px 8px; font-size: 0.68rem; font-weight: 600;">5m</button>
+                  <button class="toolbar-btn" id="tf-15m" data-tf="15m" style="padding: 3px 8px; font-size: 0.68rem; font-weight: 600;">15m</button>
+                  <button class="toolbar-btn" id="tf-1h" data-tf="1H" style="padding: 3px 8px; font-size: 0.68rem; font-weight: 600;">1H</button>
+                  <button class="toolbar-btn" id="tf-4h" data-tf="4H" style="padding: 3px 8px; font-size: 0.68rem; font-weight: 600;">4H</button>
+                  <button class="toolbar-btn active" id="tf-1d" data-tf="1D" style="padding: 3px 8px; font-size: 0.68rem; font-weight: 600;">1D</button>
                 </div>
                 
-                <!-- Utility buttons group -->
-                <div style="display: flex; align-items: center; gap: 8px;">
+                <div class="toolbar-separator" style="width: 1px; height: 16px; background: rgba(255,255,255,0.08); margin: 0 2px;"></div>
+                
+                <!-- 2. Indicators & Drawing Tools Group -->
+                <div class="toolbar-group" style="display: flex; gap: 6px; align-items: center;">
                   <button class="toolbar-btn" id="btn-indicators" title="Indicators" style="padding: 4px; display: flex; align-items: center; justify-content: center; background: transparent; border: none; cursor: pointer; color: var(--text-secondary);" disabled>
                     <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-4 6h-2v2h2v-2zm-4 4H9v2h2v-2zm4 0h-2v2h2v-2zm-8 4h2v-2H7v2zm4 0h2v-2h-2v2zm4 0h2v-2h-2v2zm4 0h2v-2h-2v2zm0-4h-2v2h2v-2zm0-4h-2v2h2v-2zm-8-4H9v2h2V5zm4 0h-2v2h2V5z"/></svg>
                   </button>
                   <button class="toolbar-btn" id="btn-drawings" title="Drawing Tools" style="padding: 4px; display: flex; align-items: center; justify-content: center; background: transparent; border: none; cursor: pointer; color: var(--text-secondary);" disabled>
                     <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
                   </button>
+                </div>
+                
+                <div class="toolbar-separator" style="width: 1px; height: 16px; background: rgba(255,255,255,0.08); margin: 0 2px;"></div>
+                
+                <!-- 3. AI Overlays Toggles Group -->
+                <div class="toolbar-group overlay-toggles" id="overlay-toggles" style="display: flex; gap: 6px;">
+                  <button class="toolbar-toggle-btn active" data-overlay="targets" style="padding: 3px 8px; font-size: 0.68rem; font-weight: 600;" title="Toggle Entry/TP/SL Targets">Targets</button>
+                  <button class="toolbar-toggle-btn active" data-overlay="sr" style="padding: 3px 8px; font-size: 0.68rem; font-weight: 600;" title="Toggle Support & Resistance">S&R</button>
+                  <button class="toolbar-toggle-btn active" data-overlay="zones" style="padding: 3px 8px; font-size: 0.68rem; font-weight: 600;" title="Toggle AI Market Zones">Zones</button>
+                  <button class="toolbar-toggle-btn active" data-overlay="patterns" style="padding: 3px 8px; font-size: 0.68rem; font-weight: 600;" title="Toggle Pattern Flags">Patterns</button>
+                </div>
+                
+                <div class="toolbar-separator" style="width: 1px; height: 16px; background: rgba(255,255,255,0.08); margin: 0 2px; margin-left: auto;"></div>
+                
+                <!-- 4. Chart Actions Group (Align Right) -->
+                <div class="toolbar-group" style="display: flex; gap: 8px;">
                   <button class="toolbar-btn" id="btn-reset-chart" title="Reset View" style="padding: 4px; display: flex; align-items: center; justify-content: center; background: transparent; border: none; cursor: pointer; color: var(--text-secondary);">
                     <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
                   </button>
@@ -693,6 +699,12 @@
                   </div>
                 </div>
                 
+                <!-- NEXT AI REVIEW COUNTDOWN -->
+                <div style="display: flex; justify-content: space-between; font-size: 0.62rem; color: var(--text-muted); margin-bottom: 4px; border-bottom: 1px solid rgba(255,255,255,0.04); padding-bottom: 6px; width: 100%; box-sizing: border-box;">
+                  <span>Last Scan: <strong id="timeline-data-refreshed" style="color: #fff;">0 seconds ago</strong></span>
+                  <span>Next AI Review: <strong id="timeline-next-analysis" style="color: var(--accent);">In 30 seconds</strong></span>
+                </div>
+                
                 <!-- SECTION 2: WHY THIS TRADE? -->
                 <div class="analysis-section" style="flex-shrink: 0; width: 100%; box-sizing: border-box;">
                   <h6 style="margin: 0 0 6px 0; font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700;">Why This Trade?</h6>
@@ -709,6 +721,7 @@
                       <!-- Filled by JS -->
                     </div>
                   </div>
+                </div>
                 <!-- SECTION 4: EXECUTION PLAN -->
                 <div class="analysis-section" style="border-top: 1px solid rgba(255,255,255,0.06); padding-top: 12px; width: 100%; box-sizing: border-box; flex-shrink: 0;">
                   <h6 style="margin: 0 0 10px 0; font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700;">Execution Plan</h6>
@@ -896,26 +909,8 @@
               <div class="tab-content-wrapper" style="flex: 1; overflow-y: auto; padding: 12px 16px; box-sizing: border-box; width: 100%;">
                 <!-- Positions Content -->
                 <div class="tab-content active" id="tab-active-positions" style="display: block;">
-                  <div class="positions-table-wrapper">
-                    <table class="positions-table">
-                      <thead>
-                        <tr>
-                          <th>Asset</th>
-                          <th>Direction</th>
-                          <th>Entry Price</th>
-                          <th>Current Price</th>
-                          <th>Position Size</th>
-                          <th>Leverage</th>
-                          <th>Unrealized P&L</th>
-                          <th>Duration</th>
-                          <th>Current Status</th>
-                          <th>Action</th>
-                        </tr>
-                      </thead>
-                      <tbody id="terminal-positions-rows">
-                        <!-- Filled by JS -->
-                      </tbody>
-                    </table>
+                  <div id="terminal-positions-cards-list" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; width: 100%;">
+                    <!-- Filled dynamically by JS -->
                   </div>
                 </div>
                 
@@ -929,27 +924,8 @@
                 
                 <!-- History Content -->
                 <div class="tab-content" id="tab-closed-history" style="display: none;">
-                  <div class="positions-table-wrapper">
-                    <table class="positions-table">
-                      <thead>
-                        <tr>
-                          <th>Date</th>
-                          <th>Asset</th>
-                          <th>Direction</th>
-                          <th>Entry</th>
-                          <th>Exit</th>
-                          <th>Profit/Loss</th>
-                          <th>Duration</th>
-                          <th>Close Reason</th>
-                          <th>Outcome</th>
-                          <th>Confidence</th>
-                          <th>Score</th>
-                        </tr>
-                      </thead>
-                      <tbody id="terminal-history-rows">
-                        <!-- Filled by JS -->
-                      </tbody>
-                    </table>
+                  <div id="terminal-history-cards-list" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; width: 100%;">
+                    <!-- Filled dynamically by JS -->
                   </div>
                 </div>
                 
@@ -1190,93 +1166,240 @@
            5. PORTFOLIO INTELLIGENCE VIEW
            ==================================================================== -->
         <section class="app-view-panel" id="view-portfolio">
-          <div class="portfolio-grid-container">
+          <!-- 1. Top Summary Bar -->
+          <div class="portfolio-summary-bar" style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 16px; margin-bottom: 24px;">
             
-            <!-- Left Side: Holdings Distribution -->
-            <div class="card-glass portfolio-holdings-card">
-              <h4>Current Asset Holdings</h4>
-              <div class="holdings-table-container">
-                <table class="holdings-table">
-                  <thead>
-                    <tr>
-                      <th>Asset</th>
-                      <th>Allocation</th>
-                      <th>Balance</th>
-                      <th>Avg Entry</th>
-                      <th>24h Change</th>
-                    </tr>
-                  </thead>
-                  <tbody id="portfolio-holdings-rows">
-                    <!-- Holdings rows are injected dynamically -->
-                  </tbody>
-                </table>
+            <div class="card-glass summary-compact-card" style="padding: 14px 18px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); text-align: left; background: rgba(14,19,37,0.4);">
+              <span style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; display: block; margin-bottom: 4px;">Portfolio Value</span>
+              <strong id="port-summary-value" style="font-size: 1.35rem; color: #fff; font-family: var(--font-display); font-weight: 700;">$132,194.10</strong>
+            </div>
+            
+            <div class="card-glass summary-compact-card" style="padding: 14px 18px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); text-align: left; background: rgba(14,19,37,0.4);">
+              <span style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; display: block; margin-bottom: 4px;">Today's P&L</span>
+              <strong id="port-summary-today-pnl" class="text-green" style="font-size: 1.35rem; font-family: var(--font-display); font-weight: 700;">+$1,240.50</strong>
+            </div>
+
+            <div class="card-glass summary-compact-card" style="padding: 14px 18px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); text-align: left; background: rgba(14,19,37,0.4);">
+              <span style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; display: block; margin-bottom: 4px;">Total Return</span>
+              <strong id="port-summary-total-pnl" class="text-green" style="font-size: 1.35rem; font-family: var(--font-display); font-weight: 700;">+$10,194.10</strong>
+            </div>
+
+            <div class="card-glass summary-compact-card" style="padding: 14px 18px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); text-align: left; background: rgba(14,19,37,0.4);">
+              <span style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; display: block; margin-bottom: 4px;">Win Rate</span>
+              <strong id="port-summary-winrate" style="font-size: 1.35rem; color: #fff; font-family: var(--font-display); font-weight: 700;">78.4%</strong>
+            </div>
+
+            <div class="card-glass summary-compact-card" style="padding: 14px 18px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); text-align: left; background: rgba(14,19,37,0.4);">
+              <span style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; display: block; margin-bottom: 4px;">Active Positions</span>
+              <strong id="port-summary-open-count" style="font-size: 1.35rem; color: #fff; font-family: var(--font-display); font-weight: 700;">3 Trades</strong>
+            </div>
+
+            <div class="card-glass summary-compact-card" style="padding: 14px 18px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); text-align: left; background: rgba(14,19,37,0.4);">
+              <span style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; display: block; margin-bottom: 4px;">Available Cash</span>
+              <strong id="port-summary-balance" style="font-size: 1.35rem; color: #fff; font-family: var(--font-display); font-weight: 700;">$39,600.00</strong>
+            </div>
+
+          </div>
+
+          <!-- 2. Portfolio Secondary Tabs Navigation -->
+          <div class="portfolio-sub-nav" style="display: flex; gap: 8px; border-bottom: 1px solid var(--border); padding-bottom: 1px; margin-bottom: 24px; overflow-x: auto;">
+            <button class="port-sub-tab active" data-tab="active-positions" style="background: none; border: none; padding: 10px 16px; color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; white-space: nowrap;">Active Positions</button>
+            <button class="port-sub-tab" data-tab="closed-trades" style="background: none; border: none; padding: 10px 16px; color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; white-space: nowrap;">Closed Trades</button>
+            <button class="port-sub-tab" data-tab="holdings" style="background: none; border: none; padding: 10px 16px; color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; white-space: nowrap;">Holdings & Diversification</button>
+            <button class="port-sub-tab" data-tab="insights" style="background: none; border: none; padding: 10px 16px; color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; white-space: nowrap;">Portfolio Insights</button>
+            <button class="port-sub-tab" data-tab="ledger" style="background: none; border: none; padding: 10px 16px; color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; white-space: nowrap;">Transaction History</button>
+          </div>
+
+          <!-- 3. Portfolio Sub-Views Container -->
+          <div class="portfolio-sub-views-wrapper">
+            
+            <!-- SUB-VIEW 1: ACTIVE POSITIONS -->
+            <div class="port-sub-view active" id="port-view-active-positions">
+              <div id="port-empty-positions" class="port-empty-state-container" style="display: none; padding: 60px 40px; text-align: center;">
+                <div style="font-size: 3rem; margin-bottom: 16px;">🔍</div>
+                <h4 style="color: #fff; margin-bottom: 8px; font-size: 1.15rem; font-family: var(--font-display);">No Active Positions</h4>
+                <p style="color: var(--text-secondary); font-size: 0.88rem; max-width: 400px; margin: 0 auto 20px auto; line-height: 1.5;">You do not have any open trades in your simulated paper portfolio. Araiven is ready to scan opportunities.</p>
+                <button class="btn btn-primary btn-onboard-start-scan" style="font-size: 0.85rem; font-weight: 600; padding: 8px 20px;">Scan Markets Now</button>
+              </div>
+
+              <div class="positions-cards-container" id="port-positions-cards-list" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+                <!-- Positions cards are injected dynamically -->
               </div>
             </div>
 
-            <!-- Right Side: Distribution visual charts -->
-            <div class="portfolio-visuals-col">
-              
-              <!-- Allocation Donut Chart -->
-              <div class="card-glass allocation-donut-card">
-                <h4>Asset Diversification</h4>
-                <div class="donut-chart-container">
-                  <svg class="donut-svg" viewBox="0 0 200 200">
-                    <circle cx="100" cy="100" r="70" fill="none" stroke="rgba(255,255,255,0.02)" stroke-width="20"/>
-                    <!-- Donut segments -->
-                    <circle cx="100" cy="100" r="70" class="donut-seg donut-eth" stroke="#2563eb" stroke-width="20" stroke-dasharray="197.9 439.8" stroke-dashoffset="109.9"/>
-                    <circle cx="100" cy="100" r="70" class="donut-seg donut-usdc" stroke="#10b981" stroke-width="20" stroke-dasharray="131.9 439.8" stroke-dashoffset="-88"/>
-                    <circle cx="100" cy="100" r="70" class="donut-seg donut-btc" stroke="#6366f1" stroke-width="20" stroke-dasharray="87.9 439.8" stroke-dashoffset="-219.9"/>
-                    <circle cx="100" cy="100" r="70" class="donut-seg donut-cash" stroke="#475569" stroke-width="20" stroke-dasharray="22 439.8" stroke-dashoffset="-307.8"/>
-                  </svg>
-                  <div class="donut-inner-metrics">
-                    <span class="donut-label">Total Assets</span>
-                    <strong class="donut-val">$132,194.10</strong>
-                  </div>
-                </div>
-                <div class="donut-legend">
-                  <div class="legend-item"><span class="legend-dot" style="background:#2563eb;"></span><span>ETH (45%)</span></div>
-                  <div class="legend-item"><span class="legend-dot" style="background:#10b981;"></span><span>USDC (30%)</span></div>
-                  <div class="legend-item"><span class="legend-dot" style="background:#6366f1;"></span><span>BTC (20%)</span></div>
-                  <div class="legend-item"><span class="legend-dot" style="background:#475569;"></span><span>Cash (5%)</span></div>
-                </div>
+            <!-- SUB-VIEW 2: CLOSED TRADES -->
+            <div class="port-sub-view" id="port-view-closed-trades" style="display: none;">
+              <div id="port-empty-closed" class="port-empty-state-container" style="display: none; padding: 60px 40px; text-align: center;">
+                <div style="font-size: 3rem; margin-bottom: 16px;">📁</div>
+                <h4 style="color: #fff; margin-bottom: 8px; font-size: 1.15rem; font-family: var(--font-display);">No Closed Trades</h4>
+                <p style="color: var(--text-secondary); font-size: 0.88rem; max-width: 400px; margin: 0 auto 20px auto; line-height: 1.5;">You haven't completed any trades yet. Deploy an opportunity from the scan queue to build history.</p>
+                <button class="btn btn-primary btn-onboard-start-scan" style="font-size: 0.85rem; font-weight: 600; padding: 8px 20px;">Scan Markets</button>
               </div>
 
-              <!-- Risk Mitigation Status -->
-              <div class="card-glass risk-intelligence-card">
-                <h4>Drawdown Safety Guard</h4>
-                <p class="risk-desc-txt">Araiven evaluates correlation matrix dependencies hourly. Current stance details:</p>
-                <div class="risk-meter-container">
-                  <div class="risk-meter-track">
-                    <div class="risk-meter-fill" id="portfolio-risk-meter-fill" style="width: 42%;"></div>
-                  </div>
-                  <div class="risk-meter-labels">
-                    <span>Conservative (18)</span>
-                    <span class="active-val" id="portfolio-active-risk">Balanced (42)</span>
-                    <span>Aggressive (78)</span>
-                  </div>
-                </div>
-                <div class="risk-guards-feed">
-                  <div class="guard-alert-item success">
-                    <span class="guard-icon">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="width: 12px; height: 12px;"><polyline points="20 6 9 17 4 12"/></svg>
-                    </span>
-                    <div>
-                      <h5>Exchange API Connections Secured</h5>
-                      <p>Read/Write trade API enabled. Withdrawal credentials disabled (Fully Protected).</p>
-                    </div>
-                  </div>
-                  <div class="guard-alert-item active">
-                    <span class="guard-icon">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                    </span>
-                    <div>
-                      <h5>Auto-Hedging Stated</h5>
-                      <p>If drawdown exceeds 3.50%, active exposure indices rotate into Stable baskets.</p>
-                    </div>
-                  </div>
+              <div class="card-glass" id="port-closed-trades-panel" style="padding: 0; border-radius: 12px; overflow: hidden;">
+                <div class="holdings-table-container">
+                  <table class="table-ds holdings-table" style="width: 100%; margin: 0;">
+                    <thead>
+                      <tr>
+                        <th>Closed Time</th>
+                        <th>Asset</th>
+                        <th>Direction</th>
+                        <th>Entry Price</th>
+                        <th>Exit Price</th>
+                        <th>Profit/Loss</th>
+                        <th>Holding Time</th>
+                        <th>Exit Reason</th>
+                        <th>AI Confidence</th>
+                        <th>Setup Score</th>
+                      </tr>
+                    </thead>
+                    <tbody id="port-closed-trades-rows">
+                      <!-- Closed trades injected dynamically -->
+                    </tbody>
+                  </table>
                 </div>
               </div>
+            </div>
 
+            <!-- SUB-VIEW 3: HOLDINGS & DIVERSIFICATION -->
+            <div class="port-sub-view" id="port-view-holdings" style="display: none;">
+              <div class="portfolio-grid-container" style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 24px;">
+                
+                <!-- Left Side: Holdings Distribution -->
+                <div class="card-glass portfolio-holdings-card" style="padding: 24px; border-radius: 16px;">
+                  <h4 style="margin-bottom: 16px; color: #fff;">Current Asset Holdings</h4>
+                  <div class="holdings-table-container" style="overflow-x: auto;">
+                    <table class="holdings-table" style="width: 100%;">
+                      <thead>
+                        <tr>
+                          <th>Asset</th>
+                          <th>Allocation</th>
+                          <th>Balance</th>
+                          <th>Avg Entry</th>
+                          <th>24h Change</th>
+                        </tr>
+                      </thead>
+                      <tbody id="portfolio-holdings-rows">
+                        <!-- Holdings rows injected dynamically -->
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                
+                <!-- Right Side: Diversification visual Donut -->
+                <div class="card-glass allocation-donut-card" style="padding: 24px; border-radius: 16px;">
+                  <h4 style="margin-bottom: 16px; color: #fff;">Asset Diversification</h4>
+                  <div class="donut-chart-container" style="display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative;">
+                    <svg class="donut-svg" viewBox="0 0 200 200" style="width: 160px; height: 160px;">
+                      <circle cx="100" cy="100" r="70" fill="none" stroke="rgba(255,255,255,0.02)" stroke-width="20"/>
+                      <!-- Donut segments -->
+                      <circle cx="100" cy="100" r="70" class="donut-seg donut-eth" stroke="#2563eb" stroke-width="20" stroke-dasharray="197.9 439.8" stroke-dashoffset="109.9"/>
+                      <circle cx="100" cy="100" r="70" class="donut-seg donut-usdc" stroke="#10b981" stroke-width="20" stroke-dasharray="131.9 439.8" stroke-dashoffset="-88"/>
+                      <circle cx="100" cy="100" r="70" class="donut-seg donut-btc" stroke="#6366f1" stroke-width="20" stroke-dasharray="87.9 439.8" stroke-dashoffset="-219.9"/>
+                      <circle cx="100" cy="100" r="70" class="donut-seg donut-cash" stroke="#475569" stroke-width="20" stroke-dasharray="22 439.8" stroke-dashoffset="-307.8"/>
+                    </svg>
+                    <div class="donut-inner-metrics" style="position: absolute; display: flex; flex-direction: column; align-items: center; justify-content: center; transform: translate(-50%, -50%); left: 50%; top: 50%;">
+                      <span class="donut-label" style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase;">Total Assets</span>
+                      <strong class="donut-val" style="font-size: 1.15rem; color: #fff; font-weight: 700;">$132,194</strong>
+                    </div>
+                  </div>
+                  <div class="donut-legend" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 20px; font-size: 0.78rem;">
+                    <div class="legend-item" style="display: flex; align-items: center; gap: 6px;"><span class="legend-dot" style="background:#2563eb; width:8px; height:8px; border-radius:50%;"></span><span>ETH (45%)</span></div>
+                    <div class="legend-item" style="display: flex; align-items: center; gap: 6px;"><span class="legend-dot" style="background:#10b981; width:8px; height:8px; border-radius:50%;"></span><span>USDC (30%)</span></div>
+                    <div class="legend-item" style="display: flex; align-items: center; gap: 6px;"><span class="legend-dot" style="background:#6366f1; width:8px; height:8px; border-radius:50%;"></span><span>BTC (20%)</span></div>
+                    <div class="legend-item" style="display: flex; align-items: center; gap: 6px;"><span class="legend-dot" style="background:#475569; width:8px; height:8px; border-radius:50%;"></span><span>Cash (5%)</span></div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- SUB-VIEW 4: PORTFOLIO INSIGHTS -->
+            <div class="port-sub-view" id="port-view-insights" style="display: none;">
+              <div class="insights-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
+                
+                <div class="card-glass insight-card" style="padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.06); text-align: left;">
+                  <div style="font-size: 1.5rem; margin-bottom: 10px;">🏆</div>
+                  <h5 style="color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; margin-bottom: 4px; font-weight: 600;">Best Performing Asset</h5>
+                  <strong id="insight-best-asset" style="font-size: 1.2rem; color: #fff; display: block;">BTC (+12.4% yield)</strong>
+                  <span style="font-size: 0.72rem; color: var(--text-muted); margin-top: 4px; display: block;">Contributed 42% of total capital profits</span>
+                </div>
+
+                <div class="card-glass insight-card" style="padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.06); text-align: left;">
+                  <div style="font-size: 1.5rem; margin-bottom: 10px;">📉</div>
+                  <h5 style="color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; margin-bottom: 4px; font-weight: 600;">Worst Trade Exposure</h5>
+                  <strong id="insight-worst-trade" style="font-size: 1.2rem; color: var(--text-secondary); display: block;">SUI (-1.80% manual close)</strong>
+                  <span style="font-size: 0.72rem; color: var(--text-muted); margin-top: 4px; display: block;">Loss mitigated by Araiven Stop Loss ladders</span>
+                </div>
+
+                <div class="card-glass insight-card" style="padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.06); text-align: left;">
+                  <div style="font-size: 1.5rem; margin-bottom: 10px;">⏱️</div>
+                  <h5 style="color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; margin-bottom: 4px; font-weight: 600;">Average Holding Time</h5>
+                  <strong id="insight-holding-time" style="font-size: 1.2rem; color: #fff; display: block;">1d 14h 22m</strong>
+                  <span style="font-size: 0.72rem; color: var(--text-muted); margin-top: 4px; display: block;">Perfect fit for Swing trading profiles</span>
+                </div>
+
+                <div class="card-glass insight-card" style="padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.06); text-align: left;">
+                  <div style="font-size: 1.5rem; margin-bottom: 10px;">⚖️</div>
+                  <h5 style="color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; margin-bottom: 4px; font-weight: 600;">Win/Loss Ratio</h5>
+                  <strong id="insight-winloss-ratio" style="font-size: 1.2rem; color: #fff; display: block;">4.2 (Win to Loss Factor)</strong>
+                  <span style="font-size: 0.72rem; color: var(--text-muted); margin-top: 4px; display: block;">Calculated over completed paper setups</span>
+                </div>
+
+                <div class="card-glass insight-card" style="padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.06); text-align: left;">
+                  <div style="font-size: 1.5rem; margin-bottom: 10px;">🔥</div>
+                  <h5 style="color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; margin-bottom: 4px; font-weight: 600;">Most Traded Asset</h5>
+                  <strong id="insight-most-traded" style="font-size: 1.2rem; color: #fff; display: block;">ETH (8 Transactions)</strong>
+                  <span style="font-size: 0.72rem; color: var(--text-muted); margin-top: 4px; display: block;">Highly active correlation spreads scanned</span>
+                </div>
+
+                <div class="card-glass insight-card" style="padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.06); text-align: left;">
+                  <div style="font-size: 1.5rem; margin-bottom: 10px;">🛡️</div>
+                  <h5 style="color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; margin-bottom: 4px; font-weight: 600;">Risk Distribution</h5>
+                  <strong id="insight-risk-level" style="font-size: 1.2rem; color: #fff; display: block;">Balanced (100% compliant)</strong>
+                  <span style="font-size: 0.72rem; color: var(--text-muted); margin-top: 4px; display: block;">0 protective guard rule breaches detected</span>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- SUB-VIEW 5: TRANSACTION HISTORY LEDGER -->
+            <div class="port-sub-view" id="port-view-ledger" style="display: none;">
+              <div class="card-glass" style="padding: 24px; border-radius: 16px;">
+                <div class="card-header-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+                  <h4 style="color: #fff; margin: 0;">Historical Transaction Ledger</h4>
+                  
+                  <div style="display: flex; gap: 10px;" class="ledger-actions-group">
+                    <input type="text" class="search-input" placeholder="Search transactions..." id="ledger-search" style="padding: 8px 12px; font-size: 0.8rem; background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 6px; color:#fff; width: 200px;">
+                    <select id="ledger-type-filter" style="padding: 8px 12px; font-size: 0.8rem; background: rgba(14,19,37,0.8); border: 1px solid var(--border); border-radius: 6px; color:#fff; cursor: pointer;">
+                      <option value="all">All Types</option>
+                      <option value="buy">BUY</option>
+                      <option value="sell">SELL</option>
+                      <option value="fee">FEES</option>
+                    </select>
+                    <button class="btn btn-secondary btn-sm" id="btn-ledger-export" style="font-size:0.8rem; font-weight:600;">Export CSV</button>
+                  </div>
+                </div>
+
+                <div class="holdings-table-container">
+                  <table class="table-ds holdings-table" style="width: 100%; margin: 0;">
+                    <thead>
+                      <tr>
+                        <th>Timestamp</th>
+                        <th>Type</th>
+                        <th>Asset</th>
+                        <th>Amount</th>
+                        <th>Price</th>
+                        <th>Fee</th>
+                        <th>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody id="port-ledger-rows">
+                      <!-- History transactions injected dynamically -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
             </div>
 
           </div>
@@ -1286,28 +1409,37 @@
            6. TRADE HISTORY VIEW
            ==================================================================== -->
         <section class="app-view-panel" id="view-history">
-          <div class="card-glass history-table-card">
-            <div class="card-header-row">
-              <h4>Historical Transaction Ledger</h4>
-              <div class="search-box">
-                <input type="text" class="search-input" placeholder="Search transactions..." id="history-search">
+          <div class="card-glass" style="padding: 24px; border-radius: 16px;">
+            <div class="card-header-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+              <h4 style="color: #fff; margin: 0;">Historical Transaction Ledger</h4>
+              
+              <div style="display: flex; gap: 10px;" class="ledger-actions-group">
+                <input type="text" class="search-input" placeholder="Search transactions..." id="history-search" style="padding: 8px 12px; font-size: 0.8rem; background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 6px; color:#fff; width: 200px;">
+                <select id="history-type-filter" style="padding: 8px 12px; font-size: 0.8rem; background: rgba(14,19,37,0.8); border: 1px solid var(--border); border-radius: 6px; color:#fff; cursor: pointer;">
+                  <option value="all">All Types</option>
+                  <option value="buy">BUY</option>
+                  <option value="sell">SELL</option>
+                  <option value="fee">FEES</option>
+                </select>
+                <button class="btn btn-secondary btn-sm" id="btn-history-export" style="font-size:0.8rem; font-weight:600;">Export CSV</button>
               </div>
             </div>
+
             <div class="history-table-container">
-              <table class="history-table">
+              <table class="table-ds holdings-table" style="width: 100%; margin: 0;">
                 <thead>
                   <tr>
                     <th>Timestamp</th>
-                    <th>Transaction Type</th>
-                    <th>Asset Detail</th>
+                    <th>Type</th>
+                    <th>Asset</th>
                     <th>Amount</th>
-                    <th>Cleared Price</th>
-                    <th>Execution fee</th>
+                    <th>Price</th>
+                    <th>Fee</th>
                     <th>Status</th>
                   </tr>
                 </thead>
                 <tbody id="history-rows-container">
-                  <!-- History transactions are injected dynamically -->
+                  <!-- History transactions injected dynamically -->
                 </tbody>
               </table>
             </div>

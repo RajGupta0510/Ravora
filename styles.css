@@ -6433,7 +6433,7 @@ h2 {
    ========================================================================== */
 .terminal-layout-grid {
   display: grid;
-  grid-template-columns: 420px 1fr 340px;
+  grid-template-columns: 340px 1fr 330px;
   gap: 16px;
   align-items: start;
   width: 100%;
@@ -7156,7 +7156,7 @@ h2 {
 /* Workspace Grid structure */
 .terminal-layout-grid {
   display: grid !important;
-  grid-template-columns: 18% 57% 25% !important;
+  grid-template-columns: 24% 53% 23% !important;
   grid-template-rows: auto auto !important;
   gap: 16px !important;
   width: 100% !important;
@@ -7955,5 +7955,92 @@ h2 {
   }
   .onboarding-footer {
     margin-top: 20px !important;
+  }
+}
+
+/* ==========================================================================
+   Portfolio Redesign Custom Styles
+   ========================================================================== */
+.port-sub-tab.active {
+  color: #fff !important;
+  border-bottom-color: var(--accent-primary) !important;
+  background: rgba(124, 58, 237, 0.04) !important;
+}
+
+.port-sub-tab:hover {
+  color: #fff !important;
+  background: rgba(255, 255, 255, 0.02) !important;
+}
+
+.position-card-modern {
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.position-card-modern:hover {
+  border-color: rgba(124, 58, 237, 0.25) !important;
+  box-shadow: 0 8px 30px rgba(124, 58, 237, 0.06);
+  transform: translateY(-2px);
+}
+
+.insight-card {
+  transition: all 0.2s ease;
+}
+
+.insight-card:hover {
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  background: rgba(255, 255, 255, 0.02) !important;
+}
+
+.closed-trade-row {
+  transition: background 0.15s ease;
+}
+
+.closed-trade-row:hover td {
+  background: rgba(255, 255, 255, 0.01) !important;
+  color: #fff !important;
+}
+
+/* Portfolio sub-views mobile adjustments */
+@media (max-width: 992px) {
+  .portfolio-summary-bar {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+  #port-positions-cards-list {
+    grid-template-columns: 1fr !important;
+  }
+  .insights-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .portfolio-summary-bar {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px !important;
+  }
+  .ledger-actions-group {
+    width: 100%;
+    flex-direction: column;
+  }
+  .ledger-actions-group input, .ledger-actions-group select, .ledger-actions-group button {
+    width: 100% !important;
+  }
+}
+
+/* Trading Workspace responsive grid overrides */
+@media (max-width: 1280px) {
+  .terminal-layout-grid {
+    grid-template-columns: 1fr !important;
+  }
+  #terminal-positions-cards-list,
+  #terminal-history-cards-list {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+@media (max-width: 768px) {
+  #terminal-positions-cards-list,
+  #terminal-history-cards-list {
+    grid-template-columns: 1fr !important;
   }
 }

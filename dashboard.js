@@ -1741,6 +1741,9 @@ document.addEventListener('DOMContentLoaded', () => {
       if (pRiskMeter) {
         pRiskMeter.style.width = state.profile.riskLevel === 0 ? '18%' : (state.profile.riskLevel === 1 ? '42%' : '78%');
       }
+      refreshPortfolioSubViews();
+    } else if (screenId === 'history') {
+      renderTradeHistoryRowsLocal();
     } else if (screenId === 'notifications') {
       // Mark notifications read on the backend
       apiCall('/notifications/read', { method: 'POST' }).then(() => {
@@ -2321,28 +2324,31 @@ document.addEventListener('DOMContentLoaded', () => {
         const watchColor = isWatch ? '#fbbf24' : 'var(--text-secondary)';
 
         tr.innerHTML = `
-          <td style="padding: 0 12px; height: 56px; border-bottom: none;">
+          <td style="padding: 6px 12px; border-bottom: none;">
             <div style="display: flex; align-items: center; gap: 8px;">
-              <span style="font-size: 1.15rem; width: 20px; text-align: center; color: var(--accent);">${icon}</span>
+              <span style="font-size: 1rem; width: 18px; text-align: center; color: var(--accent);">${icon}</span>
               <div>
-                <strong style="font-size: 0.85rem; color: #fff; display: block;">${ad.symbol}</strong>
-                <span style="font-size: 0.62rem; color: var(--text-muted); display: block; max-width: 60px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${ad.name}</span>
+                <strong style="font-size: 0.78rem; color: #fff; display: block;">${ad.symbol}</strong>
+                <span style="font-size: 0.58rem; color: var(--text-muted); display: block; max-width: 60px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${ad.name}</span>
               </div>
             </div>
           </td>
-          <td style="padding: 0 8px; height: 56px; text-align: right; border-bottom: none;">
-            <span style="font-size: 0.8rem; font-weight: 600; color: #fff;">$${priceFormatted}</span>
+          <td style="padding: 6px 8px; text-align: right; border-bottom: none;">
+            <span style="font-size: 0.78rem; font-weight: 600; color: #fff;">$${priceFormatted}</span>
           </td>
-          <td style="padding: 0 8px; height: 56px; text-align: right; border-bottom: none;">
-            <span class="${changeClass}" style="font-size: 0.72rem; font-weight: 600;">${changeSign}${ad.change24h.toFixed(2)}%</span>
+          <td style="padding: 6px 8px; text-align: right; border-bottom: none;">
+            <span class="${changeClass}" style="font-size: 0.7rem; font-weight: 600;">${changeSign}${ad.change24h.toFixed(2)}%</span>
           </td>
-          <td style="padding: 0 8px; height: 56px; text-align: center; border-bottom: none;">
-            <span style="display: inline-block; padding: 2px 6px; border-radius: 4px; font-weight: 700; background: rgba(99,102,241,0.08); color: #a5b4fc; font-size: 0.68rem;">${ad.oppScore}</span>
+          <td style="padding: 6px 8px; text-align: center; border-bottom: none;">
+            <span style="display: inline-block; padding: 2px 5px; border-radius: 4px; font-weight: 700; background: rgba(99,102,241,0.08); color: #a5b4fc; font-size: 0.65rem;">${ad.oppScore}</span>
           </td>
-          <td style="padding: 0 8px; height: 56px; text-align: center; border-bottom: none;">
-            <span class="${badgeClass}" style="display: inline-block; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.02em;">${badgeText}</span>
+          <td style="padding: 6px 8px; text-align: center; border-bottom: none;">
+            <span style="font-size: 0.68rem; color: #fff; font-weight: 600;">${ad.confScore}%</span>
           </td>
-          <td style="padding: 0 12px; height: 56px; text-align: right; position: relative; border-bottom: none;">
+          <td style="padding: 6px 8px; text-align: center; border-bottom: none;">
+            <span class="${badgeClass}" style="display: inline-block; padding: 2px 5px; border-radius: 4px; font-weight: 700; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.02em;">${badgeText}</span>
+          </td>
+          <td style="padding: 6px 12px; text-align: right; position: relative; border-bottom: none;">
             <span class="${trendClass}" style="font-size: 0.75rem; font-weight: 700;">${trendSymbol}</span>
             
             <!-- Quick Actions Container on hover -->
@@ -3504,34 +3510,46 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   async function loadTerminalPositions() {
-    const positionsRows = document.getElementById('terminal-positions-rows');
-    if (!positionsRows) return;
+    const positionsContainer = document.getElementById('terminal-positions-cards-list');
+    if (!positionsContainer) return;
 
     try {
       const openPositions = await apiCall('/paper/positions');
       window.activePositionsList = Array.isArray(openPositions) ? openPositions.map(pos => pos.asset) : [];
-      positionsRows.innerHTML = '';
+      positionsContainer.innerHTML = '';
 
       if (!Array.isArray(openPositions) || openPositions.length === 0) {
-        positionsRows.innerHTML = `
-          <tr>
-            <td colspan="10" style="text-align: center; color: var(--text-secondary); padding: 24px; font-size: 0.85rem;">
-              <p style="margin: 0 0 4px 0; font-weight: 600; color: #fff;">No active paper trades.</p>
-              <p style="margin: 0; font-size: 0.75rem; color: var(--text-secondary);">If Araiven identifies an opportunity, you can deploy it here.</p>
-            </td>
-          </tr>
+        positionsContainer.innerHTML = `
+          <div style="grid-column: 1 / -1; text-align: center; color: var(--text-secondary); padding: 32px 16px; font-size: 0.8rem; background: rgba(255,255,255,0.005); border: 1px dashed rgba(255,255,255,0.04); border-radius: 8px;">
+            <p style="margin: 0 0 4px 0; font-weight: 600; color: #fff;">No active paper trades.</p>
+            <p style="margin: 0; font-size: 0.72rem;">If Araiven identifies an opportunity, you can deploy it from the right-hand panel.</p>
+          </div>
         `;
         return;
       }
 
       openPositions.forEach(pos => {
-        const tr = document.createElement('tr');
-        
-        const marginUSD = pos.positionSize;
-        const totalSizeUSD = marginUSD * pos.leverage;
+        const card = document.createElement('div');
+        card.className = 'card-glass position-card-modern';
+        card.style.cssText = 'padding: 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); background: rgba(14,19,37,0.3); text-align: left; position: relative;';
+
+        const isShort = pos.direction.toLowerCase() === 'short';
+        const badgeBg = isShort ? 'rgba(239, 68, 68, 0.08)' : 'rgba(16, 185, 129, 0.08)';
+        const badgeColor = isShort ? '#f87171' : '#10b981';
 
         const pnlClass = pos.unrealizedPnL >= 0 ? 'text-green' : 'text-error';
         const pnlSign = pos.unrealizedPnL >= 0 ? '+' : '';
+        
+        // Progress toward TP/SL
+        const tp = isShort ? pos.entryPrice * 0.95 : pos.entryPrice * 1.05;
+        const sl = isShort ? pos.entryPrice * 1.02 : pos.entryPrice * 0.98;
+        let progressPct = 50;
+        if (isShort) {
+          progressPct = ((sl - pos.currentPrice) / (sl - tp)) * 100;
+        } else {
+          progressPct = ((pos.currentPrice - sl) / (tp - sl)) * 100;
+        }
+        progressPct = Math.max(0, Math.min(100, progressPct));
 
         const entryFormatted = pos.entryPrice >= 100
           ? pos.entryPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
@@ -3541,27 +3559,61 @@ document.addEventListener('DOMContentLoaded', () => {
           ? pos.currentPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
           : pos.currentPrice.toLocaleString(undefined, { minimumFractionDigits: 4, maximumFractionDigits: 4 });
 
-        tr.innerHTML = `
-          <td><strong>${pos.symbol} / USD</strong></td>
-          <td><span class="tag-alert-green" style="background: ${pos.direction.toLowerCase() === 'short' ? 'rgba(239, 68, 68, 0.1)' : 'rgba(16, 185, 129, 0.1)'}; color: ${pos.direction.toLowerCase() === 'short' ? '#f87171' : '#10b981'}; border-color: ${pos.direction.toLowerCase() === 'short' ? 'rgba(239, 68, 68, 0.2)' : 'rgba(16, 185, 129, 0.2)'};">${pos.direction.toUpperCase()}</span></td>
-          <td>$${entryFormatted}</td>
-          <td>$${currentFormatted}</td>
-          <td>$${totalSizeUSD.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-          <td>${pos.leverage.toFixed(1)}x</td>
-          <td class="${pnlClass}" style="font-weight: 700;">${pnlSign}$${pos.unrealizedPnL.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (${pnlSign}${pos.percentageReturn.toFixed(2)}%)</td>
-          <td>${pos.duration}</td>
-          <td><span class="status-badge" style="background: rgba(99,102,241,0.15); color: #a5b4fc; border: 1px solid rgba(99,102,241,0.2); margin: 0; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: 600;">${pos.status}</span></td>
-          <td><button class="btn btn-secondary btn-sm btn-close-pos" data-id="${pos.id}">Close</button></td>
+        card.innerHTML = `
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <div>
+              <strong style="font-size: 0.88rem; color: #fff; font-family: var(--font-display);">${pos.symbol} / USD</strong>
+              <span style="font-size: 0.65rem; color: var(--text-muted); display: block; margin-top: 1px;">Hold Time: ${pos.duration}</span>
+            </div>
+            <span class="badge-ds" style="background: ${badgeBg} !important; color: ${badgeColor} !important; border: 1px solid rgba(255,255,255,0.02) !important; font-size: 0.65rem; font-weight: 700; padding: 2px 6px; border-radius: 4px; text-transform: uppercase;">${pos.direction} ${pos.leverage.toFixed(1)}x</span>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.04); padding-bottom: 8px;">
+            <div>
+              <span style="font-size: 0.6rem; color: var(--text-muted); display: block; margin-bottom: 1px;">ENTRY</span>
+              <strong style="font-size: 0.78rem; color: #fff;">$${entryFormatted}</strong>
+            </div>
+            <div>
+              <span style="font-size: 0.6rem; color: var(--text-muted); display: block; margin-bottom: 1px;">CURRENT</span>
+              <strong style="font-size: 0.78rem; color: #fff;">$${currentFormatted}</strong>
+            </div>
+            <div>
+              <span style="font-size: 0.6rem; color: var(--text-muted); display: block; margin-bottom: 1px;">UNREALIZED P&L</span>
+              <strong class="${pnlClass}" style="font-size: 0.78rem; font-weight: 700;">${pnlSign}$${pos.unrealizedPnL.toLocaleString(undefined, { minimumFractionDigits: 2 })}</strong>
+            </div>
+          </div>
+
+          <!-- Progress toward TP/SL -->
+          <div style="margin-bottom: 14px;">
+            <div style="display: flex; justify-content: space-between; font-size: 0.62rem; color: var(--text-muted); margin-bottom: 2px; font-weight: 500;">
+              <span>SL: $${sl.toLocaleString(undefined, { maximumFractionDigits: 1 })}</span>
+              <span style="color: #fff;">Entry: $${pos.entryPrice.toLocaleString(undefined, { maximumFractionDigits: 1 })}</span>
+              <span>TP: $${tp.toLocaleString(undefined, { maximumFractionDigits: 1 })}</span>
+            </div>
+            <div style="height: 4px; background: rgba(255,255,255,0.02); border-radius: 99px; overflow: hidden; border: 1px solid rgba(255,255,255,0.04); position: relative;">
+              <div style="position: absolute; left: 0; top: 0; height: 100%; width: ${progressPct}%; background: var(--gradient-success); border-radius: 99px;"></div>
+              <div style="position: absolute; left: 50%; top: 0; width: 1px; height: 100%; background: rgba(255,255,255,0.15);"></div>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 8px; justify-content: flex-end;">
+            <button class="btn btn-secondary btn-xs btn-view-pos-analysis" style="font-size: 0.7rem; padding: 4px 8px;" data-symbol="${pos.symbol}">Analyze</button>
+            <button class="btn btn-primary btn-xs btn-close-pos-action" style="font-size: 0.7rem; padding: 4px 8px;" data-id="${pos.id}">Close</button>
+          </div>
         `;
 
-        tr.querySelector('.btn-close-pos').addEventListener('click', async (e) => {
-          e.stopPropagation();
+        card.querySelector('.btn-view-pos-analysis').addEventListener('click', () => {
+          state.selectedAsset = pos.symbol;
+          updateTerminalView(pos.symbol, window.chartStateManager.timeframe).catch(console.error);
+        });
+
+        card.querySelector('.btn-close-pos-action').addEventListener('click', async (e) => {
           const btn = e.target;
           btn.disabled = true;
-          btn.textContent = 'Closing...';
+          btn.textContent = '...';
           try {
             const res = await apiCall(`/paper/positions/${pos.id}`, { method: 'DELETE' });
-            alert(`Position closed successfully. Realized PnL: $${res.profitLoss.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`);
+            alert(`Position closed successfully. Realized PnL: $${res.profitLoss.toLocaleString(undefined, { minimumFractionDigits: 2 })}`);
             await initializeDashboardUI();
           } catch (err) {
             btn.disabled = false;
@@ -3570,7 +3622,7 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         });
 
-        positionsRows.appendChild(tr);
+        positionsContainer.appendChild(card);
       });
     } catch (e) {
       console.error('Error loading terminal positions:', e);
@@ -3578,54 +3630,76 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   async function loadTerminalHistory() {
-    const historyRows = document.getElementById('terminal-history-rows');
-    if (!historyRows) return;
+    const historyContainer = document.getElementById('terminal-history-cards-list');
+    if (!historyContainer) return;
 
     try {
       const trades = await apiCall('/paper/history');
-      historyRows.innerHTML = '';
+      historyContainer.innerHTML = '';
 
       if (!Array.isArray(trades) || trades.length === 0) {
-        historyRows.innerHTML = `
-          <tr>
-            <td colspan="11" style="text-align: center; color: var(--text-secondary); padding: 24px; font-size: 0.85rem;">
-              <p style="margin: 0 0 4px 0; font-weight: 600; color: #fff;">No completed paper trades yet.</p>
-            </td>
-          </tr>
+        historyContainer.innerHTML = `
+          <div style="grid-column: 1 / -1; text-align: center; color: var(--text-secondary); padding: 32px 16px; font-size: 0.8rem; background: rgba(255,255,255,0.005); border: 1px dashed rgba(255,255,255,0.04); border-radius: 8px;">
+            <p style="margin: 0 0 4px 0; font-weight: 600; color: #fff;">No completed simulated trades yet.</p>
+          </div>
         `;
         return;
       }
 
-      trades.forEach(t => {
-        const tr = document.createElement('tr');
-        const closeDate = new Date(t.closeTime);
-        const closeTimeStr = closeDate.toLocaleString();
+      trades.slice(0, 6).forEach(t => {
+        const card = document.createElement('div');
+        card.className = 'card-glass history-card-modern';
+        card.style.cssText = 'padding: 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.04); background: rgba(14,19,37,0.2); text-align: left; position: relative;';
+
+        const isWin = t.winLoss === 'WIN';
+        const badgeBg = isWin ? 'rgba(16, 185, 129, 0.08)' : 'rgba(239, 68, 68, 0.08)';
+        const badgeColor = isWin ? '#10b981' : '#f87171';
 
         const pnlClass = t.profitLoss >= 0 ? 'text-green' : 'text-error';
         const pnlSign = t.profitLoss >= 0 ? '+' : '';
 
         const entryFormatted = t.entryPrice >= 100
-          ? t.entryPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-          : t.entryPrice.toLocaleString(undefined, { minimumFractionDigits: 4, maximumFractionDigits: 4 });
+          ? t.entryPrice.toLocaleString(undefined, { minimumFractionDigits: 2 })
+          : t.entryPrice.toLocaleString(undefined, { minimumFractionDigits: 4 });
         
         const exitFormatted = t.exitPrice >= 100
-          ? t.exitPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-          : t.exitPrice.toLocaleString(undefined, { minimumFractionDigits: 4, maximumFractionDigits: 4 });
+          ? t.exitPrice.toLocaleString(undefined, { minimumFractionDigits: 2 })
+          : t.exitPrice.toLocaleString(undefined, { minimumFractionDigits: 4 });
 
-        tr.innerHTML = `
-          <td>${closeTimeStr}</td>
-          <td><strong>${t.symbol} / USD</strong></td>
-          <td><span class="tag-alert-green" style="background: ${t.direction.toLowerCase() === 'short' ? 'rgba(239, 68, 68, 0.1)' : 'rgba(16, 185, 129, 0.1)'}; color: ${t.direction.toLowerCase() === 'short' ? '#f87171' : '#10b981'}; border-color: ${t.direction.toLowerCase() === 'short' ? 'rgba(239, 68, 68, 0.2)' : 'rgba(16, 185, 129, 0.2)'};">${t.direction.toUpperCase()}</span></td>
-          <td>$${entryFormatted}</td>
-          <td>$${exitFormatted}</td>
-          <td class="${pnlClass}" style="font-weight: 700;">${pnlSign}$${t.profitLoss.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-          <td>${t.duration}</td>
-          <td>${t.reasonClosed}</td>
-          <td><span class="tag-alert-green" style="background: ${t.winLoss === 'LOSS' ? 'rgba(239, 68, 68, 0.1)' : 'rgba(16, 185, 129, 0.1)'}; color: ${t.winLoss === 'LOSS' ? '#f87171' : '#10b981'}; border-color: ${t.winLoss === 'LOSS' ? 'rgba(239, 68, 68, 0.2)' : 'rgba(16, 185, 129, 0.2)'};">${t.winLoss}</span></td>
-          <td>${t.confidence}%</td>
-          <td><span class="badge-opp-score" style="display:inline-block; padding: 2px 6px; border-radius:4px; font-weight:600; background:rgba(99,102,241,0.15); color:#a5b4fc; font-size:0.75rem;">${t.opportunityScore}</span></td>
+        card.innerHTML = `
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <div>
+              <strong style="font-size: 0.85rem; color: #fff;">${t.symbol} / USD</strong>
+              <span style="font-size: 0.62rem; color: var(--text-muted); display: block; margin-top: 1px;">${new Date(t.closeTime).toLocaleDateString()}</span>
+            </div>
+            <span class="badge-ds" style="background: ${badgeBg} !important; color: ${badgeColor} !important; border: 1px solid rgba(255,255,255,0.02) !important; font-size: 0.62rem; font-weight: 700; padding: 2px 6px; border-radius: 4px;">${t.winLoss}</span>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px 12px; font-size: 0.72rem; margin-bottom: 8px;">
+            <div>
+              <span style="font-size: 0.58rem; color: var(--text-muted); display: block;">ENTRY / EXIT</span>
+              <span style="color:#fff;">$${entryFormatted} → $${exitFormatted}</span>
+            </div>
+            <div>
+              <span style="font-size: 0.58rem; color: var(--text-muted); display: block;">PROFIT/LOSS</span>
+              <strong class="${pnlClass}">${pnlSign}$${t.profitLoss.toLocaleString(undefined, { minimumFractionDigits: 2 })}</strong>
+            </div>
+            <div>
+              <span style="font-size: 0.58rem; color: var(--text-muted); display: block;">DURATION</span>
+              <span style="color:#fff;">${t.duration}</span>
+            </div>
+            <div>
+              <span style="font-size: 0.58rem; color: var(--text-muted); display: block;">EXIT REASON</span>
+              <span style="color:#fff; text-transform: capitalize;">${t.reasonClosed.replace('_', ' ').toLowerCase()}</span>
+            </div>
+          </div>
+          
+          <div style="font-size: 0.65rem; color: var(--text-muted); border-top: 1px solid rgba(255,255,255,0.04); padding-top: 6px; margin-top: 4px; display: flex; justify-content: space-between;">
+            <span>AI Entry Confidence: <strong>${t.confidence}%</strong></span>
+            <span>Opportunity Score: <strong>${t.opportunityScore}</strong></span>
+          </div>
         `;
-        historyRows.appendChild(tr);
+        historyContainer.appendChild(card);
       });
     } catch (e) {
       console.error('Error loading terminal history:', e);
@@ -4123,23 +4197,27 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ==========================================================================
-  // Trade History Rows Renderer
+  // Trade History Rows Renderer & Portfolio Sub-Tabs System
   // ==========================================================================
   function renderTradeHistoryRowsLocal(searchQuery = '') {
     if (!historyRowsContainer) return;
     historyRowsContainer.innerHTML = '';
 
-    const filteredTrades = state.trades.filter(t => {
-      if (searchQuery) {
-        return t.type.toLowerCase().includes(searchQuery.toLowerCase()) || 
-               t.asset.toLowerCase().includes(searchQuery.toLowerCase()) ||
-               t.status.toLowerCase().includes(searchQuery.toLowerCase());
-      }
-      return true;
+    const typeFilter = document.getElementById('history-type-filter');
+    const typeVal = typeFilter ? typeFilter.value.toLowerCase() : 'all';
+    const searchVal = searchQuery.toLowerCase();
+
+    const filteredTrades = (state.trades || []).filter(t => {
+      const matchesSearch = !searchVal || 
+                            t.type.toLowerCase().includes(searchVal) || 
+                            t.asset.toLowerCase().includes(searchVal) ||
+                            t.status.toLowerCase().includes(searchVal);
+      const matchesType = typeVal === 'all' || t.type.toLowerCase() === typeVal;
+      return matchesSearch && matchesType;
     });
 
     if (filteredTrades.length === 0) {
-      historyRowsContainer.innerHTML = '<tr><td colspan="7" style="text-align:center; padding: 30px; color:var(--text-secondary);">No transactions matches the query.</td></tr>';
+      historyRowsContainer.innerHTML = '<tr><td colspan="7" style="text-align:center; padding: 30px; color:var(--text-secondary);">No transactions match the query.</td></tr>';
       return;
     }
 
@@ -4148,15 +4226,343 @@ document.addEventListener('DOMContentLoaded', () => {
       const badgeClass = t.status.toLowerCase();
       
       tr.innerHTML = `
-        <td style="font-family:monospace; font-size:0.75rem;">${t.timestamp}</td>
+        <td style="font-family:monospace; font-size:0.75rem; color: var(--text-muted);">${t.timestamp}</td>
         <td style="font-weight:600; color:#fff;">${t.type}</td>
         <td>${t.asset}</td>
         <td>${t.amount}</td>
         <td>${t.price}</td>
-        <td style="font-family:monospace;">${t.fee}</td>
+        <td style="font-family:monospace; color: var(--text-muted);">${t.fee}</td>
         <td><span class="status-badge ${badgeClass}">${t.status}</span></td>
       `;
       historyRowsContainer.appendChild(tr);
+    });
+  }
+
+  function initializePortfolioSubTabs() {
+    const portTabs = document.querySelectorAll('.port-sub-tab');
+    portTabs.forEach(btn => {
+      btn.addEventListener('click', () => {
+        portTabs.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        const tab = btn.getAttribute('data-tab');
+        
+        const subViews = [
+          'port-view-active-positions',
+          'port-view-closed-trades',
+          'port-view-holdings',
+          'port-view-insights',
+          'port-view-ledger'
+        ];
+        subViews.forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.style.display = 'none';
+        });
+
+        let targetId = 'port-view-active-positions';
+        if (tab === 'closed-trades') targetId = 'port-view-closed-trades';
+        else if (tab === 'holdings') targetId = 'port-view-holdings';
+        else if (tab === 'insights') targetId = 'port-view-insights';
+        else if (tab === 'ledger') targetId = 'port-view-ledger';
+
+        const targetEl = document.getElementById(targetId);
+        if (targetEl) targetEl.style.display = 'block';
+
+        refreshPortfolioSubViews();
+      });
+    });
+
+    const ledgerSearch = document.getElementById('ledger-search');
+    if (ledgerSearch) {
+      ledgerSearch.addEventListener('input', () => {
+        renderLedgerRows();
+      });
+    }
+
+    const ledgerType = document.getElementById('ledger-type-filter');
+    if (ledgerType) {
+      ledgerType.addEventListener('change', () => {
+        renderLedgerRows();
+      });
+    }
+
+    const exportBtn = document.getElementById('btn-ledger-export');
+    if (exportBtn) {
+      exportBtn.addEventListener('click', () => {
+        alert('Transaction history CSV exported successfully (simulation).');
+      });
+    }
+
+    const historyTypeFilter = document.getElementById('history-type-filter');
+    if (historyTypeFilter) {
+      historyTypeFilter.addEventListener('change', () => {
+        const searchVal = historySearchInput ? historySearchInput.value : '';
+        renderTradeHistoryRowsLocal(searchVal);
+      });
+    }
+
+    const historyExportBtn = document.getElementById('btn-history-export');
+    if (historyExportBtn) {
+      historyExportBtn.addEventListener('click', () => {
+        alert('Transaction history CSV exported successfully (simulation).');
+      });
+    }
+
+    const scanCtaBtns = document.querySelectorAll('.btn-onboard-start-scan');
+    scanCtaBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        navigateTo('dashboard', true);
+      });
+    });
+  }
+
+  async function refreshPortfolioSubViews() {
+    try {
+      // 1. Get open positions
+      const openPositions = await apiCall('/paper/positions');
+      const positionsContainer = document.getElementById('port-positions-cards-list');
+      const emptyPositions = document.getElementById('port-empty-positions');
+      
+      const openCount = Array.isArray(openPositions) ? openPositions.length : 0;
+      
+      const openCountEl = document.getElementById('port-summary-open-count');
+      if (openCountEl) openCountEl.textContent = `${openCount} ${openCount === 1 ? 'Trade' : 'Trades'}`;
+
+      if (openCount === 0) {
+        if (positionsContainer) positionsContainer.style.display = 'none';
+        if (emptyPositions) emptyPositions.style.display = 'block';
+      } else {
+        if (emptyPositions) emptyPositions.style.display = 'none';
+        if (positionsContainer) {
+          positionsContainer.style.display = 'grid';
+          positionsContainer.innerHTML = '';
+          
+          openPositions.forEach(pos => {
+            const card = document.createElement('div');
+            card.className = 'card-glass position-card-modern';
+            card.style.cssText = 'padding: 20px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.06); background: rgba(14,19,37,0.4); text-align: left; position: relative;';
+            
+            const isShort = pos.direction.toLowerCase() === 'short';
+            const badgeBg = isShort ? 'rgba(239, 68, 68, 0.08)' : 'rgba(16, 185, 129, 0.08)';
+            const badgeColor = isShort ? '#f87171' : '#10b981';
+            
+            const pnlClass = pos.unrealizedPnL >= 0 ? 'text-green' : 'text-error';
+            const pnlSign = pos.unrealizedPnL >= 0 ? '+' : '';
+            
+            // TP/SL progress bar limits
+            const tp = isShort ? pos.entryPrice * 0.95 : pos.entryPrice * 1.05;
+            const sl = isShort ? pos.entryPrice * 1.02 : pos.entryPrice * 0.98;
+            let progressPct = 50;
+            if (isShort) {
+              progressPct = ((sl - pos.currentPrice) / (sl - tp)) * 100;
+            } else {
+              progressPct = ((pos.currentPrice - sl) / (tp - sl)) * 100;
+            }
+            progressPct = Math.max(0, Math.min(100, progressPct));
+
+            card.innerHTML = `
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+                <div>
+                  <strong style="font-size: 1.1rem; color: #fff; font-family: var(--font-display);">${pos.symbol} / USD</strong>
+                  <span style="font-size: 0.72rem; color: var(--text-muted); display: block; margin-top: 2px;">Hold Time: ${pos.duration}</span>
+                </div>
+                <span class="badge-ds" style="background: ${badgeBg} !important; color: ${badgeColor} !important; border: 1px solid rgba(255,255,255,0.02) !important; font-size: 0.7rem; font-weight: 700; padding: 3px 8px; border-radius: 4px; text-transform: uppercase;">${pos.direction} ${pos.leverage.toFixed(1)}x</span>
+              </div>
+              
+              <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.04); padding-bottom: 12px;">
+                <div>
+                  <span style="font-size: 0.68rem; color: var(--text-muted); display: block; margin-bottom: 2px;">ENTRY PRICE</span>
+                  <strong style="font-size: 0.88rem; color: #fff;">$${pos.entryPrice.toLocaleString(undefined, { minimumFractionDigits: 2 })}</strong>
+                </div>
+                <div>
+                  <span style="font-size: 0.68rem; color: var(--text-muted); display: block; margin-bottom: 2px;">CURRENT PRICE</span>
+                  <strong style="font-size: 0.88rem; color: #fff;">$${pos.currentPrice.toLocaleString(undefined, { minimumFractionDigits: 2 })}</strong>
+                </div>
+                <div>
+                  <span style="font-size: 0.68rem; color: var(--text-muted); display: block; margin-bottom: 2px;">UNREALIZED P&L</span>
+                  <strong class="${pnlClass}" style="font-size: 0.88rem; font-weight: 700;">${pnlSign}$${pos.unrealizedPnL.toLocaleString(undefined, { minimumFractionDigits: 2 })} (${pnlSign}${pos.percentageReturn.toFixed(2)}%)</strong>
+                </div>
+              </div>
+
+              <!-- Progress bar toward TP/SL -->
+              <div style="margin-bottom: 18px;">
+                <div style="display: flex; justify-content: space-between; font-size: 0.68rem; color: var(--text-muted); margin-bottom: 4px; font-weight: 500;">
+                  <span>SL: $${sl.toLocaleString(undefined, { maximumFractionDigits: 1 })}</span>
+                  <span style="color: #fff;">Entry: $${pos.entryPrice.toLocaleString(undefined, { maximumFractionDigits: 1 })}</span>
+                  <span>TP: $${tp.toLocaleString(undefined, { maximumFractionDigits: 1 })}</span>
+                </div>
+                <div style="height: 5px; background: rgba(255,255,255,0.02); border-radius: 99px; overflow: hidden; border: 1px solid rgba(255,255,255,0.04); position: relative;">
+                  <div style="position: absolute; left: 0; top: 0; height: 100%; width: ${progressPct}%; background: var(--gradient-success); border-radius: 99px;"></div>
+                  <div style="position: absolute; left: 50%; top: 0; width: 1px; height: 100%; background: rgba(255,255,255,0.15);"></div>
+                </div>
+              </div>
+
+              <div style="display: flex; gap: 8px; justify-content: flex-end;">
+                <button class="btn btn-secondary btn-sm btn-view-pos-analysis" style="font-size: 0.76rem;" data-symbol="${pos.symbol}">View Analysis</button>
+                <button class="btn btn-primary btn-sm btn-close-pos-action" style="font-size: 0.76rem;" data-id="${pos.id}">Close Position</button>
+              </div>
+            `;
+            
+            card.querySelector('.btn-view-pos-analysis').addEventListener('click', () => {
+              state.selectedAsset = pos.symbol;
+              navigateTo('dashboard', true);
+            });
+
+            card.querySelector('.btn-close-pos-action').addEventListener('click', async (e) => {
+              const btn = e.target;
+              btn.disabled = true;
+              btn.textContent = 'Closing...';
+              try {
+                const res = await apiCall(`/paper/positions/${pos.id}`, { method: 'DELETE' });
+                alert(`Position closed successfully. Realized PnL: $${res.profitLoss.toLocaleString(undefined, { minimumFractionDigits: 2 })}`);
+                await initializeDashboardUI();
+                refreshPortfolioSubViews();
+              } catch (err) {
+                btn.disabled = false;
+                btn.textContent = 'Close Position';
+                alert(err.message);
+              }
+            });
+
+            positionsContainer.appendChild(card);
+          });
+        }
+      }
+
+      // 2. Get completed history
+      const trades = await apiCall('/paper/history');
+      const closedRows = document.getElementById('port-closed-trades-rows');
+      const emptyClosed = document.getElementById('port-empty-closed');
+      const closedPanel = document.getElementById('port-closed-trades-panel');
+      
+      const totalTrades = Array.isArray(trades) ? trades.length : 0;
+      let wins = 0;
+      let totalPnL = 0;
+      let bestYield = -99999;
+      let worstYield = 99999;
+      let bestAsset = 'N/A';
+      let worstTradeStr = 'N/A';
+      
+      if (totalTrades === 0) {
+        if (closedPanel) closedPanel.style.display = 'none';
+        if (emptyClosed) emptyClosed.style.display = 'block';
+      } else {
+        if (emptyClosed) emptyClosed.style.display = 'none';
+        if (closedPanel) closedPanel.style.display = 'block';
+        if (closedRows) {
+          closedRows.innerHTML = '';
+          trades.forEach(t => {
+            if (t.winLoss === 'WIN') wins++;
+            totalPnL += t.profitLoss;
+            
+            if (t.profitLoss > bestYield) {
+              bestYield = t.profitLoss;
+              bestAsset = `${t.symbol} (+$${t.profitLoss.toLocaleString(undefined, { maximumFractionDigits: 0 })} realized)`;
+            }
+            if (t.profitLoss < worstYield) {
+              worstYield = t.profitLoss;
+              worstTradeStr = `${t.symbol} (-$${Math.abs(t.profitLoss).toLocaleString(undefined, { maximumFractionDigits: 0 })} closed)`;
+            }
+
+            const tr = document.createElement('tr');
+            tr.className = 'closed-trade-row';
+            
+            const pnlClass = t.profitLoss >= 0 ? 'text-green' : 'text-error';
+            const pnlSign = t.profitLoss >= 0 ? '+' : '';
+            
+            tr.innerHTML = `
+              <td style="font-size: 0.76rem; color: var(--text-muted);">${new Date(t.closeTime).toLocaleString()}</td>
+              <td style="font-weight: 600; color: #fff;">${t.symbol} / USD</td>
+              <td><span class="badge-ds" style="background: ${t.direction.toLowerCase() === 'short' ? 'rgba(239, 68, 68, 0.08)' : 'rgba(16, 185, 129, 0.08)'} !important; color: ${t.direction.toLowerCase() === 'short' ? '#f87171' : '#10b981'} !important; border: 1px solid rgba(255,255,255,0.02) !important; padding: 2px 6px; border-radius: 4px; font-size: 0.68rem; font-weight: 700; text-transform: uppercase;">${t.direction}</span></td>
+              <td>$${t.entryPrice.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+              <td>$${t.exitPrice.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+              <td class="${pnlClass}" style="font-weight: 700;">${pnlSign}$${t.profitLoss.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+              <td>${t.duration}</td>
+              <td style="font-size:0.75rem;">${t.reasonClosed.replace('_', ' ')}</td>
+              <td>${t.confidence}%</td>
+              <td><span class="badge-ds" style="background: rgba(37,99,235,0.08) !important; color: #60a5fa !important; border: 1px solid rgba(255,255,255,0.02) !important; font-size: 0.68rem; font-weight: 700; padding: 2px 6px; border-radius: 4px;">${t.opportunityScore}</span></td>
+            `;
+            closedRows.appendChild(tr);
+          });
+        }
+      }
+
+      // Update win rate summary cards
+      const winRate = totalTrades > 0 ? ((wins / totalTrades) * 100) : 0;
+      const winRateEl = document.getElementById('port-summary-winrate');
+      if (winRateEl) winRateEl.textContent = `${winRate.toFixed(1)}%`;
+      
+      const winRateRatioEl = document.getElementById('insight-winloss-ratio');
+      if (winRateRatioEl) {
+        const losses = totalTrades - wins;
+        const ratio = losses > 0 ? (wins / losses).toFixed(1) : wins.toFixed(1);
+        winRateRatioEl.textContent = `${ratio} (W/L ratio)`;
+      }
+
+      const totalPnLEl = document.getElementById('port-summary-total-pnl');
+      if (totalPnLEl) {
+        totalPnLEl.textContent = `${totalPnL >= 0 ? '+' : ''}$${totalPnL.toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
+        totalPnLEl.className = totalPnL >= 0 ? 'text-green' : 'text-error';
+      }
+
+      const insightBest = document.getElementById('insight-best-asset');
+      if (insightBest) {
+        insightBest.textContent = bestAsset !== 'N/A' ? bestAsset : 'No completed trades';
+      }
+      const insightWorst = document.getElementById('insight-worst-trade');
+      if (insightWorst) {
+        insightWorst.textContent = worstTradeStr !== 'N/A' ? worstTradeStr : 'No losses mitigated';
+      }
+
+      renderLedgerRows();
+
+    } catch (e) {
+      console.error('Error refreshing portfolio subviews:', e);
+    }
+  }
+
+  function renderLedgerRows() {
+    const rowsContainer = document.getElementById('port-ledger-rows');
+    if (!rowsContainer) return;
+
+    rowsContainer.innerHTML = '';
+    
+    const searchInput = document.getElementById('ledger-search');
+    const searchVal = searchInput ? searchInput.value.toLowerCase() : '';
+    
+    const typeFilter = document.getElementById('ledger-type-filter');
+    const typeVal = typeFilter ? typeFilter.value.toLowerCase() : 'all';
+
+    const filtered = (state.trades || []).filter(t => {
+      const matchesSearch = !searchVal || 
+                            t.type.toLowerCase().includes(searchVal) || 
+                            t.asset.toLowerCase().includes(searchVal) || 
+                            t.status.toLowerCase().includes(searchVal);
+      
+      const matchesType = typeVal === 'all' || t.type.toLowerCase() === typeVal;
+      return matchesSearch && matchesType;
+    });
+
+    if (filtered.length === 0) {
+      rowsContainer.innerHTML = '<tr><td colspan="7" style="text-align:center; padding: 30px; color:var(--text-secondary);">No ledger records found.</td></tr>';
+      return;
+    }
+
+    filtered.forEach(t => {
+      const tr = document.createElement('tr');
+      const badgeClass = t.status.toLowerCase();
+      
+      tr.innerHTML = `
+        <td style="font-family:monospace; font-size:0.75rem; color: var(--text-muted);">${t.timestamp}</td>
+        <td style="font-weight:600; color:#fff;">${t.type}</td>
+        <td>${t.asset}</td>
+        <td>${t.amount}</td>
+        <td>${t.price}</td>
+        <td style="font-family:monospace; color: var(--text-muted);">${t.fee}</td>
+        <td><span class="status-badge ${badgeClass}">${t.status}</span></td>
+      `;
+      rowsContainer.appendChild(tr);
     });
   }
 
@@ -4543,6 +4949,7 @@ document.addEventListener('DOMContentLoaded', () => {
     await updateTerminalView(state.selectedAsset, window.chartStateManager.timeframe);
     await loadTerminalPositions();
     await loadTerminalHistory();
+    await loadTradeHistory();
 
     await loadOpportunities();
     await loadRecommendations();
@@ -4551,6 +4958,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!state.terminalEventsInitialized) {
       initializeTerminalEvents();
       initializeModalEvents();
+      initializePortfolioSubTabs();
       state.terminalEventsInitialized = true;
     }
   }
