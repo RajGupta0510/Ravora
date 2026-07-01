@@ -2663,19 +2663,35 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
 
-      const marginInput = document.getElementById('terminal-margin-input');
-      if (marginInput) {
-        const defaultMargin = Math.round(state.profile.capital * 0.1);
-        marginInput.value = Math.max(10, Math.min(50000, defaultMargin));
-      }
-
-      const tradeTypeBtns = document.querySelectorAll('#terminal-trade-type-select button');
-      tradeTypeBtns.forEach(btn => {
-        btn.classList.remove('active');
-        if (btn.getAttribute('data-type').toLowerCase() === (opp.type || 'long').toLowerCase()) {
-          btn.classList.add('active');
+      // Populate dynamic action container
+      const actionContainer = document.getElementById('terminal-action-container');
+      if (actionContainer) {
+        const rec = opp ? (opp.recommendation || 'HOLD') : 'HOLD';
+        if (rec === 'LONG' || rec === 'SHORT') {
+          actionContainer.innerHTML = `
+            <h5>Execute Simulated Paper Trade</h5>
+            <p style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 16px;">
+              Araiven has identified a valid <strong>${rec}</strong> opportunity for ${symbol}.
+            </p>
+            <button class="btn btn-primary btn-lg block-btn" id="btn-show-deploy-modal" style="width: 100%; padding: 14px; font-weight: 600;">Deploy Trade</button>
+          `;
+          
+          // Add click event listener to open the modal
+          const btnShowModal = document.getElementById('btn-show-deploy-modal');
+          if (btnShowModal) {
+            btnShowModal.addEventListener('click', () => {
+              openDeployModal(symbol, rec, opp, details.price);
+            });
+          }
+        } else {
+          actionContainer.innerHTML = `
+            <h5>Execute Simulated Paper Trade</h5>
+            <div style="text-align: center; color: var(--text-secondary); font-size: 0.75rem; padding: 20px 12px; border: 1px dashed rgba(255,255,255,0.06); border-radius: 8px;">
+              No executable trade setup at the moment.
+            </div>
+          `;
         }
-      });
+      }
 
       if (window.activeChartComponent) {
         window.activeChartComponent.updateData(details, opp);
@@ -2685,6 +2701,121 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     } catch (e) {
       console.error('Error updating terminal view:', e);
+    }
+  }
+
+  function openDeployModal(symbol, direction, opp, currentPrice) {
+    const modal = document.getElementById('paper-trade-modal');
+    const summary = document.getElementById('modal-trade-summary');
+    if (!modal || !summary) return;
+
+    const entryPrice = currentPrice || opp.suggestedEntry || 100.0;
+    const sl = opp.suggestedStopLoss || 0;
+    const tp1 = opp.suggestedTakeProfit1 || 0;
+    const tp2 = opp.suggestedTakeProfit2 || 0;
+    const tp3 = opp.suggestedTakeProfit3 || 0;
+
+    const formatPrice = (val) => val > 0 ? `$${val.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : 'N/A';
+
+    summary.innerHTML = `
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px 24px; line-height: 1.6;">
+        <div><strong style="color: var(--text-secondary);">Asset:</strong> <span style="color:#fff; font-weight:600;">${symbol} / USD</span></div>
+        <div><strong style="color: var(--text-secondary);">Direction:</strong> <span class="tag-alert-green" style="background: ${direction === 'SHORT' ? 'rgba(239, 68, 68, 0.1)' : 'rgba(16, 185, 129, 0.1)'}; color: ${direction === 'SHORT' ? '#f87171' : '#10b981'}; border-color: ${direction === 'SHORT' ? 'rgba(239, 68, 68, 0.2)' : 'rgba(16, 185, 129, 0.2)'}; padding: 2px 6px; border-radius:4px; font-size:0.75rem; font-weight:700;">${direction}</span></div>
+        <div><strong style="color: var(--text-secondary);">Entry Price:</strong> <span style="color:#fff;">${formatPrice(entryPrice)}</span></div>
+        <div><strong style="color: var(--text-secondary);">Stop Loss:</strong> <span style="color:#f87171;">${formatPrice(sl)}</span></div>
+        <div><strong style="color: var(--text-secondary);">Take Profit 1:</strong> <span style="color:#34d399;">${formatPrice(tp1)}</span></div>
+        <div><strong style="color: var(--text-secondary);">Take Profit 2:</strong> <span style="color:#34d399;">${formatPrice(tp2)}</span></div>
+        <div><strong style="color: var(--text-secondary);">Take Profit 3:</strong> <span style="color:#34d399;">${formatPrice(tp3)}</span></div>
+      </div>
+    `;
+
+    // Set default values in modal form
+    const marginInput = document.getElementById('modal-margin-input');
+    const levSlider = document.getElementById('modal-leverage-slider');
+    const levDisplay = document.getElementById('modal-leverage-display');
+
+    if (marginInput) {
+      const defaultMargin = Math.round(state.profile.capital * 0.1) || 1000;
+      marginInput.value = Math.max(10, Math.min(50000, defaultMargin));
+    }
+    if (levSlider && levDisplay) {
+      levSlider.value = 5;
+      levDisplay.textContent = '5x';
+    }
+
+    // Show the modal
+    modal.style.display = 'flex';
+
+    // Store parameters for deployment
+    modal.dataset.symbol = symbol;
+    modal.dataset.direction = direction;
+    modal.dataset.entryPrice = entryPrice;
+  }
+
+  function initializeModalEvents() {
+    const modal = document.getElementById('paper-trade-modal');
+    const btnCancel = document.getElementById('btn-modal-cancel');
+    const modalForm = document.getElementById('modal-trade-form');
+    const levSlider = document.getElementById('modal-leverage-slider');
+    const levDisplay = document.getElementById('modal-leverage-display');
+
+    if (levSlider && levDisplay) {
+      levSlider.addEventListener('input', (e) => {
+        levDisplay.textContent = `${e.target.value}x`;
+      });
+    }
+
+    if (btnCancel) {
+      btnCancel.addEventListener('click', () => {
+        if (modal) modal.style.display = 'none';
+      });
+    }
+
+    if (modalForm) {
+      modalForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const deployBtn = document.getElementById('btn-modal-deploy');
+        if (!deployBtn || !modal) return;
+
+        deployBtn.disabled = true;
+        deployBtn.textContent = 'Deploying...';
+
+        const symbol = modal.dataset.symbol;
+        const direction = modal.dataset.direction;
+        const amount = document.getElementById('modal-margin-input').value;
+        const leverage = levSlider ? levSlider.value : 5;
+
+        const opportunityMapping = {
+          BTC: 'btc-halving',
+          ETH: 'eth-staking',
+          SOL: 'solana-liquidity',
+          BNB: 'bnb-breakout',
+          SUI: 'sui-alpha'
+        };
+        const opportunityId = opportunityMapping[symbol];
+
+        try {
+          const res = await apiCall('/opportunities/deploy', {
+            method: 'POST',
+            body: JSON.stringify({
+              opportunityId,
+              amount,
+              type: direction,
+              leverage
+            })
+          });
+
+          alert(`Simulated trade successfully executed!\nTransaction ID: ${res.transactionId}\nCleared Price: $${res.clearedPrice.toLocaleString()}`);
+          modal.style.display = 'none';
+          await initializeDashboardUI();
+        } catch (err) {
+          alert(err.message);
+        } finally {
+          deployBtn.disabled = false;
+          deployBtn.textContent = 'Deploy Trade';
+        }
+      });
     }
   }
 
@@ -2699,7 +2830,10 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!Array.isArray(openPositions) || openPositions.length === 0) {
         positionsRows.innerHTML = `
           <tr>
-            <td colspan="10" style="text-align: center; color: var(--text-secondary); padding: 24px;">No active trade positions. Deploy a trade using the panel above.</td>
+            <td colspan="10" style="text-align: center; color: var(--text-secondary); padding: 24px; font-size: 0.85rem;">
+              <p style="margin: 0 0 4px 0; font-weight: 600; color: #fff;">No active paper trades.</p>
+              <p style="margin: 0; font-size: 0.75rem; color: var(--text-secondary);">If Araiven identifies an opportunity, you can deploy it here.</p>
+            </td>
           </tr>
         `;
         return;
@@ -2769,7 +2903,9 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!Array.isArray(trades) || trades.length === 0) {
         historyRows.innerHTML = `
           <tr>
-            <td colspan="11" style="text-align: center; color: var(--text-secondary); padding: 24px;">No trade transaction history.</td>
+            <td colspan="11" style="text-align: center; color: var(--text-secondary); padding: 24px; font-size: 0.85rem;">
+              <p style="margin: 0 0 4px 0; font-weight: 600; color: #fff;">No completed paper trades yet.</p>
+            </td>
           </tr>
         `;
         return;
@@ -2812,22 +2948,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function initializeTerminalEvents() {
-    const levSlider = document.getElementById('terminal-leverage-slider');
-    const levDisplay = document.getElementById('terminal-leverage-display');
-    if (levSlider && levDisplay) {
-      levSlider.addEventListener('input', (e) => {
-        levDisplay.textContent = `${e.target.value}x`;
-      });
-    }
-
-    const typeBtns = document.querySelectorAll('#terminal-trade-type-select button');
-    typeBtns.forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        typeBtns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-      });
-    });
-
     const btnCloseAll = document.getElementById('btn-close-all-trades');
     if (btnCloseAll) {
       btnCloseAll.addEventListener('click', async () => {
@@ -2843,53 +2963,6 @@ document.addEventListener('DOMContentLoaded', () => {
         } finally {
           btnCloseAll.disabled = false;
           btnCloseAll.textContent = 'Close All Trades';
-        }
-      });
-    }
-
-    const tradeForm = document.getElementById('terminal-trade-form');
-    if (tradeForm) {
-      tradeForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        
-        const deployBtn = document.getElementById('btn-terminal-deploy');
-        if (!deployBtn) return;
-        
-        deployBtn.disabled = true;
-        deployBtn.textContent = 'Deploying...';
-
-        const amount = document.getElementById('terminal-margin-input').value;
-        const leverage = document.getElementById('terminal-leverage-slider').value;
-        const activeTypeBtn = document.querySelector('#terminal-trade-type-select button.active');
-        const type = activeTypeBtn ? activeTypeBtn.getAttribute('data-type') : 'Long';
-
-        const opportunityMapping = {
-          BTC: 'btc-halving',
-          ETH: 'eth-staking',
-          SOL: 'solana-liquidity',
-          BNB: 'bnb-breakout',
-          SUI: 'sui-alpha'
-        };
-        const opportunityId = opportunityMapping[state.selectedAsset];
-
-        try {
-          const res = await apiCall('/opportunities/deploy', {
-            method: 'POST',
-            body: JSON.stringify({
-              opportunityId,
-              amount,
-              type,
-              leverage
-            })
-          });
-
-          alert(`Simulated trade successfully executed!\nTransaction ID: ${res.transactionId}\nCleared Price: $${res.clearedPrice.toLocaleString()}`);
-          await initializeDashboardUI();
-        } catch (err) {
-          alert(err.message);
-        } finally {
-          deployBtn.disabled = false;
-          deployBtn.textContent = 'Deploy Opportunity Trade';
         }
       });
     }
@@ -3665,6 +3738,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (!state.terminalEventsInitialized) {
       initializeTerminalEvents();
+      initializeModalEvents();
       state.terminalEventsInitialized = true;
     }
   }
