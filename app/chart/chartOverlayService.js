@@ -42,30 +42,34 @@ class ChartOverlayService {
 
     const rec = (opp.recommendation || 'HOLD').toUpperCase();
 
-    // 1. Draw Support and Resistance Levels (Muted Blue / Muted Orange)
+    // 1. Draw Support and Resistance Levels (Thin solid blue / thin solid orange)
     // Displayed for all states if toggled on
     if (toggles.sr) {
       if (opp.nearestSupport > 0) {
         const line = candleSeries.createPriceLine({
           price: opp.nearestSupport,
-          color: '#60a5fa', // Muted Blue
-          lineWidth: 1.5,
-          lineStyle: LightweightCharts.LineStyle.Dotted,
+          color: '#3b82f6', // Thin solid blue
+          lineWidth: 1,
+          lineStyle: LightweightCharts.LineStyle.Solid,
           axisLabelVisible: true,
           title: 'Support'
         });
+        line.title = 'Support';
+        line.originalWidth = 1;
         this.priceLines.push(line);
       }
 
       if (opp.nearestResistance > 0) {
         const line = candleSeries.createPriceLine({
           price: opp.nearestResistance,
-          color: '#fb923c', // Muted Orange
-          lineWidth: 1.5,
-          lineStyle: LightweightCharts.LineStyle.Dotted,
+          color: '#f97316', // Thin solid orange
+          lineWidth: 1,
+          lineStyle: LightweightCharts.LineStyle.Solid,
           axisLabelVisible: true,
           title: 'Resistance'
         });
+        line.title = 'Resistance';
+        line.originalWidth = 1;
         this.priceLines.push(line);
       }
     }
@@ -79,33 +83,37 @@ class ChartOverlayService {
     // 3. Draw Trade Plan Overlays (LONG and SHORT)
     if (toggles.targets) {
       if (rec === 'LONG' || rec === 'SHORT') {
-        // Entry Price: Blue
+        // Entry Price: Bright Blue solid line
         if (opp.suggestedEntry > 0) {
           const line = candleSeries.createPriceLine({
             price: opp.suggestedEntry,
-            color: '#2563eb', // Blue
-            lineWidth: 2,
+            color: '#2563eb', // Bright Blue
+            lineWidth: 1.5,
             lineStyle: LightweightCharts.LineStyle.Solid,
             axisLabelVisible: true,
             title: 'Entry Price'
           });
+          line.title = 'Entry Price';
+          line.originalWidth = 1.5;
           this.priceLines.push(line);
         }
 
-        // Stop Loss: Red
+        // Stop Loss: Red dashed line
         if (opp.suggestedStopLoss > 0) {
           const line = candleSeries.createPriceLine({
             price: opp.suggestedStopLoss,
             color: '#ef4444', // Red
-            lineWidth: 2,
-            lineStyle: LightweightCharts.LineStyle.Solid,
+            lineWidth: 1.5,
+            lineStyle: LightweightCharts.LineStyle.Dashed,
             axisLabelVisible: true,
             title: 'Stop Loss'
           });
+          line.title = 'Stop Loss';
+          line.originalWidth = 1.5;
           this.priceLines.push(line);
         }
 
-        // Take Profits: Green
+        // Take Profits: Green dashed lines
         if (opp.suggestedTakeProfit1 > 0) {
           const line = candleSeries.createPriceLine({
             price: opp.suggestedTakeProfit1,
@@ -115,6 +123,8 @@ class ChartOverlayService {
             axisLabelVisible: true,
             title: 'Take Profit 1'
           });
+          line.title = 'Take Profit 1';
+          line.originalWidth = 1.5;
           this.priceLines.push(line);
         }
         if (opp.suggestedTakeProfit2 > 0) {
@@ -126,6 +136,8 @@ class ChartOverlayService {
             axisLabelVisible: true,
             title: 'Take Profit 2'
           });
+          line.title = 'Take Profit 2';
+          line.originalWidth = 1.5;
           this.priceLines.push(line);
         }
         if (opp.suggestedTakeProfit3 > 0) {
@@ -137,10 +149,12 @@ class ChartOverlayService {
             axisLabelVisible: true,
             title: 'Take Profit 3'
           });
+          line.title = 'Take Profit 3';
+          line.originalWidth = 1.5;
           this.priceLines.push(line);
         }
 
-        // 4. Place Buy/Sell Marker at the latest candle
+        // 4. Place Buy/Sell Marker at the latest candle (Blue for Buy, Red for Sell)
         const lastCandle = history[history.length - 1];
         const lastTime = Math.floor(lastCandle.timestamp / 1000);
         
@@ -148,7 +162,7 @@ class ChartOverlayService {
           {
             time: lastTime,
             position: rec === 'LONG' ? 'belowBar' : 'aboveBar',
-            color: rec === 'LONG' ? '#10b981' : '#ef4444',
+            color: rec === 'LONG' ? '#2563eb' : '#ef4444', // Blue for Long, Red for Short
             shape: rec === 'LONG' ? 'arrowUp' : 'arrowDown',
             text: rec === 'LONG' ? 'BUY / LONG' : 'SELL / SHORT',
             size: 1.5
@@ -162,11 +176,13 @@ class ChartOverlayService {
         const line = candleSeries.createPriceLine({
           price: opp.suggestedEntry,
           color: '#f59e0b', // Yellow/Orange
-          lineWidth: 2,
+          lineWidth: 1.5,
           lineStyle: LightweightCharts.LineStyle.Dashed,
           axisLabelVisible: true,
           title: 'Expected Trigger'
         });
+        line.title = 'Expected Trigger';
+        line.originalWidth = 1.5;
         this.priceLines.push(line);
       }
     }
@@ -217,8 +233,8 @@ class ChartOverlayService {
       const p2 = swingPoints[swingPoints.length - 1];
 
       this.trendLineSeries = chart.addLineSeries({
-        color: 'rgba(255, 255, 255, 0.4)', // Subtle white
-        lineWidth: 1.5,
+        color: 'rgba(255, 255, 255, 0.6)', // Thin white line
+        lineWidth: 1,
         lineStyle: LightweightCharts.LineStyle.Solid,
         priceLineVisible: false,
         lastPriceAnimationMode: 0

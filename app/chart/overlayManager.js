@@ -30,10 +30,10 @@ class OverlayManager {
       }
 
       if (isHigh) {
-        swingHighs.push({ time: current.time, price: current.high, idx: i });
+        swingHighs.push({ time: Math.floor(current.timestamp / 1000), price: current.high, idx: i });
       }
       if (isLow) {
-        swingLows.push({ time: current.time, price: current.low, idx: i });
+        swingLows.push({ time: Math.floor(current.timestamp / 1000), price: current.low, idx: i });
       }
     }
 
@@ -60,7 +60,7 @@ class OverlayManager {
       // 1. Doji Detection (very small body relative to range)
       if (bodySize / totalRange < 0.1) {
         patterns.push({
-          time: curr.time,
+          time: Math.floor(curr.timestamp / 1000),
           price: curr.high,
           text: 'Doji',
           type: 'neutral'
@@ -71,7 +71,7 @@ class OverlayManager {
       // 2. Hammer Detection (long lower shadow, small upper body at support)
       if (lowerShadow > bodySize * 2 && upperShadow < bodySize * 0.5) {
         patterns.push({
-          time: curr.time,
+          time: Math.floor(curr.timestamp / 1000),
           price: curr.low,
           text: 'Hammer',
           type: 'bullish'
@@ -82,7 +82,7 @@ class OverlayManager {
       // 3. Shooting Star (long upper shadow, small lower body at resistance)
       if (upperShadow > bodySize * 2 && lowerShadow < bodySize * 0.5) {
         patterns.push({
-          time: curr.time,
+          time: Math.floor(curr.timestamp / 1000),
           price: curr.high,
           text: 'Shooting Star',
           type: 'bearish'
@@ -94,7 +94,7 @@ class OverlayManager {
       if (curr.close > curr.open && prev.close < prev.open &&
           curr.open <= prev.close && curr.close >= prev.open) {
         patterns.push({
-          time: curr.time,
+          time: Math.floor(curr.timestamp / 1000),
           price: curr.low,
           text: 'Engulfing',
           type: 'bullish'

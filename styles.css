@@ -6435,66 +6435,121 @@ h2 {
 
 /* Sidebar dynamic width & transition */
 .app-sidebar {
-  width: 88px !important;
-  padding: 32px 14px !important;
-  transition: width 0.2s cubic-bezier(0.4, 0, 0.2, 1), padding 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  position: fixed !important;
+  left: 0 !important;
+  top: 0 !important;
+  bottom: 0 !important;
+  width: 76px !important; /* Collapsed width */
+  padding: 20px 12px !important; /* Top padding 20px, horizontal 12px when collapsed */
+  transition: width 180ms cubic-bezier(0.4, 0, 0.2, 1), padding 180ms cubic-bezier(0.4, 0, 0.2, 1) !important;
   box-sizing: border-box !important;
   align-items: center !important;
-}
-
-.app-sidebar .sidebar-header .logo span,
-.app-sidebar .sidebar-badge,
-.app-sidebar .sidebar-menu span,
-.app-sidebar .user-meta,
-.app-sidebar #btn-logout {
-  display: none !important;
-  opacity: 0 !important;
+  z-index: 1000 !important;
+  background: rgba(8, 12, 28, 0.96) !important;
+  border-right: 1px solid var(--border-default) !important;
 }
 
 /* Expanded state on hover */
 .app-sidebar:hover {
   width: 220px !important;
-  padding: 32px 24px !important;
+  padding: 20px 16px !important;
   align-items: stretch !important;
 }
 
-.app-sidebar:hover .sidebar-header .logo span,
-.app-sidebar:hover .sidebar-badge,
-.app-sidebar:hover .sidebar-menu span,
-.app-sidebar:hover .user-meta {
+/* Keep main content area offset constant */
+.app-main-window {
+  margin-left: 76px !important;
+  width: calc(100% - 76px) !important;
+  box-sizing: border-box !important;
+}
+
+/* Collapsed text styling - hides labels when collapsed, shows on hover */
+.app-sidebar .logo span,
+.app-sidebar .logo-subtitle,
+.app-sidebar #btn-new-ai-scan span,
+.app-sidebar .sidebar-menu span,
+.app-sidebar #sidebar-ai-status span:last-child,
+.app-sidebar .user-meta,
+.app-sidebar #btn-logout-wrapper {
+  display: none !important;
+  opacity: 0 !important;
+  transition: opacity 120ms ease !important;
+}
+
+.app-sidebar:hover .logo span {
   display: inline-block !important;
   opacity: 1 !important;
 }
-
-.app-sidebar:hover .user-meta {
-  display: flex !important;
-  flex-direction: column !important;
-}
-
-.app-sidebar:hover #btn-logout {
+.app-sidebar:hover .logo-subtitle {
   display: block !important;
   opacity: 1 !important;
 }
+.app-sidebar:hover #btn-new-ai-scan span {
+  display: inline-block !important;
+  opacity: 1 !important;
+}
+.app-sidebar:hover .sidebar-menu span {
+  display: inline-block !important;
+  opacity: 1 !important;
+}
+.app-sidebar:hover #sidebar-ai-status span:last-child {
+  display: inline-block !important;
+  opacity: 1 !important;
+}
+.app-sidebar:hover .user-meta {
+  display: flex !important;
+  opacity: 1 !important;
+}
+.app-sidebar:hover #btn-logout-wrapper {
+  display: flex !important;
+  opacity: 1 !important;
+}
 
-.app-sidebar .user-profile-widget {
+/* Quick Action button customization */
+#btn-new-ai-scan {
+  height: 40px !important;
   justify-content: center !important;
-  gap: 0 !important;
+}
+.app-sidebar:hover #btn-new-ai-scan {
+  justify-content: center !important;
 }
 
-.app-sidebar:hover .user-profile-widget {
-  justify-content: space-between !important;
-  gap: 10px !important;
-}
-
-/* Center-align menu icon when collapsed, stretch when expanded */
+/* Active & Hover states for navigation items */
 .app-sidebar .menu-tab-btn {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  width: 100% !important;
+  padding: 10px 14px !important;
+  background: transparent !important;
+  border: none !important;
+  border-left: 3px solid transparent !important;
+  color: var(--text-secondary) !important;
+  text-align: left !important;
+  cursor: pointer !important;
+  border-radius: 0 6px 6px 0 !important;
+  transition: all 120ms ease !important;
+  font-size: 0.82rem !important;
+  font-weight: 500 !important;
+  box-sizing: border-box !important;
   justify-content: center !important;
-  padding: 12px !important;
 }
 
 .app-sidebar:hover .menu-tab-btn {
   justify-content: flex-start !important;
-  padding: 12px 16px !important;
+}
+
+/* Active state: no bright backgrounds, left accent line, subtle tint, brighter text */
+.app-sidebar .menu-tab-btn.active {
+  border-left-color: var(--accent) !important;
+  background: rgba(255, 255, 255, 0.03) !important;
+  color: #fff !important;
+}
+
+/* Hover state: very subtle, 120ms transition, no scale, no glow */
+.app-sidebar .menu-tab-btn:hover {
+  background: rgba(255, 255, 255, 0.015) !important;
+  color: #fff !important;
 }
 
 /* Workspace Grid structure */
@@ -6544,8 +6599,34 @@ h2 {
 
 .analysis-scroll-content {
   flex: 1 !important;
-  overflow-y: auto !important;
+  overflow-y: visible !important; /* Disables outer scrolling */
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
   margin-bottom: 12px !important;
+}
+
+.ai-summary-scroll-box {
+  flex: 1 !important;
+  overflow-y: auto !important;
+  max-height: 90px !important;
+  padding-right: 4px !important;
+}
+
+/* Custom scrollbar for premium look */
+.ai-summary-scroll-box::-webkit-scrollbar {
+  width: 4px;
+}
+.ai-summary-scroll-box::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.08);
+  border-radius: 2px;
+}
+.ai-summary-scroll-box::-webkit-scrollbar-thumb:hover {
+  background: rgba(255,255,255,0.15);
+}
+
+.market-health-bar-fill {
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1), background 0.4s ease !important;
 }
 
 /* Bottom Tabbed Workspace */
@@ -6565,4 +6646,115 @@ h2 {
 
 .terminal-positions-panel.collapsed .tab-content-wrapper {
   display: none !important;
+}
+
+/* AI Market Scanner Premium Overrides */
+.scanner-row {
+  height: 56px !important;
+  max-height: 56px !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.02) !important;
+  transition: background 0.12s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.12s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  position: relative !important;
+}
+
+.scanner-row:hover {
+  background: rgba(255, 255, 255, 0.02) !important;
+}
+
+.scanner-row.active {
+  background: rgba(59, 130, 246, 0.05) !important;
+  border-left: 3px solid #3b82f6 !important;
+}
+
+/* Quick Actions Container on hover */
+.scanner-row-actions {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: none;
+  gap: 6px;
+  align-items: center;
+  background: rgba(8, 12, 28, 0.95);
+  backdrop-filter: blur(4px);
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+}
+
+.scanner-row:hover .scanner-row-actions {
+  display: flex !important;
+}
+
+.scanner-action-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.1s ease;
+}
+
+.scanner-action-btn:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* Segmented tabs style */
+.filter-segmented .segmented-tab.active {
+  background: rgba(59, 130, 246, 0.12) !important;
+  color: #fff !important;
+}
+
+/* Badge states styling */
+.badge-high {
+  background: rgba(16, 185, 129, 0.08) !important;
+  color: #10b981 !important;
+  border: 1px solid rgba(16, 185, 129, 0.15) !important;
+}
+.badge-watch {
+  background: rgba(59, 130, 246, 0.08) !important;
+  color: #60a5fa !important;
+  border: 1px solid rgba(59, 130, 246, 0.15) !important;
+}
+.badge-wait {
+  background: rgba(245, 158, 11, 0.08) !important;
+  color: #f59e0b !important;
+  border: 1px solid rgba(245, 158, 11, 0.15) !important;
+}
+.badge-avoid {
+  background: rgba(239, 68, 68, 0.08) !important;
+  color: #ef4444 !important;
+  border: 1px solid rgba(239, 68, 68, 0.15) !important;
+}
+
+/* Clean scrollbar for scanner list */
+.scanner-table-wrapper::-webkit-scrollbar {
+  width: 4px;
+}
+.scanner-table-wrapper::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.06);
+  border-radius: 2px;
+}
+.scanner-table-wrapper::-webkit-scrollbar-thumb:hover {
+  background: rgba(255,255,255,0.12);
+}
+
+/* Redesigned visual ladder row highlights */
+.ladder-row {
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.ladder-row:hover {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border-color: rgba(255, 255, 255, 0.18) !important;
+  transform: translateX(2px);
+}
+.ladder-row:active {
+  transform: translateX(0px) scale(0.99);
 }
