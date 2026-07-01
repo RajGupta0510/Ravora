@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ravora - AI-Powered Wealth Copilot for Smarter Investing</title>
-  <meta name="description" content="Grow your wealth intelligently with Ravora, your AI-powered wealth copilot. Ravora monitors markets 24/7, identifies opportunities, and manages risk for beginners and busy professionals.">
-  <link rel="stylesheet" href="styles.css?v=2.0">
+  <title>Ravora - Professional AI Trading Operating System</title>
+  <meta name="description" content="Ravora is a premium AI-powered trading operating system. Araiven continuously scans global markets, analyzes price structural support, plans optimal execution ladders, and manages simulated risk parameters automatically.">
+  <link rel="stylesheet" href="styles.css?v=12.0">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=2.0">
   <script>
     (function() {
@@ -38,819 +38,298 @@
 </head>
 <body>
 
-  <!-- Background Ambient Glow Blobs -->
+  <!-- Premium Atmospheric Background -->
   <div class="ambient-glows">
+    <div class="ambient-grid"></div>
     <div class="glow-blob glow-1"></div>
     <div class="glow-blob glow-2"></div>
-    <div class="glow-blob glow-3"></div>
-    <div class="glow-blob glow-4"></div>
   </div>
 
   <!-- Navigation Bar -->
-  <nav class="navbar" id="navbar">
-    <div class="container">
-      <a href="#" class="logo" id="nav-logo">
-        <div class="logo-icon">R</div>
+  <nav class="navbar" id="navbar" style="border-bottom: 1px solid var(--border); background: rgba(6, 9, 19, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; transition: background 0.3s ease;">
+    <div class="container" style="max-width: var(--max-content-width); margin: 0 auto; padding: 0 var(--margin-outer); display: flex; justify-content: space-between; align-items: center; height: 76px;">
+      <a href="#" class="logo" id="nav-logo" style="display: flex; align-items: center; gap: 10px; font-family: var(--font-display); font-size: 1.15rem; font-weight: 700; color: #fff; text-decoration: none;">
+        <div class="logo-icon" style="width: 32px; height: 32px; border-radius: 6px; background: var(--gradient-interactive); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 1.1rem;">R</div>
         Ravora
       </a>
-      <ul class="nav-links" id="nav-menu">
-        <li><a href="#problem-section" id="link-problem">Why Trading Fails</a></li>
-        <li><a href="#about-araiven" id="link-araiven">Meet Araiven</a></li>
-        <li><a href="#workflow-section" id="link-workflow">How It Works</a></li>
-        <li><a href="#action-section" id="link-action">Araiven in Action</a></li>
-        <li><a href="#opportunities-section" id="link-opportunities">Opportunity Engine</a></li>
-        <li><a href="#chat-section" id="link-chat">Copilot Chat</a></li>
-        <li><a href="#pricing" id="link-pricing">Pricing</a></li>
+      <ul class="nav-links" id="nav-menu" style="list-style: none; display: flex; gap: 24px; margin: 0; padding: 0;">
+        <li><a href="#problem-section" class="active-nav" style="color: var(--text-secondary); text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: color var(--transition-hover);">The Problem</a></li>
+        <li><a href="#workflow-section" style="color: var(--text-secondary); text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: color var(--transition-hover);">How It Works</a></li>
+        <li><a href="#showcase-section" style="color: var(--text-secondary); text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: color var(--transition-hover);">Showcase</a></li>
+        <li><a href="#features-section" style="color: var(--text-secondary); text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: color var(--transition-hover);">AI Features</a></li>
+        <li><a href="#faq-section" style="color: var(--text-secondary); text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: color var(--transition-hover);">FAQ</a></li>
       </ul>
-      <div class="nav-actions">
-        <a href="/app/?auth=login" class="btn-signin" id="btn-login-nav">Sign In</a>
-        <a href="/app/?auth=register" class="btn btn-primary btn-sm" id="btn-get-started-nav">Get Started</a>
+      <div class="nav-actions" style="display: flex; align-items: center; gap: 16px;">
+        <a href="/app/?auth=login" class="btn-signin" id="btn-login-nav" style="color: var(--text-secondary); text-decoration: none; font-size: 0.85rem; font-weight: 600; transition: color var(--transition-hover);">Sign In</a>
+        <a href="/app/?auth=register" class="btn btn-primary" id="btn-get-started-nav" style="font-size: 0.82rem; padding: 8px 16px; height: 36px; border-radius: 6px;">Start Free</a>
       </div>
-      <button class="mobile-toggle" id="mobile-menu-btn" aria-label="Toggle Navigation">
-        <span></span>
-        <span></span>
-        <span></span>
-      </button>
     </div>
   </nav>
 
   <!-- Hero Section -->
-  <section class="hero state-balanced" id="hero-section">
-    <div class="container">
-      <div class="hero-content">
-        <div class="hero-badge" id="hero-badge">
-          <span class="hero-badge-glow"></span>
-          <span class="hero-badge-dot"></span>
-          <span class="hero-badge-text">Powered by Araiven Intelligence</span>
+  <section class="hero" id="hero-section" style="padding-top: 160px; padding-bottom: 100px;">
+    <div class="container" style="max-width: var(--max-content-width); margin: 0 auto; padding: 0 var(--margin-outer); display: grid; grid-template-columns: 0.9fr 1.1fr; gap: 60px; align-items: center;">
+      <!-- Hero Left (45%) -->
+      <div class="hero-content" style="display: flex; flex-direction: column; align-items: flex-start; gap: 16px;">
+        <div class="hero-badge" style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border); padding: 6px 14px; border-radius: 99px; font-size: 0.72rem; font-weight: 600; color: #fff; display: flex; align-items: center; gap: 6px;">
+          <span style="width: 6px; height: 6px; border-radius: 50%; background: var(--ai-accent); display: inline-block;"></span>
+          Ravora AI-Powered Market Operations
         </div>
         
-        <!-- Rotating Outcome-Driven Headline -->
-        <h1 class="text-gradient" id="hero-headline">Grow Wealth Without Learning Trading.</h1>
+        <h1 class="display-title" style="font-size: 3.1rem; line-height: 1.15; font-family: var(--font-display); font-weight: 700; color: #fff; letter-spacing: -0.02em; margin: 0 0 10px 0;">
+          Trade with <span class="text-accent-gradient">AI</span>, not emotions.
+        </h1>
         
-        <!-- Headline variation pagination -->
-        <div class="headline-pagination" id="headline-pagination">
-          <button class="pag-dot active" data-index="0" aria-label="Variation 1"></button>
-          <button class="pag-dot" data-index="1" aria-label="Variation 2"></button>
-          <button class="pag-dot" data-index="2" aria-label="Variation 3"></button>
-          <button class="pag-dot" data-index="3" aria-label="Variation 4"></button>
-          <button class="pag-dot" data-index="4" aria-label="Variation 5"></button>
-        </div>
-
-        <p class="hero-subtitle">
-          Most people don't have time to learn candlestick patterns, indicators, support and resistance, chart analysis, and market psychology.
-          <br><br>
-          Araiven continuously monitors markets, identifies opportunities, evaluates risk, and helps you make smarter financial decisions without spending years learning how to trade.
+        <p class="body-text" style="font-size: 1.05rem; color: var(--text-secondary); line-height: 1.55; margin: 0 0 16px 0; max-width: 500px;">
+          Araiven scans global orderbooks, drafts structured execution plan ladders, explains recommendation logic, and handles simulated drawdown limits automatically.
         </p>
-        <div class="hero-actions">
-          <a href="/app/?auth=register" class="btn btn-primary btn-lg" id="hero-cta-primary">Get Started</a>
-          <a href="#about-araiven" class="btn btn-secondary btn-lg" id="hero-cta-secondary">See Araiven In Action</a>
+
+        <div class="hero-actions" style="display: flex; gap: 12px; margin-bottom: 24px;">
+          <a href="/app/?auth=register" class="btn btn-primary" id="hero-cta-primary" style="height: 44px; padding: 0 24px; font-size: 0.9rem; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; font-weight: 600;">Start Free</a>
+          <a href="#" class="btn btn-secondary btn-watch-demo" style="height: 44px; padding: 0 24px; font-size: 0.9rem; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; font-weight: 600;">Watch Demo</a>
         </div>
 
-        <!-- Segmented Risk Control -->
-        <div class="risk-control-container">
-          <div class="risk-control-header">
-            <span class="risk-control-title">ACTIVE ARAIVEN RISK PROFILE</span>
-            <span class="risk-value-display" id="risk-value-text">Moderate</span>
+        <!-- Small Trust indicators -->
+        <div style="display: flex; flex-direction: column; gap: 8px; font-size: 0.82rem; color: var(--text-secondary);">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="var(--ai-accent)" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>24/7 Autonomous Ingestion & Opportunities Detection</span>
           </div>
-          <div class="risk-segmented-control" id="risk-segmented-control">
-            <div class="segmented-pill"></div>
-            <button class="segmented-btn" data-value="0" id="btn-risk-conservative">Conservative</button>
-            <button class="segmented-btn active" data-value="1" id="btn-risk-moderate">Balanced</button>
-            <button class="segmented-btn" data-value="2" id="btn-risk-aggressive">Aggressive</button>
-          </div>
-        </div>
-        
-        <div class="hero-social-proof">
-          <p>Integrated with secure brokerages</p>
-          <div class="hero-logos">
-            <!-- Binance Mock Logo -->
-            <svg viewBox="0 0 120 28" width="100" height="24">
-              <text x="0" y="20" font-family="'Outfit', sans-serif" font-weight="700" font-size="16" fill="currentColor">BINANCE</text>
-            </svg>
-            <!-- Coinbase Mock Logo -->
-            <svg viewBox="0 0 120 28" width="100" height="24">
-              <text x="0" y="20" font-family="'Outfit', sans-serif" font-weight="700" font-size="16" fill="currentColor">COINBASE</text>
-            </svg>
-            <!-- Kraken Mock Logo -->
-            <svg viewBox="0 0 120 28" width="100" height="24">
-              <text x="0" y="20" font-family="'Outfit', sans-serif" font-weight="700" font-size="16" fill="currentColor">KRAKEN</text>
-            </svg>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="var(--ai-accent)" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>Standardised Execution target levels & Stop Losses</span>
           </div>
         </div>
       </div>
 
-      <!-- 3D AI Wealth Visualization (Layered Depth) -->
-      <div class="hero-visual-3d" id="hero-3d-container">
-        <div class="scene-glow-ambient"></div>
-        <div class="scene-3d">
-          
-          <!-- Complexity Background Chart Layer (Markets are complex) -->
-          <div class="complexity-bg-chart">
-            <svg viewBox="0 0 400 300" class="complexity-svg">
-              <line x1="0" y1="50" x2="400" y2="50" stroke="rgba(255, 255, 255, 0.02)" />
-              <line x1="0" y1="100" x2="400" y2="100" stroke="rgba(255, 255, 255, 0.02)" />
-              <line x1="0" y1="150" x2="400" y2="150" stroke="rgba(255, 255, 255, 0.02)" />
-              <line x1="0" y1="200" x2="400" y2="200" stroke="rgba(255, 255, 255, 0.02)" />
-              <line x1="0" y1="250" x2="400" y2="250" stroke="rgba(255, 255, 255, 0.02)" />
-              <path d="M 10 180 Q 80 260 150 120 T 320 60 T 390 190" fill="none" stroke="rgba(239, 68, 68, 0.12)" stroke-width="1.5" stroke-dasharray="4,4" />
-              <path d="M 10 120 Q 90 20 180 170 T 340 100 T 390 40" fill="none" stroke="rgba(37, 99, 235, 0.12)" stroke-width="1.5" />
-              <line x1="50" y1="110" x2="50" y2="170" stroke="rgba(239, 68, 68, 0.15)" stroke-width="1" />
-              <rect x="46" y="125" width="8" height="30" fill="rgba(239, 68, 68, 0.15)" rx="1" />
-              <line x1="90" y1="190" x2="90" y2="250" stroke="rgba(16, 185, 129, 0.15)" stroke-width="1" />
-              <rect x="86" y="200" width="8" height="35" fill="rgba(16, 185, 129, 0.15)" rx="1" />
-              <line x1="130" y1="70" x2="130" y2="130" stroke="rgba(239, 68, 68, 0.15)" stroke-width="1" />
-              <rect x="126" y="85" width="8" height="30" fill="rgba(239, 68, 68, 0.15)" rx="1" />
-              <line x1="280" y1="130" x2="280" y2="210" stroke="rgba(16, 185, 129, 0.15)" stroke-width="1" />
-              <rect x="276" y="150" width="8" height="40" fill="rgba(16, 185, 129, 0.15)" rx="1" />
-              <text x="35" y="105" fill="rgba(255,255,255,0.06)" font-size="7" font-family="monospace">RSI OVERBOUGHT</text>
-              <text x="270" y="120" fill="rgba(255,255,255,0.06)" font-size="7" font-family="monospace">MACD CROSSOVER</text>
-            </svg>
-          </div>
-          
-          <!-- Volumetric Light Beam -->
-          <div class="core-light-beam"></div>
+      <!-- Hero Right: Large Animated Product Preview (55%) -->
+      <div class="mini-workspace-mock-wrapper" style="width: 100%;">
+        <div class="card-glass mini-workspace-mock" id="hero-workspace-animation" style="width: 100%; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 12px; background: rgba(14, 19, 37, 0.92); border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 24px 50px rgba(0,0,0,0.5); overflow: hidden; position: relative;">
+          <!-- Scanning Indicator bar overlay -->
+          <div class="state-scanning-indicator"></div>
 
-          <!-- Pedestal Reflection Base -->
-          <div class="pedestal-base">
-            <div class="pedestal-ring ring-outer"></div>
-            <div class="pedestal-ring ring-inner"></div>
-            <div class="pedestal-grid"></div>
-          </div>
-
-          <!-- Concentric Orbiting Wireframe Rings -->
-          <div class="orbit-rings">
-            <div class="orbit-ring ring-1"></div>
-            <div class="orbit-ring ring-2"></div>
-            <div class="orbit-ring ring-3"></div>
-          </div>
-
-          <!-- Central Glowing AI Core (Araiven Core handles complexity) -->
-          <div class="ai-core-group">
-            <div class="ai-core-sphere">
-              <!-- Volumetric Energy Rings -->
-              <div class="core-torus-ring ring-x"></div>
-              <div class="core-torus-ring ring-y"></div>
-              
-              <!-- Core Shell Layers -->
-              <div class="core-layer core-nucleus"></div>
-              <div class="core-layer core-layer-inner-shell"></div>
-              <div class="core-layer core-layer-middle"></div>
-              <div class="core-layer core-layer-outer"></div>
-              <div class="core-flare"></div>
+          <!-- Header bar -->
+          <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 10px;">
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span style="width: 8px; height: 8px; border-radius: 50%; background: #10b981; display: inline-block;"></span>
+              <span style="font-family: monospace; font-size: 0.72rem; color: var(--text-secondary); font-weight: 700; letter-spacing: 0.05em;">ARAIVEN OS SIMULATOR</span>
             </div>
+            <!-- Mock Status tag -->
+            <span style="font-family: monospace; font-size: 0.65rem; color: var(--text-muted);">ACTIVE MULTI-FEED INPUT</span>
           </div>
 
-          <!-- Refractive Glass Shards (orbiting crystals) -->
-          <div class="glass-shard shard-1"></div>
-          <div class="glass-shard shard-2"></div>
-          <div class="glass-shard shard-3"></div>
-          <div class="glass-shard shard-4"></div>
-
-          <!-- Floating Glassmorphic Panels (Outcome Layer: Users focus on outcomes) -->
-          
-          <!-- Panel 1: Market Signals -->
-          <div class="glass-panel panel-signal" id="panel-signal-widget">
-            <div class="glass-panel-glow"></div>
-            <div class="panel-header">
-              <span class="signal-indicator"><span class="pulse-dot"></span></span>
-              <span class="panel-tag">AI Market Signal</span>
-              <span class="signal-confidence" id="opp-conf-val">94%</span>
-            </div>
-            <div class="panel-body">
-              <div class="signal-title" id="opp-title-val">ETH Staking & Bluechip Allocation</div>
-              <div class="signal-desc" id="opp-desc-val">Layer 1 accumulation signals detected. AI reallocation triggered for peak efficiency.</div>
-            </div>
-            <div class="panel-footer">
-              <button class="btn-panel-action" id="opp-btn-action">Rebalance Portfolio</button>
-            </div>
-          </div>
-
-          <!-- Panel 2: Wealth Growth -->
-          <div class="glass-panel panel-growth" id="panel-growth-widget">
-            <div class="glass-panel-glow"></div>
-            <div class="panel-body">
-              <div class="growth-header">
-                <span class="panel-tag">Wealth Growth</span>
-                <span class="growth-change" id="dashboard-growth-val">+$14,210.60 (+12.0%)</span>
+          <!-- Workspace Columns -->
+          <div style="display: grid; grid-template-columns: 0.9fr 1.35fr 0.95fr; gap: 14px; height: 240px; position: relative;">
+            
+            <!-- Col 1: Scanner Mock -->
+            <div style="border-right: 1px solid rgba(255,255,255,0.06); padding-right: 10px; display: flex; flex-direction: column; gap: 8px;">
+              <span style="font-size: 0.65rem; font-weight: 700; color: var(--text-muted); letter-spacing: 0.02em;">MARKET SCANNER</span>
+              <div style="display: flex; flex-direction: column; gap: 6px;">
+                <!-- BTC opportunity row -->
+                <div class="mini-opportunity-row btc-row" style="padding: 6px; border-radius: 4px; border: 1px solid transparent; display: flex; flex-direction: column; gap: 2px; transition: all 0.3s ease;">
+                  <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-size: 0.7rem; font-weight: 600; color: #fff;">BTC/USD</span>
+                    <span class="badge-ds badge-long" style="font-size: 0.55rem; padding: 1px 4px;">LONG</span>
+                  </div>
+                  <!-- score increases on active -->
+                  <span style="font-size: 0.6rem; color: #10b981; font-weight: 700;">Opportunity: 94.2%</span>
+                </div>
+                <!-- ETH opportunity row -->
+                <div class="mini-opportunity-row" style="padding: 6px; display: flex; flex-direction: column; gap: 2px;">
+                  <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-size: 0.7rem; font-weight: 600; color: var(--text-secondary);">ETH/USD</span>
+                    <span class="badge-ds badge-hold" style="font-size: 0.55rem; padding: 1px 4px;">HOLD</span>
+                  </div>
+                  <span style="font-size: 0.6rem; color: var(--text-muted);">Consolidating</span>
+                </div>
+                <!-- SOL opportunity row -->
+                <div class="mini-opportunity-row" style="padding: 6px; display: flex; flex-direction: column; gap: 2px;">
+                  <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-size: 0.7rem; font-weight: 600; color: var(--text-secondary);">SOL/USD</span>
+                    <span class="badge-ds badge-short" style="font-size: 0.55rem; padding: 1px 4px;">SHORT</span>
+                  </div>
+                  <span style="font-size: 0.6rem; color: #ef4444;">Opportunity: 88.5%</span>
+                </div>
               </div>
-              <div class="growth-stats">
-                <span class="balance-label">Portfolio Balance</span>
-                <span class="balance-amount" id="dashboard-balance-val">$132,194.10</span>
+            </div>
+
+            <!-- Col 2: Chart Mock -->
+            <div style="display: flex; flex-direction: column; gap: 6px; justify-content: space-between;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 0.7rem; font-weight: 700; color: #fff;">BTC/USD 1H</span>
+                <span style="font-family: monospace; font-size: 0.62rem; color: var(--text-muted);">REAL-TIME</span>
               </div>
-              <div class="growth-chart">
-                <svg class="mini-chart-svg" viewBox="0 0 200 50">
-                  <defs>
-                    <linearGradient id="mini-chart-grad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stop-color="var(--state-glow-color, #a855f7)" stop-opacity="0.3"/>
-                      <stop offset="100%" stop-color="var(--state-glow-color, #a855f7)" stop-opacity="0"/>
-                    </linearGradient>
-                  </defs>
-                  <path id="chart-path" d="M 10 40 Q 45 20 105 30 T 190 12" fill="none" stroke="var(--state-glow-color, #a855f7)" stroke-width="2.5" stroke-linecap="round"/>
-                  <path id="chart-grad-path" d="M 10 40 Q 45 20 105 30 T 190 12 L 190 50 L 10 50 Z" fill="url(#mini-chart-grad)"/>
-                  <circle id="chart-pointer-dot" cx="190" cy="12" r="4.5" fill="var(--state-glow-color, #a855f7)" stroke="#ffffff" stroke-width="2"/>
+              <div style="flex: 1; position: relative;">
+                <svg viewBox="0 0 200 120" style="width: 100%; height: 100%;">
+                  <!-- Support & Resistance lines -->
+                  <line class="chart-line-sr" x1="0" y1="40" x2="200" y2="40" stroke="#10b981" stroke-width="0.5"/>
+                  <line class="chart-line-sr" x1="0" y1="85" x2="200" y2="85" stroke="#ef4444" stroke-width="0.5"/>
+
+                  <!-- Target Plan Ladder Levels -->
+                  <line class="chart-target-line" x1="10" y1="20" x2="190" y2="20" stroke="#10b981" stroke-width="1"/>
+                  <text class="chart-target-line" x="12" y="16" fill="#10b981" font-size="5" font-family="monospace">TP2: $64,250</text>
+
+                  <line class="chart-target-line" x1="10" y1="35" x2="190" y2="35" stroke="#10b981" stroke-width="1"/>
+                  <text class="chart-target-line" x="12" y="31" fill="#10b981" font-size="5" font-family="monospace">TP1: $63,100</text>
+
+                  <line class="chart-target-line" x1="10" y1="65" x2="190" y2="65" stroke="#3b82f6" stroke-width="1"/>
+                  <text class="chart-target-line" x="12" y="61" fill="#3b82f6" font-size="5" font-family="monospace">ENTRY: $61,500</text>
+
+                  <line class="chart-target-line" x1="10" y1="95" x2="190" y2="95" stroke="#ef4444" stroke-width="1"/>
+                  <text class="chart-target-line" x="12" y="91" fill="#ef4444" font-size="5" font-family="monospace">SL: $59,800</text>
+                  
+                  <!-- Candlesticks group -->
+                  <g class="chart-candle-group">
+                    <line x1="30" y1="40" x2="30" y2="90" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+                    <rect x="25" y="55" width="10" height="25" fill="rgba(239, 68, 68, 0.25)" stroke="rgba(239, 68, 68, 0.4)" stroke-width="0.5"/>
+                    <line x1="80" y1="30" x2="80" y2="80" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+                    <rect x="75" y="45" width="10" height="25" fill="rgba(16, 185, 129, 0.25)" stroke="rgba(16, 185, 129, 0.4)" stroke-width="0.5"/>
+                    <line x1="130" y1="20" x2="130" y2="70" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+                    <rect x="125" y="35" width="10" height="25" fill="rgba(16, 185, 129, 0.25)" stroke="rgba(16, 185, 129, 0.4)" stroke-width="0.5"/>
+                  </g>
                 </svg>
               </div>
             </div>
-          </div>
 
-          <!-- Panel 3: Goal progress -->
-          <div class="glass-panel panel-goal" id="panel-goal-widget">
-            <div class="glass-panel-glow"></div>
-            <div class="panel-body">
-              <div class="goal-ring-container">
-                <svg class="goal-ring-svg" viewBox="0 0 60 60">
-                  <circle class="goal-bg-circle" cx="30" cy="30" r="24" />
-                  <circle class="goal-fill-circle" id="goal-circle-fill" cx="30" cy="30" r="24" />
-                </svg>
-                <div class="goal-percentage" id="goal-percentage-val">70%</div>
-              </div>
-              <div class="goal-text">
-                <span class="goal-title">Yearly Target</span>
-                <span class="goal-desc">$180,000 Milestone</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Panel 4: Risk Monitoring Layer (Foreground) -->
-          <div class="glass-panel panel-risk-guard" id="panel-risk-guard-widget">
-            <div class="glass-panel-glow"></div>
-            <div class="panel-body">
-              <div class="risk-guard-header">
-                <span class="shield-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width: 12px; height: 12px; color: var(--success);"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                </span>
-                <span class="panel-tag">Araiven Guard</span>
-              </div>
-              <div class="risk-guard-status">
-                <span class="status-label">Active Protection</span>
-                <span class="status-val" id="dashboard-risk-guard-val">Balanced Shield</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Orbiting Asset Badges (3D coordinates) -->
-          <div class="orbiting-particle part-btc"><span class="coin-icon">₿</span></div>
-          <div class="orbiting-particle part-eth"><span class="coin-icon">Ξ</span></div>
-          <div class="orbiting-particle part-sol"><span class="coin-icon">S</span></div>
-          <div class="orbiting-particle part-usdc"><span class="coin-icon">$</span></div>
-
-        </div>
-      </div>
-      
-      <!-- Trust Statement Bar -->
-      <div class="hero-trust-bar">
-        <div class="trust-item">
-          <div class="trust-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;"><path d="M2 12h20"/><path d="M9 12V4h6v8"/></svg>
-          </div>
-          <span>No chart watching</span>
-        </div>
-        <div class="trust-item">
-          <div class="trust-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;"><path d="M3 3v18h18"/><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/></svg>
-          </div>
-          <span>No technical indicators</span>
-        </div>
-        <div class="trust-item">
-          <div class="trust-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-          </div>
-          <span>No endless market monitoring</span>
-        </div>
-        <div class="trust-item highlight">
-          <div class="trust-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
-          </div>
-          <span>Just intelligent decision-making</span>
-        </div>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- SECTION 2 — Why Traditional Trading Fails -->
-  <section class="problem-section" id="problem-section">
-    <div class="container">
-      <div class="text-center">
-        <span class="section-badge">The Reality of Trading</span>
-        <h2 class="text-gradient">Why Traditional Trading Fails</h2>
-        <p class="section-subtitle">Managing wealth manually in today's 24/7 global market requires tools and time you shouldn't have to waste.</p>
-      </div>
-      <div class="problem-grid">
-        <!-- Traditional Card -->
-        <div class="card-glass problem-card traditional">
-          <div class="card-glow-red"></div>
-          <div class="problem-header">
-            <div class="status-indicator-red"></div>
-            <h3>Traditional Trading</h3>
-          </div>
-          <p class="problem-intro">A highly complex, stressful, and time-consuming process.</p>
-          <ul class="problem-list">
-            <li>
-              <span class="list-bullet-red">✕</span>
-              <span><strong>Candlestick Patterns:</strong> Memorizing hundreds of candles and formations.</span>
-            </li>
-            <li>
-              <span class="list-bullet-red">✕</span>
-              <span><strong>Technical Indicators:</strong> Staring at RSI, MACD, EMAs, and Bollinger bands.</span>
-            </li>
-            <li>
-              <span class="list-bullet-red">✕</span>
-              <span><strong>Manual Support Lines:</strong> Drawing trend lines and resistance zones continuously.</span>
-            </li>
-            <li>
-              <span class="list-bullet-red">✕</span>
-              <span><strong>News Stress:</strong> Staying awake 24/7 monitoring macroeconomic announcement cycles.</span>
-            </li>
-          </ul>
-          <div class="traditional-chart-mock">
-            <svg viewBox="0 0 300 80" class="stress-chart">
-              <line x1="0" y1="20" x2="300" y2="20" stroke="rgba(239, 68, 68, 0.08)" />
-              <line x1="0" y1="50" x2="300" y2="50" stroke="rgba(239, 68, 68, 0.08)" />
-              <path d="M 10 50 L 50 15 L 90 60 L 130 10 L 170 65 L 210 30 L 250 70 L 290 25" fill="none" stroke="#ef4444" stroke-width="1.5" />
-              <circle cx="290" cy="25" r="3" fill="#ef4444" />
-              <text x="15" y="72" fill="#ef4444" font-size="8" font-family="monospace" opacity="0.8">EMOTIONAL OVERLOAD DETECTED</text>
-            </svg>
-          </div>
-        </div>
-
-        <!-- Araiven Card -->
-        <div class="card-glass problem-card araiven-way">
-          <div class="card-glow-purple"></div>
-          <div class="problem-header">
-            <div class="status-indicator-green"></div>
-            <h3>Ravora with Araiven</h3>
-          </div>
-          <p class="problem-intro">Simple, automated wealth building driven by machine intelligence.</p>
-          <ul class="problem-list">
-            <li>
-              <span class="list-bullet-green">✓</span>
-              <span><strong>No Trading Knowledge Required:</strong> Stop studying indicators or trend charts.</span>
-            </li>
-            <li>
-              <span class="list-bullet-green">✓</span>
-              <span><strong>Autonomous Monitoring:</strong> Araiven scans orderbooks and global sentiment 24/7.</span>
-            </li>
-            <li>
-              <span class="list-bullet-green">✓</span>
-              <span><strong>Continuous Risk Management:</strong> Instantly updates and enforces drawdown thresholds.</span>
-            </li>
-            <li>
-              <span class="list-bullet-green">✓</span>
-              <span><strong>Intelligent Outcomes:</strong> Receive clear, executable suggestions without complexity.</span>
-            </li>
-          </ul>
-          <div class="araiven-chart-mock">
-            <svg viewBox="0 0 300 80" class="calm-chart">
-              <defs>
-                <linearGradient id="calm-chart-grad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="#10b981" stop-opacity="0.3"/>
-                  <stop offset="100%" stop-color="#10b981" stop-opacity="0"/>
-                </linearGradient>
-              </defs>
-              <path d="M 10 65 Q 80 50 150 35 T 290 15" fill="none" stroke="#10b981" stroke-width="2" />
-              <path d="M 10 65 Q 80 50 150 35 T 290 15 L 290 80 L 10 80 Z" fill="url(#calm-chart-grad)" opacity="0.1" />
-              <circle cx="290" cy="15" r="4.5" fill="#10b981" stroke="#ffffff" stroke-width="1.5" />
-              <text x="15" y="72" fill="#10b981" font-size="8" font-family="monospace" opacity="0.8">ARAIVEN AUTONOMOUS COMPLIANT GROWTH</text>
-            </svg>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- SECTION 3 — Meet Araiven -->
-  <section class="about-araiven-section" id="about-araiven">
-    <div class="container">
-      <div class="about-araiven-grid">
-        <div class="about-araiven-content">
-          <span class="section-badge">The Core Engine</span>
-          <h2 class="text-gradient">Meet Araiven</h2>
-          <p class="about-desc">
-            Araiven is not a simple chatbot. It is the sophisticated multi-dimensional decision engine behind the Ravora platform.
-          </p>
-          <p class="about-desc">
-            It continuously analyzes markets, opportunities, risk, and portfolio impact. By ingesting macroeconomic data, global orderbooks, and sentiment feeds, it identifies alpha while actively safeguarding your capital.
-          </p>
-          <div class="araiven-pillars">
-            <div class="pillar-item">
-              <div class="pillar-icon-wrapper">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 18px; height: 18px; color: var(--accent-secondary);"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
-              </div>
-              <div>
-                <h5>Market Analysis</h5>
-                <p>Audits global orderbooks, tracking volume shifts and structural supports.</p>
-              </div>
-            </div>
-            <div class="pillar-item">
-              <div class="pillar-icon-wrapper">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 18px; height: 18px; color: var(--accent-secondary);"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-              </div>
-              <div>
-                <h5>Risk Exposure Guard</h5>
-                <p>Dynamically models downside variance to hedge capital automatically.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="about-araiven-visual">
-          <div class="card-glass visual-console" id="visual-console-widget">
-            <div class="console-glow"></div>
-            <div class="console-header">
-              <span class="indicator-glow-dot"></span>
-              <span class="console-title">ARAIVEN DECISION LAYER</span>
-            </div>
-            <div class="console-body">
-              <div class="metric-row">
-                <span>Core Scan Ingestion</span>
-                <span class="metric-val text-gradient" id="console-metric-ingest">24,410 feeds/sec</span>
-              </div>
-              <div class="metric-row">
-                <span>Model Correlation</span>
-                <span class="metric-val text-gradient" id="console-metric-correlation">99.8% Active</span>
-              </div>
-              <div class="console-graph">
-                <div class="bar-col" data-tooltip="Feeds: 24.4k/s" data-metric="ingest" data-val="24,410 feeds/sec"><div class="bar-value" style="height: 60%;"></div></div>
-                <div class="bar-col" data-tooltip="Risk Audits: 99.8%" data-metric="correlation" data-val="99.8% Active"><div class="bar-value" style="height: 85%;"></div></div>
-                <div class="bar-col" data-tooltip="Assets Tracked: 84" data-metric="ingest" data-val="84 tokens monitored"><div class="bar-value" style="height: 40%;"></div></div>
-                <div class="bar-col" data-tooltip="Decision Alpha: 94.2%" data-metric="correlation" data-val="94.2% Optimal"><div class="bar-value" style="height: 95%;"></div></div>
-                <div class="bar-col" data-tooltip="Latency Index: 1.2ms" data-metric="ingest" data-val="1.2ms real-time"><div class="bar-value" style="height: 70%;"></div></div>
-                <div class="bar-col" data-tooltip="Correlation Score: 99.9%" data-metric="correlation" data-val="99.9% Core Sync"><div class="bar-value" style="height: 50%;"></div></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- SECTION 4 — How Araiven Works -->
-  <section class="workflow-section" id="workflow-section">
-    <div class="container">
-      <div class="text-center">
-        <span class="section-badge">Visual Process Flow</span>
-        <h2 class="text-gradient">How Araiven Works</h2>
-        <p class="section-subtitle">The six-step processing flow that translates global market inputs into wealth building outcomes.</p>
-      </div>
-
-      <div class="pipeline-flow" id="pipeline-flow">
-        <!-- Connecting Line -->
-        <div class="pipeline-connector-line">
-          <div class="pipeline-progress-bar" id="pipeline-progress"></div>
-        </div>
-
-        <div class="pipeline-steps">
-          <!-- Step 1 -->
-          <div class="pipeline-step active" data-step="1" id="think-step-1">
-            <div class="step-circle">
-              <span class="step-num">1</span>
-            </div>
-            <h4>Market Data</h4>
-            <p>Monitors global orderbooks, tracking volume shifts and structural supports.</p>
-            <span class="node-tag">Data Ingest</span>
-          </div>
-
-          <!-- Step 2 -->
-          <div class="pipeline-step" data-step="2" id="think-step-2">
-            <div class="step-circle">
-              <span class="step-num">2</span>
-            </div>
-            <h4>News & Events</h4>
-            <p>Intercepts breaking economic announcements, CPI data, and feeds instantly.</p>
-            <span class="node-tag">Context Mapping</span>
-          </div>
-
-          <!-- Step 3 -->
-          <div class="pipeline-step" data-step="3" id="think-step-3">
-            <div class="step-circle">
-              <span class="step-num">3</span>
-            </div>
-            <h4>Risk Analysis</h4>
-            <p>Simulates exposures and correlation shifts to guard capital.</p>
-            <span class="node-tag">Drawdown Protection</span>
-          </div>
-
-          <!-- Step 4 -->
-          <div class="pipeline-step" data-step="4" id="think-step-4">
-            <div class="step-circle">
-              <span class="step-num">4</span>
-            </div>
-            <h4>Opportunity Detection</h4>
-            <p>Extracts high-probability setups and yield differentials.</p>
-            <span class="node-tag">Alpha Extraction</span>
-          </div>
-
-          <!-- Step 5 -->
-          <div class="pipeline-step" data-step="5" id="think-step-5">
-            <div class="step-circle">
-              <span class="step-num">5</span>
-            </div>
-            <h4>Decision Engine</h4>
-            <p>Calculates optimal asset reallocations for your profile.</p>
-            <span class="node-tag">Allocation Engine</span>
-          </div>
-
-          <!-- Step 6 -->
-          <div class="pipeline-step" data-step="6" id="think-step-6">
-            <div class="step-circle">
-              <span class="step-num">6</span>
-            </div>
-            <h4>Recommendation</h4>
-            <p>Pushes a plain-English recommendation requiring 1-click execution.</p>
-            <span class="node-tag">User Alert</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- SECTION 5 — Araiven In Action -->
-  <section class="action-section" id="action-section">
-    <div class="container">
-      <div class="action-layout">
-        <!-- Interactive Trigger side -->
-        <div class="action-intro-col">
-          <span class="section-badge">Live Scenario Simulation</span>
-          <h2 class="text-gradient">Araiven in Action</h2>
-          <p class="action-desc">
-            When a major macroeconomic event hits the wire, watch how Araiven handles it instantly. Click the button to trigger a mock Federal Reserve interest rate announcement.
-          </p>
-          <div class="simulation-trigger-box">
-            <button class="btn btn-primary btn-lg" id="btn-trigger-simulation">
-              <svg style="width: 20px; height: 20px; margin-right: 8px; fill: none; stroke: currentColor; stroke-width: 2;" viewBox="0 0 24 24">
-                <circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/>
-              </svg>
-              Trigger Fed Rate Event
-            </button>
-            <div class="simulation-status" id="sim-status-text">Ready for simulation</div>
-          </div>
-        </div>
-
-        <!-- Chronological Step Cards -->
-        <div class="action-timeline-col">
-          <div class="timeline-wrapper">
-            <!-- Timeline Line Backdrop -->
-            <div class="timeline-bar"></div>
-            <!-- Timeline Active Progress overlay -->
-            <div class="timeline-bar-progress" id="timeline-progress-bar"></div>
-
-            <!-- Time Step 1 -->
-            <div class="timeline-item" id="time-step-1">
-              <div class="time-marker">
-                <span class="marker-num">1</span>
-                <div class="radar-pulse"></div>
-              </div>
-              <div class="card-glass timeline-card">
-                <div class="timeline-time">14:00:02 EST • EVENT DETECTED</div>
-                <h4>Fed Rates Announced</h4>
-                <p>Federal Reserve reports 25bps interest rate increase. Yield volatility index spikes instantly.</p>
-                <div class="timeline-code-feed">
-                  <span class="code-line">[SYS_ALERT] FED_INTEREST_RATE = +0.25%</span>
-                  <span class="code-line">[SYS_STAT] YIELD_VOLATILITY_SPIKE: 24.5%</span>
+            <!-- Col 3: Details & Risk -->
+            <div style="border-left: 1px solid rgba(255,255,255,0.06); padding-left: 10px; display: flex; flex-direction: column; justify-content: space-between;">
+              <div class="plan-details-panel" style="display: flex; flex-direction: column; gap: 4px;">
+                <span style="font-size: 0.65rem; font-weight: 700; color: var(--text-muted); letter-spacing: 0.02em;">ARAIVEN PLAN</span>
+                
+                <!-- Recommendation switches dynamically -->
+                <div style="display: flex; gap: 4px; align-items: center;">
+                  <span class="badge-ds badge-wait rec-badge-wait" style="font-size: 0.6rem; padding: 2px 6px;">WAITING</span>
+                  <span class="badge-ds badge-long rec-badge-long" style="font-size: 0.6rem; padding: 2px 6px; background: rgba(124, 58, 237, 0.15) !important; border-color: rgba(124, 58, 237, 0.3) !important; color: #c084fc !important;">LONG SIGNAL</span>
                 </div>
-              </div>
-            </div>
-
-            <!-- Time Step 2 -->
-            <div class="timeline-item" id="time-step-2">
-              <div class="time-marker">
-                <span class="marker-num">2</span>
-                <div class="radar-pulse"></div>
-              </div>
-              <div class="card-glass timeline-card">
-                <div class="timeline-time">14:00:15 EST • ANALYSIS COMPLETE</div>
-                <h4>Impact Correlated</h4>
-                <p>Araiven scans 150+ asset feeds. Detects liquidity outflow from high-risk pools towards stablecoin staking baskets.</p>
-                <div class="timeline-code-feed">
-                  <span class="code-line">[SCANNING] liquidity_pools: 154 active</span>
-                  <span class="code-line">[SYS_STAT] HIGH_RISK_OUTFLOW = $124.5M</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Time Step 3 -->
-            <div class="timeline-item" id="time-step-3">
-              <div class="time-marker">
-                <span class="marker-num">3</span>
-                <div class="radar-pulse"></div>
-              </div>
-              <div class="card-glass timeline-card">
-                <div class="timeline-time">14:00:32 EST • MODEL UPDATED</div>
-                <h4>Risk Re-evaluated</h4>
-                <p>Calculates new maximum drawdown threshold. Active exposure limits automatically lowered by 5% to shield capital.</p>
-                <div class="timeline-code-feed">
-                  <span class="code-line">[CALC] max_drawdown_limit = 3.50%</span>
-                  <span class="code-line">[SYS_ACTION] EXPOSURE_BUFFER_ENFORCED = -5.00%</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Time Step 4 -->
-            <div class="timeline-item" id="time-step-4">
-              <div class="time-marker">
-                <span class="marker-num">4</span>
-                <div class="radar-pulse"></div>
-              </div>
-              <div class="card-glass timeline-card">
-                <div class="timeline-time">14:01:05 EST • OPPORTUNITY FOUND</div>
-                <h4>Ethereum Staking Target</h4>
-                <p>Araiven detects a short-term yield premium on decentralized ETH pools. Expected yield return: 9.6% APY.</p>
-                <div class="timeline-code-feed">
-                  <span class="code-line">[CORRELATION] eth_staking_spread = +1.42% APY</span>
-                  <span class="code-line">[SYS_FIND] alpha_found: decentralized_eth_pool</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Time Step 5 -->
-            <div class="timeline-item" id="time-step-5">
-              <div class="time-marker">
-                <span class="marker-num">5</span>
-                <div class="radar-pulse"></div>
-              </div>
-              <div class="card-glass timeline-card">
-                <div class="timeline-time">14:01:10 EST • USER NOTIFICATION</div>
-                <h4>Araiven Recommendation</h4>
-                <div class="timeline-push-mock">
-                  <div class="push-header">
-                    <span class="push-icon">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 10px; height: 10px;"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
-                    </span>
-                    <strong>Araiven Recommendation</strong>
-                    <span class="push-time">Just now</span>
-                  </div>
-                  <div class="push-body">
-                    "Reallocate 8% USD reserves to ETH Staking. Confidence: 94%. Risk: Low."
-                  </div>
-                  <div class="push-actions">
-                    <button class="push-btn-approve">Approve & Execute</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- SECTION 6 — Opportunity Engine -->
-  <section class="opportunities-section" id="opportunities-section">
-    <div class="container">
-      <div class="text-center">
-        <span class="section-badge">Live Detection Feed</span>
-        <h2 class="text-gradient">The Araiven Opportunity Engine</h2>
-        <p class="section-subtitle">Real-time asset allocations surfaced by continuous global analysis. Tap tabs to inspect.</p>
-      </div>
-
-      <!-- Asset Toggles -->
-      <div class="asset-tabs-container">
-        <div class="asset-tabs">
-          <button class="asset-tab active" data-asset="eth" id="tab-eth">Ethereum (ETH)</button>
-          <button class="asset-tab" data-asset="btc" id="tab-btc">Bitcoin (BTC)</button>
-          <button class="asset-tab" data-asset="yield" id="tab-yield">Stablecoin Yield Basket</button>
-        </div>
-      </div>
-
-      <!-- Opportunities Display Card -->
-      <div class="opportunities-card-container">
-        <div class="card-glass opportunity-display-card" id="opportunity-card">
-          <div class="opp-main-grid">
-            
-            <div class="opp-info-block">
-              <div class="opp-asset-header">
-                <span class="opp-icon" id="opp-display-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 24px; height: 24px;"><polygon points="12 2 2 12 12 22 22 12 12 2"/></svg>
-                </span>
-                <div>
-                  <h3 id="opp-display-name">Ethereum Staking Alpha</h3>
-                  <span class="opp-symbol" id="opp-display-symbol">ETH / USD</span>
-                </div>
-              </div>
-              
-              <div class="opp-reasoning-box">
-                <h5>ARAIVEN REASONING</h5>
-                <p id="opp-display-reasoning">
-                  Validator queue consolidation and post-upgrade staking patterns show major support. Accumulation layers at $3,450 indicate institutional backing with minimal downside risk.
-                </p>
-              </div>
-
-              <div class="opp-actions">
-                <button class="btn btn-primary" id="opp-btn-execute">Deploy Allocation</button>
-                <span class="opp-execution-notice">Requires 1-click authorization</span>
-              </div>
-            </div>
-
-            <div class="opp-metrics-block">
-              <!-- Confidence Circle -->
-              <div class="metric-gauge-wrapper">
-                <div class="metric-circle-box">
-                  <svg viewBox="0 0 100 100" class="metric-svg">
-                    <circle cx="50" cy="50" r="40" class="bg-circle" />
-                    <circle cx="50" cy="50" r="40" class="fill-circle" id="opp-circle-fill" style="stroke-dashoffset: 27.6; stroke: #10b981;" />
-                  </svg>
-                  <div class="metric-value-overlay">
-                    <span class="val-num" id="opp-display-confidence">89%</span>
-                    <span class="val-label">Araiven Confidence</span>
-                  </div>
+                
+                <div style="display: flex; flex-direction: column; gap: 1px; margin-top: 4px;">
+                  <span style="font-size: 0.6rem; color: var(--text-muted);">Simulated Exposure</span>
+                  <span style="font-size: 0.72rem; font-weight: 700; color: #fff;">$5,000 (10x Leverage)</span>
                 </div>
               </div>
 
-              <!-- Stat Rows -->
-              <div class="opp-stats-rows">
-                <div class="stat-row">
-                  <span class="stat-label">EXPECTED RETURN</span>
-                  <span class="stat-value" id="opp-display-return">8.0% - 12.0%</span>
-                </div>
-                <div class="stat-row">
-                  <span class="stat-label">RISK FACTOR</span>
-                  <span class="stat-value text-green" id="opp-display-risk">Low</span>
-                </div>
-                <div class="stat-row">
-                  <span class="stat-label">STRATEGY TYPE</span>
-                  <span class="stat-value" id="opp-display-strategy">Staking / Delta Neutral</span>
-                </div>
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- SECTION 7 — AI Wealth Copilot -->
-  <section class="chat-section" id="chat-section">
-    <div class="container">
-      <div class="chat-grid">
-        <!-- Chat Interface Mock -->
-        <div class="chat-interface-col">
-          <div class="card-glass chat-window">
-            <!-- Header -->
-            <div class="chat-header">
-              <div class="chat-avatar">A</div>
-              <div>
-                <h4>Araiven Engine</h4>
-                <span class="chat-status"><span class="status-pulse"></span>Active Copilot Instance</span>
-              </div>
-              <span class="engine-badge">v1.2</span>
-            </div>
-
-            <!-- Messages Area -->
-            <div class="chat-messages" id="chat-messages-container">
-              <!-- Initial Welcome Message -->
-              <div class="msg-bubble system">
-                <p>Welcome! I am Araiven, your wealth decision engine. You can ask me to evaluate strategies, analyze risk, or check opportunities. Select one of the questions below to test my analysis.</p>
-              </div>
-            </div>
-
-            <!-- Chat suggestion buttons -->
-            <div class="chat-suggestions">
-              <button class="chat-suggest-btn" data-question="eth-exposure">Should I increase exposure to Ethereum?</button>
-              <button class="chat-suggest-btn" data-question="risk-model">What is my current risk model setting?</button>
-              <button class="chat-suggest-btn" data-question="macro-scans">What global events is Araiven monitoring?</button>
-            </div>
-            
-            <div class="chat-input-row">
-              <div class="chat-input-mock">Ask Araiven a question...</div>
-              <button class="chat-send-btn" disabled>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 18px; height: 18px;"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+              <!-- Action button updates dynamically -->
+              <button class="btn deploy-action-btn" style="width: 100%; height: 32px; font-size: 0.68rem; font-weight: 700; border-radius: 4px; border: 1px solid transparent;">
+                Deploy Trade
               </button>
             </div>
 
-          </div>
-        </div>
-
-        <!-- Chat Description -->
-        <div class="chat-intro-col">
-          <span class="section-badge">Interactive Dialogue</span>
-          <h2 class="text-gradient">Conversational Strategy, Powered by Araiven</h2>
-          <p class="chat-desc">
-            Araiven is the actual intelligence layer directly hooked into your portfolio's execution pipeline.
-          </p>
-          <p class="chat-desc">
-            Ask complex structural questions about capital allocation, assess correlation risks, and receive precise recommendations with transparent reasoning.
-          </p>
-          <div class="chat-feature-highlights">
-            <div class="highlight-item">
-              <div class="highlight-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-              </div>
-              <div>
-                <h5>No Chatbot Hallucinations</h5>
-                <p>Araiven runs math models directly over active liquidity indicators.</p>
+            <!-- Deployed Success overlay message -->
+            <div class="deploy-success-flash">
+              <div style="display: flex; align-items: center; gap: 6px; background: rgba(6, 9, 19, 0.9); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 6px; padding: 12px 18px; box-shadow: 0 10px 25px rgba(0,0,0,0.6);">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#10b981" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                <span style="font-family: monospace; font-size: 0.75rem; color: #fff; font-weight: 700;">TRADE DEPLOYED SUCCESSFULLY</span>
               </div>
             </div>
-            <div class="highlight-item">
-              <div class="highlight-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-              </div>
-              <div>
-                <h5>Actionable Prompts</h5>
-                <p>Authorize recommended swaps and rebalances directly from the chat conversation.</p>
-              </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Trust Bar -->
+  <section class="trust-bar" style="background: rgba(14, 19, 37, 0.4); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 24px 0;">
+    <div class="container" style="max-width: var(--max-content-width); margin: 0 auto; padding: 0 var(--margin-outer); display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap;">
+      <div style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text-secondary); font-weight: 600;">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--primary)" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        <span>AI Powered</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text-secondary); font-weight: 600;">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--primary)" stroke-width="2"><path d="M2 17l10 5 10-5M2 12l10 5 10-5M12 2L2 7l10 5 10-5-10-5z"/></svg>
+        <span>Real-Time Market Analysis</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text-secondary); font-weight: 600;">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--primary)" stroke-width="2"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+        <span>Paper Trading Simulation</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text-secondary); font-weight: 600;">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--primary)" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        <span>Institutional Intelligence</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text-secondary); font-weight: 600;">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--primary)" stroke-width="2"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M12 6v6l4 2"/></svg>
+        <span>24/7 Monitoring</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 1: Problem -->
+  <section id="problem-section" style="padding: 100px 0;">
+    <div class="container" style="max-width: var(--max-content-width); margin: 0 auto; padding: 0 var(--margin-outer);">
+      <div style="text-align: center; margin-bottom: 60px;">
+        <span class="badge-ds badge-avoid" style="font-size: 0.72rem; padding: 4px 10px; margin-bottom: 12px;">Market Realities</span>
+        <h2 class="section-title" style="font-size: 2.2rem; font-weight: 700; margin-bottom: 16px;">Why Retail Traders <span class="text-accent-gradient">Struggle</span></h2>
+        <p class="body-text" style="max-width: 550px; margin: 0 auto;">Studying hundreds of lagging parameters manually leads to trading bias, emotional fatigue, and delayed executions.</p>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px;">
+        <div class="card-glass" style="display: flex; flex-direction: column; gap: 20px; border-color: rgba(239, 68, 68, 0.15);">
+          <h3 class="card-title" style="color: var(--danger); font-size: 1.15rem; margin: 0; display: flex; align-items: center; gap: 8px;">
+            <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--danger); display: inline-block;"></span>
+            The Manual Limit
+          </h3>
+          <p class="body-text">Endless indicator loops (RSI, MACD, EMAs) and spreadsheet math overload the human decision pipeline, leading to execution delays.</p>
+          <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; font-size: 0.85rem; color: var(--text-secondary);">
+            <li style="display: flex; align-items: flex-start; gap: 8px;">
+              <span style="color: var(--danger); font-weight: bold;">✕</span>
+              Staring at multiple timeframes for hours.
+            </li>
+            <li style="display: flex; align-items: flex-start; gap: 8px;">
+              <span style="color: var(--danger); font-weight: bold;">✕</span>
+              Calculating position sizes and stop ratios manually.
+            </li>
+          </ul>
+        </div>
+
+        <div class="card-glass" style="display: flex; flex-direction: column; gap: 20px; border-color: rgba(16, 185, 129, 0.15);">
+          <h3 class="card-title" style="color: var(--success); font-size: 1.15rem; margin: 0; display: flex; align-items: center; gap: 8px;">
+            <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--success); display: inline-block;"></span>
+            The Autonomous Shift
+          </h3>
+          <p class="body-text">Araiven tracks supporting volume bands, parses structural orderbook support, drafts execution plan levels, and enforces drawdown rules instantly.</p>
+          <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; font-size: 0.85rem; color: var(--text-secondary);">
+            <li style="display: flex; align-items: flex-start; gap: 8px;">
+              <span style="color: var(--success); font-weight: bold;">✓</span>
+              Multi-feed support scanning parses opportunities instantly.
+            </li>
+            <li style="display: flex; align-items: flex-start; gap: 8px;">
+              <span style="color: var(--success); font-weight: bold;">✓</span>
+              Structured target ladders pre-loaded before simulated action.
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 2: Meet Araiven -->
+  <section style="padding: 100px 0; background: rgba(14, 19, 37, 0.4); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
+    <div class="container" style="max-width: var(--max-content-width); margin: 0 auto; padding: 0 var(--margin-outer); display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center;">
+      <div>
+        <span class="badge-ds badge-ai" style="font-size: 0.72rem; padding: 4px 10px; margin-bottom: 12px;">Core Decision Engine</span>
+        <h2 class="section-title" style="font-size: 2.2rem; font-weight: 700; margin-bottom: 20px;">Meet <span class="text-accent-gradient">Araiven Intelligence</span></h2>
+        <p class="body-text" style="font-size: 1.05rem; line-height: 1.6; margin-bottom: 20px;">Araiven is the multi-dimensional decision engine behind the Ravora platform. It continuously evaluates historical supports, order volume clusters, and sentiment shifts to identify simulated trading ideas.</p>
+        <p class="body-text" style="font-size: 1.05rem; line-height: 1.6; margin-bottom: 0;">By matching market feeds against mathematical models, Araiven provides clear, transparent execution planning without retail indicator congestion.</p>
+      </div>
+      <div>
+        <div class="card-glass" style="display: flex; flex-direction: column; gap: 16px; padding: 24px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 10px;">
+            <span style="font-family: monospace; font-size: 0.72rem; color: var(--text-muted);">DECISION METRIC INPUT</span>
+            <span style="font-family: monospace; font-size: 0.72rem; color: var(--ai-accent);">SYNCED</span>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 10px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem;">
+              <span style="color: var(--text-secondary);">Feeds Latency</span>
+              <span style="font-weight: 700; color: #fff;">1.2ms (Real-Time)</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem;">
+              <span style="color: var(--text-secondary);">Risk Audits Ingestion</span>
+              <span style="font-weight: 700; color: #fff;">24.4k feeds / sec</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem;">
+              <span style="color: var(--text-secondary);">Drawdown Protection</span>
+              <span style="font-weight: 700; color: #10b981;">ACTIVE GUARD</span>
             </div>
           </div>
         </div>
@@ -858,361 +337,253 @@
     </div>
   </section>
 
-  <!-- SECTION 8 — Portfolio Intelligence -->
-  <section class="portfolio-section" id="portfolio-section">
-    <div class="container">
-      <div class="text-center">
-        <span class="section-badge">Analytics Dashboard</span>
-        <h2 class="text-gradient">Portfolio Intelligence</h2>
-        <p class="section-subtitle">Real-time health audits, allocations, and projections audited continuously by Araiven.</p>
+  <!-- Section 3: How Ravora Works -->
+  <section id="workflow-section" style="padding: 100px 0;">
+    <div class="container" style="max-width: var(--max-content-width); margin: 0 auto; padding: 0 var(--margin-outer);">
+      <div style="text-align: center; margin-bottom: 60px;">
+        <span class="badge-ds badge-long" style="font-size: 0.72rem; padding: 4px 10px; margin-bottom: 12px;">Visual Pipeline</span>
+        <h2 class="section-title" style="font-size: 2.2rem; font-weight: 700; margin-bottom: 16px;">Simple 4-Step <span class="text-accent-gradient">Intelligence</span></h2>
+        <p class="body-text" style="max-width: 550px; margin: 0 auto;">Observe how Ravora translates global market feeds into clean, simulated execution plan ladders.</p>
       </div>
 
-      <div class="portfolio-grid">
-        <!-- Health Card -->
-        <div class="card-glass dashboard-card card-health">
-          <h4>Araiven Health Score</h4>
-          <div class="dashboard-gauge">
-            <svg viewBox="0 0 100 50" class="gauge-svg">
-              <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="8" stroke-linecap="round"/>
-              <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#10b981" stroke-width="8" stroke-linecap="round" stroke-dasharray="125" stroke-dashoffset="5" id="health-gauge-fill"/>
-            </svg>
-            <div class="gauge-value" id="dashboard-health-val">96%</div>
-          </div>
-          <p class="gauge-desc">Your portfolio complies with 100% of defined risk hedge rules.</p>
+      <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px;">
+        <div class="card-glass" style="display: flex; flex-direction: column; gap: 12px;">
+          <div style="font-size: 1.8rem; font-weight: 800; color: rgba(255,255,255,0.06); font-family: var(--font-display);">01</div>
+          <h4 class="card-title" style="margin: 0;">Feed Ingestion</h4>
+          <p style="font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5; margin: 0;">Continuously checks orderbook feeds and volume spikes 24/7.</p>
         </div>
-
-        <!-- Risk Index Card -->
-        <div class="card-glass dashboard-card card-risk">
-          <h4>Active Risk Exposure</h4>
-          <div class="risk-index-bar">
-            <div class="risk-bar-track">
-              <div class="risk-bar-fill" id="risk-bar-indicator" style="width: 42%;"></div>
-            </div>
-            <div class="risk-labels">
-              <span>Low</span>
-              <span class="active-risk-label" id="dashboard-risk-index">42/100</span>
-              <span>High</span>
-            </div>
-          </div>
-          <p class="risk-desc">Mild exposure to volatility. Stables and L1 hedging active.</p>
+        <div class="card-glass" style="display: flex; flex-direction: column; gap: 12px;">
+          <div style="font-size: 1.8rem; font-weight: 800; color: rgba(255,255,255,0.06); font-family: var(--font-display);">02</div>
+          <h4 class="card-title" style="margin: 0;">Quant Analysis</h4>
+          <p style="font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5; margin: 0;">Araiven identifies support zones, momentum support, and trends.</p>
         </div>
-
-        <!-- Diversification Card -->
-        <div class="card-glass dashboard-card card-diversification">
-          <h4>Asset Allocations</h4>
-          <div class="diversification-bars">
-            <div class="div-row">
-              <span class="div-asset">ETH (Staking)</span>
-              <div class="div-bar-track"><div class="div-bar-fill" style="width: 45%; background: #7c3aed;"></div></div>
-              <span class="div-pct">45%</span>
-            </div>
-            <div class="div-row">
-              <span class="div-asset">USDC (Yields)</span>
-              <div class="div-bar-track"><div class="div-bar-fill" style="width: 30%; background: #2563eb;"></div></div>
-              <span class="div-pct">30%</span>
-            </div>
-            <div class="div-row">
-              <span class="div-asset">BTC (Holdings)</span>
-              <div class="div-bar-track"><div class="div-bar-fill" style="width: 20%; background: #f59e0b;"></div></div>
-              <span class="div-pct">20%</span>
-            </div>
-            <div class="div-row">
-              <span class="div-asset">Cash Reserves</span>
-              <div class="div-bar-track"><div class="div-bar-fill" style="width: 5%; background: #64748b;"></div></div>
-              <span class="div-pct">5%</span>
-            </div>
-          </div>
+        <div class="card-glass" style="display: flex; flex-direction: column; gap: 12px;">
+          <div style="font-size: 1.8rem; font-weight: 800; color: rgba(255,255,255,0.06); font-family: var(--font-display);">03</div>
+          <h4 class="card-title" style="margin: 0;">Ladders Setup</h4>
+          <p style="font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5; margin: 0;">Generates Execution Plan target ladders outlining Entry, SL, and multiple Take Profits.</p>
         </div>
-
-        <!-- SVG Trend Forecast Card -->
-        <div class="card-glass dashboard-card card-forecast">
-          <h4>5-Year Growth Projections</h4>
-          <div class="forecast-chart-container">
-            <svg viewBox="0 0 350 150" class="forecast-svg">
-              <defs>
-                <linearGradient id="forecast-grad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="#7c3aed" stop-opacity="0.25"/>
-                  <stop offset="100%" stop-color="#7c3aed" stop-opacity="0"/>
-                </linearGradient>
-              </defs>
-              <g class="forecast-grid-lines">
-                <line x1="0" y1="30" x2="350" y2="30" stroke="rgba(255,255,255,0.03)" />
-                <line x1="0" y1="65" x2="350" y2="65" stroke="rgba(255,255,255,0.03)" />
-                <line x1="0" y1="100" x2="350" y2="100" stroke="rgba(255,255,255,0.03)" />
-              </g>
-              <path d="M 0 130 C 50 120, 100 90, 150 75 T 350 20 L 350 150 L 0 150 Z" fill="url(#forecast-grad)"/>
-              <path d="M 0 130 C 50 120, 100 90, 150 75 T 350 20" fill="none" stroke="#7c3aed" stroke-width="2.5" />
-              <path d="M 0 130 C 50 125, 100 105, 150 95 T 350 60" fill="none" stroke="#2563eb" stroke-width="1.5" stroke-dasharray="4" />
-              <path d="M 0 130 C 50 110, 100 75, 150 50 T 350 5" fill="none" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="4" />
-              <circle cx="350" cy="20" r="4" fill="#7c3aed" stroke="#ffffff" stroke-width="1" />
-              <text x="10" y="20" fill="var(--text-muted)" font-size="8">Capital Projection (USD)</text>
-              <text x="300" y="32" fill="#7c3aed" font-size="8">Balanced</text>
-              <text x="300" y="72" fill="#2563eb" font-size="8">Conservative</text>
-              <text x="300" y="14" fill="#f59e0b" font-size="8">Aggressive</text>
-            </svg>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- SECTION 9 — Trust & Security -->
-  <section class="security-section" id="security-section">
-    <div class="container">
-      <div class="text-center">
-        <span class="section-badge">Asset Safety & Governance</span>
-        <h2 class="text-gradient">Institutional Trust & Security</h2>
-        <p class="section-subtitle">Araiven is an analytical engine, not a custodian. Your assets remain secure inside your own brokerages.</p>
-      </div>
-
-      <div class="security-grid">
-        <!-- Security Card 1 -->
-        <div class="card-glass security-card">
-          <div class="sec-icon-box">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 32px; height: 32px; color: var(--accent-secondary);"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-          </div>
-          <h4>Read-Only API Access</h4>
-          <p>We bind using secure read-only keys. Ravora cannot withdraw your tokens, transfer cash, or access external credentials.</p>
-        </div>
-
-        <!-- Security Card 2 -->
-        <div class="card-glass security-card">
-          <div class="sec-icon-box">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 32px; height: 32px; color: var(--accent-secondary);"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-          </div>
-          <h4>User Control</h4>
-          <p>Araiven detects setups, but you maintain final command. No trade executes without your explicit click approval.</p>
-        </div>
-
-        <!-- Security Card 3 -->
-        <div class="card-glass security-card">
-          <div class="sec-icon-box">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 32px; height: 32px; color: var(--accent-secondary);"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
-          </div>
-          <h4>Hard Exposure Limits</h4>
-          <p>Define custom max allocation limits, drawdowns, and safety rules that Araiven is mathematically bound to obey.</p>
-        </div>
-
-        <!-- Security Card 4 -->
-        <div class="card-glass security-card">
-          <div class="sec-icon-box">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 32px; height: 32px; color: var(--accent-secondary);"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-          </div>
-          <h4>Complete Transparency</h4>
-          <p>Every suggestion includes full, plain-text calculations explaining the reasoning. Audit the logic before executing.</p>
+        <div class="card-glass" style="display: flex; flex-direction: column; gap: 12px;">
+          <div style="font-size: 1.8rem; font-weight: 800; color: rgba(255,255,255,0.06); font-family: var(--font-display);">04</div>
+          <h4 class="card-title" style="margin: 0;">Simulated Deployment</h4>
+          <p style="font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5; margin: 0;">Execute recommended trades into simulated sandbox positions with automated drawdown caps.</p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- SECTION 10 — Pricing -->
-  <section class="pricing" id="pricing">
-    <div class="container">
-      <div class="text-center">
-        <span class="section-badge">Simple Pricing</span>
-        <h2 class="text-gradient">Transparent Plans for Everyone</h2>
-        <p class="section-subtitle">Start growing your wealth for free, then upgrade to unlocked premium AI execution when you're ready.</p>
+  <!-- Section 4: Interactive Product Showcase -->
+  <section id="showcase-section" style="padding: 100px 0; background: rgba(14, 19, 37, 0.4); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
+    <div class="container" style="max-width: var(--max-content-width); margin: 0 auto; padding: 0 var(--margin-outer);">
+      <div style="text-align: center; margin-bottom: 60px;">
+        <span class="badge-ds badge-hold" style="font-size: 0.72rem; padding: 4px 10px; margin-bottom: 12px;">Interactive Showcase</span>
+        <h2 class="section-title" style="font-size: 2.2rem; font-weight: 700; margin-bottom: 16px;">Platform Workspace <span class="text-accent-gradient">Views</span></h2>
+        <p class="body-text" style="max-width: 550px; margin: 0 auto;">Auditing each critical view inside the Ravora AI Trading Operating System.</p>
       </div>
 
-      <!-- Price Switch Toggle -->
-      <div class="pricing-toggle-container">
-        <span class="toggle-label active" id="label-monthly">Billed Monthly</span>
-        <button class="pricing-switch" id="pricing-switch-btn" aria-label="Toggle annual pricing">
-          <span class="pricing-switch-handle"></span>
-        </button>
-        <span class="toggle-label" id="label-yearly">Billed Annually</span>
-        <span class="toggle-discount">Save 30%</span>
-      </div>
-
-      <!-- Pricing Cards Grid -->
-      <div class="pricing-grid">
-        
-        <!-- Free Plan -->
-        <div class="card-glass pricing-card" id="price-card-free">
-          <h3 class="pricing-tier">Free Plan</h3>
-          <div class="pricing-price"><span class="pricing-price-val">$0</span><span class="pricing-period">/mo</span></div>
-          <p class="pricing-desc">Perfect to explore Ravora's market summaries and test insights via simulated paper trading.</p>
-          <ul class="pricing-features">
-            <li>
-              <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
-              1 Connected Account
-            </li>
-            <li>
-              <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
-              Daily Araiven Market Summaries
-            </li>
-            <li>
-              <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
-              Virtual Paper Trading Account
-            </li>
-            <li style="opacity: 0.4;">
-              <svg viewBox="0 0 24 24" style="fill: var(--text-muted);"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
-              Real-time Portfolio Auto-Execution
-            </li>
-          </ul>
-          <a href="#" class="btn btn-secondary pricing-btn" id="btn-select-free" onclick="return false;">Get Started</a>
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px;">
+        <!-- Card 1: Chart -->
+        <div class="card-glass showcase-card" style="display: flex; flex-direction: column; gap: 14px;">
+          <div style="font-weight: 700; color: var(--primary); font-size: 0.72rem; letter-spacing: 0.05em; font-family: monospace;">01 / CHART VIEW</div>
+          <h4 class="card-title" style="margin: 0;">Integrated Price Chart</h4>
+          <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; margin: 0;">A simplified price canvas plotting support/resistance bounds and active ladder levels directly on the candles.</p>
         </div>
-
-        <!-- Pro Plan (Recommended) -->
-        <div class="card-glass pricing-card premium" id="price-card-pro">
-          <div class="pricing-badge">Recommended</div>
-          <h3 class="pricing-tier" style="color: #fff;">Pro Plan</h3>
-          <div class="pricing-price"><span class="pricing-price-val">$29</span><span class="pricing-period">/mo</span></div>
-          <p class="pricing-desc">Comprehensive AI insights and execution designed for busy professionals seeking optimal passive growth.</p>
-          <ul class="pricing-features">
-            <li>
-              <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
-              Up to 3 Connected Accounts
-            </li>
-            <li>
-              <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
-              Continuous Araiven Opportunity Feed
-            </li>
-            <li>
-              <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
-              One-Click Rebalancing Suggestions
-            </li>
-            <li>
-              <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
-              Custom Portfolio Risk Hedging
-            </li>
-          </ul>
-          <a href="#" class="btn btn-primary pricing-btn" id="btn-select-pro" onclick="return false;">Start 14-day Free Trial</a>
+        <!-- Card 2: Market Scanner -->
+        <div class="card-glass showcase-card" style="display: flex; flex-direction: column; gap: 14px;">
+          <div style="font-weight: 700; color: var(--primary); font-size: 0.72rem; letter-spacing: 0.05em; font-family: monospace;">02 / SCANNER VIEW</div>
+          <h4 class="card-title" style="margin: 0;">AI Opportunity Scanner</h4>
+          <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; margin: 0;">Continuous scanners listing direction bias, opportunity score, and macro sentiment confidence on major pairs.</p>
         </div>
-
-        <!-- Premium Plan -->
-        <div class="card-glass pricing-card" id="price-card-premium">
-          <h3 class="pricing-tier">Premium Plan</h3>
-          <div class="pricing-price"><span class="pricing-price-val">$99</span><span class="pricing-period">/mo</span></div>
-          <p class="pricing-desc">Advanced features for active investors requiring custom allocations and priority AI performance.</p>
-          <ul class="pricing-features">
-            <li>
-              <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
-              Unlimited Connected Accounts
-            </li>
-            <li>
-              <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
-              Custom Goal-Tracking Strategies
-            </li>
-            <li>
-              <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
-              Dedicated Auto-Execution Engine
-            </li>
-            <li>
-              <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
-              Priority Support & Araiven Access
-            </li>
-          </ul>
-          <a href="#" class="btn btn-secondary pricing-btn" id="btn-select-premium" onclick="return false;">Talk to Sales</a>
+        <!-- Card 3: Execution Plan -->
+        <div class="card-glass showcase-card" style="display: flex; flex-direction: column; gap: 14px;">
+          <div style="font-weight: 700; color: var(--primary); font-size: 0.72rem; letter-spacing: 0.05em; font-family: monospace;">03 / EXECUTION PLAN</div>
+          <h4 class="card-title" style="margin: 0;">Structured Target Ladders</h4>
+          <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; margin: 0;">Visual confirmation boards detailing potential PnL multipliers, margin limits, and exposure ratios prior to simulated entries.</p>
         </div>
-
       </div>
     </div>
   </section>
 
-  <!-- SECTION 11 — Final Call To Action -->
-  <section class="final-cta-section" id="final-cta-section">
-    <div class="cta-glow-bg"></div>
-    <div class="container text-center">
-      <h2 class="text-gradient">Stop Watching Charts.<br>Start Building Wealth.</h2>
-      <p class="cta-subtitle">Let Araiven do the heavy lifting while you focus on what matters. Connect your first exchange securely in under 3 minutes.</p>
-      <div class="cta-actions">
-        <a href="#pricing" class="btn btn-primary btn-lg">Get Started Now</a>
-        <a href="#" class="btn btn-secondary btn-lg btn-watch-demo">Watch 90s Tour</a>
+  <!-- Section 5: AI Features -->
+  <section id="features-section" style="padding: 100px 0;">
+    <div class="container" style="max-width: var(--max-content-width); margin: 0 auto; padding: 0 var(--margin-outer);">
+      <div style="text-align: center; margin-bottom: 60px;">
+        <span class="badge-ds badge-ai" style="font-size: 0.72rem; padding: 4px 10px; margin-bottom: 12px;">Feature Matrix</span>
+        <h2 class="section-title" style="font-size: 2.2rem; font-weight: 700; margin-bottom: 16px;">Core Platform <span class="text-accent-gradient">Capabilities</span></h2>
+        <p class="body-text" style="max-width: 550px; margin: 0 auto;">Standardised tools developed to eliminate manual charting complexity.</p>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px;">
+        <div class="card-glass" style="display: flex; gap: 16px; align-items: flex-start;">
+          <div style="width: 40px; height: 40px; border-radius: 8px; background: rgba(124,58,237,0.06); display: flex; align-items: center; justify-content: center; color: var(--ai-accent); flex-shrink: 0;">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+          </div>
+          <div>
+            <h4 class="card-title" style="margin: 0 0 6px 0;">Multi-dimensional Models Ingestion</h4>
+            <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; margin: 0;">Araiven coordinates price updates, support blocks, order volume support, and macro indicators simultaneously.</p>
+          </div>
+        </div>
+
+        <div class="card-glass" style="display: flex; gap: 16px; align-items: flex-start;">
+          <div style="width: 40px; height: 40px; border-radius: 8px; background: rgba(124,58,237,0.06); display: flex; align-items: center; justify-content: center; color: var(--ai-accent); flex-shrink: 0;">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </div>
+          <div>
+            <h4 class="card-title" style="margin: 0 0 6px 0;">Exposure Guard Limiters</h4>
+            <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; margin: 0;">Real-time margin calculators showing exact Max Loss risk, potential PnL wins, and exposure levels inside Deploy modals.</p>
+          </div>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- Footer Section -->
-  <footer class="footer" id="footer">
-    <div class="container">
-      <div class="footer-grid">
-        
-        <div class="footer-info">
-          <a href="#" class="logo" id="footer-logo">
-            <div class="logo-icon">R</div>
-            Ravora
-          </a>
-          <p>Your premium, AI-powered wealth copilot designed to grow capital with confidence and simplicity.</p>
-        </div>
-
-        <div class="footer-col">
-          <h4>Product</h4>
-          <ul class="footer-links">
-            <li><a href="#features" id="foot-link-features">Features</a></li>
-            <li><a href="#how-it-works" id="foot-link-how">How it Works</a></li>
-            <li><a href="#pricing" id="foot-link-pricing">Pricing</a></li>
-          </ul>
-        </div>
-
-        <div class="footer-col">
-          <h4>Company</h4>
-          <ul class="footer-links">
-            <li><a href="#" onclick="return false;">About Us</a></li>
-            <li><a href="#" onclick="return false;">Security</a></li>
-            <li><a href="#" onclick="return false;">Careers</a></li>
-          </ul>
-        </div>
-
-        <div class="footer-col">
-          <h4>Legal</h4>
-          <ul class="footer-links">
-            <li><a href="#" onclick="return false;">Privacy Policy</a></li>
-            <li><a href="#" onclick="return false;">Terms of Service</a></li>
-            <li><a href="#" onclick="return false;">Risk Disclosure</a></li>
-          </ul>
-        </div>
-
-        <div class="footer-newsletter">
-          <h4>Stay Updated</h4>
-          <p>Subscribe to receive weekly AI market breakdowns directly to your inbox.</p>
-          <form class="newsletter-form" id="newsletter-form" onsubmit="event.preventDefault(); alert('Subscribed successfully!'); this.reset();">
-            <input type="email" placeholder="Your Email Address" class="newsletter-input" id="newsletter-email" required>
-            <button type="submit" class="btn btn-primary newsletter-btn" id="newsletter-submit-btn">
-              <svg style="width: 16px; height: 16px; fill: currentColor;" viewBox="0 0 24 24">
-                <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
-              </svg>
-            </button>
-          </form>
-        </div>
-
+  <!-- Section 6: Trading Intelligence (Workflow comparison) -->
+  <section style="padding: 100px 0; background: rgba(14, 19, 37, 0.4); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
+    <div class="container" style="max-width: var(--max-content-width); margin: 0 auto; padding: 0 var(--margin-outer);">
+      <div style="text-align: center; margin-bottom: 60px;">
+        <span class="badge-ds badge-hold" style="font-size: 0.72rem; padding: 4px 10px; margin-bottom: 12px;">Method Comparison</span>
+        <h2 class="section-title" style="font-size: 2.2rem; font-weight: 700; margin-bottom: 16px;">Standardising the <span class="text-accent-gradient">Workflow</span></h2>
+        <p class="body-text" style="max-width: 550px; margin: 0 auto;">A comparison of traditional manual processes vs. Ravora's design tokens.</p>
       </div>
 
-      <div class="footer-bottom">
-        <p>&copy; 2026 Ravora Technologies Inc. All rights reserved.</p>
-        <div class="footer-socials">
-          <a href="#" aria-label="Twitter" onclick="return false;">
-            <svg viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/></svg>
-          </a>
-          <a href="#" aria-label="LinkedIn" onclick="return false;">
-            <svg viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.779-1.75-1.75s.784-1.75 1.75-1.75 1.75.779 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
-          </a>
-          <a href="#" aria-label="Discord" onclick="return false;">
-            <svg viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994.021-.041.001-.09-.041-.106a13.094 13.094 0 0 1-1.873-.894.077.077 0 0 1-.008-.128c.126-.093.252-.19.372-.287a.075.075 0 0 1 .077-.011c3.92 1.793 8.18 1.793 12.061 0a.073.073 0 0 1 .078.009c.12.099.246.195.373.289a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.894.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.156-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.156 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.156-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.156 2.418z"/></svg>
-          </a>
+      <div class="card-glass" style="padding: 0; border-radius: 12px; overflow: hidden;">
+        <table class="table-ds" style="width: 100%; margin: 0;">
+          <thead>
+            <tr>
+              <th style="padding: 16px 20px;">TRADING METRIC</th>
+              <th style="padding: 16px 20px;">TRADITIONAL MANUAL TRADING</th>
+              <th style="padding: 16px 20px; color: var(--primary);">RAVORA AI SYSTEM</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="padding: 16px 20px; font-weight: 600; color: #fff;">Market Screening</td>
+              <td style="padding: 16px 20px; color: var(--text-muted);">8+ hours of screen monitoring per day</td>
+              <td style="padding: 16px 20px; color: #fff; font-weight: 500;">0 hours (Fully autonomous scanning)</td>
+            </tr>
+            <tr>
+              <td style="padding: 16px 20px; font-weight: 600; color: #fff;">Ladder Target Calculators</td>
+              <td style="padding: 16px 20px; color: var(--text-muted);">Manual support calculations on sheets</td>
+              <td style="padding: 16px 20px; color: #fff; font-weight: 500;">Instant visual target ladders</td>
+            </tr>
+            <tr>
+              <td style="padding: 16px 20px; font-weight: 600; color: #fff;">Downside Containment</td>
+              <td style="padding: 16px 20px; color: var(--text-muted);">Delayed or emotional Stop Loss execution</td>
+              <td style="padding: 16px 20px; color: #fff; font-weight: 500;">Automated drawdown protection limit</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 7: Testimonials -->
+  <section style="padding: 100px 0;">
+    <div class="container" style="max-width: var(--max-content-width); margin: 0 auto; padding: 0 var(--margin-outer);">
+      <div style="text-align: center; margin-bottom: 60px;">
+        <span class="badge-ds badge-success" style="font-size: 0.72rem; padding: 4px 10px; margin-bottom: 12px;">Market Feedback</span>
+        <h2 class="section-title" style="font-size: 2.2rem; font-weight: 700; margin-bottom: 16px;">What Traders <span class="text-accent-gradient">Say</span></h2>
+        <p class="body-text" style="max-width: 550px; margin: 0 auto;">Institutional and retail traders outline their simulated performance.</p>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;">
+        <div class="card-glass" style="display: flex; flex-direction: column; gap: 16px; justify-content: space-between;">
+          <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6; margin: 0;">"The execution plan ladders completely changed how I think about targets. No more math on spreadsheets; the system handles risk percentages instantly."</p>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--primary); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 0.75rem; font-weight: bold;">MK</div>
+            <div style="display: flex; flex-direction: column;">
+              <span style="font-size: 0.8rem; font-weight: 600; color: #fff;">Marcus K.</span>
+              <span style="font-size: 0.65rem; color: var(--text-muted);">Independent Portfolio Trader</span>
+            </div>
+          </div>
         </div>
+
+        <div class="card-glass" style="display: flex; flex-direction: column; gap: 16px; justify-content: space-between;">
+          <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6; margin: 0;">"Paper trading feels remarkably close to real execution. The leverage and exposure sliders teach correct risk management protocols effortlessly."</p>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--ai-accent); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 0.75rem; font-weight: bold;">TL</div>
+            <div style="display: flex; flex-direction: column;">
+              <span style="font-size: 0.8rem; font-weight: 600; color: #fff;">Tanya L.</span>
+              <span style="font-size: 0.65rem; color: var(--text-muted);">Quantitative Analyst</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-glass" style="display: flex; flex-direction: column; gap: 16px; justify-content: space-between;">
+          <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6; margin: 0;">"Araiven's risk index metrics are highly accurate. Having support and supply zones plotted dynamically on the chart keeps trading layouts clean."</p>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div style="width: 32px; height: 32px; border-radius: 50%; background: #3b82f6; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 0.75rem; font-weight: bold;">DL</div>
+            <div style="display: flex; flex-direction: column;">
+              <span style="font-size: 0.8rem; font-weight: 600; color: #fff;">David L.</span>
+              <span style="font-size: 0.65rem; color: var(--text-muted);">Retail Risk Associate</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 8: FAQ -->
+  <section id="faq-section" style="padding: 100px 0; background: rgba(14, 19, 37, 0.4); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
+    <div class="container" style="max-width: var(--max-content-width); margin: 0 auto; padding: 0 var(--margin-outer);">
+      <div style="text-align: center; margin-bottom: 60px;">
+        <span class="badge-ds badge-hold" style="font-size: 0.72rem; padding: 4px 10px; margin-bottom: 12px;">Operational Queries</span>
+        <h2 class="section-title" style="font-size: 2.2rem; font-weight: 700; margin-bottom: 16px;">Frequently Asked <span class="text-accent-gradient">Questions</span></h2>
+        <p class="body-text" style="max-width: 550px; margin: 0 auto;">Answers to key operational queries about the Ravora platform.</p>
+      </div>
+
+      <div style="max-width: 700px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px;">
+        <div class="card-glass faq-item" style="padding: 16px; border-radius: 8px;">
+          <div class="faq-item-header" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer; color: #fff; font-weight: 600; font-size: 0.95rem;">
+            <span>Is it real-money trading?</span>
+            <span style="font-size: 1.2rem; line-height: 1;">+</span>
+          </div>
+          <div class="faq-item-content" style="max-height: 0; overflow: hidden; transition: max-height 0.2s ease-out; font-size: 0.85rem; color: var(--text-secondary); margin-top: 0; line-height: 1.6;">
+            <p style="padding-top: 10px; margin: 0;">No. Ravora is currently configured exclusively for paper trading simulation. It allows you to build mock positions and test strategies against live orderbooks with zero capital risk.</p>
+          </div>
+        </div>
+
+        <div class="card-glass faq-item" style="padding: 16px; border-radius: 8px;">
+          <div class="faq-item-header" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer; color: #fff; font-weight: 600; font-size: 0.95rem;">
+            <span>How does Araiven calculate opportunities?</span>
+            <span style="font-size: 1.2rem; line-height: 1;">+</span>
+          </div>
+          <div class="faq-item-content" style="max-height: 0; overflow: hidden; transition: max-height 0.2s ease-out; font-size: 0.85rem; color: var(--text-secondary); margin-top: 0; line-height: 1.6;">
+            <p style="padding-top: 10px; margin: 0;">Araiven scans orderbooks, structural levels, volume profiles, and news feeds. It calculates probability ranges based on consolidations and overlays targets dynamically on your charts.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 9: Final CTA -->
+  <section style="padding: 100px 0; text-align: center;">
+    <div class="container" style="max-width: var(--max-content-width); margin: 0 auto; padding: 0 var(--margin-outer);">
+      <h2 class="display-title" style="font-size: 2.5rem; font-weight: 700; margin-bottom: 16px; color: #fff;">Ready to upgrade your <span class="text-accent-gradient">workflow</span>?</h2>
+      <p class="body-text" style="max-width: 500px; margin: 0 auto 32px auto;">Link your simulated account today and let Araiven discover market alpha.</p>
+      <a href="/app/?auth=register" class="btn btn-primary" style="height: 48px; padding: 0 32px; border-radius: 6px; font-size: 0.95rem; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; text-decoration: none;">Start Free Now</a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer style="padding: 40px 0; border-top: 1px solid var(--border);">
+    <div class="container" style="max-width: var(--max-content-width); margin: 0 auto; padding: 0 var(--margin-outer); display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; color: var(--text-muted); flex-wrap: wrap; gap: 16px;">
+      <p>&copy; 2026 Ravora Technologies Inc. All rights reserved.</p>
+      <div class="footer-socials" style="display: flex; gap: 12px;">
+        <a href="#" id="btn-sidebar-feedback" title="Feedback" style="color: var(--text-muted); text-decoration: none; font-weight: 600; transition: color var(--transition-hover);">Feedback</a>
       </div>
     </div>
   </footer>
 
   <!-- Interactive Demo Video Modal -->
   <div class="modal-overlay" id="demo-modal">
-    <div class="modal-content">
-      <button class="modal-close" id="modal-close-btn" aria-label="Close Modal">&times;</button>
-      <div class="modal-video-placeholder">
-        <div class="modal-demo-ui">
-          <div class="modal-demo-glow" id="modal-play-btn">
-            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-          </div>
-          <h3 style="font-family: var(--font-display); margin-bottom: 8px;">Ravora Experience Tour</h3>
-          <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 20px;">Watch how Ravora links brokerages, discovers opportunities, and optimizes risk automatically in 90 seconds.</p>
-          <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-default); border-radius: 8px; padding: 12px; font-family: monospace; font-size: 0.8rem; color: var(--accent-secondary); text-align: left; overflow: hidden; white-space: nowrap;">
-            [SYSTEM] Loading video player configuration...<br>
-            [SYSTEM] API key validated. Buffer initialized.<br>
-            [SYSTEM] Playback ready. Click the button to start simulation.
-          </div>
-        </div>
+    <div class="modal-content" style="background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px; max-width: 500px; width: 100%; position: relative; box-sizing: border-box;">
+      <button class="modal-close" id="modal-close-btn" style="position: absolute; top: 16px; right: 16px; background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer;">&times;</button>
+      <h3 style="font-family: var(--font-display); color: #fff; margin-bottom: 8px; font-size: 1.25rem;">Ravora Experience Tour</h3>
+      <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 16px; line-height: 1.5;">Watch how Ravora links simulated markets, discovers opportunities, and optimizes risk automatically in 90 seconds.</p>
+      <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 6px; padding: 12px; font-family: monospace; font-size: 0.75rem; color: var(--ai-accent); text-align: left; overflow: hidden; white-space: nowrap;">
+        [SYSTEM] Loading video player configuration...<br>
+        [SYSTEM] API key validated. Buffer initialized.<br>
+        [SYSTEM] Playback ready. Click the button to start simulation.
       </div>
     </div>
   </div>
@@ -1222,9 +593,9 @@
     <div class="card-glass onboarding-card" style="max-width: 420px; width: 100%; position: relative; padding: 28px; box-sizing: border-box;">
       <button class="modal-close" id="auth-modal-close" style="position: absolute; top: 20px; right: 20px; background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer; line-height: 1; z-index: 10;">&times;</button>
       
-      <div class="onboarding-header" style="justify-content: center; margin-bottom: 24px;">
-        <div class="logo">
-          <div class="logo-icon">R</div>
+      <div class="onboarding-header" style="justify-content: center; margin-bottom: 24px; display: flex; align-items: center; gap: 8px;">
+        <div class="logo" style="display: flex; align-items: center; gap: 8px; font-family: var(--font-display); font-size: 1.1rem; font-weight: 700; color: #fff;">
+          <div class="logo-icon" style="width: 28px; height: 28px; border-radius: 4px; background: var(--gradient-interactive); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 0.95rem;">R</div>
           Ravora Secure Access
         </div>
       </div>
@@ -1232,51 +603,70 @@
       <!-- Login Tab -->
       <div id="auth-login-container" style="width: 100%;">
         <form id="landing-login-form" class="auth-form" style="width: 100%;">
-          <h3 style="margin-bottom: 8px; text-align: left; font-family: var(--font-display); font-size: 1.4rem; font-weight: 700; color: #fff;">Welcome to Ravora</h3>
-          <p class="step-desc" style="margin-bottom: 24px; text-align: left; color: var(--text-secondary); font-size: 0.85rem; line-height: 1.45;">Enter your credentials to access your active wealth copilot.</p>
+          <h3 style="margin-bottom: 8px; text-align: left; font-family: var(--font-display); font-size: 1.3rem; font-weight: 700; color: #fff;">Welcome to Ravora</h3>
+          <p class="step-desc" style="margin-bottom: 20px; text-align: left; color: var(--text-secondary); font-size: 0.82rem; line-height: 1.45;">Enter your credentials to access your active wealth copilot.</p>
           
-          <div class="auth-input-group" style="margin-bottom: 16px; text-align: left;">
-            <label style="display: block; font-size: 0.75rem; font-weight: 600; color: #a5b4fc; margin-bottom: 6px; letter-spacing: 0.05em;">EMAIL ADDRESS</label>
-            <input type="email" id="landing-login-email" placeholder="name@domain.com" required style="width: 100%; padding: 12px 16px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.03); color: #fff; outline: none; font-size: 0.9rem; transition: border-color 0.2s;">
+          <div class="auth-input-group" style="margin-bottom: 14px; text-align: left; display: flex; flex-direction: column; gap: 6px;">
+            <label style="display: block; font-size: 0.72rem; font-weight: 600; color: #a5b4fc; letter-spacing: 0.05em;">EMAIL ADDRESS</label>
+            <input type="email" id="landing-login-email" class="form-input" placeholder="name@domain.com" required style="width: 100%;">
           </div>
           
-          <div class="auth-input-group" style="margin-bottom: 20px; text-align: left;">
-            <label style="display: block; font-size: 0.75rem; font-weight: 600; color: #a5b4fc; margin-bottom: 6px; letter-spacing: 0.05em;">PASSWORD</label>
-            <input type="password" id="landing-login-password" placeholder="••••••••" required style="width: 100%; padding: 12px 16px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.03); color: #fff; outline: none; font-size: 0.9rem; transition: border-color 0.2s;">
+          <div class="auth-input-group" style="margin-bottom: 18px; text-align: left; display: flex; flex-direction: column; gap: 6px;">
+            <label style="display: block; font-size: 0.72rem; font-weight: 600; color: #a5b4fc; letter-spacing: 0.05em;">PASSWORD</label>
+            <input type="password" id="landing-login-password" class="form-input" placeholder="••••••••" required style="width: 100%;">
           </div>
           
-          <div id="landing-login-error" style="color: #f87171; font-size: 0.8rem; margin-bottom: 16px; display: none; text-align: left; background: rgba(248, 113, 113, 0.08); padding: 10px 14px; border-radius: 8px; border: 1px solid rgba(248, 113, 113, 0.15);"></div>
+          <div id="landing-login-error" style="color: #f87171; font-size: 0.8rem; margin-bottom: 14px; display: none; text-align: left; background: rgba(248, 113, 113, 0.08); padding: 10px 14px; border-radius: 8px; border: 1px solid rgba(248, 113, 113, 0.15);"></div>
           
-          <button type="submit" class="btn btn-primary" style="width: 100%; padding: 14px; margin-bottom: 20px; font-weight: 600; font-size: 0.95rem; border-radius: 8px; border: none; cursor: pointer;">Sign In</button>
-          <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0; text-align: center;">Don't have an account? <a href="#" id="switch-to-signup" style="color: var(--accent); font-weight: 600; text-decoration: none; transition: color 0.2s;">Create Account</a></p>
+          <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px; margin-bottom: 16px; font-weight: 600; font-size: 0.9rem; border-radius: 6px; border: none; cursor: pointer; height: 40px;">Sign In</button>
+          <p style="font-size: 0.82rem; color: var(--text-secondary); margin: 0; text-align: center;">Don't have an account? <a href="#" id="switch-to-signup" style="color: var(--primary); font-weight: 600; text-decoration: none; transition: color var(--transition-hover);">Create Account</a></p>
         </form>
       </div>
 
       <!-- Register Tab -->
       <div id="auth-register-container" style="display: none; width: 100%;">
         <form id="landing-register-form" class="auth-form" style="width: 100%;">
-          <h3 style="margin-bottom: 8px; text-align: left; font-family: var(--font-display); font-size: 1.4rem; font-weight: 700; color: #fff;">Create Ravora Account</h3>
-          <p class="step-desc" style="margin-bottom: 24px; text-align: left; color: var(--text-secondary); font-size: 0.85rem; line-height: 1.45;">Initialize your institutional-grade AI wealth management workspace.</p>
+          <h3 style="margin-bottom: 8px; text-align: left; font-family: var(--font-display); font-size: 1.3rem; font-weight: 700; color: #fff;">Create Ravora Account</h3>
+          <p class="step-desc" style="margin-bottom: 20px; text-align: left; color: var(--text-secondary); font-size: 0.82rem; line-height: 1.45;">Initialize your institutional-grade AI wealth management workspace.</p>
           
-          <div class="auth-input-group" style="margin-bottom: 16px; text-align: left;">
-            <label style="display: block; font-size: 0.75rem; font-weight: 600; color: #a5b4fc; margin-bottom: 6px; letter-spacing: 0.05em;">EMAIL ADDRESS</label>
-            <input type="email" id="landing-register-email" placeholder="name@domain.com" required style="width: 100%; padding: 12px 16px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.03); color: #fff; outline: none; font-size: 0.9rem; transition: border-color 0.2s;">
+          <div class="auth-input-group" style="margin-bottom: 14px; text-align: left; display: flex; flex-direction: column; gap: 6px;">
+            <label style="display: block; font-size: 0.72rem; font-weight: 600; color: #a5b4fc; letter-spacing: 0.05em;">EMAIL ADDRESS</label>
+            <input type="email" id="landing-register-email" class="form-input" placeholder="name@domain.com" required style="width: 100%;">
           </div>
           
-          <div class="auth-input-group" style="margin-bottom: 20px; text-align: left;">
-            <label style="display: block; font-size: 0.75rem; font-weight: 600; color: #a5b4fc; margin-bottom: 6px; letter-spacing: 0.05em;">PASSWORD</label>
-            <input type="password" id="landing-register-password" placeholder="••••••••" required style="width: 100%; padding: 12px 16px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.03); color: #fff; outline: none; font-size: 0.9rem; transition: border-color 0.2s;">
+          <div class="auth-input-group" style="margin-bottom: 18px; text-align: left; display: flex; flex-direction: column; gap: 6px;">
+            <label style="display: block; font-size: 0.72rem; font-weight: 600; color: #a5b4fc; letter-spacing: 0.05em;">PASSWORD</label>
+            <input type="password" id="landing-register-password" class="form-input" placeholder="••••••••" required style="width: 100%;">
           </div>
           
-          <div id="landing-register-error" style="color: #f87171; font-size: 0.8rem; margin-bottom: 16px; display: none; text-align: left; background: rgba(248, 113, 113, 0.08); padding: 10px 14px; border-radius: 8px; border: 1px solid rgba(248, 113, 113, 0.15);"></div>
+          <div id="landing-register-error" style="color: #f87171; font-size: 0.8rem; margin-bottom: 14px; display: none; text-align: left; background: rgba(248, 113, 113, 0.08); padding: 10px 14px; border-radius: 8px; border: 1px solid rgba(248, 113, 113, 0.15);"></div>
           
-          <button type="submit" class="btn btn-primary" style="width: 100%; padding: 14px; margin-bottom: 20px; font-weight: 600; font-size: 0.95rem; border-radius: 8px; border: none; cursor: pointer;">Create Account</button>
-          <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0; text-align: center;">Already have an account? <a href="#" id="switch-to-login" style="color: var(--accent); font-weight: 600; text-decoration: none; transition: color 0.2s;">Sign In</a></p>
+          <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px; margin-bottom: 16px; font-weight: 600; font-size: 0.9rem; border-radius: 6px; border: none; cursor: pointer; height: 40px;">Create Account</button>
+          <p style="font-size: 0.82rem; color: var(--text-secondary); margin: 0; text-align: center;">Already have an account? <a href="#" id="switch-to-login" style="color: var(--primary); font-weight: 600; text-decoration: none; transition: color var(--transition-hover);">Sign In</a></p>
         </form>
       </div>
     </div>
   </div>
 
   <script src="app.js?v=5.0"></script>
+  <!-- Tiny inline FAQ toggle handler -->
+  <script>
+    document.querySelectorAll('.faq-item-header').forEach(header => {
+      header.addEventListener('click', () => {
+        const item = header.closest('.faq-item');
+        const content = item.querySelector('.faq-item-content');
+        const indicator = header.querySelector('span:last-child');
+        
+        item.classList.toggle('active');
+        if (item.classList.contains('active')) {
+          content.style.maxHeight = content.scrollHeight + 'px';
+          indicator.textContent = '−';
+        } else {
+          content.style.maxHeight = '0';
+          indicator.textContent = '+';
+        }
+      });
+    });
+  </script>
 </body>
 </html>

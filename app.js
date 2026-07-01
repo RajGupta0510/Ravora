@@ -929,4 +929,44 @@ document.addEventListener('DOMContentLoaded', () => {
     openAuth('register');
   }
 
+  // ==========================================================================
+  // 6. Looping Product Workspace Simulation (Hero Showcase Animation)
+  // ==========================================================================
+  const workspaceContainer = document.getElementById('hero-workspace-animation');
+  if (workspaceContainer) {
+    const states = [
+      'state-scanning',
+      'state-scanner-active',
+      'state-chart-drawn',
+      'state-plan-active',
+      'state-deployed'
+    ];
+    let currentStateIndex = 0;
+
+    function nextState() {
+      if (!workspaceContainer) return;
+      states.forEach(state => workspaceContainer.classList.remove(state));
+      currentStateIndex = (currentStateIndex + 1) % states.length;
+      workspaceContainer.classList.add(states[currentStateIndex]);
+      
+      let delay = 3000;
+      if (states[currentStateIndex] === 'state-scanning') {
+        delay = 2500;
+      } else if (states[currentStateIndex] === 'state-scanner-active') {
+        delay = 2000;
+      } else if (states[currentStateIndex] === 'state-chart-drawn') {
+        delay = 3000;
+      } else if (states[currentStateIndex] === 'state-plan-active') {
+        delay = 3500;
+      } else if (states[currentStateIndex] === 'state-deployed') {
+        delay = 2500;
+      }
+      
+      setTimeout(nextState, delay);
+    }
+    
+    workspaceContainer.classList.add(states[0]);
+    setTimeout(nextState, 2500);
+  }
+
 });
