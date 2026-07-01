@@ -800,104 +800,225 @@
   </div>
 
   <!-- Auth Modal -->
-  <div class="modal-overlay" id="auth-modal" style="z-index: 1100;">
-    <div class="card-glass onboarding-card"
-      style="max-width: 420px; width: 100%; position: relative; padding: 28px; box-sizing: border-box;">
-      <button class="modal-close" id="auth-modal-close"
-        style="position: absolute; top: 20px; right: 20px; background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer; line-height: 1; z-index: 10;">&times;</button>
+  <div class="modal-overlay auth-page-overlay" id="auth-modal" style="z-index: 1100;">
+    <div class="auth-split-container">
+      
+      <!-- Left Side: Brand Storytelling (45%) -->
+      <div class="auth-left-story">
+        <div class="ambient-grid"></div>
+        <div class="glow-blob glow-1" style="width: 250px; height: 250px; opacity: 0.15;"></div>
+        
+        <div class="auth-story-content">
+          <!-- Logo -->
+          <a href="#" class="logo" style="display: flex; align-items: center; gap: 10px; font-family: var(--font-display); font-size: 1.25rem; font-weight: 700; color: #fff; text-decoration: none; margin-bottom: 40px;">
+            <div class="logo-icon" style="width: 36px; height: 36px; border-radius: 6px; background: var(--gradient-primary); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 1.2rem;">R</div>
+            Ravora
+          </a>
+          
+          <h2 style="font-family: var(--font-display); font-size: 2.2rem; font-weight: 700; color: #fff; line-height: 1.25; margin-bottom: 16px; letter-spacing: -0.02em;">
+            Enter the future of <span class="text-accent-gradient">automated wealth</span>.
+          </h2>
+          
+          <p style="color: var(--text-secondary); font-size: 1rem; line-height: 1.55; margin-bottom: 40px; max-width: 420px;">
+            Araiven coordinates real-time market orderbooks, builds execution target ladders, and monitors risk parameters 24/7.
+          </p>
+          
+          <!-- Subtle AI/Dashboard preview animation (minimised SVG loop) -->
+          <div class="auth-dashboard-preview" style="border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; background: rgba(14,19,37,0.6); padding: 16px; position: relative; overflow: hidden; box-shadow: 0 12px 30px rgba(0,0,0,0.3); max-width: 440px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 8px; margin-bottom: 12px;">
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <span style="width: 6px; height: 6px; border-radius: 50%; background: #10b981; display: inline-block;"></span>
+                <span style="font-family: monospace; font-size: 0.65rem; color: var(--text-secondary); font-weight: 700;">ARAIVEN FEED STATUS</span>
+              </div>
+              <span style="font-family: monospace; font-size: 0.6rem; color: var(--ai-accent); font-weight: 700;">STREAMING LIVE</span>
+            </div>
+            
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 0.72rem; color: #fff; font-weight: 600;">BTC/USD Opportunity Score</span>
+                <span class="text-accent-gradient" style="font-size: 0.75rem; font-weight: 700; font-family: monospace;">94.2%</span>
+              </div>
+              <!-- Animated progress bar -->
+              <div style="height: 6px; background: rgba(255,255,255,0.02); border-radius: 99px; overflow: hidden; border: 1px solid rgba(255,255,255,0.04);">
+                <div class="auth-preview-bar-fill" style="width: 94.2%; height: 100%; background: var(--gradient-primary); border-radius: 99px;"></div>
+              </div>
+            </div>
+          </div>
 
-      <div class="onboarding-header"
-        style="justify-content: center; margin-bottom: 24px; display: flex; align-items: center; gap: 8px;">
-        <div class="logo"
-          style="display: flex; align-items: center; gap: 8px; font-family: var(--font-display); font-size: 1.1rem; font-weight: 700; color: #fff;">
-          <div class="logo-icon"
-            style="width: 28px; height: 28px; border-radius: 4px; background: var(--gradient-interactive); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 0.95rem;">
-            R</div>
-          Ravora Secure Access
+          <!-- Trust Points -->
+          <div style="display: flex; flex-direction: column; gap: 10px; font-size: 0.8rem; color: var(--text-secondary); margin-top: 40px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="var(--primary)" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+              <span>256-bit Secure TLS Data Transmission</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="var(--primary)" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+              <span>Simulated Sandbox Environment (No real capital required)</span>
+            </div>
+          </div>
         </div>
       </div>
+      
+      <!-- Right Side: Auth Forms (55%) -->
+      <div class="auth-right-form-wrapper">
+        <!-- Close button -->
+        <button class="modal-close" id="auth-modal-close" style="position: absolute; top: 24px; right: 24px; background: none; border: none; color: var(--text-muted); font-size: 1.8rem; cursor: pointer; line-height: 1; z-index: 100; transition: color 0.2s;">&times;</button>
+        
+        <div class="auth-form-card">
+          
+          <!-- 1. SIGN IN VIEW -->
+          <div id="auth-login-container" class="auth-flow-section" style="width: 100%;">
+            <form id="landing-login-form" class="auth-form" style="width: 100%;">
+              <h3 style="margin-bottom: 6px; text-align: left; font-family: var(--font-display); font-size: 1.45rem; font-weight: 700; color: #fff;">Welcome to Ravora</h3>
+              <p class="body-text" style="margin-bottom: 24px; text-align: left; font-size: 0.85rem; color: var(--text-secondary); line-height: 1.45;">Enter your credentials to access your active wealth copilot.</p>
+              
+              <div class="auth-input-group">
+                <label>EMAIL ADDRESS</label>
+                <input type="email" id="landing-login-email" class="form-input" placeholder="name@domain.com" required style="width: 100%;">
+              </div>
+              
+              <div class="auth-input-group">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                  <label style="margin-bottom: 0;">PASSWORD</label>
+                  <a href="#" class="auth-forgot-link" id="go-to-forgot-btn">Forgot Password?</a>
+                </div>
+                <input type="password" id="landing-login-password" class="form-input" placeholder="••••••••" required style="width: 100%;">
+              </div>
 
-      <!-- Login Tab -->
-      <div id="auth-login-container" style="width: 100%;">
-        <form id="landing-login-form" class="auth-form" style="width: 100%;">
-          <h3
-            style="margin-bottom: 8px; text-align: left; font-family: var(--font-display); font-size: 1.3rem; font-weight: 700; color: #fff;">
-            Welcome to Ravora</h3>
-          <p class="step-desc"
-            style="margin-bottom: 20px; text-align: left; color: var(--text-secondary); font-size: 0.82rem; line-height: 1.45;">
-            Enter your credentials to access your active wealth copilot.</p>
+              <!-- Remember me checkbox -->
+              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 20px; font-size: 0.82rem; color: var(--text-secondary);">
+                <input type="checkbox" id="login-remember-me" style="accent-color: var(--primary); cursor: pointer; width: 15px; height: 15px;">
+                <label for="login-remember-me" style="margin: 0; font-weight: 500; cursor: pointer;">Remember me on this device</label>
+              </div>
+              
+              <div id="landing-login-error" class="auth-error-msg" style="display: none;"></div>
+              
+              <button type="submit" class="btn btn-primary auth-submit-btn" style="width: 100%; height: 44px; font-size: 0.9rem; font-weight: 600; margin-bottom: 16px;">
+                <span>Sign In</span>
+                <span class="auth-spinner" style="display: none;"></span>
+              </button>
 
-          <div class="auth-input-group"
-            style="margin-bottom: 14px; text-align: left; display: flex; flex-direction: column; gap: 6px;">
-            <label
-              style="display: block; font-size: 0.72rem; font-weight: 600; color: #a5b4fc; letter-spacing: 0.05em;">EMAIL
-              ADDRESS</label>
-            <input type="email" id="landing-login-email" class="form-input" placeholder="name@domain.com" required
-              style="width: 100%;">
+              <!-- Social Login Placeholder -->
+              <div class="social-divider" style="text-align: center; margin: 20px 0; position: relative; font-size: 0.75rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">
+                <span style="background: #060913; padding: 0 10px; position: relative; z-index: 2;">OR CONTINUE WITH</span>
+                <div style="position: absolute; top: 50%; left: 0; width: 100%; height: 1px; background: rgba(255,255,255,0.06); z-index: 1;"></div>
+              </div>
+
+              <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 24px;">
+                <button type="button" class="btn btn-secondary social-btn" style="height: 38px; font-size: 0.78rem; padding: 0;">Google</button>
+                <button type="button" class="btn btn-secondary social-btn" style="height: 38px; font-size: 0.78rem; padding: 0;">GitHub</button>
+                <button type="button" class="btn btn-secondary social-btn" style="height: 38px; font-size: 0.78rem; padding: 0;">Apple</button>
+              </div>
+              
+              <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0; text-align: center;">Don't have an account? <a href="#" id="switch-to-signup" class="auth-switch-link">Create Account</a></p>
+            </form>
           </div>
 
-          <div class="auth-input-group"
-            style="margin-bottom: 18px; text-align: left; display: flex; flex-direction: column; gap: 6px;">
-            <label
-              style="display: block; font-size: 0.72rem; font-weight: 600; color: #a5b4fc; letter-spacing: 0.05em;">PASSWORD</label>
-            <input type="password" id="landing-login-password" class="form-input" placeholder="••••••••" required
-              style="width: 100%;">
+          <!-- 2. CREATE ACCOUNT VIEW -->
+          <div id="auth-register-container" class="auth-flow-section" style="display: none; width: 100%;">
+            <form id="landing-register-form" class="auth-form" style="width: 100%;">
+              <h3 style="margin-bottom: 6px; text-align: left; font-family: var(--font-display); font-size: 1.45rem; font-weight: 700; color: #fff;">Create Account</h3>
+              <p class="body-text" style="margin-bottom: 24px; text-align: left; font-size: 0.85rem; color: var(--text-secondary); line-height: 1.45;">Initialize your institutional-grade AI wealth workspace.</p>
+
+              <div class="auth-input-group">
+                <label>FULL NAME</label>
+                <input type="text" id="landing-register-name" class="form-input" placeholder="Alex Mercer" required style="width: 100%;">
+              </div>
+              
+              <div class="auth-input-group">
+                <label>EMAIL ADDRESS</label>
+                <input type="email" id="landing-register-email" class="form-input" placeholder="name@domain.com" required style="width: 100%;">
+              </div>
+              
+              <div class="auth-input-group">
+                <label>PASSWORD</label>
+                <input type="password" id="landing-register-password" class="form-input" placeholder="••••••••" required style="width: 100%;">
+                <!-- Password strength meter -->
+                <div class="pwd-strength-container" style="margin-top: 6px; display: flex; gap: 4px; height: 3px;">
+                  <div class="pwd-strength-bar" style="flex: 1; border-radius: 99px; background: rgba(255,255,255,0.06); transition: background 0.3s;"></div>
+                  <div class="pwd-strength-bar" style="flex: 1; border-radius: 99px; background: rgba(255,255,255,0.06); transition: background 0.3s;"></div>
+                  <div class="pwd-strength-bar" style="flex: 1; border-radius: 99px; background: rgba(255,255,255,0.06); transition: background 0.3s;"></div>
+                </div>
+                <span id="pwd-strength-desc" style="font-size: 0.65rem; color: var(--text-muted); margin-top: 4px; display: block; font-weight: 600;">Password must be at least 8 characters.</span>
+              </div>
+
+              <!-- Accept Terms checkbox -->
+              <div style="display: flex; align-items: flex-start; gap: 8px; margin-bottom: 20px; font-size: 0.82rem; color: var(--text-secondary); line-height: 1.4;">
+                <input type="checkbox" id="register-terms" required style="accent-color: var(--primary); cursor: pointer; width: 15px; height: 15px; margin-top: 2px;">
+                <label for="register-terms" style="margin: 0; font-weight: 500; cursor: pointer;">I agree to Ravora's <a href="#" style="color: var(--primary); text-decoration: none;">Terms of Service</a> and <a href="#" style="color: var(--primary); text-decoration: none;">Privacy Policy</a>.</label>
+              </div>
+              
+              <div id="landing-register-error" class="auth-error-msg" style="display: none;"></div>
+              
+              <button type="submit" class="btn btn-primary auth-submit-btn" style="width: 100%; height: 44px; font-size: 0.9rem; font-weight: 600; margin-bottom: 16px;">
+                <span>Create Account</span>
+                <span class="auth-spinner" style="display: none;"></span>
+              </button>
+              
+              <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0; text-align: center;">Already have an account? <a href="#" id="switch-to-login" class="auth-switch-link">Sign In</a></p>
+            </form>
           </div>
 
-          <div id="landing-login-error"
-            style="color: #f87171; font-size: 0.8rem; margin-bottom: 14px; display: none; text-align: left; background: rgba(248, 113, 113, 0.08); padding: 10px 14px; border-radius: 8px; border: 1px solid rgba(248, 113, 113, 0.15);">
+          <!-- 3. FORGOT PASSWORD VIEW -->
+          <div id="auth-forgot-container" class="auth-flow-section" style="display: none; width: 100%;">
+            <form id="landing-forgot-form" class="auth-form" style="width: 100%;">
+              <h3 style="margin-bottom: 6px; text-align: left; font-family: var(--font-display); font-size: 1.45rem; font-weight: 700; color: #fff;">Reset Password</h3>
+              <p class="body-text" style="margin-bottom: 24px; text-align: left; font-size: 0.85rem; color: var(--text-secondary); line-height: 1.45;">Enter your registered email address and we'll send a password recovery code.</p>
+
+              <div class="auth-input-group" style="margin-bottom: 20px;">
+                <label>EMAIL ADDRESS</label>
+                <input type="email" id="landing-forgot-email" class="form-input" placeholder="name@domain.com" required style="width: 100%;">
+              </div>
+              
+              <div id="landing-forgot-error" class="auth-error-msg" style="display: none;"></div>
+              <div id="landing-forgot-success" class="auth-success-msg" style="display: none; background: rgba(16, 185, 129, 0.08); color: var(--success); padding: 12px; border-radius: 8px; border: 1px solid rgba(16, 185, 129, 0.15); font-size: 0.82rem; margin-bottom: 20px; line-height: 1.45;"></div>
+              
+              <button type="submit" class="btn btn-primary auth-submit-btn" style="width: 100%; height: 44px; font-size: 0.9rem; font-weight: 600; margin-bottom: 16px;">
+                <span>Send Recovery Code</span>
+                <span class="auth-spinner" style="display: none;"></span>
+              </button>
+              
+              <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0; text-align: center;"><a href="#" id="forgot-back-to-login" class="auth-switch-link">Back to Sign In</a></p>
+            </form>
           </div>
 
-          <button type="submit" class="btn btn-primary"
-            style="width: 100%; padding: 12px; margin-bottom: 16px; font-weight: 600; font-size: 0.9rem; border-radius: 6px; border: none; cursor: pointer; height: 40px;">Sign
-            In</button>
-          <p style="font-size: 0.82rem; color: var(--text-secondary); margin: 0; text-align: center;">Don't have an
-            account? <a href="#" id="switch-to-signup"
-              style="color: var(--primary); font-weight: 600; text-decoration: none; transition: color var(--transition-hover);">Create
-              Account</a></p>
-        </form>
+          <!-- 4. EMAIL VERIFICATION VIEW -->
+          <div id="auth-verification-container" class="auth-flow-section" style="display: none; width: 100%;">
+            <form id="landing-verify-form" class="auth-form" style="width: 100%;">
+              <h3 style="margin-bottom: 6px; text-align: left; font-family: var(--font-display); font-size: 1.45rem; font-weight: 700; color: #fff;">Verify Email</h3>
+              <p class="body-text" style="margin-bottom: 24px; text-align: left; font-size: 0.85rem; color: var(--text-secondary); line-height: 1.45;">We've sent a 6-digit confirmation code to your email. Enter it below to unlock Ravora.</p>
+
+              <div class="auth-input-group" style="margin-bottom: 24px;">
+                <label style="text-align: center; display: block; margin-bottom: 8px;">VERIFICATION CODE</label>
+                <div style="display: flex; gap: 8px; justify-content: center;" class="digit-inputs-group">
+                  <input type="text" maxlength="1" class="verify-digit-input" required>
+                  <input type="text" maxlength="1" class="verify-digit-input" required>
+                  <input type="text" maxlength="1" class="verify-digit-input" required>
+                  <input type="text" maxlength="1" class="verify-digit-input" required>
+                  <input type="text" maxlength="1" class="verify-digit-input" required>
+                  <input type="text" maxlength="1" class="verify-digit-input" required>
+                </div>
+              </div>
+              
+              <div id="landing-verify-error" class="auth-error-msg" style="display: none;"></div>
+              <div id="landing-verify-success" class="auth-success-msg" style="display: none; background: rgba(16, 185, 129, 0.08); color: var(--success); padding: 12px; border-radius: 8px; border: 1px solid rgba(16, 185, 129, 0.15); font-size: 0.82rem; margin-bottom: 20px; text-align: center;"></div>
+              
+              <button type="submit" class="btn btn-primary auth-submit-btn" style="width: 100%; height: 44px; font-size: 0.9rem; font-weight: 600; margin-bottom: 16px;">
+                <span>Confirm & Initialize Workspace</span>
+                <span class="auth-spinner" style="display: none;"></span>
+              </button>
+
+              <div style="text-align: center; font-size: 0.82rem; color: var(--text-secondary);">
+                Didn't receive the email? <a href="#" id="resend-code-btn" style="color: var(--primary); text-decoration: none; font-weight: 600;">Resend Code</a>
+              </div>
+            </form>
+          </div>
+
+        </div>
       </div>
-
-      <!-- Register Tab -->
-      <div id="auth-register-container" style="display: none; width: 100%;">
-        <form id="landing-register-form" class="auth-form" style="width: 100%;">
-          <h3
-            style="margin-bottom: 8px; text-align: left; font-family: var(--font-display); font-size: 1.3rem; font-weight: 700; color: #fff;">
-            Create Ravora Account</h3>
-          <p class="step-desc"
-            style="margin-bottom: 20px; text-align: left; color: var(--text-secondary); font-size: 0.82rem; line-height: 1.45;">
-            Initialize your institutional-grade AI wealth management workspace.</p>
-
-          <div class="auth-input-group"
-            style="margin-bottom: 14px; text-align: left; display: flex; flex-direction: column; gap: 6px;">
-            <label
-              style="display: block; font-size: 0.72rem; font-weight: 600; color: #a5b4fc; letter-spacing: 0.05em;">EMAIL
-              ADDRESS</label>
-            <input type="email" id="landing-register-email" class="form-input" placeholder="name@domain.com" required
-              style="width: 100%;">
-          </div>
-
-          <div class="auth-input-group"
-            style="margin-bottom: 18px; text-align: left; display: flex; flex-direction: column; gap: 6px;">
-            <label
-              style="display: block; font-size: 0.72rem; font-weight: 600; color: #a5b4fc; letter-spacing: 0.05em;">PASSWORD</label>
-            <input type="password" id="landing-register-password" class="form-input" placeholder="••••••••" required
-              style="width: 100%;">
-          </div>
-
-          <div id="landing-register-error"
-            style="color: #f87171; font-size: 0.8rem; margin-bottom: 14px; display: none; text-align: left; background: rgba(248, 113, 113, 0.08); padding: 10px 14px; border-radius: 8px; border: 1px solid rgba(248, 113, 113, 0.15);">
-          </div>
-
-          <button type="submit" class="btn btn-primary"
-            style="width: 100%; padding: 12px; margin-bottom: 16px; font-weight: 600; font-size: 0.9rem; border-radius: 6px; border: none; cursor: pointer; height: 40px;">Create
-            Account</button>
-          <p style="font-size: 0.82rem; color: var(--text-secondary); margin: 0; text-align: center;">Already have an
-            account? <a href="#" id="switch-to-login"
-              style="color: var(--primary); font-weight: 600; text-decoration: none; transition: color var(--transition-hover);">Sign
-              In</a></p>
-        </form>
-      </div>
+      
+    </div>
+  </div>
     </div>
   </div>
 

@@ -744,8 +744,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const loginContainer = document.getElementById('auth-login-container');
   const registerContainer = document.getElementById('auth-register-container');
+  const forgotContainer = document.getElementById('auth-forgot-container');
+  const verificationContainer = document.getElementById('auth-verification-container');
   const switchToSignup = document.getElementById('switch-to-signup');
   const switchToLogin = document.getElementById('switch-to-login');
+  const goToForgotBtn = document.getElementById('go-to-forgot-btn');
+  const forgotBackToLogin = document.getElementById('forgot-back-to-login');
 
   const landingLoginForm = document.getElementById('landing-login-form');
   const landingRegisterForm = document.getElementById('landing-register-form');
@@ -755,18 +759,100 @@ document.addEventListener('DOMContentLoaded', () => {
   const openAuth = (mode = 'login') => {
     if (!authModal) return;
     authModal.classList.add('active');
+    
+    // Hide all panels
+    if (loginContainer) loginContainer.style.display = 'none';
+    if (registerContainer) registerContainer.style.display = 'none';
+    if (forgotContainer) forgotContainer.style.display = 'none';
+    if (verificationContainer) verificationContainer.style.display = 'none';
+
+    // Show active panel
     if (mode === 'login') {
       if (loginContainer) loginContainer.style.display = 'block';
-      if (registerContainer) registerContainer.style.display = 'none';
-    } else {
-      if (loginContainer) loginContainer.style.display = 'none';
+    } else if (mode === 'register') {
       if (registerContainer) registerContainer.style.display = 'block';
+    } else if (mode === 'forgot') {
+      if (forgotContainer) forgotContainer.style.display = 'block';
+    } else if (mode === 'verify') {
+      if (verificationContainer) verificationContainer.style.display = 'block';
     }
   };
 
   const closeAuth = () => {
     if (authModal) authModal.classList.remove('active');
   };
+
+  // Wire up Forgot Password & Back to Login triggers
+  if (goToForgotBtn) {
+    goToForgotBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      openAuth('forgot');
+    });
+  }
+  if (forgotBackToLogin) {
+    forgotBackToLogin.addEventListener('click', (e) => {
+      e.preventDefault();
+      openAuth('login');
+    });
+  }
+
+  // 6-Digit input jumps helper
+  const digitInputs = document.querySelectorAll('.verify-digit-input');
+  digitInputs.forEach((input, index) => {
+    input.addEventListener('input', (e) => {
+      if (e.target.value.length === 1 && index < digitInputs.length - 1) {
+        digitInputs[index + 1].focus();
+      }
+    });
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Backspace' && e.target.value.length === 0 && index > 0) {
+        digitInputs[index - 1].focus();
+      }
+    });
+  });
+
+  // Password strength meter helper
+  const regPasswordInput = document.getElementById('landing-register-password');
+  const strengthBars = document.querySelectorAll('.pwd-strength-bar');
+  const strengthDesc = document.getElementById('pwd-strength-desc');
+  if (regPasswordInput) {
+    regPasswordInput.addEventListener('input', (e) => {
+      const val = e.target.value;
+      let score = 0;
+      if (val.length >= 8) score++;
+      if (/[A-Z]/.test(val)) score++;
+      if (/[0-9]/.test(val)) score++;
+      if (/[^A-Za-z0-9]/.test(val)) score++;
+
+      strengthBars.forEach((bar, idx) => {
+        if (idx < score) {
+          if (score === 1) {
+            bar.style.background = '#ef4444';
+          } else if (score === 2 || score === 3) {
+            bar.style.background = '#f59e0b';
+          } else if (score === 4) {
+            bar.style.background = '#10b981';
+          }
+        } else {
+          bar.style.background = 'rgba(255,255,255,0.06)';
+        }
+      });
+
+      if (val.length === 0) {
+        strengthDesc.textContent = 'Password must be at least 8 characters.';
+        strengthDesc.style.color = 'var(--text-muted)';
+      } else if (score <= 1) {
+        strengthDesc.textContent = 'Weak password (try adding letters, numbers, and symbols).';
+        strengthDesc.style.color = '#ef4444';
+      } else if (score <= 3) {
+        strengthDesc.textContent = 'Medium password strength.';
+        strengthDesc.style.color = '#f59e0b';
+      } else {
+        strengthDesc.textContent = 'Strong password.';
+        strengthDesc.style.color = '#10b981';
+      }
+    });
+  }
 
   // Close modal when clicking on the overlay background
   if (authModal) {
@@ -831,7 +917,15 @@ document.addEventListener('DOMContentLoaded', () => {
       const email = document.getElementById('landing-login-email').value;
       const password = document.getElementById('landing-login-password').value;
 
+      const submitBtn = landingLoginForm.querySelector('.auth-submit-btn');
+      const spinner = submitBtn.querySelector('.auth-spinner');
+      const btnText = submitBtn.querySelector('span');
+
       try {
+        if (submitBtn) submitBtn.disabled = true;
+        if (spinner) spinner.style.display = 'inline-block';
+        if (btnText) btnText.style.opacity = '0.5';
+
         let res;
         try {
           res = await fetch(`${API_BASE}/auth/login`, {
@@ -841,6 +935,8 @@ document.addEventListener('DOMContentLoaded', () => {
           });
         } catch (netErr) {
           console.warn('Backend login failed (network), using local fallback:', netErr.message);
+          // Wait 1.2s to simulate network latency for loading state verification
+          await new Promise(resolve => setTimeout(resolve, 1200));
           localStorage.setItem('ravora_token', 'mock-jwt-token-fallback');
           localStorage.setItem('ravora_logged_in', 'true');
           localStorage.setItem('ravora_login_time', Date.now().toString());
@@ -860,7 +956,7 @@ document.addEventListener('DOMContentLoaded', () => {
           window.location.href = REDIRECT_BASE;
           return;
         } else {
-          const data = await res.json().catch(() => ({}));
+          const data = await res.ok ? {} : await res.json().catch(() => ({}));
           throw new Error(data.error || 'Authentication failed.');
         }
       } catch (err) {
@@ -868,6 +964,10 @@ document.addEventListener('DOMContentLoaded', () => {
           landingLoginError.textContent = err.message;
           landingLoginError.style.display = 'block';
         }
+      } finally {
+        if (submitBtn) submitBtn.disabled = false;
+        if (spinner) spinner.style.display = 'none';
+        if (btnText) btnText.style.opacity = '1';
       }
     });
   }
@@ -879,37 +979,41 @@ document.addEventListener('DOMContentLoaded', () => {
       if (landingRegisterError) landingRegisterError.style.display = 'none';
       const email = document.getElementById('landing-register-email').value;
       const password = document.getElementById('landing-register-password').value;
+      const name = document.getElementById('landing-register-name').value;
+
+      const submitBtn = landingRegisterForm.querySelector('.auth-submit-btn');
+      const spinner = submitBtn.querySelector('.auth-spinner');
+      const btnText = submitBtn.querySelector('span');
 
       try {
+        if (submitBtn) submitBtn.disabled = true;
+        if (spinner) spinner.style.display = 'inline-block';
+        if (btnText) btnText.style.opacity = '0.5';
+
         let res;
         try {
           res = await fetch(`${API_BASE}/auth/register`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password })
+            body: JSON.stringify({ email, password, name })
           });
         } catch (netErr) {
           console.warn('Backend registration failed (network), using local fallback:', netErr.message);
-          localStorage.setItem('ravora_token', 'mock-jwt-token-fallback');
-          localStorage.setItem('ravora_logged_in', 'true');
-          localStorage.setItem('ravora_login_time', Date.now().toString());
-          localStorage.setItem('ravora_email', email);
-          localStorage.setItem('ravora_onboarding_completed', 'false');
-          window.location.href = REDIRECT_BASE;
+          await new Promise(resolve => setTimeout(resolve, 1500));
+          localStorage.setItem('ravora_temp_email', email);
+          localStorage.setItem('ravora_temp_name', name);
+          openAuth('verify');
           return;
         }
 
         if (res.ok) {
           const data = await res.json();
-          localStorage.setItem('ravora_token', data.token);
-          localStorage.setItem('ravora_logged_in', 'true');
-          localStorage.setItem('ravora_login_time', Date.now().toString());
-          localStorage.setItem('ravora_email', email);
-          localStorage.setItem('ravora_onboarding_completed', 'false');
-          window.location.href = REDIRECT_BASE;
+          localStorage.setItem('ravora_temp_email', email);
+          localStorage.setItem('ravora_temp_name', name);
+          openAuth('verify');
           return;
         } else {
-          const data = await res.json().catch(() => ({}));
+          const data = await res.ok ? {} : await res.json().catch(() => ({}));
           throw new Error(data.error || 'Registration failed.');
         }
       } catch (err) {
@@ -917,6 +1021,101 @@ document.addEventListener('DOMContentLoaded', () => {
           landingRegisterError.textContent = err.message;
           landingRegisterError.style.display = 'block';
         }
+      } finally {
+        if (submitBtn) submitBtn.disabled = false;
+        if (spinner) spinner.style.display = 'none';
+        if (btnText) btnText.style.opacity = '1';
+      }
+    });
+  }
+
+  // Handle Forgot Password Form Submission
+  const landingForgotForm = document.getElementById('landing-forgot-form');
+  const landingForgotError = document.getElementById('landing-forgot-error');
+  const landingForgotSuccess = document.getElementById('landing-forgot-success');
+  if (landingForgotForm) {
+    landingForgotForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (landingForgotError) landingForgotError.style.display = 'none';
+      if (landingForgotSuccess) landingForgotSuccess.style.display = 'none';
+      
+      const email = document.getElementById('landing-forgot-email').value;
+      const submitBtn = landingForgotForm.querySelector('.auth-submit-btn');
+      const spinner = submitBtn.querySelector('.auth-spinner');
+      const btnText = submitBtn.querySelector('span');
+
+      try {
+        if (submitBtn) submitBtn.disabled = true;
+        if (spinner) spinner.style.display = 'inline-block';
+        if (btnText) btnText.style.opacity = '0.5';
+
+        // Mock request delay
+        await new Promise(resolve => setTimeout(resolve, 1200));
+
+        if (landingForgotSuccess) {
+          landingForgotSuccess.textContent = `A recovery code has been sent to ${email}.`;
+          landingForgotSuccess.style.display = 'block';
+        }
+      } catch (err) {
+        if (landingForgotError) {
+          landingForgotError.textContent = err.message || 'An error occurred.';
+          landingForgotError.style.display = 'block';
+        }
+      } finally {
+        if (submitBtn) submitBtn.disabled = false;
+        if (spinner) spinner.style.display = 'none';
+        if (btnText) btnText.style.opacity = '1';
+      }
+    });
+  }
+
+  // Handle Verification Form Submission
+  const landingVerifyForm = document.getElementById('landing-verify-form');
+  const landingVerifyError = document.getElementById('landing-verify-error');
+  const landingVerifySuccess = document.getElementById('landing-verify-success');
+  if (landingVerifyForm) {
+    landingVerifyForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (landingVerifyError) landingVerifyError.style.display = 'none';
+      if (landingVerifySuccess) landingVerifySuccess.style.display = 'none';
+
+      const submitBtn = landingVerifyForm.querySelector('.auth-submit-btn');
+      const spinner = submitBtn.querySelector('.auth-spinner');
+      const btnText = submitBtn.querySelector('span');
+
+      try {
+        if (submitBtn) submitBtn.disabled = true;
+        if (spinner) spinner.style.display = 'inline-block';
+        if (btnText) btnText.style.opacity = '0.5';
+
+        // Mock code validation
+        await new Promise(resolve => setTimeout(resolve, 1500));
+
+        if (landingVerifySuccess) {
+          landingVerifySuccess.textContent = 'Account verified! Initializing sandbox...';
+          landingVerifySuccess.style.display = 'block';
+        }
+        
+        // Save verified authentication state
+        const tempEmail = localStorage.getItem('ravora_temp_email') || 'user@example.com';
+        localStorage.setItem('ravora_logged_in', 'true');
+        localStorage.setItem('ravora_login_time', Date.now().toString());
+        localStorage.setItem('ravora_email', tempEmail);
+        localStorage.setItem('ravora_onboarding_completed', 'false');
+        localStorage.setItem('ravora_token', 'mock-jwt-token-verified');
+        
+        setTimeout(() => {
+          window.location.href = REDIRECT_BASE;
+        }, 1000);
+      } catch (err) {
+        if (landingVerifyError) {
+          landingVerifyError.textContent = err.message || 'Verification failed.';
+          landingVerifyError.style.display = 'block';
+        }
+      } finally {
+        if (submitBtn) submitBtn.disabled = false;
+        if (spinner) spinner.style.display = 'none';
+        if (btnText) btnText.style.opacity = '1';
       }
     });
   }
