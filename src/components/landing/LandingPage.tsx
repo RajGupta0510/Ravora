@@ -23,7 +23,7 @@ interface RiskConfig {
 
 export const LandingPage: React.FC = () => {
   const { login, register, verifyOtpCode } = useAuth();
-  
+
   // UI states
   const [activeNav, setActiveNav] = useState('problem-section');
   const [navbarScrolled, setNavbarScrolled] = useState(false);
@@ -32,7 +32,7 @@ export const LandingPage: React.FC = () => {
   const [authTab, setAuthTab] = useState<'email' | 'phone'>('email');
   const [showPassword, setShowPassword] = useState(false);
   const [selectedRisk, setSelectedRisk] = useState<0 | 1 | 2>(1); // 0=Cons, 1=Mod, 2=Agg
-  
+
   // Auth Form Fields
   const [fullName, setFullName] = useState('');
   const [emailOrPhone, setEmailOrPhone] = useState('');
@@ -41,7 +41,7 @@ export const LandingPage: React.FC = () => {
   const [otpCode, setOtpCode] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
   const [loginWithOtp, setLoginWithOtp] = useState(false);
-  
+
   // Auth Helper States
   const [authError, setAuthError] = useState('');
   const [authLoading, setAuthLoading] = useState(false);
@@ -58,7 +58,7 @@ export const LandingPage: React.FC = () => {
   const [pipelineStep, setPipelineStep] = useState(1);
   const [simInteractiveStep, setSimInteractiveStep] = useState(0); // 0=idle, 1-5=running
   const [simStatusText, setSimStatusText] = useState('Standby. Inject Fed event to start analysis.');
-  
+
   // Opportunity asset preview state
   const [selectedAssetTab, setSelectedAssetTab] = useState<'eth' | 'btc' | 'yield'>('eth');
 
@@ -80,7 +80,7 @@ export const LandingPage: React.FC = () => {
     const hasDigit = /[0-9]/.test(password);
     const hasSpecial = /[^A-Za-z0-9]/.test(password);
     const matches = [hasUpper, hasLower, hasDigit, hasSpecial].filter(Boolean).length;
-    
+
     if (matches <= 2) setPasswordStrength({ score: 2, message: 'Weak password' });
     else if (matches === 3) setPasswordStrength({ score: 3, message: 'Medium password' });
     else setPasswordStrength({ score: 4, message: 'Strong password' });
@@ -335,7 +335,7 @@ export const LandingPage: React.FC = () => {
 
   return (
     <div style={{ background: 'var(--background)', color: '#fff', minHeight: '100vh', overflowX: 'hidden' }}>
-      
+
       {/* Background Glow Overlay */}
       <div className="ambient-glows">
         <div className="ambient-grid"></div>
@@ -392,8 +392,8 @@ export const LandingPage: React.FC = () => {
           <ul className="nav-links" style={{ listStyle: 'none', display: 'flex', gap: '24px', margin: 0, padding: 0 }}>
             {['problem-section', 'workflow-section', 'showcase-section', 'features-section', 'faq-section'].map((sect) => (
               <li key={sect}>
-                <a 
-                  href={`#${sect}`} 
+                <a
+                  href={`#${sect}`}
                   className={activeNav === sect ? 'active-nav' : ''}
                   onClick={() => setActiveNav(sect)}
                   style={{
@@ -415,8 +415,8 @@ export const LandingPage: React.FC = () => {
           </ul>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-            <button 
-              onClick={() => { setAuthMode('login'); setAuthError(''); }} 
+            <button
+              onClick={() => { setAuthMode('login'); setAuthError(''); }}
               style={{
                 background: 'none',
                 border: 'none',
@@ -429,9 +429,9 @@ export const LandingPage: React.FC = () => {
             >
               Sign In
             </button>
-            <button 
-              onClick={() => { setAuthMode('register'); setAuthError(''); }} 
-              className="btn btn-primary" 
+            <button
+              onClick={() => { setAuthMode('register'); setAuthError(''); }}
+              className="btn btn-primary"
               style={{ fontSize: '0.82rem', padding: '8px 16px', height: '36px', borderRadius: '6px' }}
             >
               Start Free
@@ -478,9 +478,9 @@ export const LandingPage: React.FC = () => {
             </p>
 
             <div style={{ display: 'flex', gap: '12px', marginBottom: '24px' }}>
-              <button 
-                onClick={() => { setAuthMode('register'); setAuthError(''); }} 
-                className="btn btn-primary" 
+              <button
+                onClick={() => { setAuthMode('register'); setAuthError(''); }}
+                className="btn btn-primary"
                 style={{ height: '44px', padding: '0 24px', fontSize: '0.9rem', borderRadius: '6px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600 }}
               >
                 Start Free
@@ -503,8 +503,8 @@ export const LandingPage: React.FC = () => {
           </div>
 
           {/* Right Product 3D Showcase (Mouse Parallax) */}
-          <div 
-            id="hero-3d-container" 
+          <div
+            id="hero-3d-container"
             style={{ width: '100%', perspective: '1000px' }}
             onMouseMove={(e) => {
               const rect = e.currentTarget.getBoundingClientRect();
@@ -515,7 +515,7 @@ export const LandingPage: React.FC = () => {
             onMouseEnter={() => setIsHovered3D(true)}
             onMouseLeave={() => setIsHovered3D(false)}
           >
-            <div 
+            <div
               className={`card-glass mini-workspace-mock state-${simState}`}
               style={{
                 width: '100%',
@@ -589,11 +589,11 @@ export const LandingPage: React.FC = () => {
                   <span style={{ fontSize: '0.65rem', fontWeight: 700, color: 'var(--text-muted)' }}>ACTIVE CHART</span>
                   <div style={{ flex: 1, background: 'rgba(255,255,255,0.01)', border: '1px solid rgba(255,255,255,0.04)', borderRadius: '6px', position: 'relative', overflow: 'hidden' }}>
                     <svg viewBox="0 0 200 100" style={{ width: '100%', height: '100%' }}>
-                      <path 
-                        d="M10 80 Q 40 40 90 60 T 190 20" 
-                        fill="none" 
-                        stroke={simState === 'chart-drawn' ? 'var(--ai-accent)' : 'rgba(255,255,255,0.1)'} 
-                        strokeWidth="2" 
+                      <path
+                        d="M10 80 Q 40 40 90 60 T 190 20"
+                        fill="none"
+                        stroke={simState === 'chart-drawn' ? 'var(--ai-accent)' : 'rgba(255,255,255,0.1)'}
+                        strokeWidth="2"
                         style={{ transition: 'stroke 0.3s' }}
                       />
                     </svg>
@@ -614,8 +614,8 @@ export const LandingPage: React.FC = () => {
                     <div style={{ fontSize: '0.6rem', color: 'var(--text-secondary)', marginTop: '4px' }}>Stop Loss:</div>
                     <div style={{ fontSize: '0.65rem', fontWeight: 600, color: 'var(--danger)' }}>$61,870.00</div>
                   </div>
-                  
-                  <button 
+
+                  <button
                     disabled={simState !== 'plan-active'}
                     style={{
                       width: '100%',
@@ -664,7 +664,7 @@ export const LandingPage: React.FC = () => {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', justifyContent: 'center' }}>
               <div className="filter-segmented" style={{ display: 'flex', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', padding: '4px' }}>
                 {([0, 1, 2] as const).map((v) => (
-                  <button 
+                  <button
                     key={v}
                     onClick={() => setSelectedRisk(v)}
                     className={`segmented-tab ${selectedRisk === v ? 'active' : ''}`}
@@ -773,8 +773,8 @@ export const LandingPage: React.FC = () => {
               { id: 5, title: 'Drafting Allocation rebalance', desc: 'Calcules target adjustments and forms stop-loss/take-profit exit parameters.' },
               { id: 6, title: 'Advisory Dispatch', desc: 'Pushes the complete structured plan with detailed plain-English explanations to your copilot.' }
             ].map((step) => (
-              <div 
-                key={step.id} 
+              <div
+                key={step.id}
                 style={{
                   display: 'flex',
                   gap: '16px',
@@ -837,7 +837,7 @@ export const LandingPage: React.FC = () => {
                 color: simInteractiveStep === 5 ? '#10b981' : (simInteractiveStep > 0 ? '#3b82f6' : '#94a3b8')
               }}>{simStatusText}</div>
 
-              <button 
+              <button
                 onClick={runInteractiveSimulation}
                 className="btn btn-primary"
                 disabled={simInteractiveStep > 0 && simInteractiveStep < 5}
@@ -943,7 +943,7 @@ export const LandingPage: React.FC = () => {
                     <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>Strategy: {currentOpp.strategy}</span>
                   </div>
                 </div>
-                
+
                 <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
                   {currentOpp.reasoning}
                 </p>
@@ -965,14 +965,14 @@ export const LandingPage: React.FC = () => {
                 <div style={{ position: 'relative', width: '100px', height: '100px' }}>
                   <svg width="100" height="100" viewBox="0 0 100 100">
                     <circle cx="50" cy="50" r="40" fill="none" stroke="rgba(255,255,255,0.02)" strokeWidth="8" />
-                    <circle 
-                      cx="50" 
-                      cy="50" 
-                      r="40" 
-                      fill="none" 
-                      stroke={currentOpp.strokeColor} 
-                      strokeWidth="8" 
-                      strokeDasharray="251" 
+                    <circle
+                      cx="50"
+                      cy="50"
+                      r="40"
+                      fill="none"
+                      stroke={currentOpp.strokeColor}
+                      strokeWidth="8"
+                      strokeDasharray="251"
                       strokeDashoffset={251 * (1 - parseFloat(currentOpp.confidence) / 100)}
                       transform="rotate(-90 50 50)"
                       style={{ transition: 'stroke-dashoffset 0.5s' }}
@@ -1031,7 +1031,7 @@ export const LandingPage: React.FC = () => {
           overflowY: 'auto'
         }}>
           <div style={{ display: 'flex', width: '100%', minHeight: '100vh', flexDirection: 'row', flexWrap: 'wrap' }}>
-            
+
             {/* Story Panel (Left) */}
             <div className="auth-left-story" style={{
               width: '45%',
@@ -1059,11 +1059,11 @@ export const LandingPage: React.FC = () => {
                 <div className="logo-icon" style={{ width: '36px', height: '36px', borderRadius: '6px', background: 'var(--gradient-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: '1.2rem' }}>R</div>
                 Ravora
               </a>
-              
+
               <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '2.2rem', fontWeight: 700, color: '#fff', lineHeight: 1.25, marginBottom: '16px', letterSpacing: '-0.02em' }}>
                 Enter the future of <span className="text-accent-gradient">automated wealth</span>.
               </h2>
-              
+
               <p style={{ color: 'var(--text-secondary)', fontSize: '1.0rem', lineHeight: 1.55, marginBottom: '40px', maxWidth: '420px' }}>
                 Araiven coordinates real-time market orderbooks, builds execution target ladders, and monitors risk parameters 24/7.
               </p>
@@ -1092,7 +1092,7 @@ export const LandingPage: React.FC = () => {
               minWidth: '320px',
               overflowY: 'auto'
             }}>
-              
+
               <div className="auth-form-card" style={{
                 width: '100%',
                 maxWidth: '440px',
@@ -1104,10 +1104,10 @@ export const LandingPage: React.FC = () => {
                 boxSizing: 'border-box',
                 position: 'relative'
               }}>
-                
+
                 {/* Close Button */}
-                <button 
-                  onClick={() => setAuthMode(null)} 
+                <button
+                  onClick={() => setAuthMode(null)}
                   style={{
                     position: 'absolute',
                     top: '20px',
@@ -1123,7 +1123,7 @@ export const LandingPage: React.FC = () => {
                 </button>
 
                 <form onSubmit={handleAuthSubmit} style={{ width: '100%' }}>
-                  
+
                   {/* SIGN IN */}
                   {authMode === 'login' && (
                     <>
@@ -1147,8 +1147,8 @@ export const LandingPage: React.FC = () => {
                         <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: '#a5b4fc', marginBottom: '6px', letterSpacing: '0.05em' }}>
                           {authTab === 'email' ? 'EMAIL ADDRESS' : 'MOBILE NUMBER'}
                         </label>
-                        <input 
-                          type={authTab === 'email' ? 'email' : 'text'} 
+                        <input
+                          type={authTab === 'email' ? 'email' : 'text'}
                           required
                           value={emailOrPhone}
                           onChange={(e) => setEmailOrPhone(e.target.value)}
@@ -1162,7 +1162,7 @@ export const LandingPage: React.FC = () => {
                         <div style={{ marginBottom: '20px' }}>
                           <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: '#a5b4fc', marginBottom: '6px', letterSpacing: '0.05em' }}>PASSWORD</label>
                           <div style={{ position: 'relative', width: '100%' }}>
-                            <input 
+                            <input
                               type={showPassword ? 'text' : 'password'}
                               required
                               value={password}
@@ -1210,8 +1210,8 @@ export const LandingPage: React.FC = () => {
 
                       <div style={{ marginBottom: '12px' }}>
                         <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: '#a5b4fc', marginBottom: '6px', letterSpacing: '0.05em' }}>FULL NAME</label>
-                        <input 
-                          type="text" 
+                        <input
+                          type="text"
                           required
                           value={fullName}
                           onChange={(e) => setFullName(e.target.value)}
@@ -1224,8 +1224,8 @@ export const LandingPage: React.FC = () => {
                         <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: '#a5b4fc', marginBottom: '6px', letterSpacing: '0.05em' }}>
                           {authTab === 'email' ? 'EMAIL ADDRESS' : 'MOBILE NUMBER'}
                         </label>
-                        <input 
-                          type={authTab === 'email' ? 'email' : 'text'} 
+                        <input
+                          type={authTab === 'email' ? 'email' : 'text'}
                           required
                           value={emailOrPhone}
                           onChange={(e) => setEmailOrPhone(e.target.value)}
@@ -1236,8 +1236,8 @@ export const LandingPage: React.FC = () => {
 
                       <div style={{ marginBottom: '12px' }}>
                         <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: '#a5b4fc', marginBottom: '6px', letterSpacing: '0.05em' }}>PASSWORD</label>
-                        <input 
-                          type="password" 
+                        <input
+                          type="password"
                           required
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
@@ -1249,13 +1249,13 @@ export const LandingPage: React.FC = () => {
                           <div style={{ marginTop: '8px' }}>
                             <div style={{ display: 'flex', gap: '4px', height: '3px', width: '100%' }}>
                               {[1, 2, 3, 4].map((s) => (
-                                <div 
-                                  key={s} 
+                                <div
+                                  key={s}
                                   style={{
                                     flex: 1,
                                     borderRadius: '99px',
-                                    background: passwordStrength.score >= s 
-                                      ? (passwordStrength.score === 1 ? 'var(--danger)' : (passwordStrength.score <= 3 ? 'var(--warning)' : 'var(--success)')) 
+                                    background: passwordStrength.score >= s
+                                      ? (passwordStrength.score === 1 ? 'var(--danger)' : (passwordStrength.score <= 3 ? 'var(--warning)' : 'var(--success)'))
                                       : 'rgba(255,255,255,0.06)'
                                   }}
                                 ></div>
@@ -1268,8 +1268,8 @@ export const LandingPage: React.FC = () => {
 
                       <div style={{ marginBottom: '20px' }}>
                         <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: '#a5b4fc', marginBottom: '6px', letterSpacing: '0.05em' }}>CONFIRM PASSWORD</label>
-                        <input 
-                          type="password" 
+                        <input
+                          type="password"
                           required
                           value={confirmPassword}
                           onChange={(e) => setConfirmPassword(e.target.value)}
@@ -1290,8 +1290,8 @@ export const LandingPage: React.FC = () => {
 
                       <div style={{ marginBottom: '20px' }}>
                         <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: '#a5b4fc', marginBottom: '6px', letterSpacing: '0.05em' }}>6-DIGIT CODE</label>
-                        <input 
-                          type="text" 
+                        <input
+                          type="text"
                           maxLength={6}
                           required
                           value={otpCode}
@@ -1310,8 +1310,8 @@ export const LandingPage: React.FC = () => {
                     </div>
                   )}
 
-                  <button 
-                    type="submit" 
+                  <button
+                    type="submit"
                     className="btn btn-primary"
                     disabled={authLoading}
                     style={{ width: '100%', padding: '14px', marginBottom: '20px', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', height: '46px' }}

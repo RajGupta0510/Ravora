@@ -76,7 +76,7 @@ export const sendEmailOtp = async (toEmail, otpCode) => {
   if (provider === 'sendgrid') {
     const apiKey = process.env.SENDGRID_API_KEY;
     if (!apiKey) throw new Error('SENDGRID_API_KEY env variable is not set.');
-    
+
     const body = JSON.stringify({
       personalizations: [{ to: [{ email: toEmail }] }],
       from: { email: fromEmail, name: 'Ravora Intelligence' },
@@ -94,12 +94,12 @@ export const sendEmailOtp = async (toEmail, otpCode) => {
     await requestHttps('https://api.sendgrid.com/v3/mail/send', options, body);
     console.log(`[Email Delivery] SendGrid email successfully dispatched.`);
     return true;
-  } 
-  
+  }
+
   if (provider === 'resend') {
     const apiKey = process.env.RESEND_API_KEY;
     if (!apiKey) throw new Error('RESEND_API_KEY env variable is not set.');
-    
+
     const body = JSON.stringify({
       from: fromEmail,
       to: toEmail,

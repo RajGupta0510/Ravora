@@ -231,13 +231,13 @@ export const sendOtp = async ({ email, phone }) => {
  */
 export const verifyOtp = async ({ email, phone, token, type }) => {
   const target = email || phone;
-  
+
   if (!isConfigured) {
     const active = mockOtps[target];
     if (!active || active.code !== token || active.expires < Date.now()) {
       return { data: null, error: new Error('Invalid or expired verification code') };
     }
-    
+
     // Find or create user
     let user = Object.values(mockUsers).find(u => u.email === email || u.phone === phone);
     if (!user) {
@@ -247,7 +247,7 @@ export const verifyOtp = async ({ email, phone, token, type }) => {
     } else {
       user.verified = true;
     }
-    
+
     delete mockOtps[target];
     const jwtToken = 'mock_jwt_token_' + user.id;
     return { data: { session: { access_token: jwtToken }, user: { id: user.id, email: user.email, phone: user.phone } }, error: null };

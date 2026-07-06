@@ -4,13 +4,13 @@ import crypto from 'crypto';
 import { dbGet, dbRun, dbQuery } from '../database.js';
 import { JWT_SECRET } from '../middleware/auth.js';
 import { sendEmailOtp, sendSmsOtp, sendWhatsAppOtp } from '../utils/delivery.js';
-import { 
-  signUpWithEmail, 
-  signUpWithPhone, 
-  signInWithPassword, 
-  sendOtp, 
-  verifyOtp as supabaseVerifyOtp, 
-  upsertProfile 
+import {
+  signUpWithEmail,
+  signUpWithPhone,
+  signInWithPassword,
+  sendOtp,
+  verifyOtp as supabaseVerifyOtp,
+  upsertProfile
 } from '../utils/supabase.js';
 
 // Simple in-memory rate limiter for login attempts
@@ -35,7 +35,7 @@ const checkPasswordStrength = (pwd) => {
   const hasLower = /[a-z]/.test(pwd);
   const hasDigit = /[0-9]/.test(pwd);
   const hasSpecial = /[^A-Za-z0-9]/.test(pwd);
-  
+
   const matches = [hasUpper, hasLower, hasDigit, hasSpecial].filter(Boolean).length;
   if (matches <= 2) return { score: 2, message: 'Weak password' };
   if (matches === 3) return { score: 3, message: 'Medium password' };

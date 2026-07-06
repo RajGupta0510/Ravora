@@ -90,10 +90,10 @@ apiRouter.get('/market/summary', async (req, res) => {
     const totalMarketCap = overview.reduce((acc, curr) => acc + curr.marketCap, 0);
     const totalVolume24h = overview.reduce((acc, curr) => acc + curr.volume24h, 0);
     const averageChange24h = overview.length > 0 ? (overview.reduce((acc, curr) => acc + curr.change24h, 0) / overview.length) : 0;
-    
+
     const btcTicker = overview.find(o => o.symbol === 'BTC');
     const btcDominance = (btcTicker && totalMarketCap > 0) ? (btcTicker.marketCap / totalMarketCap) * 100 : 0;
-    
+
     return res.json({
       totalMarketCap,
       totalVolume24h,
