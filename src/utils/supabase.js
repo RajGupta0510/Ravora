@@ -1,8 +1,8 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import https from 'https';
 import crypto from 'crypto';
+import { createClient } from '@supabase/supabase-js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -36,31 +36,22 @@ const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 
 const isConfigured = SUPABASE_URL && SUPABASE_ANON_KEY;
 
+let supabase = null;
+let supabaseAdmin = null;
+
+if (isConfigured) {
+  supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  if (SUPABASE_SERVICE_ROLE_KEY) {
+    supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+  } else {
+    supabaseAdmin = supabase;
+  }
+}
+
 // Local mock database to support Sandbox Fallback Mode
 const mockUsers = {};
 const mockOtps = {};
 const mockProfiles = {};
-
-const requestHttps = (url, options, bodyData = '') => {
-  return new Promise((resolve, reject) => {
-    const req = https.request(url, options, (res) => {
-      let body = '';
-      res.on('data', (chunk) => body += chunk);
-      res.on('end', () => {
-        resolve({
-          statusCode: res.statusCode,
-          headers: res.headers,
-          body: body
-        });
-      });
-    });
-    req.on('error', (err) => reject(err));
-    if (bodyData) {
-      req.write(bodyData);
-    }
-    req.end();
-  });
-};
 
 export const getSupabaseConfig = () => {
   return {
@@ -80,28 +71,15 @@ export const signUpWithEmail = async (email, password, fullName) => {
     return { data: { user: { id: userId, email } }, error: null };
   }
 
-  const url = `${SUPABASE_URL}/auth/v1/signup`;
-  const body = JSON.stringify({
-    email,
-    password,
-    options: { data: { full_name: fullName } }
-  });
-
-  const options = {
-    method: 'POST',
-    headers: {
-      'apikey': SUPABASE_ANON_KEY,
-      'Content-Type': 'application/json'
-    }
-  };
-
   try {
-    const res = await requestHttps(url, options, body);
-    const data = JSON.parse(res.body);
-    if (res.statusCode >= 400) {
-      return { data: null, error: new Error(data.msg || data.error_description || 'Signup failed') };
-    }
-    return { data, error: null };
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: { full_name: fullName }
+      }
+    });
+    return { data, error };
   } catch (err) {
     return { data: null, error: err };
   }
@@ -118,28 +96,15 @@ export const signUpWithPhone = async (phone, password, fullName) => {
     return { data: { user: { id: userId, phone } }, error: null };
   }
 
-  const url = `${SUPABASE_URL}/auth/v1/signup`;
-  const body = JSON.stringify({
-    phone,
-    password,
-    options: { data: { full_name: fullName } }
-  });
-
-  const options = {
-    method: 'POST',
-    headers: {
-      'apikey': SUPABASE_ANON_KEY,
-      'Content-Type': 'application/json'
-    }
-  };
-
   try {
-    const res = await requestHttps(url, options, body);
-    const data = JSON.parse(res.body);
-    if (res.statusCode >= 400) {
-      return { data: null, error: new Error(data.msg || data.error_description || 'Phone signup failed') };
-    }
-    return { data, error: null };
+    const { data, error } = await supabase.auth.signUp({
+      phone,
+      password,
+      options: {
+        data: { full_name: fullName }
+      }
+    });
+    return { data, error };
   } catch (err) {
     return { data: null, error: err };
   }
@@ -159,28 +124,13 @@ export const signInWithPassword = async ({ email, phone, password }) => {
     return { data: { session: { access_token: token }, user: { id: user.id, email: user.email, phone: user.phone } }, error: null };
   }
 
-  const url = `${SUPABASE_URL}/auth/v1/token?grant_type=password`;
-  const body = JSON.stringify({
-    email,
-    phone,
-    password
-  });
-
-  const options = {
-    method: 'POST',
-    headers: {
-      'apikey': SUPABASE_ANON_KEY,
-      'Content-Type': 'application/json'
-    }
-  };
-
   try {
-    const res = await requestHttps(url, options, body);
-    const data = JSON.parse(res.body);
-    if (res.statusCode >= 400) {
-      return { data: null, error: new Error(data.msg || data.error_description || 'Authentication failed') };
-    }
-    return { data: { session: { access_token: data.access_token }, user: data.user }, error: null };
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      phone,
+      password
+    });
+    return { data, error };
   } catch (err) {
     return { data: null, error: err };
   }
@@ -199,28 +149,40 @@ export const sendOtp = async ({ email, phone }) => {
     return { data: { otpCode }, error: null };
   }
 
-  const url = `${SUPABASE_URL}/auth/v1/otp`;
-  const body = JSON.stringify({
-    email,
-    phone,
-    create_user: true
-  });
+  try {
+    const { data, error } = await supabase.auth.signInWithOtp({
+      email,
+      phone,
+      options: {
+        shouldCreateUser: true
+      }
+    });
+    return { data: { otpCode }, error };
+  } catch (err) {
+    return { data: null, error: err };
+  }
+};
 
-  const options = {
-    method: 'POST',
-    headers: {
-      'apikey': SUPABASE_ANON_KEY,
-      'Content-Type': 'application/json'
-    }
-  };
+/**
+ * Supabase Auth: Resend OTP Code
+ */
+export const resendOtpSupabase = async ({ type, email, phone }) => {
+  const target = email || phone;
+  const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+  mockOtps[target] = { code: otpCode, expires: Date.now() + 5 * 60 * 1000 };
+
+  if (!isConfigured) {
+    console.log(`[Supabase Auth Sandbox Resend OTP] Target: ${target} | Code: ${otpCode}`);
+    return { data: { otpCode }, error: null };
+  }
 
   try {
-    const res = await requestHttps(url, options, body);
-    const data = JSON.parse(res.body);
-    if (res.statusCode >= 400) {
-      return { data: null, error: new Error(data.msg || data.error_description || 'Failed to dispatch OTP') };
-    }
-    return { data: { otpCode }, error: null };
+    const { data, error } = await supabase.auth.resend({
+      type, // 'signup', 'sms', 'magiclink', 'recovery'
+      email,
+      phone
+    });
+    return { data: { otpCode }, error };
   } catch (err) {
     return { data: null, error: err };
   }
@@ -253,29 +215,14 @@ export const verifyOtp = async ({ email, phone, token, type }) => {
     return { data: { session: { access_token: jwtToken }, user: { id: user.id, email: user.email, phone: user.phone } }, error: null };
   }
 
-  const url = `${SUPABASE_URL}/auth/v1/verify`;
-  const body = JSON.stringify({
-    email,
-    phone,
-    token,
-    type
-  });
-
-  const options = {
-    method: 'POST',
-    headers: {
-      'apikey': SUPABASE_ANON_KEY,
-      'Content-Type': 'application/json'
-    }
-  };
-
   try {
-    const res = await requestHttps(url, options, body);
-    const data = JSON.parse(res.body);
-    if (res.statusCode >= 400) {
-      return { data: null, error: new Error(data.msg || data.error_description || 'OTP validation failed') };
-    }
-    return { data: { session: { access_token: data.access_token }, user: data.user }, error: null };
+    const { data, error } = await supabase.auth.verifyOtp({
+      email,
+      phone,
+      token,
+      type
+    });
+    return { data, error };
   } catch (err) {
     return { data: null, error: err };
   }
@@ -292,22 +239,9 @@ export const getUser = async (token) => {
     return { data: { user: { id: user.id, email: user.email, phone: user.phone } }, error: null };
   }
 
-  const url = `${SUPABASE_URL}/auth/v1/user`;
-  const options = {
-    method: 'GET',
-    headers: {
-      'apikey': SUPABASE_ANON_KEY,
-      'Authorization': `Bearer ${token}`
-    }
-  };
-
   try {
-    const res = await requestHttps(url, options);
-    const data = JSON.parse(res.body);
-    if (res.statusCode >= 400) {
-      return { data: { user: null }, error: new Error(data.msg || 'JWT validation failed') };
-    }
-    return { data: { user: data }, error: null };
+    const { data: { user }, error } = await supabase.auth.getUser(token);
+    return { data: { user }, error };
   } catch (err) {
     return { data: { user: null }, error: err };
   }
@@ -317,49 +251,69 @@ export const getUser = async (token) => {
  * Profiles Database Manager: Upsert user profiles
  */
 export const upsertProfile = async (profile) => {
-  const { id, name, email, phone, provider } = profile;
+  const { id, name, email, phone, provider, avatar } = profile;
 
   if (!isConfigured) {
     console.log('[Supabase DB Sandbox] Upserting profile for user:', id);
-    mockProfiles[id] = {
-      id,
-      name,
-      email,
-      phone,
-      provider,
-      created_at: mockProfiles[id]?.created_at || new Date().toISOString(),
-      last_login: new Date().toISOString()
-    };
+    const exists = !!mockProfiles[id];
+    if (exists) {
+      mockProfiles[id].last_login = new Date().toISOString();
+      mockProfiles[id].updated_at = new Date().toISOString();
+    } else {
+      mockProfiles[id] = {
+        id,
+        full_name: name,
+        email,
+        phone,
+        provider,
+        avatar_url: avatar || null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        last_login: new Date().toISOString()
+      };
+    }
     return { data: mockProfiles[id], error: null };
   }
 
-  const url = `${SUPABASE_URL}/rest/v1/profiles`;
-  const body = JSON.stringify({
-    id,
-    name,
-    email,
-    phone,
-    provider,
-    last_login: new Date().toISOString()
-  });
-
-  const options = {
-    method: 'POST',
-    headers: {
-      'apikey': SUPABASE_SERVICE_ROLE_KEY,
-      'Authorization': `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
-      'Content-Type': 'application/json',
-      'Prefer': 'resolution=merge-duplicates,return=representation'
-    }
-  };
-
   try {
-    const res = await requestHttps(url, options, body);
-    const data = JSON.parse(res.body);
-    if (res.statusCode >= 400) {
-      return { data: null, error: new Error(data.message || 'Profile database write failed') };
+    // Check if profile exists
+    const { data: existing, error: fetchError } = await supabaseAdmin
+      .from('profiles')
+      .select('id')
+      .eq('id', id)
+      .maybeSingle();
+
+    if (fetchError) throw fetchError;
+
+    if (existing) {
+      // Returning user: update last_login and updated_at only
+      const { data, error } = await supabaseAdmin
+        .from('profiles')
+        .update({
+          last_login: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', id)
+        .select();
+      return { data: data ? data[0] : null, error };
+    } else {
+      // First-time user: create profile automatically
+      const { data, error } = await supabaseAdmin
+        .from('profiles')
+        .insert({
+          id,
+          full_name: name,
+          email,
+          phone,
+          provider,
+          avatar_url: avatar || null,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          last_login: new Date().toISOString()
+        })
+        .select();
+      return { data: data ? data[0] : null, error };
     }
-    return { data: data[0], error: null };
   } catch (err) {
     return { data: null, error: err };
   }
@@ -374,23 +328,42 @@ export const getProfile = async (id) => {
     return { data: profile, error: null };
   }
 
-  const url = `${SUPABASE_URL}/rest/v1/profiles?id=eq.${id}&select=*`;
-  const options = {
-    method: 'GET',
-    headers: {
-      'apikey': SUPABASE_ANON_KEY,
-      'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-    }
-  };
-
   try {
-    const res = await requestHttps(url, options);
-    const data = JSON.parse(res.body);
-    if (res.statusCode >= 400) {
-      return { data: null, error: new Error(data.message || 'Failed to fetch profile') };
-    }
-    return { data: data[0] || null, error: null };
+    const { data, error } = await supabaseAdmin
+      .from('profiles')
+      .select('*')
+      .eq('id', id)
+      .single();
+    return { data: data || null, error };
   } catch (err) {
     return { data: null, error: err };
+  }
+};
+
+/**
+ * Check if user exists in Supabase or Sandbox mock database
+ */
+export const checkUserExists = async (email, phone) => {
+  if (!isConfigured) {
+    const user = Object.values(mockUsers).find(u => (email && u.email === email) || (phone && u.phone === phone));
+    if (user) {
+      return { exists: true, method: user.provider || 'password' };
+    }
+    return { exists: false };
+  }
+
+  try {
+    const { data: users, error } = await supabaseAdmin.auth.admin.listUsers();
+    if (error) throw error;
+    const user = users.users.find(u => (email && u.email === email) || (phone && u.phone === phone));
+    if (user) {
+      const identities = user.identities || [];
+      const oauthIdentity = identities.find(id => id.provider !== 'email' && id.provider !== 'phone');
+      return { exists: true, method: oauthIdentity ? oauthIdentity.provider : 'password' };
+    }
+    return { exists: false };
+  } catch (err) {
+    console.error('[Supabase checkUserExists error]', err);
+    return { exists: false };
   }
 };

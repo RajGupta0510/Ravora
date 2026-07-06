@@ -12,12 +12,14 @@ interface AuthContextType {
   token: string | null;
   user: User | null;
   loading: boolean;
-  login: (emailOrPhone: string, isPhone: boolean, isOtp: boolean, passwordOrOtp: string, rememberMe: boolean) => Promise<{ success: boolean; otpRequired?: boolean; error?: string }>;
+  deviceFingerprint: string;
+  login: (emailOrPhone: string, isPhone: boolean, isOtp: boolean, passwordOrOtp: string, rememberMe: boolean) => Promise<{ success: boolean; otpRequired?: boolean; userId?: string; channel?: string; destination?: string; error?: string }>;
   register: (fullName: string, emailOrPhone: string, isPhone: boolean, password: string, confirmPassword: string) => Promise<{ success: boolean; otpRequired: boolean; userId: string; channel: string; destination: string; error?: string }>;
-  verifyOtpCode: (emailOrPhone: string, isPhone: boolean, otpCode: string, userId: string) => Promise<{ success: boolean; error?: string }>;
+  verifyOtpCode: (emailOrPhone: string, isPhone: boolean, otpCode: string, userId: string, rememberMe?: boolean) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
   checkAuth: () => Promise<void>;
   updateOnboardingCompletedState: (completed: boolean) => void;
+  socialLoginSuccess: (token: string, email: string, onboardingCompleted: boolean) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -32,15 +34,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [token, setToken] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [deviceFingerprint, setDeviceFingerprint] = useState<string>('');
 
   const API_BASE = '/v1';
+
+  // Initialize device fingerprint
+  useEffect(() => {
+    let df = localStorage.getItem('ravora_device_fingerprint');
+    if (!df) {
+      df = 'df_' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+      localStorage.setItem('ravora_device_fingerprint', df);
+    }
+    setDeviceFingerprint(df);
+  }, []);
 
   const checkAuth = async () => {
     try {
       const storedToken = localStorage.getItem('ravora_token') || sessionStorage.getItem('ravora_token');
-      if (!storedToken) {
-        setToken(null);
-        setUser(null);
+      const loggedIn = localStorage.getItem('ravora_logged_in') === 'true';
+      
+      // Remember Me / session storage alignment
+      const rememberMe = localStorage.getItem('ravora_remember_me') === 'true';
+      const sessionActive = sessionStorage.getItem('ravora_session_active') === 'true';
+      const sessionValid = rememberMe || sessionActive;
+
+      if (!storedToken || !loggedIn || !sessionValid) {
+        logout();
         setLoading(false);
         return;
       }
@@ -67,14 +86,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     } catch (err) {
       console.error('[Auth check error]', err);
+      logout();
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    checkAuth();
-  }, []);
+    // Only check auth after deviceFingerprint is initialized
+    if (deviceFingerprint) {
+      checkAuth();
+    }
+  }, [deviceFingerprint]);
 
   const login = async (
     emailOrPhone: string,
@@ -84,9 +107,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     rememberMe: boolean
   ) => {
     try {
-      const payload: any = {};
+      const payload: any = {
+        deviceFingerprint,
+        rememberMe
+      };
+
       if (isPhone) {
-        payload.mobileNumber = emailOrPhone;
+        payload.mobile = emailOrPhone;
       } else {
         payload.email = emailOrPhone;
       }
@@ -121,17 +148,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       // Save session
-      const userToken = data.token || data.session?.access_token;
+      const userToken = data.token;
       if (!userToken) return { success: false, error: 'Token missing from response.' };
 
       if (rememberMe) {
         localStorage.setItem('ravora_token', userToken);
-        localStorage.setItem('ravora_logged_in', 'true');
-        localStorage.setItem('ravora_login_time', Date.now().toString());
-        localStorage.setItem('ravora_email', emailOrPhone);
+        localStorage.setItem('ravora_remember_me', 'true');
       } else {
         sessionStorage.setItem('ravora_token', userToken);
+        localStorage.setItem('ravora_remember_me', 'false');
       }
+      
+      localStorage.setItem('ravora_logged_in', 'true');
+      localStorage.setItem('ravora_login_time', Date.now().toString());
+      localStorage.setItem('ravora_email', emailOrPhone);
+      sessionStorage.setItem('ravora_session_active', 'true');
 
       setToken(userToken);
       setUser({
@@ -139,7 +170,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         email: emailOrPhone,
         fullName: data.user?.full_name || 'Ravora Member',
         verified: true,
-        onboardingCompleted: data.onboardingCompleted ?? false
+        onboardingCompleted: data.user?.onboardingCompleted ?? false
       });
 
       return { success: true };
@@ -197,12 +228,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     emailOrPhone: string,
     isPhone: boolean,
     otpCode: string,
-    userId: string
+    userId: string,
+    rememberMe = false
   ) => {
     try {
       const payload: any = {
         userId,
-        otpCode
+        otpCode,
+        deviceFingerprint,
+        rememberMe
       };
 
       if (isPhone) {
@@ -223,14 +257,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return { success: false, error: data.error || 'OTP verification failed.' };
       }
 
-      const userToken = data.token || data.session?.access_token;
+      const userToken = data.token;
       if (!userToken) return { success: false, error: 'Token missing from response.' };
 
-      // Persist in localStorage by default on verification
-      localStorage.setItem('ravora_token', userToken);
+      if (rememberMe) {
+        localStorage.setItem('ravora_token', userToken);
+        localStorage.setItem('ravora_remember_me', 'true');
+      } else {
+        sessionStorage.setItem('ravora_token', userToken);
+        localStorage.setItem('ravora_remember_me', 'false');
+      }
+      
       localStorage.setItem('ravora_logged_in', 'true');
       localStorage.setItem('ravora_login_time', Date.now().toString());
       localStorage.setItem('ravora_email', emailOrPhone);
+      sessionStorage.setItem('ravora_session_active', 'true');
 
       setToken(userToken);
       setUser({
@@ -238,7 +279,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         email: emailOrPhone,
         fullName: data.user?.full_name || 'Ravora Member',
         verified: true,
-        onboardingCompleted: data.onboardingCompleted ?? false
+        onboardingCompleted: data.user?.onboardingCompleted ?? false
       });
 
       return { success: true };
@@ -253,7 +294,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.removeItem('ravora_login_time');
     localStorage.removeItem('ravora_email');
     localStorage.removeItem('ravora_onboarding_completed');
-    sessionStorage.removeItem('ravora_token');
+    localStorage.removeItem('ravora_remember_me');
+    sessionStorage.removeItem('ravora_session_active');
     setToken(null);
     setUser(null);
   };
@@ -268,8 +310,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const socialLoginSuccess = async (token: string, email: string, onboardingCompleted: boolean) => {
+    localStorage.setItem('ravora_token', token);
+    localStorage.setItem('ravora_logged_in', 'true');
+    localStorage.setItem('ravora_login_time', Date.now().toString());
+    localStorage.setItem('ravora_email', email);
+    localStorage.setItem('ravora_remember_me', 'true');
+    sessionStorage.setItem('ravora_session_active', 'true');
+
+    setToken(token);
+    setUser({
+      id: 'oauth_user',
+      email,
+      fullName: 'Ravora Member',
+      verified: true,
+      onboardingCompleted
+    });
+    
+    await checkAuth();
+  };
+
   return (
-    <AuthContext.Provider value={{ token, user, loading, login, register, verifyOtpCode, logout, checkAuth, updateOnboardingCompletedState }}>
+    <AuthContext.Provider value={{ token, user, loading, deviceFingerprint, login, register, verifyOtpCode, logout, checkAuth, updateOnboardingCompletedState, socialLoginSuccess }}>
       {children}
     </AuthContext.Provider>
   );

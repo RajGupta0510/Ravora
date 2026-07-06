@@ -85,71 +85,99 @@
               <h3 style="margin-bottom: 4px; text-align: left; font-family: var(--font-display); font-size: 1.45rem; font-weight: 700; color: #fff;">Welcome to Ravora</h3>
               <p class="body-text" style="margin-bottom: 12px; text-align: left; font-size: 0.85rem; color: var(--text-secondary); line-height: 1.45;">Enter your credentials to access your active wealth copilot.</p>
               
-              <!-- Tab toggle: Email vs Mobile -->
-              <div class="filter-segmented" style="display: flex; margin-bottom: 12px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 6px; padding: 2px;">
-                <button type="button" class="segmented-tab active" id="login-tab-email" style="flex: 1; padding: 8px; font-size: 0.72rem; font-weight: 600; border: none; background: transparent; color: #fff; cursor: pointer;">Email Address</button>
-                <button type="button" class="segmented-tab" id="login-tab-mobile" style="flex: 1; padding: 8px; font-size: 0.72rem; font-weight: 600; border: none; background: transparent; color: var(--text-secondary); cursor: pointer;">Mobile Number</button>
-              </div>
-
-              <!-- Email Block -->
-              <div id="login-email-container" class="auth-input-group" style="margin-bottom: 16px; text-align: left;">
-                <label style="display: block; font-size: 0.72rem; font-weight: 600; color: #a5b4fc; margin-bottom: 6px; letter-spacing: 0.05em;">EMAIL ADDRESS</label>
-                <input type="email" id="login-email" placeholder="name@domain.com" style="width: 100%; padding: 12px 16px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.03); color: #fff; outline: none; font-size: 0.9rem; box-sizing: border-box;">
-              </div>
-
-              <!-- Mobile Block -->
-              <div id="login-mobile-container" class="auth-input-group" style="margin-bottom: 16px; text-align: left; display: none;">
-                <label style="display: block; font-size: 0.72rem; font-weight: 600; color: #a5b4fc; margin-bottom: 6px; letter-spacing: 0.05em;">MOBILE NUMBER</label>
-                <input type="text" id="login-mobile" placeholder="+1 (555) 000-0000" style="width: 100%; padding: 12px 16px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.03); color: #fff; outline: none; font-size: 0.9rem; box-sizing: border-box;">
-              </div>
-
-              <!-- Password Block -->
-              <div id="login-password-container" class="auth-input-group" style="margin-bottom: 20px; text-align: left; position: relative;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                  <label style="margin-bottom: 0; font-size: 0.72rem; font-weight: 600; color: #a5b4fc; letter-spacing: 0.05em;">PASSWORD</label>
-                  <a href="#" class="auth-forgot-link" id="login-forgot-btn" style="font-size: 0.72rem; color: var(--accent); text-decoration: none; font-weight: 600;">Forgot Password?</a>
+              <!-- 1. EMAIL/MOBILE INPUT STAGE -->
+              <div id="login-stage-email" style="display: block;">
+                <!-- Tab toggle: Email vs Mobile -->
+                <div class="filter-segmented" style="display: flex; margin-bottom: 12px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 6px; padding: 2px;">
+                  <button type="button" class="segmented-tab active" id="login-tab-email" style="flex: 1; padding: 8px; font-size: 0.72rem; font-weight: 600; border: none; background: transparent; color: #fff; cursor: pointer;">Email Address</button>
+                  <button type="button" class="segmented-tab" id="login-tab-mobile" style="flex: 1; padding: 8px; font-size: 0.72rem; font-weight: 600; border: none; background: transparent; color: var(--text-secondary); cursor: pointer;">Mobile Number</button>
                 </div>
-                <div style="position: relative; width: 100%;">
-                  <input type="password" id="login-password" placeholder="••••••••" style="width: 100%; padding: 12px 40px 12px 16px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.03); color: #fff; outline: none; font-size: 0.9rem; box-sizing: border-box;">
-                  <button type="button" class="btn-toggle-password" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0;">
-                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                  </button>
+
+                <!-- Email Block -->
+                <div id="login-email-container" class="auth-input-group" style="margin-bottom: 16px; text-align: left;">
+                  <label style="display: block; font-size: 0.72rem; font-weight: 600; color: #a5b4fc; margin-bottom: 6px; letter-spacing: 0.05em;">EMAIL ADDRESS</label>
+                  <input type="email" id="login-email" placeholder="name@domain.com" style="width: 100%; padding: 12px 16px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.03); color: #fff; outline: none; font-size: 0.9rem; box-sizing: border-box;">
+                </div>
+
+                <!-- Mobile Block -->
+                <div id="login-mobile-container" class="auth-input-group" style="margin-bottom: 16px; text-align: left; display: none;">
+                  <label style="display: block; font-size: 0.72rem; font-weight: 600; color: #a5b4fc; margin-bottom: 6px; letter-spacing: 0.05em;">MOBILE NUMBER</label>
+                  <input type="text" id="login-mobile" placeholder="+1 (555) 000-0000" style="width: 100%; padding: 12px 16px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.03); color: #fff; outline: none; font-size: 0.9rem; box-sizing: border-box;">
                 </div>
               </div>
 
-              <!-- Login with OTP toggle -->
-              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 20px; font-size: 0.8rem; color: var(--text-secondary); text-align: left;">
-                <input type="checkbox" id="login-otp-toggle" style="accent-color: var(--primary); cursor: pointer; width: 15px; height: 15px;">
-                <label for="login-otp-toggle" style="margin: 0; font-weight: 500; cursor: pointer;">Sign in with OTP code instead of password</label>
+              <!-- 2. PASSWORD STAGE (Initially Hidden) -->
+              <div id="login-stage-password" style="display: none;">
+                <div style="margin-bottom: 16px; font-size: 0.85rem; color: var(--text-secondary); text-align: left;">
+                  Signing in as <strong id="login-active-email" style="color: #fff;"></strong> (<a href="#" id="login-change-active" style="color: var(--accent); text-decoration: none; font-weight: 600;">Change</a>)
+                </div>
+
+                <!-- Password Block -->
+                <div id="login-password-container" class="auth-input-group" style="margin-bottom: 20px; text-align: left; position: relative;">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                    <label style="margin-bottom: 0; font-size: 0.72rem; font-weight: 600; color: #a5b4fc; letter-spacing: 0.05em;">PASSWORD</label>
+                    <a href="#" class="auth-forgot-link" id="login-forgot-btn" style="font-size: 0.72rem; color: var(--accent); text-decoration: none; font-weight: 600;">Forgot Password?</a>
+                  </div>
+                  <div style="position: relative; width: 100%;">
+                    <input type="password" id="login-password" placeholder="••••••••" style="width: 100%; padding: 12px 40px 12px 16px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.03); color: #fff; outline: none; font-size: 0.9rem; box-sizing: border-box;">
+                    <button type="button" class="btn-toggle-password" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0;">
+                      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Login with OTP toggle -->
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 20px; font-size: 0.8rem; color: var(--text-secondary); text-align: left;">
+                  <input type="checkbox" id="login-otp-toggle" style="accent-color: var(--primary); cursor: pointer; width: 15px; height: 15px;">
+                  <label for="login-otp-toggle" style="margin: 0; font-weight: 500; cursor: pointer;">Sign in with OTP code instead of password</label>
+                </div>
+
+                <!-- Remember Me & Trust settings -->
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 20px; font-size: 0.8rem; color: var(--text-secondary); text-align: left;">
+                  <input type="checkbox" id="login-remember-me" style="accent-color: var(--primary); cursor: pointer; width: 15px; height: 15px;">
+                  <label for="login-remember-me" style="margin: 0; font-weight: 500; cursor: pointer;">Trust this device (skip future OTPs)</label>
+                </div>
               </div>
 
-              <!-- Remember Me & Trust settings -->
-              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 20px; font-size: 0.8rem; color: var(--text-secondary); text-align: left;">
-                <input type="checkbox" id="login-remember-me" style="accent-color: var(--primary); cursor: pointer; width: 15px; height: 15px;">
-                <label for="login-remember-me" style="margin: 0; font-weight: 500; cursor: pointer;">Trust this device (skip future OTPs)</label>
+              <!-- 3. NO ACCOUNT STAGE (Initially Hidden) -->
+              <div id="login-stage-no-account" style="display: none; text-align: center; padding: 10px 0;">
+                <p style="color: #f87171; font-size: 0.95rem; font-weight: 600; margin-bottom: 20px;">No account found.</p>
+                <button type="button" id="no-account-create-btn" class="btn btn-primary" style="width: 100%; padding: 12px; margin-bottom: 12px; font-weight: 600; color: #fff; cursor: pointer; border: none; border-radius: 8px;">Create Account</button>
+                <button type="button" id="no-account-retry-btn" class="btn btn-secondary" style="width: 100%; padding: 12px; margin-bottom: 12px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); color: #fff; border-radius: 8px; cursor: pointer;">Try Another Email</button>
+                <button type="button" id="no-account-stay-btn" class="btn btn-secondary" style="width: 100%; padding: 12px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); color: #fff; border-radius: 8px; cursor: pointer;">Stay on Sign In</button>
               </div>
 
+              <!-- 4. OAUTH SIGN IN REDIRECT STAGE (Initially Hidden) -->
+              <div id="login-stage-oauth" style="display: none; text-align: center; padding: 10px 0;">
+                <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 20px;">This account uses <strong id="oauth-provider-name" style="color: #fff; text-transform: capitalize;"></strong> Sign In.</p>
+                <button type="button" id="oauth-continue-btn" class="btn btn-primary" style="width: 100%; padding: 12px; margin-bottom: 16px; font-weight: 600; color: #fff; cursor: pointer; border: none; border-radius: 8px;">Continue</button>
+                <div>
+                  <a href="#" id="oauth-back-btn" style="font-size: 0.8rem; color: var(--text-muted); text-decoration: none; font-weight: 600;">Back to Sign In</a>
+                </div>
+              </div>
+
+              <!-- Submit / Error sections -->
               <div id="login-error" style="color: #f87171; font-size: 0.8rem; margin-bottom: 16px; display: none; text-align: left; background: rgba(248, 113, 113, 0.08); padding: 10px 14px; border-radius: 8px; border: 1px solid rgba(248, 113, 113, 0.15); box-sizing: border-box;"></div>
               
-              <button type="submit" class="btn btn-primary auth-submit-btn" style="width: 100%; padding: 14px; margin-bottom: 20px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; height: 46px;">
-                <span>Sign In</span>
+              <button type="submit" id="login-submit-btn" class="btn btn-primary auth-submit-btn" style="width: 100%; padding: 14px; margin-bottom: 20px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; height: 46px;">
+                <span id="login-btn-text">Continue</span>
                 <span class="auth-spinner" style="display: none; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff; animation: spin-loader 0.8s linear infinite;"></span>
               </button>
 
               <!-- Social Divider -->
-              <div class="social-divider" style="text-align: center; margin: 20px 0; position: relative; font-size: 0.72rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">
+              <div id="login-social-divider" class="social-divider" style="text-align: center; margin: 20px 0; position: relative; font-size: 0.72rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">
                 <span style="background: rgb(8, 11, 22); padding: 0 10px; position: relative; z-index: 2;">OR CONTINUE WITH</span>
                 <div style="position: absolute; top: 50%; left: 0; width: 100%; height: 1px; background: rgba(255,255,255,0.06); z-index: 1;"></div>
               </div>
 
               <!-- Social Buttons -->
-              <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 24px;">
+              <div id="login-social-buttons" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 24px;">
                 <button type="button" class="btn btn-secondary social-btn btn-social-login" data-provider="google" style="height: 38px; font-size: 0.76rem; padding: 0; font-weight: 600; background: rgba(255,255,255,0.01);">Google</button>
                 <button type="button" class="btn btn-secondary social-btn btn-social-login" data-provider="github" style="height: 38px; font-size: 0.76rem; padding: 0; font-weight: 600; background: rgba(255,255,255,0.01);">GitHub</button>
                 <button type="button" class="btn btn-secondary social-btn btn-social-login" data-provider="apple" style="height: 38px; font-size: 0.76rem; padding: 0; font-weight: 600; background: rgba(255,255,255,0.01);">Apple</button>
               </div>
 
-              <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0; text-align: center;">Don't have an account? <a href="#" id="go-to-register" style="color: var(--accent); font-weight: 600; text-decoration: none;">Create Account</a></p>
+              <p id="login-footer-register" style="font-size: 0.85rem; color: var(--text-secondary); margin: 0; text-align: center;">Don't have an account? <a href="#" id="go-to-register" style="color: var(--accent); font-weight: 600; text-decoration: none;">Create Account</a></p>
               <p style="font-size: 0.8rem; color: var(--text-muted); margin: 12px 0 0 0; text-align: center;"><a href="/" style="color: var(--text-muted); text-decoration: none; font-weight: 500; transition: color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='var(--text-muted)'">&larr; Back to Landing Page</a></p>
             </form>
           </div>
@@ -158,10 +186,10 @@
           <div id="auth-register-view" style="display: none; width: 100%;">
             <form id="auth-register-form" class="auth-form" style="width: 100%;">
               <h3 style="margin-bottom: 4px; text-align: left; font-family: var(--font-display); font-size: 1.45rem; font-weight: 700; color: #fff;">Create Account</h3>
-              <p class="body-text" style="margin-bottom: 12px; text-align: left; font-size: 0.85rem; color: var(--text-secondary); line-height: 1.45;">Initialize your institutional-grade AI wealth management workspace.</p>
+              <p class="body-text" id="register-subtitle" style="margin-bottom: 12px; text-align: left; font-size: 0.85rem; color: var(--text-secondary); line-height: 1.45;">Initialize your institutional-grade AI wealth management workspace.</p>
 
-              <!-- Tab toggle: Email vs Mobile -->
-              <div class="filter-segmented" style="display: flex; margin-bottom: 12px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 6px; padding: 2px;">
+              <!-- Tab toggle: Email vs Mobile (Hidden as it is pre-selected) -->
+              <div class="filter-segmented" style="display: none; margin-bottom: 12px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 6px; padding: 2px;">
                 <button type="button" class="segmented-tab active" id="register-tab-email" style="flex: 1; padding: 8px; font-size: 0.72rem; font-weight: 600; border: none; background: transparent; color: #fff; cursor: pointer;">Email Address</button>
                 <button type="button" class="segmented-tab" id="register-tab-mobile" style="flex: 1; padding: 8px; font-size: 0.72rem; font-weight: 600; border: none; background: transparent; color: var(--text-secondary); cursor: pointer;">Mobile Number</button>
               </div>
@@ -171,14 +199,14 @@
                 <input type="text" id="register-fullname" placeholder="Alex Mercer" required style="width: 100%; padding: 12px 16px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.03); color: #fff; outline: none; font-size: 0.9rem; box-sizing: border-box;">
               </div>
 
-              <!-- Email Block -->
-              <div id="register-email-container" class="auth-input-group" style="margin-bottom: 16px; text-align: left;">
+              <!-- Email Block (Hidden as it is pre-filled) -->
+              <div id="register-email-container" class="auth-input-group" style="display: none; margin-bottom: 16px; text-align: left;">
                 <label style="display: block; font-size: 0.72rem; font-weight: 600; color: #a5b4fc; margin-bottom: 6px; letter-spacing: 0.05em;">EMAIL ADDRESS</label>
-                <input type="email" id="register-email" placeholder="name@domain.com" required style="width: 100%; padding: 12px 16px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.03); color: #fff; outline: none; font-size: 0.9rem; box-sizing: border-box;">
+                <input type="email" id="register-email" placeholder="name@domain.com" style="width: 100%; padding: 12px 16px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.03); color: #fff; outline: none; font-size: 0.9rem; box-sizing: border-box;">
               </div>
 
-              <!-- Mobile Block -->
-              <div id="register-mobile-container" class="auth-input-group" style="margin-bottom: 16px; text-align: left; display: none;">
+              <!-- Mobile Block (Hidden as it is pre-filled) -->
+              <div id="register-mobile-container" class="auth-input-group" style="display: none; margin-bottom: 16px; text-align: left;">
                 <label style="display: block; font-size: 0.72rem; font-weight: 600; color: #a5b4fc; margin-bottom: 6px; letter-spacing: 0.05em;">MOBILE NUMBER</label>
                 <input type="text" id="register-mobile" placeholder="+1 (555) 000-0000" style="width: 100%; padding: 12px 16px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.03); color: #fff; outline: none; font-size: 0.9rem; box-sizing: border-box;">
               </div>

@@ -4,7 +4,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { initializeDatabase, dbQuery } from './src/database.js';
 import { verifyToken } from './src/middleware/auth.js';
-import { register, login, verifyOtp, resendOtp, requestPasswordRecovery, resetPassword, socialLogin } from './src/controllers/authController.js';
+import { register, login, verifyOtp, resendOtp, requestPasswordRecovery, resetPassword, socialLogin, checkAccount } from './src/controllers/authController.js';
 import { getProfile, onboard, updateSettings } from './src/controllers/userController.js';
 import { getPortfolio, getPortfolioHistory, getTransactions, closePosition } from './src/controllers/portfolioController.js';
 import { getOpportunities, getRecommendations, executeRecommendation, deployOpportunity, scanMarkets } from './src/controllers/opportunityController.js';
@@ -40,6 +40,7 @@ const apiRouter = express.Router();
 
 // Auth Endpoints
 apiRouter.get('/auth/config', (req, res) => res.json(getSupabaseConfig()));
+apiRouter.post('/auth/check-account', checkAccount);
 apiRouter.post('/auth/register', register);
 apiRouter.post('/auth/login', login);
 apiRouter.post('/auth/otp/verify', verifyOtp);

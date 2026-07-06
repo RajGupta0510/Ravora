@@ -38,6 +38,7 @@
       box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
       text-align: center;
       box-sizing: border-box;
+      display: none; /* Hidden during redirect checks */
     }
 
     .provider-logo {
@@ -157,11 +158,18 @@
       color: #818cf8;
       text-decoration: none;
     }
+
+    .loading-spinner {
+      font-size: 1rem;
+      color: var(--text-muted);
+    }
   </style>
 </head>
 <body>
 
-  <div class="oauth-container">
+  <div id="loader" class="loading-spinner">Verifying connection with identity provider...</div>
+
+  <div class="oauth-container" id="oauth-ui">
     <div id="provider-icon" class="provider-logo"></div>
     <h2 id="provider-title">Sign In</h2>
     <p id="provider-subtitle">to continue to Ravora</p>
@@ -186,79 +194,143 @@
   </div>
 
   <script>
-    // Get query parameters
     const params = new URLSearchParams(window.location.search);
     const provider = params.get('provider') || 'google';
 
-    const iconEl = document.getElementById('provider-icon');
-    const titleEl = document.getElementById('provider-title');
-    const subtitleEl = document.getElementById('provider-subtitle');
-    const submitBtn = document.getElementById('btn-submit');
-    const emailInput = document.getElementById('oauth-email');
+    const loader = document.getElementById('loader');
+    const oauthUi = document.getElementById('oauth-ui');
 
-    // Branded state definitions
-    const brands = {
-      google: {
-        title: 'Sign In with Google',
-        subtitle: 'Securely link your Google Identity with Ravora',
-        logoClass: 'google-logo',
-        logoText: 'G',
-        btnClass: 'btn-google',
-        btnText: 'Allow Access',
-        defaultEmail: 'google.user@gmail.com'
-      },
-      github: {
-        title: 'Authorize GitHub Integration',
-        subtitle: 'Allow Ravora to read your verified GitHub emails',
-        logoClass: 'github-logo',
-        logoText: 'Git',
-        btnClass: 'btn-github',
-        btnText: 'Authorize RajGupta0510',
-        defaultEmail: 'github.user@github.com'
-      },
-      apple: {
-        title: 'Sign In with Apple ID',
-        subtitle: 'Use your Apple ID to sign into Ravora securely',
-        logoClass: 'apple-logo',
-        logoText: '',
-        btnClass: 'btn-apple',
-        btnText: 'Continue with Apple',
-        defaultEmail: 'apple.user@icloud.com'
-      }
-    };
+    // Callback Phase (Url hash has access_token)
+    const hash = window.location.hash;
+    if (hash && hash.includes('access_token=')) {
+      loader.textContent = 'Authenticating with Ravora...';
+      const hashParams = new URLSearchParams(hash.substring(1));
+      const accessToken = hashParams.get('access_token');
 
-    const b = brands[provider] || brands.google;
+      // Fetch config to locate Supabase REST URL
+      fetch('/v1/auth/config')
+        .then(res => res.json())
+        .then(config => {
+          return fetch(`${config.supabaseUrl}/auth/v1/user`, {
+            headers: {
+              'Authorization': `Bearer ${accessToken}`,
+              'apikey': config.supabaseAnonKey
+            }
+          });
+        })
+        .then(res => res.json())
+        .then(user => {
+          if (window.opener) {
+            window.opener.postMessage({
+              provider: provider,
+              email: user.email,
+              fullName: user.user_metadata?.full_name || user.email.split('@')[0],
+              token: accessToken,
+              providerUserId: user.id
+            }, window.location.origin);
+            window.close();
+          } else {
+            alert('Authorization complete. You can close this window.');
+          }
+        })
+        .catch(err => {
+          console.error('[OAuth Callback Error]', err);
+          loader.textContent = 'Authentication failed. Close and try again.';
+          alert('OAuth Callback Error: ' + err.message);
+        });
+    } else {
+      // Initial Trigger Phase
+      fetch('/v1/auth/config')
+        .then(res => res.json())
+        .then(config => {
+          const isRealSupabase = config.supabaseUrl && !config.supabaseUrl.includes('localhost') && !config.supabaseUrl.includes('mock');
+          
+          if (isRealSupabase) {
+            // Redirect popup directly to Supabase authorize endpoint
+            const redirectTo = `${window.location.origin}/app/oauth-consent.html`;
+            const authorizeUrl = `${config.supabaseUrl}/auth/v1/authorize?provider=${provider}&redirect_to=${encodeURIComponent(redirectTo)}`;
+            window.location.href = authorizeUrl;
+          } else {
+            // Render local sandbox mock console
+            loader.style.display = 'none';
+            oauthUi.style.display = 'block';
+            initMockConsentScreen();
+          }
+        })
+        .catch(err => {
+          console.warn('[Config fetch failed, falling back to mock]', err);
+          loader.style.display = 'none';
+          oauthUi.style.display = 'block';
+          initMockConsentScreen();
+        });
+    }
 
-    // Apply branded state to DOM
-    iconEl.classList.add(b.logoClass);
-    iconEl.textContent = b.logoText;
-    titleEl.textContent = b.title;
-    subtitleEl.textContent = b.subtitle;
-    submitBtn.classList.add(b.btnClass);
-    submitBtn.textContent = b.btnText;
-    emailInput.value = b.defaultEmail;
+    function initMockConsentScreen() {
+      const iconEl = document.getElementById('provider-icon');
+      const titleEl = document.getElementById('provider-title');
+      const subtitleEl = document.getElementById('provider-subtitle');
+      const submitBtn = document.getElementById('btn-submit');
+      const emailInput = document.getElementById('oauth-email');
 
-    // Handle form submit
-    document.getElementById('oauth-form').addEventListener('submit', (e) => {
-      e.preventDefault();
-      const email = emailInput.value.trim();
-      const name = provider.charAt(0).toUpperCase() + provider.slice(1) + ' Verified User';
+      const brands = {
+        google: {
+          title: 'Sign In with Google',
+          subtitle: 'Securely link your Google Identity with Ravora',
+          logoClass: 'google-logo',
+          logoText: 'G',
+          btnClass: 'btn-google',
+          btnText: 'Allow Access',
+          defaultEmail: 'google.user@gmail.com'
+        },
+        github: {
+          title: 'Authorize GitHub Integration',
+          subtitle: 'Allow Ravora to read your verified GitHub emails',
+          logoClass: 'github-logo',
+          logoText: 'Git',
+          btnClass: 'btn-github',
+          btnText: 'Authorize RajGupta0510',
+          defaultEmail: 'github.user@github.com'
+        },
+        apple: {
+          title: 'Sign In with Apple ID',
+          subtitle: 'Use your Apple ID to sign into Ravora securely',
+          logoClass: 'apple-logo',
+          logoText: '',
+          btnClass: 'btn-apple',
+          btnText: 'Continue with Apple',
+          defaultEmail: 'apple.user@icloud.com'
+        }
+      };
 
-      // Send the callback message back to the parent opener window
-      if (window.opener) {
-        window.opener.postMessage({
-          provider: provider,
-          email: email,
-          fullName: name,
-          code: 'auth_code_' + Math.floor(Math.random() * 1000000)
-        }, window.location.origin);
-        
-        // Close consent screen popup
-        window.close();
-      } else {
-        alert('Parent window opener not found. OAuth simulation failed.');
-      }
-    });
+      const b = brands[provider] || brands.google;
+
+      iconEl.classList.add(b.logoClass);
+      iconEl.textContent = b.logoText;
+      titleEl.textContent = b.title;
+      subtitleEl.textContent = b.subtitle;
+      submitBtn.classList.add(b.btnClass);
+      submitBtn.textContent = b.btnText;
+      emailInput.value = b.defaultEmail;
+
+      document.getElementById('oauth-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const email = emailInput.value.trim();
+        const name = provider.charAt(0).toUpperCase() + provider.slice(1) + ' Verified User';
+
+        if (window.opener) {
+          window.opener.postMessage({
+            provider: provider,
+            email: email,
+            fullName: name,
+            token: 'mock_jwt_token_oauth_' + Math.floor(Math.random() * 1000000),
+            providerUserId: 'oauth_id_' + Math.floor(Math.random() * 1000000)
+          }, window.location.origin);
+          window.close();
+        } else {
+          alert('Parent window opener not found. OAuth simulation failed.');
+        }
+      });
+    }
   </script>
 </body>
 </html>

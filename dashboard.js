@@ -1090,18 +1090,30 @@ document.addEventListener('DOMContentLoaded', () => {
   if (goToRegister) {
     goToRegister.addEventListener('click', (e) => {
       e.preventDefault();
-      loginForm.style.display = 'none';
-      registerForm.style.display = 'block';
-      registerError.style.display = 'none';
+      switchAuthView('register');
+      const emailVal = document.getElementById('login-email').value;
+      const mobileVal = document.getElementById('login-mobile').value;
+      const subtitleEl = document.getElementById('register-subtitle');
+      if (activeLoginTab === 'email') {
+        document.getElementById('register-email').value = emailVal;
+        document.getElementById('register-tab-email').click();
+        if (subtitleEl) {
+          subtitleEl.innerHTML = `Creating Ravora account for <strong style="color: #fff;">${emailVal || 'your email'}</strong>`;
+        }
+      } else {
+        document.getElementById('register-mobile').value = mobileVal;
+        document.getElementById('register-tab-mobile').click();
+        if (subtitleEl) {
+          subtitleEl.innerHTML = `Creating Ravora account for <strong style="color: #fff;">${mobileVal || 'your device'}</strong>`;
+        }
+      }
     });
   }
 
   if (goToLogin) {
     goToLogin.addEventListener('click', (e) => {
       e.preventDefault();
-      registerForm.style.display = 'none';
-      loginForm.style.display = 'block';
-      loginError.style.display = 'none';
+      switchAuthView('login');
     });
   }
 
@@ -1332,6 +1344,34 @@ document.addEventListener('DOMContentLoaded', () => {
         authViews[k].style.display = (k === viewName) ? 'block' : 'none';
       }
     });
+    if (viewName === 'login') {
+      resetLoginStages();
+    }
+  }
+
+  function resetLoginStages() {
+    currentLoginStep = 'email';
+    const stageEmail = document.getElementById('login-stage-email');
+    const stagePwd = document.getElementById('login-stage-password');
+    const stageNoAcc = document.getElementById('login-stage-no-account');
+    const stageOauth = document.getElementById('login-stage-oauth');
+    const submitBtn = document.getElementById('login-submit-btn');
+    const divider = document.getElementById('login-social-divider');
+    const socialBtns = document.getElementById('login-social-buttons');
+    const footer = document.getElementById('login-footer-register');
+    const btnText = document.getElementById('login-btn-text');
+    const errorEl = document.getElementById('login-error');
+
+    if (stageEmail) stageEmail.style.display = 'block';
+    if (stagePwd) stagePwd.style.display = 'none';
+    if (stageNoAcc) stageNoAcc.style.display = 'none';
+    if (stageOauth) stageOauth.style.display = 'none';
+    if (submitBtn) submitBtn.style.display = 'flex';
+    if (divider) divider.style.display = 'block';
+    if (socialBtns) socialBtns.style.display = 'grid';
+    if (footer) footer.style.display = 'block';
+    if (btnText) btnText.textContent = 'Continue';
+    if (errorEl) errorEl.style.display = 'none';
   }
 
   // Clear OTP Timers
@@ -1456,6 +1496,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const loginOtpToggle = document.getElementById('login-otp-toggle');
 
   let activeLoginTab = 'email';
+  let currentLoginStep = 'email';
 
   if (loginTabEmail && loginTabMobile) {
     loginTabEmail.addEventListener('click', () => {
@@ -1507,6 +1548,15 @@ document.addEventListener('DOMContentLoaded', () => {
   const registerMobileContainer = document.getElementById('register-mobile-container');
   let activeRegisterTab = 'email';
 
+  const updateRegisterSubtitle = () => {
+    const subtitleEl = document.getElementById('register-subtitle');
+    if (!subtitleEl) return;
+    const emailVal = document.getElementById('register-email').value;
+    const mobileVal = document.getElementById('register-mobile').value;
+    const currentVal = activeRegisterTab === 'email' ? emailVal : mobileVal;
+    subtitleEl.innerHTML = `Creating Ravora account for <strong style="color: #fff;">${currentVal || (activeRegisterTab === 'email' ? 'your email' : 'your device')}</strong>`;
+  };
+
   if (registerTabEmail && registerTabMobile) {
     registerTabEmail.addEventListener('click', () => {
       activeRegisterTab = 'email';
@@ -1516,6 +1566,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (registerMobileContainer) registerMobileContainer.style.display = 'none';
       document.getElementById('register-email').required = true;
       document.getElementById('register-mobile').required = false;
+      updateRegisterSubtitle();
     });
 
     registerTabMobile.addEventListener('click', () => {
@@ -1526,7 +1577,13 @@ document.addEventListener('DOMContentLoaded', () => {
       if (registerMobileContainer) registerMobileContainer.style.display = 'block';
       document.getElementById('register-email').required = false;
       document.getElementById('register-mobile').required = true;
+      updateRegisterSubtitle();
     });
+
+    const regEmailInput = document.getElementById('register-email');
+    const regMobileInput = document.getElementById('register-mobile');
+    if (regEmailInput) regEmailInput.addEventListener('input', updateRegisterSubtitle);
+    if (regMobileInput) regMobileInput.addEventListener('input', updateRegisterSubtitle);
   }
 
   // PASSWORD STRENGTH LOGIC
@@ -1625,6 +1682,123 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // SUBMIT SIGN IN
   if (loginForm) {
+    // Bind helper buttons for wizard stages
+    const noAccountCreate = document.getElementById('no-account-create-btn');
+    if (noAccountCreate) {
+      noAccountCreate.addEventListener('click', () => {
+        const emailVal = document.getElementById('login-email').value;
+        const mobileVal = document.getElementById('login-mobile').value;
+        switchAuthView('register');
+        if (activeLoginTab === 'email') {
+          document.getElementById('register-email').value = emailVal;
+          document.getElementById('register-tab-email').click();
+        } else {
+          document.getElementById('register-mobile').value = mobileVal;
+          document.getElementById('register-tab-mobile').click();
+        }
+        document.getElementById('register-fullname').focus();
+      });
+    }
+
+    const noAccountRetry = document.getElementById('no-account-retry-btn');
+    if (noAccountRetry) {
+      noAccountRetry.addEventListener('click', () => {
+        document.getElementById('login-email').value = '';
+        document.getElementById('login-mobile').value = '';
+        resetLoginStages();
+      });
+    }
+
+    const noAccountStay = document.getElementById('no-account-stay-btn');
+    if (noAccountStay) {
+      noAccountStay.addEventListener('click', () => {
+        resetLoginStages();
+      });
+    }
+
+    const changeActive = document.getElementById('login-change-active');
+    if (changeActive) {
+      changeActive.addEventListener('click', (e) => {
+        e.preventDefault();
+        resetLoginStages();
+      });
+    }
+
+    const oauthBack = document.getElementById('oauth-back-btn');
+    if (oauthBack) {
+      oauthBack.addEventListener('click', (e) => {
+        e.preventDefault();
+        resetLoginStages();
+      });
+    }
+
+    let activeOauthProvider = '';
+    const oauthContinue = document.getElementById('oauth-continue-btn');
+    if (oauthContinue) {
+      oauthContinue.addEventListener('click', () => {
+        if (activeOauthProvider) {
+          handleSocialLogin(activeOauthProvider);
+        }
+      });
+    }
+
+    function handleSocialLogin(provider) {
+      const width = 500;
+      const height = 600;
+      const left = (window.screen.width / 2) - (width / 2);
+      const top = (window.screen.height / 2) - (height / 2);
+      const consentUrl = `/app/oauth-consent.html?provider=${provider}`;
+      window.open(consentUrl, `Authorize ${provider}`, `width=${width},height=${height},top=${top},left=${left},scrollbars=no,resizable=no`);
+    }
+
+    // Bind social buttons
+    document.querySelectorAll('.btn-social-login').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const provider = btn.getAttribute('data-provider');
+        handleSocialLogin(provider);
+      });
+    });
+
+    // Listen for OAuth postMessage callbacks
+    window.addEventListener('message', async (event) => {
+      if (event.origin !== window.location.origin) return;
+      if (event.data && event.data.provider) {
+        console.log('[Legacy OAuth Callback] Received message:', event.data);
+        try {
+          const res = await fetch(`${API_BASE}/auth/social`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              provider: event.data.provider,
+              providerUserId: event.data.providerUserId || event.data.code,
+              email: event.data.email,
+              fullName: event.data.fullName,
+              token: event.data.token
+            })
+          });
+          if (res.ok) {
+            const data = await res.json();
+            localStorage.setItem('ravora_token', data.token);
+            localStorage.setItem('ravora_logged_in', 'true');
+            localStorage.setItem('ravora_login_time', Date.now().toString());
+            localStorage.setItem('ravora_email', event.data.email);
+            localStorage.setItem('ravora_onboarding_completed', data.user.onboardingCompleted ? 'true' : 'false');
+            localStorage.setItem('ravora_remember_me', 'true');
+            sessionStorage.setItem('ravora_session_active', 'true');
+            switchAuthView('success');
+            setTimeout(() => {
+              checkAuthState();
+            }, 1000);
+          } else {
+            const data = await res.json();
+            alert('OAuth failed: ' + (data.error || 'Unknown error'));
+          }
+        } catch (err) {
+          alert('OAuth error: ' + err.message);
+        }
+      }
+    });
+
     loginForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       if (loginError) loginError.style.display = 'none';
@@ -1635,92 +1809,161 @@ document.addEventListener('DOMContentLoaded', () => {
       const otpMode = loginOtpToggle ? loginOtpToggle.checked : false;
       const remember = document.getElementById('login-remember-me').checked;
 
-      const submitBtn = loginForm.querySelector('.auth-submit-btn');
+      const submitBtn = document.getElementById('login-submit-btn');
       const spinner = submitBtn.querySelector('.auth-spinner');
-      const btnText = submitBtn.querySelector('span');
+      const btnText = document.getElementById('login-btn-text');
 
-      try {
-        submitBtn.disabled = true;
-        if (spinner) spinner.style.display = 'inline-block';
-        if (btnText) btnText.style.opacity = '0.5';
-
-        const payload = {
-          deviceFingerprint,
-          rememberMe: remember
-        };
-
-        if (activeLoginTab === 'email') {
-          payload.email = email;
-          if (!otpMode) {
-            payload.password = password;
-          }
-        } else {
-          payload.mobileNumber = mobile;
-        }
-
-        let res;
+      if (currentLoginStep === 'email') {
+        // Stage 1: Check if account exists
         try {
-          res = await fetch(`${API_BASE}/auth/login`, {
+          submitBtn.disabled = true;
+          if (spinner) spinner.style.display = 'inline-block';
+          if (btnText) btnText.style.opacity = '0.5';
+
+          const checkRes = await fetch(`${API_BASE}/auth/check-account`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(activeLoginTab === 'email' ? { email } : { phone: mobile })
+          });
+
+          if (!checkRes.ok) {
+            throw new Error('Verification request rejected.');
+          }
+
+          const checkData = await checkRes.json();
+          if (!checkData.exists) {
+            // Account does not exist
+            currentLoginStep = 'no-account';
+            document.getElementById('login-stage-email').style.display = 'none';
+            document.getElementById('login-stage-no-account').style.display = 'block';
+            submitBtn.style.display = 'none';
+            document.getElementById('login-social-divider').style.display = 'none';
+            document.getElementById('login-social-buttons').style.display = 'none';
+            document.getElementById('login-footer-register').style.display = 'none';
+          } else {
+            // Account exists! Determine method
+            if (checkData.method === 'password') {
+              currentLoginStep = 'password';
+              document.getElementById('login-stage-email').style.display = 'none';
+              document.getElementById('login-stage-password').style.display = 'block';
+              document.getElementById('login-active-email').textContent = activeLoginTab === 'email' ? email : mobile;
+              btnText.textContent = 'Sign In';
+            } else if (checkData.method === 'otp') {
+              // Direct passwordless OTP flow
+              const otpPayload = activeLoginTab === 'email' ? { email } : { mobileNumber: mobile };
+              const otpRes = await fetch(`${API_BASE}/auth/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(otpPayload)
+              });
+              if (!otpRes.ok) {
+                const data = await otpRes.json().catch(() => ({}));
+                throw new Error(data.error || 'Failed to send OTP code.');
+              }
+              const data = await otpRes.json();
+              activeVerifyUserId = data.userId;
+              activeOtpChannel = data.channel;
+              const desc = document.getElementById('otp-description');
+              if (desc) {
+                desc.textContent = `Smart Security Check: We've sent a 6-digit code to ${data.destination}`;
+                if (data.otpCode) {
+                  desc.innerHTML = `Smart Security Check: We've sent a 6-digit code to ${data.destination}.<br><strong style="color: var(--success); font-family: monospace; font-size: 0.95rem; display: block; margin-top: 8px;">[SANDBOX OTP] ${data.otpCode}</strong>`;
+                }
+              }
+              switchAuthView('otp');
+              startOtpTimers(data.channel);
+            } else {
+              // OAuth account (Google, GitHub, Apple)
+              currentLoginStep = 'oauth';
+              activeOauthProvider = checkData.method;
+              document.getElementById('login-stage-email').style.display = 'none';
+              document.getElementById('login-stage-oauth').style.display = 'block';
+              document.getElementById('oauth-provider-name').textContent = checkData.method;
+              submitBtn.style.display = 'none';
+              document.getElementById('login-social-divider').style.display = 'none';
+              document.getElementById('login-social-buttons').style.display = 'none';
+              document.getElementById('login-footer-register').style.display = 'none';
+            }
+          }
+        } catch (err) {
+          if (loginError) {
+            loginError.textContent = err.message;
+            loginError.style.display = 'block';
+          }
+        } finally {
+          submitBtn.disabled = false;
+          if (spinner) spinner.style.display = 'none';
+          if (btnText) btnText.style.opacity = '1';
+        }
+      } else if (currentLoginStep === 'password') {
+        // Stage 2: Password Sign In
+        try {
+          submitBtn.disabled = true;
+          if (spinner) spinner.style.display = 'inline-block';
+          if (btnText) btnText.style.opacity = '0.5';
+
+          const payload = {
+            deviceFingerprint,
+            rememberMe: remember
+          };
+
+          if (activeLoginTab === 'email') {
+            payload.email = email;
+            if (!otpMode) {
+              payload.password = password;
+            }
+          } else {
+            payload.mobileNumber = mobile;
+          }
+
+          let res = await fetch(`${API_BASE}/auth/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
           });
-        } catch (netErr) {
-          console.warn('Backend login fallback (offline):', netErr);
-          await new Promise(r => setTimeout(r, 800));
-          localStorage.setItem('ravora_token', 'mock-jwt-token-fallback');
-          localStorage.setItem('ravora_logged_in', 'true');
-          localStorage.setItem('ravora_login_time', Date.now().toString());
-          localStorage.setItem('ravora_email', email || mobile || 'sandbox-user@ravora.ai');
-          localStorage.setItem('ravora_onboarding_completed', 'true');
-          switchAuthView('success');
-          setTimeout(() => {
-            checkAuthState();
-          }, 1000);
-          return;
-        }
 
-        if (res.ok) {
-          const data = await res.json();
-          if (data.otpRequired) {
-            activeVerifyUserId = data.userId;
-            activeOtpChannel = data.channel;
-            const desc = document.getElementById('otp-description');
-            if (desc) {
-              desc.textContent = `Smart Security Check: We've sent a 6-digit code to ${data.destination}`;
-              if (data.otpCode) {
-                desc.innerHTML = `Smart Security Check: We've sent a 6-digit code to ${data.destination}.<br><strong style="color: var(--success); font-family: monospace; font-size: 0.95rem; display: block; margin-top: 8px;">[SANDBOX OTP] ${data.otpCode}</strong>`;
+          if (res.ok) {
+            const data = await res.json();
+            if (data.otpRequired) {
+              activeVerifyUserId = data.userId;
+              activeOtpChannel = data.channel;
+              const desc = document.getElementById('otp-description');
+              if (desc) {
+                desc.textContent = `Smart Security Check: We've sent a 6-digit code to ${data.destination}`;
+                if (data.otpCode) {
+                  desc.innerHTML = `Smart Security Check: We've sent a 6-digit code to ${data.destination}.<br><strong style="color: var(--success); font-family: monospace; font-size: 0.95rem; display: block; margin-top: 8px;">[SANDBOX OTP] ${data.otpCode}</strong>`;
+                }
               }
+              switchAuthView('otp');
+              startOtpTimers(data.channel);
+            } else {
+              localStorage.setItem('ravora_token', data.token);
+              localStorage.setItem('ravora_logged_in', 'true');
+              localStorage.setItem('ravora_login_time', Date.now().toString());
+              localStorage.setItem('ravora_email', email || mobile);
+              localStorage.setItem('ravora_onboarding_completed', (data.user && data.user.onboardingCompleted) ? 'true' : 'false');
+              localStorage.setItem('ravora_remember_me', remember ? 'true' : 'false');
+              sessionStorage.setItem('ravora_session_active', 'true');
+              
+              switchAuthView('success');
+              setTimeout(() => {
+                checkAuthState();
+              }, 1200);
             }
-            switchAuthView('otp');
-            startOtpTimers(data.channel);
           } else {
-            localStorage.setItem('ravora_token', data.token);
-            localStorage.setItem('ravora_logged_in', 'true');
-            localStorage.setItem('ravora_login_time', Date.now().toString());
-            localStorage.setItem('ravora_email', email || mobile);
-            localStorage.setItem('ravora_onboarding_completed', (data.user && data.user.onboardingCompleted) ? 'true' : 'false');
-            localStorage.setItem('ravora_remember_me', remember ? 'true' : 'false');
-            sessionStorage.setItem('ravora_session_active', 'true');
-            
-            switchAuthView('success');
-            setTimeout(() => {
-              checkAuthState();
-            }, 1200);
+            const data = await res.json().catch(() => ({}));
+            throw new Error(data.error || 'Login credentials rejected.');
           }
-        } else {
-          const data = await res.json().catch(() => ({}));
-          throw new Error(data.error || 'Login credentials rejected.');
+        } catch (err) {
+          if (loginError) {
+            loginError.textContent = err.message;
+            loginError.style.display = 'block';
+          }
+        } finally {
+          submitBtn.disabled = false;
+          if (spinner) spinner.style.display = 'none';
+          if (btnText) btnText.style.opacity = '1';
         }
-      } catch (err) {
-        if (loginError) {
-          loginError.textContent = err.message;
-          loginError.style.display = 'block';
-        }
-      } finally {
-        submitBtn.disabled = false;
-        if (spinner) spinner.style.display = 'none';
-        if (btnText) btnText.style.opacity = '1';
       }
     });
   }
@@ -1837,13 +2080,16 @@ document.addEventListener('DOMContentLoaded', () => {
         if (btnText) btnText.style.opacity = '0.5';
 
         let res;
+        const remember = document.getElementById('login-remember-me') ? document.getElementById('login-remember-me').checked : false;
         try {
           res = await fetch(`${API_BASE}/auth/otp/verify`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               userId: activeVerifyUserId,
-              otpCode: digits
+              otpCode: digits,
+              deviceFingerprint: deviceFingerprint,
+              rememberMe: remember
             })
           });
         } catch (netErr) {

@@ -22,16 +22,48 @@ interface RiskConfig {
 }
 
 export const LandingPage: React.FC = () => {
-  const { login, register, verifyOtpCode } = useAuth();
+  const { login, register, verifyOtpCode, socialLoginSuccess } = useAuth();
 
   // UI states
   const [activeNav, setActiveNav] = useState('problem-section');
   const [navbarScrolled, setNavbarScrolled] = useState(false);
   const [isYearly, setIsYearly] = useState(false);
-  const [authMode, setAuthMode] = useState<'login' | 'register' | 'otp' | null>(null);
+  const [authMode, setAuthMode] = useState<'login' | 'register' | 'otp' | 'forgot' | 'reset' | null>(null);
   const [authTab, setAuthTab] = useState<'email' | 'phone'>('email');
   const [showPassword, setShowPassword] = useState(false);
   const [selectedRisk, setSelectedRisk] = useState<0 | 1 | 2>(1); // 0=Cons, 1=Mod, 2=Agg
+  const [loginStep, setLoginStep] = useState<'email' | 'no-account' | 'password' | 'oauth-redirect'>('email');
+  const [detectedMethod, setDetectedMethod] = useState<'password' | 'otp' | 'google' | 'github' | 'apple'>('password');
+  const [otpDigits, setOtpDigits] = useState<string[]>(['', '', '', '', '', '']);
+  const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
+
+  // Design screens state machine (Design only)
+  const [designScreen, setDesignScreen] = useState<'signin' | 'signin-password' | 'create-account' | 'forgot-password' | 'verify-email' | 'verify-mobile' | 'reset-password' | 'success'>('signin');
+  const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
+
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const isDesktop = windowWidth >= 1024;
+
+  // Sync authMode triggers with designScreen states
+  useEffect(() => {
+    if (authMode === 'login') {
+      setDesignScreen('signin');
+    } else if (authMode === 'register') {
+      setDesignScreen('create-account');
+    } else if (authMode === 'forgot') {
+      setDesignScreen('forgot-password');
+    } else if (authMode === 'reset') {
+      setDesignScreen('reset-password');
+    } else if (authMode === 'otp') {
+      setDesignScreen(authTab === 'email' ? 'verify-email' : 'verify-mobile');
+    }
+  }, [authMode, authTab]);
+
 
   // Auth Form Fields
   const [fullName, setFullName] = useState('');
@@ -47,6 +79,10 @@ export const LandingPage: React.FC = () => {
   const [authLoading, setAuthLoading] = useState(false);
   const [otpDetails, setOtpDetails] = useState<{ userId: string; channel: string; destination: string } | null>(null);
   const [passwordStrength, setPasswordStrength] = useState({ score: 0, message: '' });
+
+  // OTP Timers
+  const [secondsLeft, setSecondsLeft] = useState(300);
+  const [resendCooldown, setResendCooldown] = useState(30);
 
   // 3D Parallax Mouse States
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
@@ -133,44 +169,198 @@ export const LandingPage: React.FC = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // Interactive Scenario Simulator Trigger
-  const runInteractiveSimulation = () => {
-    if (simulationTimerRef.current) clearInterval(simulationTimerRef.current);
-    setSimInteractiveStep(1);
-    setSimStatusText('Federal Reserve rate statement intercepted. Analyzing macro factors...');
+  // Listen for OAuth popup callbacks
+  useEffect(() => {
+    const handleOAuthCallback = async (event: MessageEvent) => {
+      if (event.origin !== window.location.origin) return;
+      if (event.data && event.data.provider) {
+        console.log('[React OAuth Callback] Received message:', event.data);
+        try {
+          setAuthLoading(true);
+          const res = await fetch('/v1/auth/social', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              provider: event.data.provider,
+              providerUserId: event.data.providerUserId || event.data.code,
+              email: event.data.email,
+              fullName: event.data.fullName,
+              token: event.data.token
+            })
+          });
+          if (res.ok) {
+            const data = await res.json();
+            await socialLoginSuccess(data.token, event.data.email, data.user.onboardingCompleted);
+            setAuthMode(null);
+          } else {
+            const data = await res.json();
+            setAuthError(data.error || 'Social login failed.');
+          }
+        } catch (err: any) {
+          setAuthError(err.message || 'Social login failed.');
+        } finally {
+          setAuthLoading(false);
+        }
+      }
+    };
 
-    let timeouts = [
-      setTimeout(() => {
-        setSimInteractiveStep(2);
-        setSimStatusText('CPI data correlated. Staking rates and stable pools inflows spiking...');
-      }, 2000),
-      setTimeout(() => {
-        setSimInteractiveStep(3);
-        setSimStatusText('drawdown risks recalculated. Dynamically increasing hedge targets...');
-      }, 3500),
-      setTimeout(() => {
-        setSimInteractiveStep(4);
-        setSimStatusText('Optimal entry zone locked. ETH Yield optimization path created...');
-      }, 5000),
-      setTimeout(() => {
-        setSimInteractiveStep(5);
-        setSimStatusText('Recommendation dispatched to copilot. Active risk guard: Stable sync.');
-      }, 6500)
-    ];
+    window.addEventListener('message', handleOAuthCallback);
+    return () => window.removeEventListener('message', handleOAuthCallback);
+  }, [socialLoginSuccess]);
 
-    return () => timeouts.forEach(clearTimeout);
+  // Reset login step when authMode toggles
+  useEffect(() => {
+    if (authMode === 'login') {
+      setLoginStep('email');
+      setDetectedMethod('password');
+    }
+  }, [authMode]);
+
+  // Handle OTP digit box reset and auto-focus
+  useEffect(() => {
+    if (authMode === 'otp' || authMode === 'reset') {
+      setOtpDigits(['', '', '', '', '', '']);
+      setTimeout(() => {
+        otpRefs.current[0]?.focus();
+      }, 50);
+    }
+  }, [authMode]);
+
+  // OTP Expiry & Resend Cooldown Timers
+  useEffect(() => {
+    if (authMode !== 'otp') return;
+    setSecondsLeft(300);
+    setResendCooldown(30);
+  }, [authMode, otpDetails]);
+
+  useEffect(() => {
+    if (authMode !== 'otp') return;
+    const interval = setInterval(() => {
+      setSecondsLeft(prev => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          setAuthError('Verification code has expired. Please request a new one.');
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [authMode, otpDetails]);
+
+  useEffect(() => {
+    if (authMode !== 'otp') return;
+    const interval = setInterval(() => {
+      setResendCooldown(prev => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [authMode, otpDetails]);
+
+  const handleSocialLogin = (provider: string) => {
+    const width = 500;
+    const height = 600;
+    const left = (window.screen.width / 2) - (width / 2);
+    const top = (window.screen.height / 2) - (height / 2);
+    const consentUrl = `/app/oauth-consent.html?provider=${provider}`;
+    window.open(consentUrl, `Authorize ${provider}`, `width=${width},height=${height},top=${top},left=${left},scrollbars=no,resizable=no`);
   };
 
-  // Auth form submissions
-  const handleAuthSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleResendOtp = async () => {
+    if (resendCooldown > 0) return;
+    setAuthLoading(true);
+    setAuthError('');
+    try {
+      const res = await fetch('/v1/auth/otp/resend', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: otpDetails?.userId,
+          email: otpDetails?.channel === 'email' ? otpDetails.destination : undefined,
+          mobileNumber: otpDetails?.channel === 'sms' ? otpDetails.destination : undefined
+        })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setResendCooldown(30);
+        setSecondsLeft(300);
+        if (data.otpCode) {
+          setAuthError(`[SANDBOX OTP] ${data.otpCode}`);
+        } else {
+          setAuthError('Verification code resent successfully.');
+        }
+      } else {
+        setAuthError(data.error || 'Failed to resend OTP.');
+      }
+    } catch (err: any) {
+      setAuthError(err.message || 'Error resending OTP.');
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
+  const triggerSubmit = async (customOtp?: string) => {
     setAuthError('');
     setAuthLoading(true);
-
     const isPhone = authTab === 'phone';
+    const activeOtp = customOtp || otpCode;
 
     try {
       if (authMode === 'login') {
+        if (loginStep === 'email') {
+          const checkRes = await fetch('/v1/auth/check-account', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(isPhone ? { phone: emailOrPhone } : { email: emailOrPhone })
+          });
+          if (!checkRes.ok) {
+            throw new Error('Verification request rejected.');
+          }
+          const checkData = await checkRes.json();
+          if (!checkData.exists) {
+            setLoginStep('no-account');
+          } else {
+            if (checkData.method === 'password') {
+              setDetectedMethod('password');
+              setLoginStep('password');
+            } else if (checkData.method === 'otp') {
+              setDetectedMethod('otp');
+              // Automatically trigger passwordless OTP logic
+              const otpPayload = isPhone ? { mobileNumber: emailOrPhone } : { email: emailOrPhone };
+              const otpRes = await fetch('/v1/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(otpPayload)
+              });
+              if (!otpRes.ok) {
+                const data = await otpRes.json().catch(() => ({}));
+                throw new Error(data.error || 'Failed to send OTP code.');
+              }
+              const data = await otpRes.json();
+              setOtpDetails({
+                userId: data.userId,
+                channel: data.channel,
+                destination: data.destination
+              });
+              if (data.otpCode) {
+                setAuthError(`[SANDBOX OTP] ${data.otpCode}`);
+              }
+              setAuthMode('otp');
+            } else {
+              setDetectedMethod(checkData.method as any);
+              setLoginStep('oauth-redirect');
+            }
+          }
+          setAuthLoading(false);
+          return;
+        }
+
+        // Stage 2: Password Sign In
         const res = await login(emailOrPhone, isPhone, loginWithOtp, password, rememberMe);
         if (!res.success) {
           setAuthError(res.error || 'Login failed.');
@@ -180,9 +370,11 @@ export const LandingPage: React.FC = () => {
             channel: (res as any).channel,
             destination: (res as any).destination
           });
+          if ((res as any).otpCode) {
+            setAuthError(`[SANDBOX OTP] ${(res as any).otpCode}`);
+          }
           setAuthMode('otp');
         } else {
-          // Redirect handled by App.tsx React state
           setAuthMode(null);
         }
       } else if (authMode === 'register') {
@@ -206,15 +398,63 @@ export const LandingPage: React.FC = () => {
             channel: res.channel,
             destination: res.destination
           });
+          if ((res as any).otpCode) {
+            setAuthError(`[SANDBOX OTP] ${(res as any).otpCode}`);
+          }
           setAuthMode('otp');
         }
       } else if (authMode === 'otp') {
         if (!otpDetails) return;
-        const res = await verifyOtpCode(emailOrPhone, isPhone, otpCode, otpDetails.userId);
+        const res = await verifyOtpCode(emailOrPhone, isPhone, activeOtp, otpDetails.userId, rememberMe);
         if (!res.success) {
           setAuthError(res.error || 'OTP verification failed.');
         } else {
           setAuthMode(null);
+        }
+      } else if (authMode === 'forgot') {
+        const res = await fetch('/v1/auth/forgot-password/request', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ recoveryTarget: emailOrPhone })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          setOtpDetails({
+            userId: data.userId,
+            channel: data.channel,
+            destination: data.destination
+          });
+          if (data.otpCode) {
+            setAuthError(`[SANDBOX OTP] ${data.otpCode}`);
+          }
+          setAuthMode('reset');
+        } else {
+          setAuthError(data.error || 'Failed to request recovery code.');
+        }
+      } else if (authMode === 'reset') {
+        if (password !== confirmPassword) {
+          setAuthError('Passwords do not match.');
+          setAuthLoading(false);
+          return;
+        }
+        const res = await fetch('/v1/auth/forgot-password/reset', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId: otpDetails?.userId,
+            otpCode: otpCode,
+            newPassword: password,
+            confirmPassword: confirmPassword,
+            email: otpDetails?.channel === 'email' ? otpDetails.destination : undefined,
+            mobileNumber: otpDetails?.channel === 'sms' ? otpDetails.destination : undefined
+          })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          setAuthMode('login');
+          setAuthError('Password reset successful. Please sign in.');
+        } else {
+          setAuthError(data.error || 'Reset code validation failed.');
         }
       }
     } catch (err: any) {
@@ -222,6 +462,11 @@ export const LandingPage: React.FC = () => {
     } finally {
       setAuthLoading(false);
     }
+  };
+
+  const handleAuthSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await triggerSubmit();
   };
 
   const pricingPeriods = {
@@ -1015,7 +1260,7 @@ export const LandingPage: React.FC = () => {
         <p>© 2026 Ravora Intelligence Operating System. Managed in Sandbox Developer Mode.</p>
       </footer>
 
-      {/* Authentication Modal Overlay */}
+      {/* Authentication Modal */}
       {authMode && (
         <div className="onboarding-overlay" style={{
           display: 'flex',
@@ -1028,315 +1273,657 @@ export const LandingPage: React.FC = () => {
           zIndex: 99999,
           alignItems: 'stretch',
           justifyContent: 'center',
-          overflowY: 'auto'
+          overflow: 'hidden',
+          boxSizing: 'border-box'
         }}>
-          <div style={{ display: 'flex', width: '100%', minHeight: '100vh', flexDirection: 'row', flexWrap: 'wrap' }}>
+          {/* Custom CSS animations */}
+          <style>{`
+            @keyframes float-slow {
+              0% { transform: translateY(0px) rotate(0deg); }
+              50% { transform: translateY(-8px) rotate(0.3deg); }
+              100% { transform: translateY(0px) rotate(0deg); }
+            }
+            @keyframes float-delay {
+              0% { transform: translateY(0px) rotate(0deg); }
+              50% { transform: translateY(-12px) rotate(-0.3deg); }
+              100% { transform: translateY(0px) rotate(0deg); }
+            }
+            @keyframes pulse-glow {
+              0% { opacity: 0.12; transform: scale(1); }
+              50% { opacity: 0.22; transform: scale(1.05); }
+              100% { opacity: 0.12; transform: scale(1); }
+            }
+            .float-ticker-1 {
+              animation: float-slow 7s ease-in-out infinite;
+            }
+            .float-ticker-2 {
+              animation: float-delay 9s ease-in-out infinite;
+            }
+            .float-ticker-3 {
+              animation: float-slow 8s ease-in-out infinite;
+              animation-delay: 2s;
+            }
+            .pulse-circle {
+              animation: pulse-glow 8s ease-in-out infinite;
+            }
+            .auth-input:focus {
+              border-color: #2563EB !important;
+              box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15) !important;
+              background: rgba(255,255,255,0.04) !important;
+            }
+            .auth-social-btn:hover {
+              background: rgba(255, 255, 255, 0.06) !important;
+              border-color: rgba(255, 255, 255, 0.16) !important;
+            }
+            .auth-primary-btn:hover {
+              transform: scale(1.01);
+              opacity: 0.95;
+            }
+          `}</style>
 
-            {/* Story Panel (Left) */}
-            <div className="auth-left-story" style={{
-              width: '45%',
-              padding: '48px 60px',
-              background: 'radial-gradient(circle at top left, rgba(99, 102, 241, 0.1) 0%, transparent 60%), #070b19',
-              borderRight: '1px solid rgba(255,255,255,0.06)',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-              boxSizing: 'border-box',
-              minWidth: '320px'
-            }}>
-              <a href="#" className="logo" style={{
+          <div style={{ display: 'flex', width: '100%', height: '100%', flexDirection: 'row' }}>
+
+            {/* LEFT STORY PANEL (Hidden on tablet/mobile to match modern clean SaaS guidelines) */}
+            {isDesktop && (
+              <div className="auth-left-story" style={{
+                width: '45%',
+                height: '100%',
+                padding: '60px',
+                background: 'radial-gradient(circle at 10% 20%, rgba(37, 99, 235, 0.08) 0%, transparent 40%), radial-gradient(circle at 90% 80%, rgba(124, 58, 237, 0.08) 0%, transparent 40%), #070b19',
+                borderRight: '1px solid rgba(255,255,255,0.06)',
                 display: 'flex',
-                alignItems: 'center',
-                gap: '10px',
-                fontFamily: 'var(--font-display)',
-                fontSize: '1.25rem',
-                fontWeight: 700,
-                color: '#fff',
-                textDecoration: 'none',
-                marginBottom: '40px',
-                pointerEvents: 'none'
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+                boxSizing: 'border-box',
+                position: 'relative',
+                overflow: 'hidden'
               }}>
-                <div className="logo-icon" style={{ width: '36px', height: '36px', borderRadius: '6px', background: 'var(--gradient-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: '1.2rem' }}>R</div>
-                Ravora
-              </a>
+                {/* SVG AI Node Visualization */}
+                <svg width="100%" height="100%" style={{ position: 'absolute', top: 0, left: 0, opacity: 0.18, pointerEvents: 'none' }}>
+                  <circle cx="15%" cy="25%" r="3" fill="#2563EB" className="pulse-circle" />
+                  <circle cx="35%" cy="18%" r="4" fill="#7C3AED" />
+                  <circle cx="55%" cy="28%" r="3" fill="#2563EB" />
+                  <circle cx="25%" cy="52%" r="4" fill="#7C3AED" className="pulse-circle" />
+                  <circle cx="48%" cy="58%" r="5" fill="#2563EB" />
+                  <circle cx="18%" cy="78%" r="3" fill="#7C3AED" />
+                  <circle cx="38%" cy="72%" r="4" fill="#2563EB" className="pulse-circle" />
+                  <circle cx="58%" cy="82%" r="3" fill="#7C3AED" />
+                  
+                  <line x1="15%" y1="25%" x2="35%" y2="18%" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+                  <line x1="35%" y1="18%" x2="55%" y2="28%" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+                  <line x1="15%" y1="25%" x2="25%" y2="52%" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+                  <line x1="35%" y1="18%" x2="25%" y2="52%" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+                  <line x1="55%" y1="28%" x2="48%" y2="58%" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+                  <line x1="25%" y1="52%" x2="48%" y2="58%" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+                  <line x1="25%" y1="52%" x2="18%" y2="78%" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+                  <line x1="18%" y1="78%" x2="38%" y2="72%" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+                  <line x1="48%" y1="58%" x2="38%" y2="72%" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+                  <line x1="38%" y1="72%" x2="58%" y2="82%" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+                </svg>
 
-              <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '2.2rem', fontWeight: 700, color: '#fff', lineHeight: 1.25, marginBottom: '16px', letterSpacing: '-0.02em' }}>
-                Enter the future of <span className="text-accent-gradient">automated wealth</span>.
-              </h2>
-
-              <p style={{ color: 'var(--text-secondary)', fontSize: '1.0rem', lineHeight: 1.55, marginBottom: '40px', maxWidth: '420px' }}>
-                Araiven coordinates real-time market orderbooks, builds execution target ladders, and monitors risk parameters 24/7.
-              </p>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span style={{ color: 'var(--success)' }}>✓</span>
-                  <span>256-bit Secure TLS Data Transmission</span>
+                {/* Top: Logo & Branding */}
+                <div style={{ position: 'relative', zIndex: 2 }}>
+                  <a href="#" className="logo" style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    fontFamily: 'var(--font-display)',
+                    fontSize: '1.35rem',
+                    fontWeight: 700,
+                    color: '#fff',
+                    textDecoration: 'none',
+                    pointerEvents: 'none'
+                  }}>
+                    <div className="logo-icon" style={{ width: '40px', height: '40px', borderRadius: '10px', background: 'var(--gradient-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: '1.3rem', boxShadow: '0 4px 20px rgba(37, 99, 235, 0.3)' }}>R</div>
+                    <span>Ravora</span>
+                  </a>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span style={{ color: 'var(--success)' }}>✓</span>
-                  <span>Simulated Sandbox Environment (No real capital required)</span>
+
+                {/* Middle: Headline, Dashboard Visual, Floating Tickers */}
+                <div style={{ position: 'relative', zIndex: 2, margin: '40px 0' }}>
+                  <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '2.5rem', fontWeight: 700, color: '#fff', lineHeight: 1.2, marginBottom: '16px', letterSpacing: '-0.02em', background: 'linear-gradient(180deg, #FFFFFF 0%, #A5B4FC 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                    Trade Smarter with Araiven
+                  </h2>
+                  <p style={{ color: 'var(--text-secondary)', fontSize: '1.0rem', lineHeight: 1.55, marginBottom: '32px', maxWidth: '420px' }}>
+                    Our AI wealth operating system manages real-time orderbooks and risk parameters 24/7 so you can build capital safely.
+                  </p>
+
+                  {/* Dashboard Preview mockup */}
+                  <div className="card-glass" style={{
+                    padding: '24px',
+                    borderRadius: '16px',
+                    background: 'rgba(14, 19, 37, 0.45)',
+                    border: '1px solid rgba(255, 255, 255, 0.08)',
+                    position: 'relative',
+                    boxShadow: '0 20px 40px rgba(0,0,0,0.4)',
+                    marginBottom: '20px'
+                  }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px', alignItems: 'center' }}>
+                      <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: 600, letterSpacing: '0.05em' }}>ARAIVEN CO-PILOT ACTIVE</span>
+                      <span style={{ fontSize: '0.7rem', padding: '2px 8px', borderRadius: '4px', background: 'rgba(16, 185, 129, 0.12)', color: 'var(--success)', fontWeight: 600 }}>98% Safety Cushion</span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginBottom: '16px' }}>
+                      <span style={{ fontSize: '1.75rem', fontWeight: 700, color: '#fff', fontFamily: 'var(--font-display)' }}>$142,850.00</span>
+                      <span style={{ fontSize: '0.8rem', color: 'var(--success)', fontWeight: 600 }}>+24.8% APY</span>
+                    </div>
+                    {/* Mock Mini Chart Line */}
+                    <svg width="100%" height="60" style={{ overflow: 'visible' }}>
+                      <path d="M0,45 Q50,40 100,25 T200,30 T300,10 T400,5" fill="none" stroke="url(#chartGrad)" strokeWidth="3" />
+                      <defs>
+                        <linearGradient id="chartGrad" x1="0" y1="0" x2="1" y2="0">
+                          <stop offset="0%" stopColor="#2563EB" />
+                          <stop offset="100%" stopColor="#7C3AED" />
+                        </linearGradient>
+                      </defs>
+                    </svg>
+                  </div>
+
+                  {/* Floating Market Tickers */}
+                  <div style={{ position: 'relative', height: '60px' }}>
+                    <div className="float-ticker-1" style={{ position: 'absolute', top: '0px', left: '10px', background: 'rgba(14, 19, 37, 0.8)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '999px', padding: '6px 14px', fontSize: '0.75rem', color: '#fff', display: 'flex', alignItems: 'center', gap: '6px', boxShadow: '0 4px 12px rgba(0,0,0,0.2)' }}>
+                      <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--success)' }}></span>
+                      <strong>BTC/USD</strong> <span>$64,285.50</span> <span style={{ color: 'var(--success)' }}>+2.4%</span>
+                    </div>
+                    <div className="float-ticker-2" style={{ position: 'absolute', top: '25px', left: '200px', background: 'rgba(14, 19, 37, 0.8)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '999px', padding: '6px 14px', fontSize: '0.75rem', color: '#fff', display: 'flex', alignItems: 'center', gap: '6px', boxShadow: '0 4px 12px rgba(0,0,0,0.2)' }}>
+                      <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--success)' }}></span>
+                      <strong>ETH/USD</strong> <span>$3,485.20</span> <span style={{ color: 'var(--success)' }}>+1.8%</span>
+                    </div>
+                  </div>
+
+                  {/* Trust Indicators */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '24px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <span style={{ color: '#2563EB', fontWeight: 'bold' }}>✓</span>
+                      <span>Secure Authentication</span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <span style={{ color: '#2563EB', fontWeight: 'bold' }}>✓</span>
+                      <span>AI-Powered Trading Intelligence</span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <span style={{ color: '#2563EB', fontWeight: 'bold' }}>✓</span>
+                      <span>Institutional Grade Security</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Bottom: Statistics */}
+                <div style={{ display: 'flex', gap: '40px', borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '24px', position: 'relative', zIndex: 2 }}>
+                  <div>
+                    <div style={{ fontSize: '1.2rem', fontWeight: 700, color: '#fff', fontFamily: 'var(--font-display)' }}>142k+</div>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Active Users</div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '1.2rem', fontWeight: 700, color: '#fff', fontFamily: 'var(--font-display)' }}>$4.2B+</div>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Trading Volume</div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '1.2rem', fontWeight: 700, color: '#fff', fontFamily: 'var(--font-display)' }}>180+</div>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Supported Markets</div>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
 
-            {/* Form Panel (Right) */}
+            {/* RIGHT FORM CONTAINER */}
             <div className="auth-right-form-wrapper" style={{
-              width: '55%',
+              width: isDesktop ? '55%' : '100%',
+              height: '100%',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               padding: '24px',
               boxSizing: 'border-box',
-              background: 'var(--background)',
-              minWidth: '320px',
+              background: '#060913',
+              position: 'relative',
               overflowY: 'auto'
             }}>
+              {/* Close Button */}
+              <button
+                onClick={() => setAuthMode(null)}
+                style={{
+                  position: 'absolute',
+                  top: '32px',
+                  right: '32px',
+                  background: 'none',
+                  border: 'none',
+                  color: 'var(--text-muted)',
+                  cursor: 'pointer',
+                  fontSize: '1.25rem',
+                  padding: '8px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+              >
+                ✕
+              </button>
 
               <div className="auth-form-card" style={{
                 width: '100%',
-                maxWidth: '440px',
-                padding: '24px 32px',
+                maxWidth: '460px',
+                padding: '40px',
                 borderRadius: '16px',
-                background: 'rgba(14, 19, 37, 0.8)',
-                border: '1px solid rgba(255,255,255,0.06)',
-                boxShadow: '0 20px 40px rgba(0, 0, 0, 0.5)',
+                background: 'rgba(14, 19, 37, 0.4)',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
+                boxShadow: '0 20px 50px rgba(0, 0, 0, 0.4), 0 0 40px rgba(124, 58, 237, 0.03)',
                 boxSizing: 'border-box',
-                position: 'relative'
+                backdropFilter: 'blur(16px)'
               }}>
 
-                {/* Close Button */}
-                <button
-                  onClick={() => setAuthMode(null)}
-                  style={{
-                    position: 'absolute',
-                    top: '20px',
-                    right: '20px',
-                    background: 'none',
-                    border: 'none',
-                    color: 'var(--text-secondary)',
-                    cursor: 'pointer',
-                    fontSize: '1.1rem'
-                  }}
-                >
-                  ✕
-                </button>
+                {/* SCREEN 1: SIGN IN (EMAIL CHECK) */}
+                {designScreen === 'signin' && (
+                  <div>
+                    <h3 style={{ fontSize: '1.75rem', fontWeight: 700, color: '#fff', fontFamily: 'var(--font-display)', marginBottom: '8px' }}>Welcome Back</h3>
+                    <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginBottom: '32px' }}>Sign in to continue using Ravora.</p>
 
-                <form onSubmit={handleAuthSubmit} style={{ width: '100%' }}>
+                    {/* Social OAuth Buttons */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '24px' }}>
+                      <button type="button" onClick={() => setDesignScreen('success')} className="auth-social-btn" style={{ height: '52px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.03)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', fontWeight: 600, fontSize: '0.875rem', cursor: 'pointer', transition: 'all 0.2s', width: '100%' }}>
+                        <span>Continue with Google</span>
+                      </button>
+                      <button type="button" onClick={() => setDesignScreen('success')} className="auth-social-btn" style={{ height: '52px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.03)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', fontWeight: 600, fontSize: '0.875rem', cursor: 'pointer', transition: 'all 0.2s', width: '100%' }}>
+                        <span>Continue with GitHub</span>
+                      </button>
+                      <button type="button" onClick={() => setDesignScreen('success')} className="auth-social-btn" style={{ height: '52px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.03)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', fontWeight: 600, fontSize: '0.875rem', cursor: 'pointer', transition: 'all 0.2s', width: '100%' }}>
+                        <span>Continue with Apple</span>
+                      </button>
+                    </div>
 
-                  {/* SIGN IN */}
-                  {authMode === 'login' && (
-                    <>
-                      <h3 style={{ marginBottom: '4px', fontSize: '1.45rem', fontWeight: 700, fontFamily: 'var(--font-display)' }}>Welcome to Ravora</h3>
-                      <p style={{ marginBottom: '12px', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-                        Enter your credentials to access your active wealth copilot.
-                      </p>
+                    <div style={{ display: 'flex', alignItems: 'center', margin: '24px 0', gap: '12px' }}>
+                      <div style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.08)' }}></div>
+                      <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>OR</span>
+                      <div style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.08)' }}></div>
+                    </div>
 
-                      {/* Segmented Auth Channels */}
-                      <div className="filter-segmented" style={{ display: 'flex', marginBottom: '12px', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '6px', padding: '2px' }}>
-                        <button type="button" onClick={() => setAuthTab('email')} className={`segmented-tab ${authTab === 'email' ? 'active' : ''}`} style={{ flex: 1, padding: '8px', fontSize: '0.72rem', border: 'none', background: 'transparent', cursor: 'pointer', color: authTab === 'email' ? '#fff' : 'var(--text-secondary)' }}>
-                          Email Address
-                        </button>
-                        <button type="button" onClick={() => setAuthTab('phone')} className={`segmented-tab ${authTab === 'phone' ? 'active' : ''}`} style={{ flex: 1, padding: '8px', fontSize: '0.72rem', border: 'none', background: 'transparent', cursor: 'pointer', color: authTab === 'phone' ? '#fff' : 'var(--text-secondary)' }}>
-                          Mobile Number
-                        </button>
+                    {/* Email Input */}
+                    <div style={{ marginBottom: '24px' }}>
+                      <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#a5b4fc', marginBottom: '8px', letterSpacing: '0.05em' }}>EMAIL ADDRESS</label>
+                      <input
+                        type="email"
+                        value={emailOrPhone}
+                        onChange={(e) => setEmailOrPhone(e.target.value)}
+                        placeholder="name@domain.com"
+                        className="auth-input"
+                        style={{ height: '48px', width: '100%', padding: '0 16px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.02)', color: '#fff', outline: 'none', fontSize: '0.875rem', boxSizing: 'border-box', transition: 'all 0.2s' }}
+                      />
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => setDesignScreen('signin-password')}
+                      className="auth-primary-btn"
+                      style={{ height: '52px', width: '100%', borderRadius: '12px', border: 'none', background: 'var(--gradient-primary)', color: '#fff', fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s', fontSize: '0.875rem' }}
+                    >
+                      Continue
+                    </button>
+
+                    <div style={{ marginTop: '24px', textAlign: 'center', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                      Don't have an account?{' '}
+                      <span onClick={() => setDesignScreen('create-account')} style={{ color: '#2563EB', fontWeight: 600, cursor: 'pointer' }}>Create Account</span>
+                    </div>
+                  </div>
+                )}
+
+                {/* SCREEN 2: ENTER PASSWORD */}
+                {designScreen === 'signin-password' && (
+                  <div>
+                    <h3 style={{ fontSize: '1.75rem', fontWeight: 700, color: '#fff', fontFamily: 'var(--font-display)', marginBottom: '8px' }}>Enter Your Password</h3>
+                    <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginBottom: '32px' }}>
+                      Sign in as <strong style={{ color: '#fff' }}>{emailOrPhone || 'user@ravora.ai'}</strong>
+                    </p>
+
+                    <div style={{ marginBottom: '24px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                        <label style={{ fontSize: '0.75rem', fontWeight: 600, color: '#a5b4fc', letterSpacing: '0.05em' }}>PASSWORD</label>
+                        <span onClick={() => setDesignScreen('forgot-password')} style={{ fontSize: '0.75rem', color: '#2563EB', fontWeight: 600, cursor: 'pointer' }}>Forgot Password?</span>
                       </div>
-
-                      {/* Input Channel field */}
-                      <div style={{ marginBottom: '16px' }}>
-                        <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: '#a5b4fc', marginBottom: '6px', letterSpacing: '0.05em' }}>
-                          {authTab === 'email' ? 'EMAIL ADDRESS' : 'MOBILE NUMBER'}
-                        </label>
+                      <div style={{ position: 'relative', width: '100%' }}>
                         <input
-                          type={authTab === 'email' ? 'email' : 'text'}
-                          required
-                          value={emailOrPhone}
-                          onChange={(e) => setEmailOrPhone(e.target.value)}
-                          placeholder={authTab === 'email' ? 'name@domain.com' : '+1 (555) 000-0000'}
-                          style={{ width: '100%', padding: '12px 16px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.03)', color: '#fff', outline: 'none', fontSize: '0.9rem', boxSizing: 'border-box' }}
-                        />
-                      </div>
-
-                      {/* Password field */}
-                      {!loginWithOtp && (
-                        <div style={{ marginBottom: '20px' }}>
-                          <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: '#a5b4fc', marginBottom: '6px', letterSpacing: '0.05em' }}>PASSWORD</label>
-                          <div style={{ position: 'relative', width: '100%' }}>
-                            <input
-                              type={showPassword ? 'text' : 'password'}
-                              required
-                              value={password}
-                              onChange={(e) => setPassword(e.target.value)}
-                              placeholder="••••••••"
-                              style={{ width: '100%', padding: '12px 40px 12px 16px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.03)', color: '#fff', outline: 'none', fontSize: '0.9rem', boxSizing: 'border-box' }}
-                            />
-                            <button type="button" onClick={() => setShowPassword(!showPassword)} style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>
-                              {showPassword ? 'Hide' : 'Show'}
-                            </button>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Toggles */}
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '20px' }}>
-                        <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.8rem', color: 'var(--text-secondary)', cursor: 'pointer' }}>
-                          <input type="checkbox" checked={loginWithOtp} onChange={(e) => setLoginWithOtp(e.target.checked)} style={{ accentColor: 'var(--primary)', width: '15px', height: '15px' }} />
-                          Sign in with OTP code instead of password
-                        </label>
-                        <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.8rem', color: 'var(--text-secondary)', cursor: 'pointer' }}>
-                          <input type="checkbox" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} style={{ accentColor: 'var(--primary)', width: '15px', height: '15px' }} />
-                          Trust this device (skip future OTPs)
-                        </label>
-                      </div>
-                    </>
-                  )}
-
-                  {/* REGISTRATION */}
-                  {authMode === 'register' && (
-                    <>
-                      <h3 style={{ marginBottom: '4px', fontSize: '1.45rem', fontWeight: 700, fontFamily: 'var(--font-display)' }}>Create Account</h3>
-                      <p style={{ marginBottom: '12px', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-                        Initialize your AI-powered wealth workspace.
-                      </p>
-
-                      <div className="filter-segmented" style={{ display: 'flex', marginBottom: '12px', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '6px', padding: '2px' }}>
-                        <button type="button" onClick={() => setAuthTab('email')} className={`segmented-tab ${authTab === 'email' ? 'active' : ''}`} style={{ flex: 1, padding: '8px', fontSize: '0.72rem', border: 'none', background: 'transparent', cursor: 'pointer', color: authTab === 'email' ? '#fff' : 'var(--text-secondary)' }}>
-                          Email Address
-                        </button>
-                        <button type="button" onClick={() => setAuthTab('phone')} className={`segmented-tab ${authTab === 'phone' ? 'active' : ''}`} style={{ flex: 1, padding: '8px', fontSize: '0.72rem', border: 'none', background: 'transparent', cursor: 'pointer', color: authTab === 'phone' ? '#fff' : 'var(--text-secondary)' }}>
-                          Mobile Number
-                        </button>
-                      </div>
-
-                      <div style={{ marginBottom: '12px' }}>
-                        <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: '#a5b4fc', marginBottom: '6px', letterSpacing: '0.05em' }}>FULL NAME</label>
-                        <input
-                          type="text"
-                          required
-                          value={fullName}
-                          onChange={(e) => setFullName(e.target.value)}
-                          placeholder="Alex Mercer"
-                          style={{ width: '100%', padding: '12px 16px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.03)', color: '#fff', outline: 'none', fontSize: '0.9rem', boxSizing: 'border-box' }}
-                        />
-                      </div>
-
-                      <div style={{ marginBottom: '12px' }}>
-                        <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: '#a5b4fc', marginBottom: '6px', letterSpacing: '0.05em' }}>
-                          {authTab === 'email' ? 'EMAIL ADDRESS' : 'MOBILE NUMBER'}
-                        </label>
-                        <input
-                          type={authTab === 'email' ? 'email' : 'text'}
-                          required
-                          value={emailOrPhone}
-                          onChange={(e) => setEmailOrPhone(e.target.value)}
-                          placeholder={authTab === 'email' ? 'name@domain.com' : '+1 (555) 000-0000'}
-                          style={{ width: '100%', padding: '12px 16px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.03)', color: '#fff', outline: 'none', fontSize: '0.9rem', boxSizing: 'border-box' }}
-                        />
-                      </div>
-
-                      <div style={{ marginBottom: '12px' }}>
-                        <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: '#a5b4fc', marginBottom: '6px', letterSpacing: '0.05em' }}>PASSWORD</label>
-                        <input
-                          type="password"
-                          required
+                          type={showPassword ? 'text' : 'password'}
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
                           placeholder="••••••••"
-                          style={{ width: '100%', padding: '12px 16px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.03)', color: '#fff', outline: 'none', fontSize: '0.9rem', boxSizing: 'border-box' }}
+                          className="auth-input"
+                          style={{ height: '48px', width: '100%', padding: '0 48px 0 16px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.02)', color: '#fff', outline: 'none', fontSize: '0.875rem', boxSizing: 'border-box', transition: 'all 0.2s' }}
                         />
-                        {/* Strength bar */}
-                        {password && (
-                          <div style={{ marginTop: '8px' }}>
-                            <div style={{ display: 'flex', gap: '4px', height: '3px', width: '100%' }}>
-                              {[1, 2, 3, 4].map((s) => (
-                                <div
-                                  key={s}
-                                  style={{
-                                    flex: 1,
-                                    borderRadius: '99px',
-                                    background: passwordStrength.score >= s
-                                      ? (passwordStrength.score === 1 ? 'var(--danger)' : (passwordStrength.score <= 3 ? 'var(--warning)' : 'var(--success)'))
-                                      : 'rgba(255,255,255,0.06)'
-                                  }}
-                                ></div>
-                              ))}
-                            </div>
-                            <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', marginTop: '4px', display: 'block' }}>{passwordStrength.message}</span>
-                          </div>
-                        )}
+                        <button type="button" onClick={() => setShowPassword(!showPassword)} style={{ position: 'absolute', right: '16px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '0.75rem' }}>
+                          {showPassword ? 'Hide' : 'Show'}
+                        </button>
                       </div>
-
-                      <div style={{ marginBottom: '20px' }}>
-                        <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: '#a5b4fc', marginBottom: '6px', letterSpacing: '0.05em' }}>CONFIRM PASSWORD</label>
-                        <input
-                          type="password"
-                          required
-                          value={confirmPassword}
-                          onChange={(e) => setConfirmPassword(e.target.value)}
-                          placeholder="••••••••"
-                          style={{ width: '100%', padding: '12px 16px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.03)', color: '#fff', outline: 'none', fontSize: '0.9rem', boxSizing: 'border-box' }}
-                        />
-                      </div>
-                    </>
-                  )}
-
-                  {/* OTP VERIFICATION STEP */}
-                  {authMode === 'otp' && otpDetails && (
-                    <>
-                      <h3 style={{ marginBottom: '4px', fontSize: '1.45rem', fontWeight: 700, fontFamily: 'var(--font-display)' }}>Enter verification code</h3>
-                      <p style={{ marginBottom: '20px', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-                        We sent a 6-digit verification code to your {otpDetails.channel} <strong>{otpDetails.destination}</strong>.
-                      </p>
-
-                      <div style={{ marginBottom: '20px' }}>
-                        <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 600, color: '#a5b4fc', marginBottom: '6px', letterSpacing: '0.05em' }}>6-DIGIT CODE</label>
-                        <input
-                          type="text"
-                          maxLength={6}
-                          required
-                          value={otpCode}
-                          onChange={(e) => setOtpCode(e.target.value)}
-                          placeholder="000000"
-                          style={{ width: '100%', padding: '14px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.03)', color: '#fff', fontSize: '1.4rem', letterSpacing: '0.2em', textAlign: 'center', outline: 'none', boxSizing: 'border-box' }}
-                        />
-                      </div>
-                    </>
-                  )}
-
-                  {/* Show error block if any */}
-                  {authError && (
-                    <div style={{ color: '#f87171', fontSize: '0.8rem', marginBottom: '16px', background: 'rgba(248, 113, 113, 0.08)', padding: '10px 14px', borderRadius: '8px', border: '1px solid rgba(248, 113, 113, 0.15)', boxSizing: 'border-box' }}>
-                      {authError}
                     </div>
-                  )}
 
-                  <button
-                    type="submit"
-                    className="btn btn-primary"
-                    disabled={authLoading}
-                    style={{ width: '100%', padding: '14px', marginBottom: '20px', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', height: '46px' }}
-                  >
-                    <span>
-                      {authLoading ? 'Loading...' : (authMode === 'login' ? 'Sign In' : (authMode === 'register' ? 'Create Account' : 'Verify Code'))}
-                    </span>
-                  </button>
+                    <div style={{ marginBottom: '24px' }}>
+                      <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.8rem', color: 'var(--text-secondary)', cursor: 'pointer' }}>
+                        <input type="checkbox" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} style={{ accentColor: '#2563EB', width: '16px', height: '16px' }} />
+                        Remember this device
+                      </label>
+                    </div>
 
-                  {/* Toggle Mode */}
-                  {authMode === 'login' ? (
-                    <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', textAlign: 'center', margin: 0 }}>
-                      Don't have an account? <span onClick={() => { setAuthMode('register'); setAuthError(''); }} style={{ color: 'var(--ai-accent)', fontWeight: 600, cursor: 'pointer' }}>Create Account</span>
-                    </p>
-                  ) : authMode === 'register' ? (
-                    <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', textAlign: 'center', margin: 0 }}>
-                      Already have an account? <span onClick={() => { setAuthMode('login'); setAuthError(''); }} style={{ color: 'var(--ai-accent)', fontWeight: 600, cursor: 'pointer' }}>Sign In</span>
-                    </p>
-                  ) : (
-                    <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', textAlign: 'center', margin: 0 }}>
-                      Didn't receive a code? <span onClick={() => setAuthMode('login')} style={{ color: 'var(--ai-accent)', fontWeight: 600, cursor: 'pointer' }}>Go Back</span>
-                    </p>
-                  )}
+                    <div style={{ display: 'flex', gap: '12px' }}>
+                      <button
+                        type="button"
+                        onClick={() => setDesignScreen('signin')}
+                        className="auth-social-btn"
+                        style={{ height: '52px', flex: 1, borderRadius: '12px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.03)', color: '#fff', fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s', fontSize: '0.875rem' }}
+                      >
+                        Back
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setDesignScreen('success')}
+                        className="auth-primary-btn"
+                        style={{ height: '52px', flex: 2, borderRadius: '12px', border: 'none', background: 'var(--gradient-primary)', color: '#fff', fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s', fontSize: '0.875rem' }}
+                      >
+                        Sign In
+                      </button>
+                    </div>
+                  </div>
+                )}
 
-                </form>
+                {/* SCREEN 3: CREATE ACCOUNT */}
+                {designScreen === 'create-account' && (
+                  <div>
+                    <h3 style={{ fontSize: '1.75rem', fontWeight: 700, color: '#fff', fontFamily: 'var(--font-display)', marginBottom: '8px' }}>Create Your Account</h3>
+                    <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginBottom: '24px' }}>Start trading with AI.</p>
+
+                    {/* OAuth options */}
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px', marginBottom: '20px' }}>
+                      <button type="button" onClick={() => setDesignScreen('success')} className="auth-social-btn" style={{ height: '44px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.03)', color: '#fff', fontWeight: 600, fontSize: '0.75rem', cursor: 'pointer', transition: 'all 0.2s' }}>Google</button>
+                      <button type="button" onClick={() => setDesignScreen('success')} className="auth-social-btn" style={{ height: '44px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.03)', color: '#fff', fontWeight: 600, fontSize: '0.75rem', cursor: 'pointer', transition: 'all 0.2s' }}>GitHub</button>
+                      <button type="button" onClick={() => setDesignScreen('success')} className="auth-social-btn" style={{ height: '44px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.03)', color: '#fff', fontWeight: 600, fontSize: '0.75rem', cursor: 'pointer', transition: 'all 0.2s' }}>Apple</button>
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', margin: '20px 0', gap: '10px' }}>
+                      <div style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.08)' }}></div>
+                      <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase' }}>OR</span>
+                      <div style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.08)' }}></div>
+                    </div>
+
+                    {/* Method Selector Tabs */}
+                    <div style={{ display: 'flex', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '10px', padding: '2px', marginBottom: '20px' }}>
+                      <button type="button" onClick={() => setSignupMethod('email')} style={{ flex: 1, padding: '10px', fontSize: '0.75rem', border: 'none', background: signupMethod === 'email' ? 'rgba(255,255,255,0.05)' : 'transparent', borderRadius: '8px', cursor: 'pointer', color: signupMethod === 'email' ? '#fff' : 'var(--text-secondary)', fontWeight: 600 }}>
+                        Email Address
+                      </button>
+                      <button type="button" onClick={() => setSignupMethod('mobile')} style={{ flex: 1, padding: '10px', fontSize: '0.75rem', border: 'none', background: signupMethod === 'mobile' ? 'rgba(255,255,255,0.05)' : 'transparent', borderRadius: '8px', cursor: 'pointer', color: signupMethod === 'mobile' ? '#fff' : 'var(--text-secondary)', fontWeight: 600 }}>
+                        Mobile Number
+                      </button>
+                    </div>
+
+                    {/* Full Name */}
+                    <div style={{ marginBottom: '16px' }}>
+                      <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#a5b4fc', marginBottom: '6px' }}>FULL NAME</label>
+                      <input
+                        type="text"
+                        value={fullName}
+                        onChange={(e) => setFullName(e.target.value)}
+                        placeholder="Alex Mercer"
+                        className="auth-input"
+                        style={{ height: '48px', width: '100%', padding: '0 16px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.02)', color: '#fff', outline: 'none', fontSize: '0.875rem', boxSizing: 'border-box' }}
+                      />
+                    </div>
+
+                    {/* Email or Phone field */}
+                    <div style={{ marginBottom: '16px' }}>
+                      <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#a5b4fc', marginBottom: '6px' }}>
+                        {signupMethod === 'email' ? 'EMAIL ADDRESS' : 'MOBILE PHONE'}
+                      </label>
+                      <input
+                        type="text"
+                        value={emailOrPhone}
+                        onChange={(e) => setEmailOrPhone(e.target.value)}
+                        placeholder={signupMethod === 'email' ? 'name@domain.com' : '+91 9876543210'}
+                        className="auth-input"
+                        style={{ height: '48px', width: '100%', padding: '0 16px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.02)', color: '#fff', outline: 'none', fontSize: '0.875rem', boxSizing: 'border-box' }}
+                      />
+                    </div>
+
+                    {/* Password */}
+                    <div style={{ marginBottom: '16px' }}>
+                      <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#a5b4fc', marginBottom: '6px' }}>PASSWORD</label>
+                      <input
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="••••••••"
+                        className="auth-input"
+                        style={{ height: '48px', width: '100%', padding: '0 16px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.02)', color: '#fff', outline: 'none', fontSize: '0.875rem', boxSizing: 'border-box' }}
+                      />
+                    </div>
+
+                    {/* Confirm Password */}
+                    <div style={{ marginBottom: '24px' }}>
+                      <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#a5b4fc', marginBottom: '6px' }}>CONFIRM PASSWORD</label>
+                      <input
+                        type="password"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        placeholder="••••••••"
+                        className="auth-input"
+                        style={{ height: '48px', width: '100%', padding: '0 16px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.02)', color: '#fff', outline: 'none', fontSize: '0.875rem', boxSizing: 'border-box' }}
+                      />
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => setDesignScreen(signupMethod === 'email' ? 'verify-email' : 'verify-mobile')}
+                      className="auth-primary-btn"
+                      style={{ height: '52px', width: '100%', borderRadius: '12px', border: 'none', background: 'var(--gradient-primary)', color: '#fff', fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s', fontSize: '0.875rem' }}
+                    >
+                      Create Account
+                    </button>
+
+                    <div style={{ marginTop: '20px', textAlign: 'center', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                      Already have an account?{' '}
+                      <span onClick={() => setDesignScreen('signin')} style={{ color: '#2563EB', fontWeight: 600, cursor: 'pointer' }}>Sign In</span>
+                    </div>
+                  </div>
+                )}
+
+                {/* SCREEN 4: VERIFY EMAIL */}
+                {designScreen === 'verify-email' && (
+                  <div style={{ textAlign: 'center' }}>
+                    <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: 'rgba(37,99,235,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px auto', color: '#2563EB' }}>
+                      <Shield size={32} />
+                    </div>
+
+                    <h3 style={{ fontSize: '1.75rem', fontWeight: 700, color: '#fff', fontFamily: 'var(--font-display)', marginBottom: '8px' }}>Verify Your Email</h3>
+                    <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginBottom: '24px', lineHeight: 1.5 }}>
+                      We sent a 6-digit verification code to <br /><strong style={{ color: '#fff' }}>{emailOrPhone || 'raj@gmail.com'}</strong>
+                    </p>
+
+                    {/* 6 OTP Boxes */}
+                    <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', marginBottom: '24px' }}>
+                      {[0, 1, 2, 3, 4, 5].map((idx) => (
+                        <input
+                          key={idx}
+                          type="text"
+                          maxLength={1}
+                          className="auth-input"
+                          style={{ width: '46px', height: '52px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.02)', color: '#fff', textAlign: 'center', fontSize: '1.25rem', fontWeight: '700', outline: 'none' }}
+                        />
+                      ))}
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => setDesignScreen('success')}
+                      className="auth-primary-btn"
+                      style={{ height: '52px', width: '100%', borderRadius: '12px', border: 'none', background: 'var(--gradient-primary)', color: '#fff', fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s', fontSize: '0.875rem', marginBottom: '24px' }}
+                    >
+                      Verify Code
+                    </button>
+
+                    <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                      <div>OTP expires in 5:00</div>
+                      <div style={{ marginTop: '8px' }}>
+                        Didn't receive code?{' '}
+                        <span style={{ color: '#2563EB', fontWeight: 600, cursor: 'pointer' }}>Resend Code</span>
+                      </div>
+                      <div style={{ marginTop: '16px' }}>
+                        <span onClick={() => setDesignScreen('create-account')} style={{ color: 'var(--text-muted)', fontWeight: 600, cursor: 'pointer' }}>Change Email</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* SCREEN 5: VERIFY PHONE */}
+                {designScreen === 'verify-mobile' && (
+                  <div style={{ textAlign: 'center' }}>
+                    <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: 'rgba(37,99,235,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px auto', color: '#2563EB' }}>
+                      <Shield size={32} />
+                    </div>
+
+                    <h3 style={{ fontSize: '1.75rem', fontWeight: 700, color: '#fff', fontFamily: 'var(--font-display)', marginBottom: '8px' }}>Verify Your Phone</h3>
+                    <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginBottom: '24px', lineHeight: 1.5 }}>
+                      Verification code sent to <br /><strong style={{ color: '#fff' }}>{emailOrPhone || '+91 XXXXXXXX45'}</strong>
+                    </p>
+
+                    {/* 6 OTP Boxes */}
+                    <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', marginBottom: '24px' }}>
+                      {[0, 1, 2, 3, 4, 5].map((idx) => (
+                        <input
+                          key={idx}
+                          type="text"
+                          maxLength={1}
+                          className="auth-input"
+                          style={{ width: '46px', height: '52px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.02)', color: '#fff', textAlign: 'center', fontSize: '1.25rem', fontWeight: '700', outline: 'none' }}
+                        />
+                      ))}
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => setDesignScreen('success')}
+                      className="auth-primary-btn"
+                      style={{ height: '52px', width: '100%', borderRadius: '12px', border: 'none', background: 'var(--gradient-primary)', color: '#fff', fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s', fontSize: '0.875rem', marginBottom: '24px' }}
+                    >
+                      Verify Code
+                    </button>
+
+                    <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                      <div>OTP expires in 5:00</div>
+                      <div style={{ marginTop: '8px' }}>
+                        Didn't receive code?{' '}
+                        <span style={{ color: '#2563EB', fontWeight: 600, cursor: 'pointer' }}>Resend Code</span>
+                      </div>
+                      <div style={{ marginTop: '16px' }}>
+                        <span onClick={() => setDesignScreen('create-account')} style={{ color: 'var(--text-muted)', fontWeight: 600, cursor: 'pointer' }}>Change Phone Number</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* SCREEN 6: FORGOT PASSWORD */}
+                {designScreen === 'forgot-password' && (
+                  <div>
+                    <h3 style={{ fontSize: '1.75rem', fontWeight: 700, color: '#fff', fontFamily: 'var(--font-display)', marginBottom: '8px' }}>Forgot Password</h3>
+                    <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginBottom: '32px' }}>Enter your registered email address or phone number to receive a verification code.</p>
+
+                    <div style={{ marginBottom: '24px' }}>
+                      <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#a5b4fc', marginBottom: '8px', letterSpacing: '0.05em' }}>EMAIL OR PHONE</label>
+                      <input
+                        type="text"
+                        value={emailOrPhone}
+                        onChange={(e) => setEmailOrPhone(e.target.value)}
+                        placeholder="name@domain.com or +91..."
+                        className="auth-input"
+                        style={{ height: '48px', width: '100%', padding: '0 16px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.02)', color: '#fff', outline: 'none', fontSize: '0.875rem', boxSizing: 'border-box' }}
+                      />
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => setDesignScreen('reset-password')}
+                      className="auth-primary-btn"
+                      style={{ height: '52px', width: '100%', borderRadius: '12px', border: 'none', background: 'var(--gradient-primary)', color: '#fff', fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s', fontSize: '0.875rem', marginBottom: '20px' }}
+                    >
+                      Continue
+                    </button>
+
+                    <div style={{ textAlign: 'center' }}>
+                      <span onClick={() => setDesignScreen('signin')} style={{ fontSize: '0.85rem', color: '#2563EB', fontWeight: 600, cursor: 'pointer' }}>Back to Sign In</span>
+                    </div>
+                  </div>
+                )}
+
+                {/* SCREEN 7: RESET PASSWORD */}
+                {designScreen === 'reset-password' && (
+                  <div>
+                    <h3 style={{ fontSize: '1.75rem', fontWeight: 700, color: '#fff', fontFamily: 'var(--font-display)', marginBottom: '8px' }}>Create New Password</h3>
+                    <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginBottom: '32px' }}>Enter a strong password for your account.</p>
+
+                    <div style={{ marginBottom: '20px' }}>
+                      <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#a5b4fc', marginBottom: '8px' }}>NEW PASSWORD</label>
+                      <input
+                        type="password"
+                        placeholder="••••••••"
+                        className="auth-input"
+                        style={{ height: '48px', width: '100%', padding: '0 16px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.02)', color: '#fff', outline: 'none', fontSize: '0.875rem', boxSizing: 'border-box' }}
+                      />
+                    </div>
+
+                    <div style={{ marginBottom: '24px' }}>
+                      <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#a5b4fc', marginBottom: '8px' }}>CONFIRM PASSWORD</label>
+                      <input
+                        type="password"
+                        placeholder="••••••••"
+                        className="auth-input"
+                        style={{ height: '48px', width: '100%', padding: '0 16px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.02)', color: '#fff', outline: 'none', fontSize: '0.875rem', boxSizing: 'border-box' }}
+                      />
+                    </div>
+
+                    {/* Requirements checklist */}
+                    <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '10px', padding: '16px', marginBottom: '24px', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                      <div style={{ display: 'flex', gap: '8px', marginBottom: '8px', alignItems: 'center' }}>
+                        <span style={{ color: '#10B981' }}>✓</span>
+                        <span>At least 8 characters</span>
+                      </div>
+                      <div style={{ display: 'flex', gap: '8px', marginBottom: '8px', alignItems: 'center' }}>
+                        <span style={{ color: '#10B981' }}>✓</span>
+                        <span>Contains uppercase and lowercase letters</span>
+                      </div>
+                      <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                        <span style={{ color: '#10B981' }}>✓</span>
+                        <span>Contains a number or special character</span>
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => setDesignScreen('success')}
+                      className="auth-primary-btn"
+                      style={{ height: '52px', width: '100%', borderRadius: '12px', border: 'none', background: 'var(--gradient-primary)', color: '#fff', fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s', fontSize: '0.875rem' }}
+                    >
+                      Create Password
+                    </button>
+                  </div>
+                )}
+
+                {/* SCREEN 8: VERIFICATION SUCCESS */}
+                {designScreen === 'success' && (
+                  <div style={{ textAlign: 'center', padding: '10px 0' }}>
+                    <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: 'rgba(16,185,129,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 28px auto', color: 'var(--success)' }}>
+                      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                      </svg>
+                    </div>
+
+                    <h3 style={{ fontSize: '2rem', fontWeight: 700, color: '#fff', fontFamily: 'var(--font-display)', marginBottom: '12px' }}>Account Ready</h3>
+                    <p style={{ fontSize: '0.95rem', color: 'var(--text-secondary)', marginBottom: '36px', lineHeight: 1.5 }}>
+                      Araiven is waiting for you. <br />Your institutional wealth workspace has been initialized.
+                    </p>
+
+                    <button
+                      type="button"
+                      onClick={() => setAuthMode(null)}
+                      className="auth-primary-btn"
+                      style={{ height: '52px', width: '100%', borderRadius: '12px', border: 'none', background: 'var(--gradient-primary)', color: '#fff', fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s', fontSize: '0.9rem', boxShadow: '0 4px 20px rgba(124, 58, 237, 0.3)' }}
+                    >
+                      Launch Dashboard
+                    </button>
+                  </div>
+                )}
 
               </div>
             </div>
