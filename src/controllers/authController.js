@@ -77,6 +77,12 @@ export const register = async (req, res) => {
     const user = result.data.user;
     const userId = user.id;
 
+    // Create local user record in SQLite to satisfy foreign key constraints
+    await dbRun(
+      'INSERT OR IGNORE INTO users (id, email, mobile_number, full_name, password_hash) VALUES (?, ?, ?, ?, ?)',
+      [userId, email || null, mobileNumber || null, fullName, '']
+    );
+
     // Create local portfolio & user settings in SQLite to support Ravora Trading Workspace
     const portfolioId = crypto.randomUUID();
     await dbRun(
@@ -297,6 +303,12 @@ export const login = async (req, res) => {
       provider: 'local'
     });
 
+    // Ensure local user record exists in SQLite to satisfy foreign key constraints
+    await dbRun(
+      'INSERT OR IGNORE INTO users (id, email, mobile_number, full_name, password_hash) VALUES (?, ?, ?, ?, ?)',
+      [user.id, user.email || null, user.phone || null, user.user_metadata?.full_name || 'Ravora User', '']
+    );
+
     // Create local default portfolios and user settings rows
     await dbRun('INSERT OR IGNORE INTO portfolios (id, user_id, current_balance, safety_score) VALUES (?, ?, 0.00, 100)', [crypto.randomUUID(), user.id]);
     await dbRun('INSERT OR IGNORE INTO user_settings (id, user_id, auto_hedge_enabled, notifications_enabled, execution_mode) VALUES (?, ?, 1, 1, \'advisory\')', [crypto.randomUUID(), user.id]);
@@ -439,6 +451,12 @@ export const socialLogin = async (req, res) => {
       phone: null,
       provider: provider
     });
+
+    // Ensure local user record exists in SQLite to satisfy foreign key constraints
+    await dbRun(
+      'INSERT OR IGNORE INTO users (id, email, mobile_number, full_name, password_hash) VALUES (?, ?, ?, ?, ?)',
+      [providerUserId, email || null, null, fullName || 'OAuth User', '']
+    );
 
     // Create default portfolios and settings rows locally
     await dbRun('INSERT OR IGNORE INTO portfolios (id, user_id, current_balance, safety_score) VALUES (?, ?, 0.00, 100)', [crypto.randomUUID(), providerUserId]);

@@ -164,21 +164,27 @@ apiRouter.post('/settings/exchanges', verifyToken, connectExchange);
 app.use('/v1', apiRouter);
 
 // SPA routing setup:
-// 1. Serve static files inside /app (e.g. css/js sub-assets, if any)
-app.use('/app', express.static(path.join(__dirname, 'app')));
+import fs from 'fs';
+const distPath = path.join(__dirname, 'dist');
 
-// 2. Serve index.html or other static files in the root (like styles.css, dashboard.js, favicon.svg)
-app.use(express.static(__dirname));
-
-// 3. Fallback to app/index.html for any client-side route under /app (History API)
-app.get('/app*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'app/index.html'));
-});
-
-// 4. Fallback for landing page
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
-});
+if (fs.existsSync(distPath)) {
+  console.log('[SPA Server] Serving production React Vite assets from /dist');
+  app.use(express.static(distPath));
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/v1')) return next();
+    res.sendFile(path.join(distPath, 'index.html'));
+  });
+} else {
+  console.log('[SPA Server] Serving developer legacy static files');
+  app.use('/app', express.static(path.join(__dirname, 'app')));
+  app.use(express.static(__dirname));
+  app.get('/app*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'app/index.html'));
+  });
+  app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+  });
+}
 
 // Start background rebalancing / scoring engine
 const startEngineScheduler = () => {
@@ -233,7 +239,7 @@ const startServer = async () => {
       console.log(`Ravora MVP Foundation listening at http://localhost:${PORT}`);
     });
   } catch (error) {
-    console.error('Failed to start server:', error);
+    console.error('Failed to start server:', error.stack || error);
     process.exit(1);
   }
 };

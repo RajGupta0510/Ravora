@@ -2,6 +2,7 @@ import sqlite3 from 'sqlite3';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import crypto from 'crypto';
+import fs from 'fs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -9,7 +10,7 @@ const __dirname = path.dirname(__filename);
 // Database file path inside workspace
 const dbPath = path.resolve(__dirname, '../ravora.db');
 
-const db = new sqlite3.Database(dbPath, (err) => {
+let db = new sqlite3.Database(dbPath, (err) => {
   if (err) {
     console.error('Error opening database:', err);
   } else {
@@ -47,8 +48,46 @@ export const dbRun = (sql, params = []) => {
 
 // Database initialization
 export const initializeDatabase = async () => {
-  // Enable foreign keys
-  await dbRun('PRAGMA foreign_keys = ON;');
+  try {
+    // Check if any existing table schema in sqlite_master references 'users_old'
+    const corruptTables = await dbQuery("SELECT name FROM sqlite_master WHERE sql LIKE '%users_old%';");
+    if (corruptTables && corruptTables.length > 0) {
+      const names = corruptTables.map(t => t.name).join(', ');
+      console.warn(`[Database Self-Heal] Found dangling 'users_old' references in schemas of: ${names}`);
+      throw new Error('Database contains dangling users_old references');
+    }
+  } catch (err) {
+    console.log('[DEBUG] initializeDatabase catch block. err:', err, 'message:', err?.message, 'stack:', err?.stack);
+    if (err.message && err.message.includes('users_old')) {
+      console.warn('[Database Self-Heal] Schema corruption detected (dangling users_old reference). Recreating database file...');
+      
+      // Close active handle
+      await new Promise((resolve) => db.close(() => resolve(null)));
+      
+      // Delete corrupt SQLite file
+      try {
+        if (fs.existsSync(dbPath)) {
+          fs.unlinkSync(dbPath);
+          console.log('[Database Self-Heal] Corrupted database file successfully deleted.');
+        }
+      } catch (delErr) {
+        console.error('[Database Self-Heal] Failed to delete database file:', delErr);
+      }
+
+      // Re-establish fresh connection
+      db = new sqlite3.Database(dbPath, (err) => {
+        if (err) console.error('Error reopening database:', err);
+      });
+      
+      // Mini buffer to ensure handle is ready
+      await new Promise((resolve) => setTimeout(resolve, 200));
+    } else {
+      throw err;
+    }
+  }
+
+  // Disable foreign keys temporarily during DDL migration checks to prevent SQLite schema corruptions
+  await dbRun('PRAGMA foreign_keys = OFF;');
 
   // Check and migrate users table schema if needed
   try {
@@ -121,6 +160,9 @@ export const initializeDatabase = async () => {
       );
     `);
   }
+
+  // Re-enable foreign key constraints after all schema alterations are completed
+  await dbRun('PRAGMA foreign_keys = ON;');
 
   // 1b. user_otps table
   await dbRun(`
