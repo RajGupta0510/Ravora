@@ -799,14 +799,14 @@
     </div>
   </div>
 
-  <!-- Auth Modal -->
-  <div class="modal-overlay auth-page-overlay" id="auth-modal" style="z-index: 1100;">
-    <div class="auth-split-container">
+  <!-- Auth Modal disabled to use /app/ as single auth controller -->
+  <div class="modal-overlay auth-page-overlay" id="auth-modal" style="display: none !important; z-index: 1100;">
+    <div class="auth-split-container" style="display: none !important;">
       
       <!-- Left Side: Brand Storytelling (45%) -->
-      <div class="auth-left-story">
+      <div class="auth-left-story" style="display: none !important;">
         <div class="ambient-grid"></div>
-        <div class="glow-blob glow-1" style="width: 250px; height: 250px; opacity: 0.15;"></div>
+        <div class="glow-blob glow-1" style="display: none !important; width: 250px; height: 250px; opacity: 0.15;"></div>
         
         <div class="auth-story-content">
           <!-- Logo -->
@@ -864,154 +864,275 @@
         <!-- Close button -->
         <button class="modal-close" id="auth-modal-close" style="position: absolute; top: 24px; right: 24px; background: none; border: none; color: var(--text-muted); font-size: 1.8rem; cursor: pointer; line-height: 1; z-index: 100; transition: color 0.2s;">&times;</button>
         
-        <div class="auth-form-card">
+        <div class="auth-form-card" style="width: 100%; max-width: 440px; padding: 32px !important; border-radius: 16px !important; background: rgba(14, 19, 37, 0.8) !important; border: 1px solid rgba(255,255,255,0.06); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5) !important; box-sizing: border-box;">
           
           <!-- 1. SIGN IN VIEW -->
-          <div id="auth-login-container" class="auth-flow-section" style="width: 100%;">
+          <div id="auth-login-view" style="display: block; width: 100%;">
             <form id="landing-login-form" class="auth-form" style="width: 100%;">
               <h3 style="margin-bottom: 6px; text-align: left; font-family: var(--font-display); font-size: 1.45rem; font-weight: 700; color: #fff;">Welcome to Ravora</h3>
-              <p class="body-text" style="margin-bottom: 24px; text-align: left; font-size: 0.85rem; color: var(--text-secondary); line-height: 1.45;">Enter your credentials to access your active wealth copilot.</p>
+              <p class="body-text" style="margin-bottom: 20px; text-align: left; font-size: 0.85rem; color: var(--text-secondary); line-height: 1.45;">Enter your credentials to access your active wealth copilot.</p>
               
-              <div class="auth-input-group">
-                <label>EMAIL ADDRESS</label>
-                <input type="email" id="landing-login-email" class="form-input" placeholder="name@domain.com" required style="width: 100%;">
-              </div>
-              
-              <div class="auth-input-group">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-                  <label style="margin-bottom: 0;">PASSWORD</label>
-                  <a href="#" class="auth-forgot-link" id="go-to-forgot-btn">Forgot Password?</a>
-                </div>
-                <input type="password" id="landing-login-password" class="form-input" placeholder="••••••••" required style="width: 100%;">
+              <!-- Tab toggle: Email vs Mobile -->
+              <div class="filter-segmented" style="display: flex; margin-bottom: 20px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 6px; padding: 2px;">
+                <button type="button" class="segmented-tab active" id="login-tab-email" style="flex: 1; padding: 8px; font-size: 0.72rem; font-weight: 600; border: none; background: transparent; color: #fff; cursor: pointer;">Email Address</button>
+                <button type="button" class="segmented-tab" id="login-tab-mobile" style="flex: 1; padding: 8px; font-size: 0.72rem; font-weight: 600; border: none; background: transparent; color: var(--text-secondary); cursor: pointer;">Mobile Number</button>
               </div>
 
-              <!-- Remember me checkbox -->
-              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 20px; font-size: 0.82rem; color: var(--text-secondary);">
-                <input type="checkbox" id="login-remember-me" style="accent-color: var(--primary); cursor: pointer; width: 15px; height: 15px;">
-                <label for="login-remember-me" style="margin: 0; font-weight: 500; cursor: pointer;">Remember me on this device</label>
+              <!-- Email Block -->
+              <div id="login-email-container" class="auth-input-group" style="margin-bottom: 16px; text-align: left;">
+                <label style="display: block; font-size: 0.72rem; font-weight: 600; color: #a5b4fc; margin-bottom: 6px; letter-spacing: 0.05em;">EMAIL ADDRESS</label>
+                <input type="email" id="landing-login-email" class="form-input" placeholder="name@domain.com" style="width: 100%; box-sizing: border-box;">
               </div>
-              
+
+              <!-- Mobile Block -->
+              <div id="login-mobile-container" class="auth-input-group" style="margin-bottom: 16px; text-align: left; display: none;">
+                <label style="display: block; font-size: 0.72rem; font-weight: 600; color: #a5b4fc; margin-bottom: 6px; letter-spacing: 0.05em;">MOBILE NUMBER</label>
+                <input type="text" id="landing-login-mobile" class="form-input" placeholder="+1 (555) 000-0000" style="width: 100%; box-sizing: border-box;">
+              </div>
+
+              <!-- Password Block -->
+              <div id="login-password-container" class="auth-input-group" style="margin-bottom: 20px; text-align: left; position: relative;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                  <label style="margin-bottom: 0; font-size: 0.72rem; font-weight: 600; color: #a5b4fc; letter-spacing: 0.05em;">PASSWORD</label>
+                  <a href="#" class="auth-forgot-link" id="login-forgot-btn" style="font-size: 0.72rem; color: var(--accent); text-decoration: none; font-weight: 600;">Forgot Password?</a>
+                </div>
+                <div style="position: relative; width: 100%;">
+                  <input type="password" id="landing-login-password" class="form-input" placeholder="••••••••" style="width: 100%; padding-right: 40px; box-sizing: border-box;">
+                  <button type="button" class="btn-toggle-password" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0;">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Login with OTP toggle -->
+              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 20px; font-size: 0.8rem; color: var(--text-secondary); text-align: left;">
+                <input type="checkbox" id="login-otp-toggle" style="accent-color: var(--primary); cursor: pointer; width: 15px; height: 15px;">
+                <label for="login-otp-toggle" style="margin: 0; font-weight: 500; cursor: pointer;">Sign in with OTP code instead of password</label>
+              </div>
+
+              <!-- Remember Me & Trust settings -->
+              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 20px; font-size: 0.8rem; color: var(--text-secondary); text-align: left;">
+                <input type="checkbox" id="login-remember-me" style="accent-color: var(--primary); cursor: pointer; width: 15px; height: 15px;">
+                <label for="login-remember-me" style="margin: 0; font-weight: 500; cursor: pointer;">Trust this device (skip future OTPs)</label>
+              </div>
+
               <div id="landing-login-error" class="auth-error-msg" style="display: none;"></div>
               
-              <button type="submit" class="btn btn-primary auth-submit-btn" style="width: 100%; height: 44px; font-size: 0.9rem; font-weight: 600; margin-bottom: 16px;">
+              <button type="submit" class="btn btn-primary auth-submit-btn" style="width: 100%; padding: 14px; margin-bottom: 20px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; height: 46px;">
                 <span>Sign In</span>
-                <span class="auth-spinner" style="display: none;"></span>
+                <span class="auth-spinner" style="display: none; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff; animation: spin-loader 0.8s linear infinite;"></span>
               </button>
 
-              <!-- Social Login Placeholder -->
-              <div class="social-divider" style="text-align: center; margin: 20px 0; position: relative; font-size: 0.75rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">
-                <span style="background: #060913; padding: 0 10px; position: relative; z-index: 2;">OR CONTINUE WITH</span>
+              <!-- Social Divider -->
+              <div class="social-divider" style="text-align: center; margin: 20px 0; position: relative; font-size: 0.72rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">
+                <span style="background: rgb(8, 11, 22); padding: 0 10px; position: relative; z-index: 2;">OR CONTINUE WITH</span>
                 <div style="position: absolute; top: 50%; left: 0; width: 100%; height: 1px; background: rgba(255,255,255,0.06); z-index: 1;"></div>
               </div>
 
+              <!-- Social Buttons -->
               <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 24px;">
-                <button type="button" class="btn btn-secondary social-btn" style="height: 38px; font-size: 0.78rem; padding: 0;">Google</button>
-                <button type="button" class="btn btn-secondary social-btn" style="height: 38px; font-size: 0.78rem; padding: 0;">GitHub</button>
-                <button type="button" class="btn btn-secondary social-btn" style="height: 38px; font-size: 0.78rem; padding: 0;">Apple</button>
+                <button type="button" class="btn btn-secondary social-btn btn-social-login" data-provider="google" style="height: 38px; font-size: 0.76rem; padding: 0; font-weight: 600; background: rgba(255,255,255,0.01);">Google</button>
+                <button type="button" class="btn btn-secondary social-btn btn-social-login" data-provider="github" style="height: 38px; font-size: 0.76rem; padding: 0; font-weight: 600; background: rgba(255,255,255,0.01);">GitHub</button>
+                <button type="button" class="btn btn-secondary social-btn btn-social-login" data-provider="apple" style="height: 38px; font-size: 0.76rem; padding: 0; font-weight: 600; background: rgba(255,255,255,0.01);">Apple</button>
               </div>
-              
-              <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0; text-align: center;">Don't have an account? <a href="#" id="switch-to-signup" class="auth-switch-link">Create Account</a></p>
+
+              <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0; text-align: center;">Don't have an account? <a href="#" id="switch-to-signup" class="auth-switch-link" style="color: var(--accent); font-weight: 600;">Create Account</a></p>
             </form>
           </div>
 
-          <!-- 2. CREATE ACCOUNT VIEW -->
-          <div id="auth-register-container" class="auth-flow-section" style="display: none; width: 100%;">
+          <!-- 2. REGISTRATION VIEW -->
+          <div id="auth-register-view" style="display: none; width: 100%;">
             <form id="landing-register-form" class="auth-form" style="width: 100%;">
               <h3 style="margin-bottom: 6px; text-align: left; font-family: var(--font-display); font-size: 1.45rem; font-weight: 700; color: #fff;">Create Account</h3>
-              <p class="body-text" style="margin-bottom: 24px; text-align: left; font-size: 0.85rem; color: var(--text-secondary); line-height: 1.45;">Initialize your institutional-grade AI wealth workspace.</p>
+              <p class="body-text" style="margin-bottom: 20px; text-align: left; font-size: 0.85rem; color: var(--text-secondary); line-height: 1.45;">Initialize your institutional-grade AI wealth management workspace.</p>
 
-              <div class="auth-input-group">
-                <label>FULL NAME</label>
-                <input type="text" id="landing-register-name" class="form-input" placeholder="Alex Mercer" required style="width: 100%;">
+              <!-- Tab toggle: Email vs Mobile -->
+              <div class="filter-segmented" style="display: flex; margin-bottom: 20px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 6px; padding: 2px;">
+                <button type="button" class="segmented-tab active" id="register-tab-email" style="flex: 1; padding: 8px; font-size: 0.72rem; font-weight: 600; border: none; background: transparent; color: #fff; cursor: pointer;">Email Address</button>
+                <button type="button" class="segmented-tab" id="register-tab-mobile" style="flex: 1; padding: 8px; font-size: 0.72rem; font-weight: 600; border: none; background: transparent; color: var(--text-secondary); cursor: pointer;">Mobile Number</button>
               </div>
-              
-              <div class="auth-input-group">
-                <label>EMAIL ADDRESS</label>
-                <input type="email" id="landing-register-email" class="form-input" placeholder="name@domain.com" required style="width: 100%;">
+
+              <div class="auth-input-group" style="margin-bottom: 16px; text-align: left;">
+                <label style="display: block; font-size: 0.72rem; font-weight: 600; color: #a5b4fc; margin-bottom: 6px; letter-spacing: 0.05em;">FULL NAME</label>
+                <input type="text" id="landing-register-name" class="form-input" placeholder="Alex Mercer" required style="width: 100%; box-sizing: border-box;">
               </div>
-              
-              <div class="auth-input-group">
-                <label>PASSWORD</label>
-                <input type="password" id="landing-register-password" class="form-input" placeholder="••••••••" required style="width: 100%;">
-                <!-- Password strength meter -->
-                <div class="pwd-strength-container" style="margin-top: 6px; display: flex; gap: 4px; height: 3px;">
+
+              <!-- Email Block -->
+              <div id="register-email-container" class="auth-input-group" style="margin-bottom: 16px; text-align: left;">
+                <label style="display: block; font-size: 0.72rem; font-weight: 600; color: #a5b4fc; margin-bottom: 6px; letter-spacing: 0.05em;">EMAIL ADDRESS</label>
+                <input type="email" id="landing-register-email" class="form-input" placeholder="name@domain.com" style="width: 100%; box-sizing: border-box;">
+              </div>
+
+              <!-- Mobile Block -->
+              <div id="register-mobile-container" class="auth-input-group" style="margin-bottom: 16px; text-align: left; display: none;">
+                <label style="display: block; font-size: 0.72rem; font-weight: 600; color: #a5b4fc; margin-bottom: 6px; letter-spacing: 0.05em;">MOBILE NUMBER</label>
+                <input type="text" id="landing-register-mobile" class="form-input" placeholder="+1 (555) 000-0000" style="width: 100%; box-sizing: border-box;">
+              </div>
+
+              <!-- Passwords -->
+              <div class="auth-input-group" style="margin-bottom: 16px; text-align: left; position: relative;">
+                <label style="display: block; font-size: 0.72rem; font-weight: 600; color: #a5b4fc; margin-bottom: 6px; letter-spacing: 0.05em;">PASSWORD</label>
+                <div style="position: relative; width: 100%;">
+                  <input type="password" id="landing-register-password" class="form-input" placeholder="••••••••" required style="width: 100%; padding-right: 40px; box-sizing: border-box;">
+                  <button type="button" class="btn-toggle-password" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0;">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  </button>
+                </div>
+                <!-- Strength bar -->
+                <div class="pwd-strength-container" style="margin-top: 8px; display: flex; gap: 4px; height: 3px; width: 100%;">
                   <div class="pwd-strength-bar" style="flex: 1; border-radius: 99px; background: rgba(255,255,255,0.06); transition: background 0.3s;"></div>
                   <div class="pwd-strength-bar" style="flex: 1; border-radius: 99px; background: rgba(255,255,255,0.06); transition: background 0.3s;"></div>
                   <div class="pwd-strength-bar" style="flex: 1; border-radius: 99px; background: rgba(255,255,255,0.06); transition: background 0.3s;"></div>
                 </div>
-                <span id="pwd-strength-desc" style="font-size: 0.65rem; color: var(--text-muted); margin-top: 4px; display: block; font-weight: 600;">Password must be at least 8 characters.</span>
+                <span id="pwd-strength-desc" style="font-size: 0.62rem; color: var(--text-muted); margin-top: 4px; display: block; font-weight: 600;">Password must be at least 8 characters.</span>
               </div>
 
-              <!-- Accept Terms checkbox -->
-              <div style="display: flex; align-items: flex-start; gap: 8px; margin-bottom: 20px; font-size: 0.82rem; color: var(--text-secondary); line-height: 1.4;">
-                <input type="checkbox" id="register-terms" required style="accent-color: var(--primary); cursor: pointer; width: 15px; height: 15px; margin-top: 2px;">
-                <label for="register-terms" style="margin: 0; font-weight: 500; cursor: pointer;">I agree to Ravora's <a href="#" style="color: var(--primary); text-decoration: none;">Terms of Service</a> and <a href="#" style="color: var(--primary); text-decoration: none;">Privacy Policy</a>.</label>
+              <div class="auth-input-group" style="margin-bottom: 20px; text-align: left; position: relative;">
+                <label style="display: block; font-size: 0.72rem; font-weight: 600; color: #a5b4fc; margin-bottom: 6px; letter-spacing: 0.05em;">CONFIRM PASSWORD</label>
+                <div style="position: relative; width: 100%;">
+                  <input type="password" id="landing-register-confirm-password" class="form-input" placeholder="••••••••" required style="width: 100%; padding-right: 40px; box-sizing: border-box;">
+                  <button type="button" class="btn-toggle-password" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0;">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  </button>
+                </div>
               </div>
-              
+
+              <!-- Terms Checkbox -->
+              <div style="display: flex; align-items: flex-start; gap: 8px; margin-bottom: 20px; font-size: 0.8rem; color: var(--text-secondary); line-height: 1.4; text-align: left;">
+                <input type="checkbox" id="register-terms" required style="accent-color: var(--primary); cursor: pointer; width: 15px; height: 15px; margin-top: 2px;">
+                <label for="register-terms" style="margin: 0; font-weight: 500; cursor: pointer;">I agree to Ravora's <a href="#" style="color: var(--accent); text-decoration: none;">Terms of Service</a> and <a href="#" style="color: var(--accent); text-decoration: none;">Privacy Policy</a>.</label>
+              </div>
+
               <div id="landing-register-error" class="auth-error-msg" style="display: none;"></div>
-              
-              <button type="submit" class="btn btn-primary auth-submit-btn" style="width: 100%; height: 44px; font-size: 0.9rem; font-weight: 600; margin-bottom: 16px;">
+
+              <button type="submit" class="btn btn-primary auth-submit-btn" style="width: 100%; padding: 14px; margin-bottom: 20px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; height: 46px;">
                 <span>Create Account</span>
-                <span class="auth-spinner" style="display: none;"></span>
+                <span class="auth-spinner" style="display: none; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff; animation: spin-loader 0.8s linear infinite;"></span>
               </button>
-              
-              <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0; text-align: center;">Already have an account? <a href="#" id="switch-to-login" class="auth-switch-link">Sign In</a></p>
+
+              <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0; text-align: center;">Already have an account? <a href="#" id="switch-to-login" class="auth-switch-link" style="color: var(--accent); font-weight: 600;">Sign In</a></p>
             </form>
           </div>
 
-          <!-- 3. FORGOT PASSWORD VIEW -->
-          <div id="auth-forgot-container" class="auth-flow-section" style="display: none; width: 100%;">
-            <form id="landing-forgot-form" class="auth-form" style="width: 100%;">
-              <h3 style="margin-bottom: 6px; text-align: left; font-family: var(--font-display); font-size: 1.45rem; font-weight: 700; color: #fff;">Reset Password</h3>
-              <p class="body-text" style="margin-bottom: 24px; text-align: left; font-size: 0.85rem; color: var(--text-secondary); line-height: 1.45;">Enter your registered email address and we'll send a password recovery code.</p>
+          <!-- 3. OTP VERIFICATION VIEW -->
+          <div id="auth-otp-view" style="display: none; width: 100%;">
+            <form id="landing-verify-form" class="auth-form" style="width: 100%;">
+              <h3 style="margin-bottom: 6px; text-align: left; font-family: var(--font-display); font-size: 1.45rem; font-weight: 700; color: #fff;">Verify Account</h3>
+              <p class="body-text" id="otp-description" style="margin-bottom: 20px; text-align: left; font-size: 0.85rem; color: var(--text-secondary); line-height: 1.45;">We've sent a 6-digit verification code. Enter it below to secure access.</p>
 
               <div class="auth-input-group" style="margin-bottom: 20px;">
-                <label>EMAIL ADDRESS</label>
-                <input type="email" id="landing-forgot-email" class="form-input" placeholder="name@domain.com" required style="width: 100%;">
+                <label style="text-align: center; display: block; margin-bottom: 12px; font-size: 0.72rem; font-weight: 600; color: #a5b4fc; letter-spacing: 0.05em;">VERIFICATION CODE</label>
+                <div style="display: flex; gap: 8px; justify-content: center;" class="digit-inputs-group">
+                  <input type="text" maxlength="1" class="verify-digit-input" id="otp-1" required style="width: 44px; height: 48px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.03); color: #fff; text-align: center; font-size: 1.25rem; font-weight: 700; outline: none;">
+                  <input type="text" maxlength="1" class="verify-digit-input" id="otp-2" required style="width: 44px; height: 48px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.03); color: #fff; text-align: center; font-size: 1.25rem; font-weight: 700; outline: none;">
+                  <input type="text" maxlength="1" class="verify-digit-input" id="otp-3" required style="width: 44px; height: 48px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.03); color: #fff; text-align: center; font-size: 1.25rem; font-weight: 700; outline: none;">
+                  <input type="text" maxlength="1" class="verify-digit-input" id="otp-4" required style="width: 44px; height: 48px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.03); color: #fff; text-align: center; font-size: 1.25rem; font-weight: 700; outline: none;">
+                  <input type="text" maxlength="1" class="verify-digit-input" id="otp-5" required style="width: 44px; height: 48px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.03); color: #fff; text-align: center; font-size: 1.25rem; font-weight: 700; outline: none;">
+                  <input type="text" maxlength="1" class="verify-digit-input" id="otp-6" required style="width: 44px; height: 48px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.03); color: #fff; text-align: center; font-size: 1.25rem; font-weight: 700; outline: none;">
+                </div>
               </div>
-              
-              <div id="landing-forgot-error" class="auth-error-msg" style="display: none;"></div>
-              <div id="landing-forgot-success" class="auth-success-msg" style="display: none; background: rgba(16, 185, 129, 0.08); color: var(--success); padding: 12px; border-radius: 8px; border: 1px solid rgba(16, 185, 129, 0.15); font-size: 0.82rem; margin-bottom: 20px; line-height: 1.45;"></div>
-              
-              <button type="submit" class="btn btn-primary auth-submit-btn" style="width: 100%; height: 44px; font-size: 0.9rem; font-weight: 600; margin-bottom: 16px;">
-                <span>Send Recovery Code</span>
-                <span class="auth-spinner" style="display: none;"></span>
+
+              <!-- Timers & WhatsApp Option -->
+              <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; font-size: 0.8rem; color: var(--text-secondary); text-align: center;">
+                <div>OTP expires in: <strong id="otp-expiry-timer" style="color: #fff;">5:00</strong></div>
+                <div style="margin-top: 4px;">
+                  Didn't receive code? <a href="#" id="otp-resend-link" style="color: var(--accent); font-weight: 600; text-decoration: none; pointer-events: none; opacity: 0.4;">Resend Code (30s)</a>
+                </div>
+                <button type="button" id="btn-otp-whatsapp" class="btn btn-secondary" style="height: 32px; font-size: 0.72rem; padding: 0 10px; align-self: center; margin-top: 8px; display: none;">Send duplicate code to WhatsApp</button>
+              </div>
+
+              <div id="landing-verify-error" class="auth-error-msg" style="display: none;"></div>
+
+              <button type="submit" class="btn btn-primary auth-submit-btn" style="width: 100%; padding: 14px; margin-bottom: 20px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; height: 46px;">
+                <span>Verify OTP</span>
+                <span class="auth-spinner" style="display: none; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff; animation: spin-loader 0.8s linear infinite;"></span>
               </button>
-              
-              <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0; text-align: center;"><a href="#" id="forgot-back-to-login" class="auth-switch-link">Back to Sign In</a></p>
+
+              <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0; text-align: center;"><a href="#" class="go-back-to-login" style="color: var(--text-secondary); text-decoration: none; font-weight: 600;">Back to Sign In</a></p>
             </form>
           </div>
 
-          <!-- 4. EMAIL VERIFICATION VIEW -->
-          <div id="auth-verification-container" class="auth-flow-section" style="display: none; width: 100%;">
-            <form id="landing-verify-form" class="auth-form" style="width: 100%;">
-              <h3 style="margin-bottom: 6px; text-align: left; font-family: var(--font-display); font-size: 1.45rem; font-weight: 700; color: #fff;">Verify Email</h3>
-              <p class="body-text" style="margin-bottom: 24px; text-align: left; font-size: 0.85rem; color: var(--text-secondary); line-height: 1.45;">We've sent a 6-digit confirmation code to your email. Enter it below to unlock Ravora.</p>
+          <!-- 4. FORGOT PASSWORD VIEW -->
+          <div id="auth-forgot-view" style="display: none; width: 100%;">
+            <form id="landing-forgot-form" class="auth-form" style="width: 100%;">
+              <h3 style="margin-bottom: 6px; text-align: left; font-family: var(--font-display); font-size: 1.45rem; font-weight: 700; color: #fff;">Reset Password</h3>
+              <p class="body-text" style="margin-bottom: 20px; text-align: left; font-size: 0.85rem; color: var(--text-secondary); line-height: 1.45;">Enter your registered email address or mobile number to receive a verification code.</p>
 
-              <div class="auth-input-group" style="margin-bottom: 24px;">
-                <label style="text-align: center; display: block; margin-bottom: 8px;">VERIFICATION CODE</label>
-                <div style="display: flex; gap: 8px; justify-content: center;" class="digit-inputs-group">
-                  <input type="text" maxlength="1" class="verify-digit-input" required>
-                  <input type="text" maxlength="1" class="verify-digit-input" required>
-                  <input type="text" maxlength="1" class="verify-digit-input" required>
-                  <input type="text" maxlength="1" class="verify-digit-input" required>
-                  <input type="text" maxlength="1" class="verify-digit-input" required>
-                  <input type="text" maxlength="1" class="verify-digit-input" required>
-                </div>
+              <div class="auth-input-group" style="margin-bottom: 20px; text-align: left;">
+                <label style="display: block; font-size: 0.72rem; font-weight: 600; color: #a5b4fc; margin-bottom: 6px; letter-spacing: 0.05em;">EMAIL OR MOBILE NUMBER</label>
+                <input type="text" id="forgot-target" class="form-input" placeholder="name@domain.com or +1555..." required style="width: 100%; box-sizing: border-box;">
               </div>
-              
-              <div id="landing-verify-error" class="auth-error-msg" style="display: none;"></div>
-              <div id="landing-verify-success" class="auth-success-msg" style="display: none; background: rgba(16, 185, 129, 0.08); color: var(--success); padding: 12px; border-radius: 8px; border: 1px solid rgba(16, 185, 129, 0.15); font-size: 0.82rem; margin-bottom: 20px; text-align: center;"></div>
-              
-              <button type="submit" class="btn btn-primary auth-submit-btn" style="width: 100%; height: 44px; font-size: 0.9rem; font-weight: 600; margin-bottom: 16px;">
-                <span>Confirm & Initialize Workspace</span>
-                <span class="auth-spinner" style="display: none;"></span>
+
+              <div id="landing-forgot-error" class="auth-error-msg" style="display: none;"></div>
+
+              <button type="submit" class="btn btn-primary auth-submit-btn" style="width: 100%; padding: 14px; margin-bottom: 20px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; height: 46px;">
+                <span>Send Recovery Code</span>
+                <span class="auth-spinner" style="display: none; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff; animation: spin-loader 0.8s linear infinite;"></span>
               </button>
 
-              <div style="text-align: center; font-size: 0.82rem; color: var(--text-secondary);">
-                Didn't receive the email? <a href="#" id="resend-code-btn" style="color: var(--primary); text-decoration: none; font-weight: 600;">Resend Code</a>
-              </div>
+              <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0; text-align: center;"><a href="#" class="go-back-to-login" style="color: var(--text-secondary); text-decoration: none; font-weight: 600;">Back to Sign In</a></p>
             </form>
+          </div>
+
+          <!-- 5. RESET PASSWORD VIEW -->
+          <div id="auth-reset-view" style="display: none; width: 100%;">
+            <form id="landing-reset-form" class="auth-form" style="width: 100%;">
+              <h3 style="margin-bottom: 6px; text-align: left; font-family: var(--font-display); font-size: 1.45rem; font-weight: 700; color: #fff;">New Password</h3>
+              <p class="body-text" style="margin-bottom: 20px; text-align: left; font-size: 0.85rem; color: var(--text-secondary); line-height: 1.45;">Enter the verification code sent to your device along with your new password.</p>
+
+              <div class="auth-input-group" style="margin-bottom: 16px; text-align: left;">
+                <label style="display: block; font-size: 0.72rem; font-weight: 600; color: #a5b4fc; margin-bottom: 6px; letter-spacing: 0.05em;">VERIFICATION CODE</label>
+                <input type="text" id="reset-otp-code" class="form-input" placeholder="6-digit code" required style="width: 100%; box-sizing: border-box; text-align: center; letter-spacing: 0.2em; font-weight: 700;">
+              </div>
+
+              <div class="auth-input-group" style="margin-bottom: 16px; text-align: left; position: relative;">
+                <label style="display: block; font-size: 0.72rem; font-weight: 600; color: #a5b4fc; margin-bottom: 6px; letter-spacing: 0.05em;">NEW PASSWORD</label>
+                <div style="position: relative; width: 100%;">
+                  <input type="password" id="reset-password" class="form-input" placeholder="••••••••" required style="width: 100%; padding-right: 40px; box-sizing: border-box;">
+                  <button type="button" class="btn-toggle-password" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0;">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  </button>
+                </div>
+                <!-- Strength bar -->
+                <div class="pwd-strength-container" style="margin-top: 8px; display: flex; gap: 4px; height: 3px; width: 100%;">
+                  <div class="pwd-strength-bar" style="flex: 1; border-radius: 99px; background: rgba(255,255,255,0.06); transition: background 0.3s;"></div>
+                  <div class="pwd-strength-bar" style="flex: 1; border-radius: 99px; background: rgba(255,255,255,0.06); transition: background 0.3s;"></div>
+                  <div class="pwd-strength-bar" style="flex: 1; border-radius: 99px; background: rgba(255,255,255,0.06); transition: background 0.3s;"></div>
+                </div>
+                <span id="reset-pwd-strength-desc" style="font-size: 0.62rem; color: var(--text-muted); margin-top: 4px; display: block; font-weight: 600;">Password must be at least 8 characters.</span>
+              </div>
+
+              <div class="auth-input-group" style="margin-bottom: 20px; text-align: left; position: relative;">
+                <label style="display: block; font-size: 0.72rem; font-weight: 600; color: #a5b4fc; margin-bottom: 6px; letter-spacing: 0.05em;">CONFIRM PASSWORD</label>
+                <div style="position: relative; width: 100%;">
+                  <input type="password" id="reset-confirm-password" class="form-input" placeholder="••••••••" required style="width: 100%; padding-right: 40px; box-sizing: border-box;">
+                  <button type="button" class="btn-toggle-password" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0;">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  </button>
+                </div>
+              </div>
+
+              <div id="reset-error" class="auth-error-msg" style="display: none;"></div>
+
+              <button type="submit" class="btn btn-primary auth-submit-btn" style="width: 100%; padding: 14px; margin-bottom: 20px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; height: 46px;">
+                <span>Reset Password & Login</span>
+                <span class="auth-spinner" style="display: none; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff; animation: spin-loader 0.8s linear infinite;"></span>
+              </button>
+
+              <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0; text-align: center;"><a href="#" class="go-back-to-login" style="color: var(--text-secondary); text-decoration: none; font-weight: 600;">Back to Sign In</a></p>
+            </form>
+          </div>
+
+          <!-- 6. SUCCESS VIEW -->
+          <div id="auth-success-view" style="display: none; width: 100%; text-align: center; padding: 20px 0;">
+            <div style="width: 64px; height: 64px; border-radius: 50%; background: rgba(16, 185, 129, 0.08); border: 2px solid #10b981; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px auto; animation: pulse-dot 2s infinite ease-in-out;">
+              <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="#10b981" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            </div>
+            <h3 style="font-family: var(--font-display); font-size: 1.45rem; font-weight: 700; color: #fff; margin-bottom: 10px;">Security Verified</h3>
+            <p class="body-text" id="success-view-msg" style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 24px; max-width: 320px; margin-left: auto; margin-right: auto;">Your identity has been authenticated. Launching secure sandbox environment...</p>
+            <div class="loader-circle-small" style="width: 24px; height: 24px; border: 3px solid rgba(255,255,255,0.06); border-top-color: var(--accent); border-radius: 50%; animation: spin-loader 0.8s linear infinite; margin: 0 auto;"></div>
           </div>
 
         </div>

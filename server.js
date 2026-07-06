@@ -4,7 +4,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { initializeDatabase, dbQuery } from './src/database.js';
 import { verifyToken } from './src/middleware/auth.js';
-import { register, login } from './src/controllers/authController.js';
+import { register, login, verifyOtp, resendOtp, requestPasswordRecovery, resetPassword, socialLogin } from './src/controllers/authController.js';
 import { getProfile, onboard, updateSettings } from './src/controllers/userController.js';
 import { getPortfolio, getPortfolioHistory, getTransactions, closePosition } from './src/controllers/portfolioController.js';
 import { getOpportunities, getRecommendations, executeRecommendation, deployOpportunity, scanMarkets } from './src/controllers/opportunityController.js';
@@ -13,6 +13,7 @@ import { openPaperPosition, getActivePaperPositions, closePaperPosition, closeAl
 import { MarketDataService } from './src/services/marketDataService.js';
 import { RecommendationEngine } from './src/services/recommendations/recommendationEngine.js';
 import { PaperTradingService } from './src/services/paperTradingService.js';
+import { getSupabaseConfig } from './src/utils/supabase.js';
 
 
 const __filename = fileURLToPath(import.meta.url);
@@ -38,8 +39,14 @@ app.use((req, res, next) => {
 const apiRouter = express.Router();
 
 // Auth Endpoints
+apiRouter.get('/auth/config', (req, res) => res.json(getSupabaseConfig()));
 apiRouter.post('/auth/register', register);
 apiRouter.post('/auth/login', login);
+apiRouter.post('/auth/otp/verify', verifyOtp);
+apiRouter.post('/auth/otp/resend', resendOtp);
+apiRouter.post('/auth/forgot-password/request', requestPasswordRecovery);
+apiRouter.post('/auth/forgot-password/reset', resetPassword);
+apiRouter.post('/auth/social', socialLogin);
 
 // Market Data Layer v1 Endpoints (Public)
 apiRouter.get('/market/prices', async (req, res) => {

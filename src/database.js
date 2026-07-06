@@ -50,15 +50,116 @@ export const initializeDatabase = async () => {
   // Enable foreign keys
   await dbRun('PRAGMA foreign_keys = ON;');
 
-  // 1. users table
+  // Check and migrate users table schema if needed
+  try {
+    const columns = await dbQuery("PRAGMA table_info(users);");
+    if (columns && columns.length > 0) {
+      const hasMobile = columns.some(c => c.name === 'mobile_number');
+      if (!hasMobile) {
+        console.log('[Migration] Upgrading users table to support optional email and mobile signup...');
+        await dbRun('DROP TABLE IF EXISTS users_old;');
+        await dbRun('ALTER TABLE users RENAME TO users_old;');
+        
+        await dbRun(`
+          CREATE TABLE users (
+            id TEXT PRIMARY KEY,
+            email TEXT UNIQUE,
+            mobile_number TEXT UNIQUE,
+            full_name TEXT,
+            password_hash TEXT,
+            is_mfa_enabled INTEGER DEFAULT 0,
+            verified_email INTEGER DEFAULT 0,
+            verified_mobile INTEGER DEFAULT 0,
+            always_require_otp INTEGER DEFAULT 0,
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+            updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+          );
+        `);
+
+        await dbRun(`
+          INSERT INTO users (id, email, password_hash, is_mfa_enabled, created_at, updated_at)
+          SELECT id, email, password_hash, is_mfa_enabled, created_at, updated_at FROM users_old;
+        `);
+
+        await dbRun('DROP TABLE users_old;');
+        console.log('[Migration] users table upgraded successfully!');
+      }
+    } else {
+      // Table doesn't exist, create it fresh
+      await dbRun(`
+        CREATE TABLE users (
+          id TEXT PRIMARY KEY,
+          email TEXT UNIQUE,
+          mobile_number TEXT UNIQUE,
+          full_name TEXT,
+          password_hash TEXT,
+          is_mfa_enabled INTEGER DEFAULT 0,
+          verified_email INTEGER DEFAULT 0,
+          verified_mobile INTEGER DEFAULT 0,
+          always_require_otp INTEGER DEFAULT 0,
+          created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+          updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+        );
+      `);
+    }
+  } catch (err) {
+    console.error('[Migration] Error during users table check/migration:', err);
+    // Fresh creation fallback
+    await dbRun(`
+      CREATE TABLE IF NOT EXISTS users (
+        id TEXT PRIMARY KEY,
+        email TEXT UNIQUE,
+        mobile_number TEXT UNIQUE,
+        full_name TEXT,
+        password_hash TEXT,
+        is_mfa_enabled INTEGER DEFAULT 0,
+        verified_email INTEGER DEFAULT 0,
+        verified_mobile INTEGER DEFAULT 0,
+        always_require_otp INTEGER DEFAULT 0,
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+        updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+  }
+
+  // 1b. user_otps table
   await dbRun(`
-    CREATE TABLE IF NOT EXISTS users (
+    CREATE TABLE IF NOT EXISTS user_otps (
       id TEXT PRIMARY KEY,
-      email TEXT UNIQUE NOT NULL,
-      password_hash TEXT NOT NULL,
-      is_mfa_enabled INTEGER DEFAULT 0,
+      user_id TEXT,
+      otp_code TEXT NOT NULL,
+      channel TEXT NOT NULL,
+      attempts INTEGER DEFAULT 0,
+      expires_at TEXT NOT NULL,
       created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-      updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    );
+  `);
+
+  // 1c. user_devices table
+  await dbRun(`
+    CREATE TABLE IF NOT EXISTS user_devices (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL,
+      device_fingerprint TEXT NOT NULL,
+      is_trusted INTEGER DEFAULT 0,
+      ip_address TEXT,
+      user_agent TEXT,
+      last_login_at TEXT DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    );
+  `);
+
+  // 1d. social_identities table
+  await dbRun(`
+    CREATE TABLE IF NOT EXISTS social_identities (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL,
+      provider TEXT NOT NULL,
+      provider_user_id TEXT NOT NULL,
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+      UNIQUE(provider, provider_user_id)
     );
   `);
 

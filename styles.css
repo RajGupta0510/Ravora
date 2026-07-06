@@ -8044,3 +8044,26 @@ h2 {
     grid-template-columns: 1fr !important;
   }
 }
+
+/* Authentication overlay responsive behavior */
+@media (max-width: 900px) {
+  #auth-container > div {
+    flex-direction: column !important;
+  }
+  .auth-left-story {
+    width: 100% !important;
+    display: none !important; /* Hide left brand side on smaller tablet/mobile devices */
+  }
+  .auth-right-form-wrapper {
+    width: 100% !important;
+    padding: 24px 16px !important;
+    min-height: 100vh !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  .auth-form-card {
+    padding: 24px 20px !important;
+    margin: auto !important;
+  }
+}

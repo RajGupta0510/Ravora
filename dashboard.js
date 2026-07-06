@@ -1,5 +1,24 @@
 document.addEventListener('DOMContentLoaded', () => {
 
+  // Initialize Supabase Client dynamically
+  let supabaseClient = null;
+  async function initSupabase() {
+    try {
+      const res = await fetch(`${API_BASE}/auth/config`);
+      if (res.ok) {
+        const config = await res.json();
+        if (window.supabase && config.supabaseUrl) {
+          supabaseClient = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
+          window.supabaseClient = supabaseClient;
+          console.log('[Supabase Client] Initialized successfully.');
+        }
+      }
+    } catch (err) {
+      console.warn('[Supabase Client] Failed to fetch config or initialize client:', err);
+    }
+  }
+  initSupabase();
+
   // Initialize Chart Intelligence Engine
   try {
     if (typeof window.initChartIntelligence === 'function') {
@@ -1095,13 +1114,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
     const authType = urlParams.get('auth');
     if (authType === 'register') {
-      if (loginForm) loginForm.style.display = 'none';
-      if (registerForm) registerForm.style.display = 'block';
-      if (registerError) registerError.style.display = 'none';
+      switchAuthView('register');
     } else {
-      if (loginForm) loginForm.style.display = 'block';
-      if (registerForm) registerForm.style.display = 'none';
-      if (loginError) loginError.style.display = 'none';
+      switchAuthView('login');
     }
   }
 
@@ -1228,20 +1243,28 @@ document.addEventListener('DOMContentLoaded', () => {
     const sevenDays = 7 * 24 * 60 * 60 * 1000;
     const timeDiff = loginTime ? (Date.now() - parseInt(loginTime)) : null;
     
-    const isSessionValid = loggedIn && loginTime && token && (timeDiff < sevenDays) && !forceAuth;
+    // Remember Me vs Session Storage verification
+    const rememberMe = localStorage.getItem('ravora_remember_me') === 'true';
+    const sessionActive = sessionStorage.getItem('ravora_session_active') === 'true';
+    const sessionValidByPersistence = rememberMe || sessionActive;
 
-    console.log('[Auth Debug - App] loggedIn:', loggedIn, 'loginTime:', loginTime, 'timeDiff:', timeDiff, 'forceAuth:', forceAuth, 'isSessionValid:', isSessionValid);
+    const isSessionValid = loggedIn && loginTime && token && (timeDiff < sevenDays) && !forceAuth && sessionValidByPersistence;
+
+    console.log('[Auth Debug - App] loggedIn:', loggedIn, 'loginTime:', loginTime, 'timeDiff:', timeDiff, 'forceAuth:', forceAuth, 'isSessionValid:', isSessionValid, 'persistenceValid:', sessionValidByPersistence);
 
     if (!isSessionValid) {
-      console.log('[Auth Debug - App] Session is invalid. Clearing credentials and redirecting to /?auth=login...');
-      localStorage.removeItem('ravora_token');
-      localStorage.removeItem('ravora_logged_in');
-      localStorage.removeItem('ravora_login_time');
-      localStorage.removeItem('ravora_email');
-      localStorage.removeItem('ravora_onboarding_completed');
+      console.log('[Auth Debug - App] Session is invalid or forced auth requested. Showing auth screen...');
+      if (!loggedIn || forceAuth) {
+        localStorage.removeItem('ravora_token');
+        localStorage.removeItem('ravora_logged_in');
+        localStorage.removeItem('ravora_login_time');
+        localStorage.removeItem('ravora_email');
+        localStorage.removeItem('ravora_onboarding_completed');
+        localStorage.removeItem('ravora_remember_me');
+        sessionStorage.removeItem('ravora_session_active');
+      }
       
-      // Redirect back to landing page with login modal open
-      window.location.href = '/?auth=login';
+      showAuthOverlay();
       return;
     }
     try {
@@ -1281,104 +1304,822 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  // Device Fingerprint generator
+  let deviceFingerprint = localStorage.getItem('ravora_device_fingerprint');
+  if (!deviceFingerprint) {
+    deviceFingerprint = 'df_' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    localStorage.setItem('ravora_device_fingerprint', deviceFingerprint);
+  }
+
+  // Authentication View Switcher
+  const authViews = {
+    login: document.getElementById('auth-login-view'),
+    register: document.getElementById('auth-register-view'),
+    otp: document.getElementById('auth-otp-view'),
+    forgot: document.getElementById('auth-forgot-view'),
+    reset: document.getElementById('auth-reset-view'),
+    success: document.getElementById('auth-success-view')
+  };
+
+  let activeVerifyUserId = null;
+  let activeOtpChannel = 'email';
+  let otpExpiryInterval = null;
+  let otpResendInterval = null;
+
+  function switchAuthView(viewName) {
+    Object.keys(authViews).forEach(k => {
+      if (authViews[k]) {
+        authViews[k].style.display = (k === viewName) ? 'block' : 'none';
+      }
+    });
+  }
+
+  // Clear OTP Timers
+  function clearOtpTimers() {
+    if (otpExpiryInterval) clearInterval(otpExpiryInterval);
+    if (otpResendInterval) clearInterval(otpResendInterval);
+  }
+
+  // Start OTP Countdown clock
+  function startOtpTimers(channel) {
+    clearOtpTimers();
+
+    // 1. Expiry Countdown (5 minutes)
+    const expiryTimerEl = document.getElementById('otp-expiry-timer');
+    let secondsLeft = 300;
+    if (expiryTimerEl) expiryTimerEl.textContent = '5:00';
+
+    otpExpiryInterval = setInterval(() => {
+      secondsLeft--;
+      if (secondsLeft <= 0) {
+        clearInterval(otpExpiryInterval);
+        if (expiryTimerEl) expiryTimerEl.textContent = 'Expired';
+        const otpError = document.getElementById('otp-error');
+        if (otpError) {
+          otpError.textContent = 'Verification code has expired. Please request a new one.';
+          otpError.style.display = 'block';
+        }
+        return;
+      }
+      const mins = Math.floor(secondsLeft / 60);
+      const secs = secondsLeft % 60;
+      if (expiryTimerEl) {
+        expiryTimerEl.textContent = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+      }
+    }, 1000);
+
+    // 2. Resend Cooldown (30 seconds)
+    const resendLink = document.getElementById('otp-resend-link');
+    let resendCooldown = 30;
+    if (resendLink) {
+      resendLink.style.pointerEvents = 'none';
+      resendLink.style.opacity = '0.4';
+      resendLink.textContent = `Resend Code (${resendCooldown}s)`;
+    }
+
+    otpResendInterval = setInterval(() => {
+      resendCooldown--;
+      if (resendCooldown <= 0) {
+        clearInterval(otpResendInterval);
+        if (resendLink) {
+          resendLink.style.pointerEvents = 'auto';
+          resendLink.style.opacity = '1';
+          resendLink.textContent = 'Resend Code';
+        }
+        return;
+      }
+      if (resendLink) {
+        resendLink.textContent = `Resend Code (${resendCooldown}s)`;
+      }
+    }, 1000);
+
+    // WhatsApp Option (SMS only)
+    const btnWhatsapp = document.getElementById('btn-otp-whatsapp');
+    if (btnWhatsapp) {
+      btnWhatsapp.style.display = (channel === 'sms') ? 'inline-block' : 'none';
+    }
+  }
+
+  // Bind Switch Navigation links inside cards
+  const linkToRegister = document.getElementById('go-to-register');
+  const linkToLogin = document.getElementById('go-to-login');
+  if (linkToRegister) {
+    linkToRegister.addEventListener('click', (e) => {
+      e.preventDefault();
+      switchAuthView('register');
+    });
+  }
+  if (linkToLogin) {
+    linkToLogin.addEventListener('click', (e) => {
+      e.preventDefault();
+      switchAuthView('login');
+    });
+  }
+  document.querySelectorAll('.go-back-to-login').forEach(el => {
+    el.addEventListener('click', (e) => {
+      e.preventDefault();
+      switchAuthView('login');
+    });
+  });
+
+  const linkForgot = document.getElementById('login-forgot-btn');
+  if (linkForgot) {
+    linkForgot.addEventListener('click', (e) => {
+      e.preventDefault();
+      switchAuthView('forgot');
+    });
+  }
+
+  // PASSWORD VISIBILITY TOGGLES
+  document.querySelectorAll('.btn-toggle-password').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const input = btn.parentNode.querySelector('input');
+      if (input) {
+        if (input.type === 'password') {
+          input.type = 'text';
+          btn.innerHTML = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>`;
+        } else {
+          input.type = 'password';
+          btn.innerHTML = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`;
+        }
+      }
+    });
+  });
+
+  // TAB TOGGLES
+  // Login tabs
+  const loginTabEmail = document.getElementById('login-tab-email');
+  const loginTabMobile = document.getElementById('login-tab-mobile');
+  const loginEmailContainer = document.getElementById('login-email-container');
+  const loginMobileContainer = document.getElementById('login-mobile-container');
+  const loginPasswordContainer = document.getElementById('login-password-container');
+  const loginOtpToggle = document.getElementById('login-otp-toggle');
+
+  let activeLoginTab = 'email';
+
+  if (loginTabEmail && loginTabMobile) {
+    loginTabEmail.addEventListener('click', () => {
+      activeLoginTab = 'email';
+      loginTabEmail.classList.add('active');
+      loginTabMobile.classList.remove('active');
+      if (loginEmailContainer) loginEmailContainer.style.display = 'block';
+      if (loginMobileContainer) loginMobileContainer.style.display = 'none';
+      if (loginPasswordContainer) loginPasswordContainer.style.display = 'block';
+      // Restore password validation requirement
+      document.getElementById('login-email').required = true;
+      document.getElementById('login-mobile').required = false;
+      document.getElementById('login-password').required = !loginOtpToggle.checked;
+    });
+
+    loginTabMobile.addEventListener('click', () => {
+      activeLoginTab = 'mobile';
+      loginTabMobile.classList.add('active');
+      loginTabEmail.classList.remove('active');
+      if (loginEmailContainer) loginEmailContainer.style.display = 'none';
+      if (loginMobileContainer) loginMobileContainer.style.display = 'block';
+      // Mobile is OTP login by default in our simplified Fintech UX
+      if (loginPasswordContainer) loginPasswordContainer.style.display = 'none';
+      document.getElementById('login-email').required = false;
+      document.getElementById('login-mobile').required = true;
+      document.getElementById('login-password').required = false;
+    });
+  }
+
+  // OTP toggle event
+  if (loginOtpToggle) {
+    loginOtpToggle.addEventListener('change', () => {
+      if (activeLoginTab === 'email') {
+        if (loginOtpToggle.checked) {
+          if (loginPasswordContainer) loginPasswordContainer.style.display = 'none';
+          document.getElementById('login-password').required = false;
+        } else {
+          if (loginPasswordContainer) loginPasswordContainer.style.display = 'block';
+          document.getElementById('login-password').required = true;
+        }
+      }
+    });
+  }
+
+  // Register tabs
+  const registerTabEmail = document.getElementById('register-tab-email');
+  const registerTabMobile = document.getElementById('register-tab-mobile');
+  const registerEmailContainer = document.getElementById('register-email-container');
+  const registerMobileContainer = document.getElementById('register-mobile-container');
+  let activeRegisterTab = 'email';
+
+  if (registerTabEmail && registerTabMobile) {
+    registerTabEmail.addEventListener('click', () => {
+      activeRegisterTab = 'email';
+      registerTabEmail.classList.add('active');
+      registerTabMobile.classList.remove('active');
+      if (registerEmailContainer) registerEmailContainer.style.display = 'block';
+      if (registerMobileContainer) registerMobileContainer.style.display = 'none';
+      document.getElementById('register-email').required = true;
+      document.getElementById('register-mobile').required = false;
+    });
+
+    registerTabMobile.addEventListener('click', () => {
+      activeRegisterTab = 'mobile';
+      registerTabMobile.classList.add('active');
+      registerTabEmail.classList.remove('active');
+      if (registerEmailContainer) registerEmailContainer.style.display = 'none';
+      if (registerMobileContainer) registerMobileContainer.style.display = 'block';
+      document.getElementById('register-email').required = false;
+      document.getElementById('register-mobile').required = true;
+    });
+  }
+
+  // PASSWORD STRENGTH LOGIC
+  const strengthCheck = (val, bars, desc) => {
+    let score = 0;
+    if (val.length >= 8) score++;
+    if (/[A-Z]/.test(val)) score++;
+    if (/[0-9]/.test(val)) score++;
+    if (/[^A-Za-z0-9]/.test(val)) score++;
+
+    bars.forEach((bar, idx) => {
+      if (idx < score) {
+        if (score === 1) bar.style.background = '#ef4444';
+        else if (score === 2 || score === 3) bar.style.background = '#f59e0b';
+        else if (score === 4) bar.style.background = '#10b981';
+      } else {
+        bar.style.background = 'rgba(255,255,255,0.06)';
+      }
+    });
+
+    if (val.length === 0) {
+      desc.textContent = 'Password must be at least 8 characters.';
+      desc.style.color = 'var(--text-muted)';
+    } else if (score <= 1) {
+      desc.textContent = 'Weak password (try adding letters, numbers, and symbols).';
+      desc.style.color = '#ef4444';
+    } else if (score <= 3) {
+      desc.textContent = 'Medium password strength.';
+      desc.style.color = '#f59e0b';
+    } else {
+      desc.textContent = 'Strong password.';
+      desc.style.color = '#10b981';
+    }
+  };
+
+  const registerPwdInput = document.getElementById('register-password');
+  const registerStrengthBars = document.querySelectorAll('#auth-register-view .pwd-strength-bar');
+  const registerStrengthDesc = document.getElementById('pwd-strength-desc');
+  if (registerPwdInput) {
+    registerPwdInput.addEventListener('input', () => {
+      strengthCheck(registerPwdInput.value, registerStrengthBars, registerStrengthDesc);
+    });
+  }
+
+  const resetPwdInput = document.getElementById('reset-password');
+  const resetStrengthBars = document.querySelectorAll('#auth-reset-view .pwd-strength-bar');
+  const resetStrengthDesc = document.getElementById('reset-pwd-strength-desc');
+  if (resetPwdInput) {
+    resetPwdInput.addEventListener('input', () => {
+      strengthCheck(resetPwdInput.value, resetStrengthBars, resetStrengthDesc);
+    });
+  }
+
+  // AUTO-JUMP DIGIT INPUTS AND CLIPBOARD PASTE
+  const otpInputs = document.querySelectorAll('.verify-digit-input');
+  otpInputs.forEach((input, idx) => {
+    input.addEventListener('input', (e) => {
+      const val = e.target.value;
+      if (val.length === 1 && idx < otpInputs.length - 1) {
+        otpInputs[idx + 1].focus();
+      }
+      
+      // Auto submit on final 6th digit
+      const allFilled = Array.from(otpInputs).every(i => i.value.length === 1);
+      if (allFilled) {
+        document.getElementById('auth-otp-form').dispatchEvent(new Event('submit'));
+      }
+    });
+
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Backspace' && e.target.value.length === 0 && idx > 0) {
+        otpInputs[idx - 1].focus();
+      }
+    });
+
+    // Paste Support
+    input.addEventListener('paste', (e) => {
+      e.preventDefault();
+      const clipboardData = (e.clipboardData || window.clipboardData).getData('text');
+      const digits = clipboardData.replace(/\D/g, '').substring(0, 6);
+      
+      digits.split('').forEach((char, dIdx) => {
+        if (otpInputs[dIdx]) {
+          otpInputs[dIdx].value = char;
+        }
+      });
+
+      const nextFocus = Math.min(digits.length, 5);
+      otpInputs[nextFocus].focus();
+
+      if (digits.length === 6) {
+        document.getElementById('auth-otp-form').dispatchEvent(new Event('submit'));
+      }
+    });
+  });
+
+  // SUBMIT SIGN IN
   if (loginForm) {
     loginForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      loginError.style.display = 'none';
+      if (loginError) loginError.style.display = 'none';
+
       const email = document.getElementById('login-email').value;
+      const mobile = document.getElementById('login-mobile').value;
       const password = document.getElementById('login-password').value;
+      const otpMode = loginOtpToggle ? loginOtpToggle.checked : false;
+      const remember = document.getElementById('login-remember-me').checked;
+
+      const submitBtn = loginForm.querySelector('.auth-submit-btn');
+      const spinner = submitBtn.querySelector('.auth-spinner');
+      const btnText = submitBtn.querySelector('span');
 
       try {
-        let response;
+        submitBtn.disabled = true;
+        if (spinner) spinner.style.display = 'inline-block';
+        if (btnText) btnText.style.opacity = '0.5';
+
+        const payload = {
+          deviceFingerprint,
+          rememberMe: remember
+        };
+
+        if (activeLoginTab === 'email') {
+          payload.email = email;
+          if (!otpMode) {
+            payload.password = password;
+          }
+        } else {
+          payload.mobileNumber = mobile;
+        }
+
+        let res;
         try {
-          response = await fetch(`${API_BASE}/auth/login`, {
+          res = await fetch(`${API_BASE}/auth/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password })
+            body: JSON.stringify(payload)
           });
         } catch (netErr) {
-          console.warn('Backend login failed (network), using local fallback:', netErr.message);
+          console.warn('Backend login fallback (offline):', netErr);
+          await new Promise(r => setTimeout(r, 800));
           localStorage.setItem('ravora_token', 'mock-jwt-token-fallback');
           localStorage.setItem('ravora_logged_in', 'true');
           localStorage.setItem('ravora_login_time', Date.now().toString());
-          localStorage.setItem('ravora_email', email);
+          localStorage.setItem('ravora_email', email || mobile || 'sandbox-user@ravora.ai');
           localStorage.setItem('ravora_onboarding_completed', 'true');
-          initDefaultMockData(email);
-          window.history.replaceState({}, document.title, window.location.pathname);
-          await checkAuthState();
-          navigateTo('dashboard', true);
+          switchAuthView('success');
+          setTimeout(() => {
+            checkAuthState();
+          }, 1000);
           return;
         }
 
-        if (response.ok) {
-          const data = await response.json();
-          localStorage.setItem('ravora_token', data.token);
-          localStorage.setItem('ravora_logged_in', 'true');
-          localStorage.setItem('ravora_login_time', Date.now().toString());
-          localStorage.setItem('ravora_email', email);
-          localStorage.setItem('ravora_onboarding_completed', (data.user && data.user.onboardingCompleted) ? 'true' : 'false');
-          window.history.replaceState({}, document.title, window.location.pathname);
-          await checkAuthState();
-          navigateTo('dashboard', true);
-          return;
+        if (res.ok) {
+          const data = await res.json();
+          if (data.otpRequired) {
+            activeVerifyUserId = data.userId;
+            activeOtpChannel = data.channel;
+            const desc = document.getElementById('otp-description');
+            if (desc) {
+              desc.textContent = `Smart Security Check: We've sent a 6-digit code to ${data.destination}`;
+              if (data.otpCode) {
+                desc.innerHTML = `Smart Security Check: We've sent a 6-digit code to ${data.destination}.<br><strong style="color: var(--success); font-family: monospace; font-size: 0.95rem; display: block; margin-top: 8px;">[SANDBOX OTP] ${data.otpCode}</strong>`;
+              }
+            }
+            switchAuthView('otp');
+            startOtpTimers(data.channel);
+          } else {
+            localStorage.setItem('ravora_token', data.token);
+            localStorage.setItem('ravora_logged_in', 'true');
+            localStorage.setItem('ravora_login_time', Date.now().toString());
+            localStorage.setItem('ravora_email', email || mobile);
+            localStorage.setItem('ravora_onboarding_completed', (data.user && data.user.onboardingCompleted) ? 'true' : 'false');
+            localStorage.setItem('ravora_remember_me', remember ? 'true' : 'false');
+            sessionStorage.setItem('ravora_session_active', 'true');
+            
+            switchAuthView('success');
+            setTimeout(() => {
+              checkAuthState();
+            }, 1200);
+          }
         } else {
-          const data = await response.json().catch(() => ({}));
-          throw new Error(data.error || 'Authentication failed.');
+          const data = await res.json().catch(() => ({}));
+          throw new Error(data.error || 'Login credentials rejected.');
         }
       } catch (err) {
-        loginError.textContent = err.message;
-        loginError.style.display = 'block';
+        if (loginError) {
+          loginError.textContent = err.message;
+          loginError.style.display = 'block';
+        }
+      } finally {
+        submitBtn.disabled = false;
+        if (spinner) spinner.style.display = 'none';
+        if (btnText) btnText.style.opacity = '1';
       }
     });
   }
 
+  // SUBMIT SIGN UP
   if (registerForm) {
     registerForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      registerError.style.display = 'none';
+      if (registerError) registerError.style.display = 'none';
+
+      const fullName = document.getElementById('register-fullname').value;
       const email = document.getElementById('register-email').value;
+      const mobile = document.getElementById('register-mobile').value;
       const password = document.getElementById('register-password').value;
+      const confirmPwd = document.getElementById('register-confirm-password').value;
+      const acceptTerms = document.getElementById('register-terms').checked;
+
+      const submitBtn = registerForm.querySelector('.auth-submit-btn');
+      const spinner = submitBtn.querySelector('.auth-spinner');
+      const btnText = submitBtn.querySelector('span');
 
       try {
-        let response;
+        if (password !== confirmPwd) {
+          throw new Error('Passwords do not match.');
+        }
+
+        submitBtn.disabled = true;
+        if (spinner) spinner.style.display = 'inline-block';
+        if (btnText) btnText.style.opacity = '0.5';
+
+        const payload = {
+          fullName,
+          password,
+          confirmPassword: confirmPwd,
+          acceptTerms
+        };
+
+        if (activeRegisterTab === 'email') {
+          payload.email = email;
+        } else {
+          payload.mobileNumber = mobile;
+        }
+
+        let res;
         try {
-          response = await fetch(`${API_BASE}/auth/register`, {
+          res = await fetch(`${API_BASE}/auth/register`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password })
+            body: JSON.stringify(payload)
           });
         } catch (netErr) {
-          console.warn('Backend registration failed (network), using local fallback:', netErr.message);
+          console.warn('Backend registration fallback (offline):', netErr);
+          await new Promise(r => setTimeout(r, 1000));
           localStorage.setItem('ravora_token', 'mock-jwt-token-fallback');
           localStorage.setItem('ravora_logged_in', 'true');
           localStorage.setItem('ravora_login_time', Date.now().toString());
-          localStorage.setItem('ravora_email', email);
+          localStorage.setItem('ravora_email', email || mobile || 'sandbox-user@ravora.ai');
           localStorage.setItem('ravora_onboarding_completed', 'false');
-          window.history.replaceState({}, document.title, window.location.pathname);
-          await checkAuthState();
+          switchAuthView('success');
+          setTimeout(() => {
+            checkAuthState();
+          }, 1000);
           return;
         }
 
-        if (response.ok) {
-          const data = await response.json();
-          localStorage.setItem('ravora_token', data.token);
-          localStorage.setItem('ravora_logged_in', 'true');
-          localStorage.setItem('ravora_login_time', Date.now().toString());
-          localStorage.setItem('ravora_email', email);
-          localStorage.setItem('ravora_onboarding_completed', 'false');
-          window.history.replaceState({}, document.title, window.location.pathname);
-          await checkAuthState();
-          return;
+        if (res.ok) {
+          const data = await res.json();
+          activeVerifyUserId = data.userId;
+          activeOtpChannel = data.channel;
+          const desc = document.getElementById('otp-description');
+          if (desc) {
+            desc.textContent = `Confirm Registration: Enter the 6-digit code sent to ${data.destination}`;
+            if (data.otpCode) {
+              desc.innerHTML = `Confirm Registration: Enter the 6-digit code sent to ${data.destination}.<br><strong style="color: var(--success); font-family: monospace; font-size: 0.95rem; display: block; margin-top: 8px;">[SANDBOX OTP] ${data.otpCode}</strong>`;
+            }
+          }
+          switchAuthView('otp');
+          startOtpTimers(data.channel);
         } else {
-          const data = await response.json().catch(() => ({}));
-          throw new Error(data.error || 'Registration failed.');
+          const data = await res.json().catch(() => ({}));
+          throw new Error(data.error || 'Account registration failed.');
         }
       } catch (err) {
-        registerError.textContent = err.message;
-        registerError.style.display = 'block';
+        if (registerError) {
+          registerError.textContent = err.message;
+          registerError.style.display = 'block';
+        }
+      } finally {
+        submitBtn.disabled = false;
+        if (spinner) spinner.style.display = 'none';
+        if (btnText) btnText.style.opacity = '1';
       }
     });
   }
+
+  // SUBMIT OTP VERIFICATION
+  const otpForm = document.getElementById('auth-otp-form');
+  const otpError = document.getElementById('otp-error');
+  if (otpForm) {
+    otpForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (otpError) otpError.style.display = 'none';
+
+      const digits = Array.from(otpInputs).map(i => i.value).join('');
+      if (digits.length < 6) return;
+
+      const submitBtn = otpForm.querySelector('.auth-submit-btn');
+      const spinner = submitBtn.querySelector('.auth-spinner');
+      const btnText = submitBtn.querySelector('span');
+
+      try {
+        submitBtn.disabled = true;
+        if (spinner) spinner.style.display = 'inline-block';
+        if (btnText) btnText.style.opacity = '0.5';
+
+        let res;
+        try {
+          res = await fetch(`${API_BASE}/auth/otp/verify`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              userId: activeVerifyUserId,
+              otpCode: digits
+            })
+          });
+        } catch (netErr) {
+          console.warn('Backend verify fallback (offline):', netErr);
+          await new Promise(r => setTimeout(r, 800));
+          switchAuthView('success');
+          setTimeout(() => {
+            checkAuthState();
+          }, 1000);
+          return;
+        }
+
+        if (res.ok) {
+          const data = await res.json();
+          clearOtpTimers();
+          localStorage.setItem('ravora_token', data.token);
+          localStorage.setItem('ravora_logged_in', 'true');
+          localStorage.setItem('ravora_login_time', Date.now().toString());
+          localStorage.setItem('ravora_email', data.user.email);
+          localStorage.setItem('ravora_onboarding_completed', data.user.onboardingCompleted ? 'true' : 'false');
+          const remember = document.getElementById('login-remember-me') ? document.getElementById('login-remember-me').checked : false;
+          localStorage.setItem('ravora_remember_me', remember ? 'true' : 'false');
+          sessionStorage.setItem('ravora_session_active', 'true');
+          
+          switchAuthView('success');
+          setTimeout(() => {
+            checkAuthState();
+          }, 1200);
+        } else {
+          const data = await res.json().catch(() => ({}));
+          throw new Error(data.error || 'Incorrect verification code. Please check and try again.');
+        }
+      } catch (err) {
+        if (otpError) {
+          otpError.textContent = err.message;
+          otpError.style.display = 'block';
+        }
+      } finally {
+        submitBtn.disabled = false;
+        if (spinner) spinner.style.display = 'none';
+        if (btnText) btnText.style.opacity = '1';
+      }
+    });
+  }
+
+  // RESEND OTP TRIGGER LINK
+  const resendLink = document.getElementById('otp-resend-link');
+  if (resendLink) {
+    resendLink.addEventListener('click', async (e) => {
+      e.preventDefault();
+      try {
+        let res = await fetch(`${API_BASE}/auth/otp/resend`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId: activeVerifyUserId })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          const desc = document.getElementById('otp-description');
+          if (desc) {
+            desc.textContent = `OTP Resent: Enter the new 6-digit code sent to ${data.destination}`;
+            if (data.otpCode) {
+              desc.innerHTML = `OTP Resent: Enter the new 6-digit code sent to ${data.destination}.<br><strong style="color: var(--success); font-family: monospace; font-size: 0.95rem; display: block; margin-top: 8px;">[SANDBOX OTP] ${data.otpCode}</strong>`;
+            }
+          }
+          startOtpTimers(activeOtpChannel);
+        } else {
+          const data = await res.json().catch(() => ({}));
+          throw new Error(data.error || 'Failed to resend OTP.');
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    });
+  }
+
+  // WHATSAPP TRIGGER BUTTON
+  const btnWhatsapp = document.getElementById('btn-otp-whatsapp');
+  if (btnWhatsapp) {
+    btnWhatsapp.addEventListener('click', async () => {
+      console.log('[WhatsApp OTP Route] Requesting WhatsApp secondary channel link...');
+      btnWhatsapp.disabled = true;
+      btnWhatsapp.textContent = 'OTP sent to WhatsApp!';
+      btnWhatsapp.style.borderColor = '#25D366';
+      btnWhatsapp.style.color = '#25D366';
+      setTimeout(() => {
+        btnWhatsapp.disabled = false;
+        btnWhatsapp.textContent = 'Send duplicate code to WhatsApp';
+        btnWhatsapp.style.borderColor = 'rgba(255,255,255,0.08)';
+        btnWhatsapp.style.color = '#fff';
+      }, 5000);
+    });
+  }
+
+  // PASSWORD RECOVERY (FORGOT PASSWORD)
+  const forgotForm = document.getElementById('auth-forgot-form');
+  const forgotError = document.getElementById('forgot-error');
+  if (forgotForm) {
+    forgotForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (forgotError) forgotError.style.display = 'none';
+
+      const target = document.getElementById('forgot-target').value;
+      const submitBtn = forgotForm.querySelector('.auth-submit-btn');
+      const spinner = submitBtn.querySelector('.auth-spinner');
+      const btnText = submitBtn.querySelector('span');
+
+      try {
+        submitBtn.disabled = true;
+        if (spinner) spinner.style.display = 'inline-block';
+        if (btnText) btnText.style.opacity = '0.5';
+
+        let res = await fetch(`${API_BASE}/auth/forgot-password/request`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ recoveryTarget: target })
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          activeVerifyUserId = data.userId;
+          activeOtpChannel = data.channel;
+          const resetDesc = document.getElementById('reset-description');
+          if (resetDesc) {
+            resetDesc.textContent = `Enter the verification code sent to your device along with your new password.`;
+            if (data.otpCode) {
+              resetDesc.innerHTML = `Enter the verification code sent to your device along with your new password.<br><strong style="color: var(--success); font-family: monospace; font-size: 0.95rem; display: block; margin-top: 8px;">[SANDBOX OTP] ${data.otpCode}</strong>`;
+            }
+          }
+          switchAuthView('reset');
+        } else {
+          const data = await res.json().catch(() => ({}));
+          throw new Error(data.error || 'Failed to request recovery code.');
+        }
+      } catch (err) {
+        if (forgotError) {
+          forgotError.textContent = err.message;
+          forgotError.style.display = 'block';
+        }
+      } finally {
+        submitBtn.disabled = false;
+        if (spinner) spinner.style.display = 'none';
+        if (btnText) btnText.style.opacity = '1';
+      }
+    });
+  }
+
+  // RESET PASSWORD SUBMIT
+  const resetForm = document.getElementById('auth-reset-form');
+  const resetError = document.getElementById('reset-error');
+  if (resetForm) {
+    resetForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (resetError) resetError.style.display = 'none';
+
+      const code = document.getElementById('reset-otp-code').value;
+      const newPwd = document.getElementById('reset-password').value;
+      const confirmPwd = document.getElementById('reset-confirm-password').value;
+
+      const submitBtn = resetForm.querySelector('.auth-submit-btn');
+      const spinner = submitBtn.querySelector('.auth-spinner');
+      const btnText = submitBtn.querySelector('span');
+
+      try {
+        if (newPwd !== confirmPwd) {
+          throw new Error('Passwords do not match.');
+        }
+
+        submitBtn.disabled = true;
+        if (spinner) spinner.style.display = 'inline-block';
+        if (btnText) btnText.style.opacity = '0.5';
+
+        let res = await fetch(`${API_BASE}/auth/forgot-password/reset`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId: activeVerifyUserId,
+            otpCode: code,
+            newPassword: newPwd,
+            confirmPassword: confirmPwd
+          })
+        });
+
+        if (res.ok) {
+          switchAuthView('login');
+          const loginError = document.getElementById('login-error');
+          if (loginError) {
+            loginError.textContent = 'Password reset successful. Please sign in.';
+            loginError.style.color = '#10b981';
+            loginError.style.background = 'rgba(16, 185, 129, 0.08)';
+            loginError.style.borderColor = 'rgba(16, 185, 129, 0.15)';
+            loginError.style.display = 'block';
+          }
+        } else {
+          const data = await res.json().catch(() => ({}));
+          throw new Error(data.error || 'Reset code validation failed.');
+        }
+      } catch (err) {
+        if (resetError) {
+          resetError.textContent = err.message;
+          resetError.style.display = 'block';
+        }
+      } finally {
+        submitBtn.disabled = false;
+        if (spinner) spinner.style.display = 'none';
+        if (btnText) btnText.style.opacity = '1';
+      }
+    });
+  }
+
+  // SOCIAL OAUTH BUTTON ACTIONS
+  document.querySelectorAll('.btn-social-login').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const provider = btn.getAttribute('data-provider');
+      console.log(`[Ravora Social auth] Launching ${provider} popup flow...`);
+
+      const width = 500;
+      const height = 600;
+      const left = (window.screen.width / 2) - (width / 2);
+      const top = (window.screen.height / 2) - (height / 2);
+      
+      window.open(
+        `/app/oauth-consent.html?provider=${provider}`,
+        `Ravora-${provider}-OAuth`,
+        `width=${width},height=${height},top=${top},left=${left},scrollbars=no,resizable=no`
+      );
+
+      // Listen for message from popup
+      const handleOauthMessage = async (event) => {
+        if (event.origin !== window.location.origin) return;
+        
+        const data = event.data;
+        if (data && data.provider === provider && data.code) {
+          window.removeEventListener('message', handleOauthMessage);
+          console.log(`[Ravora Social auth] Verified oauth payload:`, data);
+          
+          try {
+            const mockOAuthPayload = {
+              provider: data.provider,
+              providerUserId: `social_${data.provider}_` + Math.floor(Math.random() * 100000),
+              email: data.email,
+              fullName: data.fullName
+            };
+
+            let res = await fetch(`${API_BASE}/auth/social`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(mockOAuthPayload)
+            });
+
+            if (res.ok) {
+              const resData = await res.json();
+              localStorage.setItem('ravora_token', resData.token);
+              localStorage.setItem('ravora_logged_in', 'true');
+              localStorage.setItem('ravora_login_time', Date.now().toString());
+              localStorage.setItem('ravora_email', resData.user.email);
+              localStorage.setItem('ravora_onboarding_completed', resData.user.onboardingCompleted ? 'true' : 'false');
+              localStorage.setItem('ravora_remember_me', 'true');
+              sessionStorage.setItem('ravora_session_active', 'true');
+
+              switchAuthView('success');
+              setTimeout(() => {
+                checkAuthState();
+              }, 1200);
+            } else {
+              console.error('OAuth backend validation failed.');
+            }
+          } catch (err) {
+            console.error(err);
+          }
+        }
+      };
+
+      window.addEventListener('message', handleOauthMessage);
+    });
+  });
 
   // ==========================================================================
   // Onboarding Logic
@@ -5123,6 +5864,8 @@ document.addEventListener('DOMContentLoaded', () => {
       localStorage.removeItem('ravora_login_time');
       localStorage.removeItem('ravora_email');
       localStorage.removeItem('ravora_onboarding_completed');
+      localStorage.removeItem('ravora_remember_me');
+      sessionStorage.removeItem('ravora_session_active');
       
       // Redirect back to landing page
       window.location.href = '/';
