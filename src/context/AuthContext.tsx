@@ -23,7 +23,7 @@ interface AuthContextType {
   updateOnboardingCompletedState: (completed: boolean) => void;
   forgotPassword: (email: string) => Promise<{ success: boolean; error?: string }>;
   resetPassword: (password: string) => Promise<{ success: boolean; error?: string }>;
-  signInWithOAuth: (provider: 'google' | 'github' | 'apple') => Promise<{ success: boolean; error?: string }>;
+  signInWithOAuth: (provider: 'google' | 'github' | 'twitter') => Promise<{ success: boolean; error?: string }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -292,7 +292,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const signInWithOAuth = async (provider: 'google' | 'github' | 'apple') => {
+  const signInWithOAuth = async (provider: 'google' | 'github' | 'twitter') => {
     try {
       const { error } = await supabase.auth.signInWithOAuth({
         provider,
