@@ -20,7 +20,6 @@ import {
   HelpCircle,
 } from 'lucide-react';
 import AuthSwitch from './auth-switch';
-import Demo from './demo';
 
 // Validation Schemas
 const emailOrPhoneSchema = z.string().min(1, 'Email or phone number is required').refine(
@@ -341,14 +340,14 @@ export const AuthCardPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen w-full bg-[#060B17] text-white flex flex-col lg:flex-row relative overflow-hidden font-body">
+    <div className="h-screen w-full bg-[#060B17] text-white flex flex-col lg:flex-row relative overflow-hidden font-body">
       
       {/* Background ambient lighting */}
       <div className="absolute top-[20%] left-[10%] w-[350px] h-[350px] bg-[#4F7CFF]/5 rounded-full blur-[120px] pointer-events-none" />
       <div className="absolute bottom-[20%] right-[10%] w-[400px] h-[400px] bg-[#7A5AF8]/5 rounded-full blur-[120px] pointer-events-none" />
 
       {/* LEFT STORY PANEL (Hidden on mobile/tablet) */}
-      <div className="hidden lg:flex w-[48%] min-h-screen bg-gradient-to-br from-[#060B17] via-[#080E1E] to-[#0A142C] border-r border-white/5 flex-col justify-between p-16 relative overflow-hidden">
+      <div className="hidden lg:flex w-[48%] h-full bg-gradient-to-br from-[#060B17] via-[#080E1E] to-[#0A142C] border-r border-white/5 flex-col justify-between p-12 relative overflow-hidden">
         {/* Subtle grid pattern */}
         <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-[size:32px_32px] [mask-image:radial-gradient(ellipse_at_center,black_70%,transparent_100%)] pointer-events-none" />
         
@@ -424,7 +423,7 @@ export const AuthCardPage: React.FC = () => {
       </div>
 
       {/* RIGHT AUTHENTICATION CARD PANEL */}
-      <div className="flex-1 flex flex-col justify-center items-center p-6 lg:p-12 min-h-screen relative z-10">
+      <div className="flex-1 flex flex-col justify-center items-center p-4 lg:p-6 h-full overflow-y-auto relative z-10">
         
         {/* Mobile Header Logo */}
         <div className="lg:hidden flex items-center gap-2.5 mb-8">
@@ -435,7 +434,7 @@ export const AuthCardPage: React.FC = () => {
         </div>
 
         {/* Main Glassmorphic Wrapper */}
-        <div className="max-w-[480px] w-full bg-[#0F172A]/70 backdrop-blur-xl border border-white/10 rounded-3xl p-8 lg:p-10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] transition-all duration-300">
+        <div className="max-w-[440px] w-full bg-[#0F172A]/70 backdrop-blur-xl border border-white/10 rounded-2xl p-6 lg:p-8 shadow-[0_20px_50px_rgba(0,0,0,0.5)] transition-all duration-300">
           
           {/* Mode Switch Tab Bar */}
           {mode !== 'forgot' && mode !== 'reset' && mode !== 'otp' && (
@@ -912,9 +911,6 @@ export const AuthCardPage: React.FC = () => {
           )}
 
         </div>
-
-        {/* Developer Quick-Access Autofill (Visible only in dev/test/sandbox mode) */}
-        <Demo onSelectDemoUser={handleAutofillDemo} isLoading={isSubmitting} />
 
       </div>
     </div>
