@@ -89,7 +89,7 @@ const getErrorMessage = (err: any): string => {
 export const AuthCardPage: React.FC = () => {
   const { login, register, forgotPassword, resetPassword, signInWithOAuth, verifyOtpCode, supabaseClient } = useAuth();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const resetMode = searchParams.get('mode') === 'reset';
   const paramMode = searchParams.get('mode');
   const initialMode = paramMode === 'register' ? 'register' : (paramMode === 'login' ? 'login' : (resetMode ? 'reset' : 'login'));
@@ -99,12 +99,22 @@ export const AuthCardPage: React.FC = () => {
     initialMode
   );
 
+  const changeMode = (newMode: 'login' | 'register' | 'forgot' | 'reset' | 'otp') => {
+    setMode(newMode);
+    setServerError(null);
+    if (newMode === 'login' || newMode === 'register' || newMode === 'reset') {
+      setSearchParams({ mode: newMode });
+    }
+  };
+
   useEffect(() => {
     const m = searchParams.get('mode');
     if (m === 'register' || m === 'login' || m === 'reset') {
       setMode(m as any);
     }
   }, [searchParams]);
+
+
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -340,7 +350,7 @@ export const AuthCardPage: React.FC = () => {
   };
 
   return (
-    <div className="h-screen w-full bg-[#060B17] text-white flex flex-col lg:flex-row relative overflow-hidden font-body">
+    <div className="fixed inset-0 w-full h-full bg-[#060B17] text-white flex flex-col lg:flex-row overflow-hidden font-body">
       
       {/* Background ambient lighting */}
       <div className="absolute top-[20%] left-[10%] w-[350px] h-[350px] bg-[#4F7CFF]/5 rounded-full blur-[120px] pointer-events-none" />
@@ -439,7 +449,7 @@ export const AuthCardPage: React.FC = () => {
           {/* Mode Switch Tab Bar */}
           {mode !== 'forgot' && mode !== 'reset' && mode !== 'otp' && (
             <div className="mb-8">
-              <AuthSwitch mode={mode} onChange={(newMode) => { setMode(newMode as any); setServerError(null); }} />
+              <AuthSwitch mode={mode} onChange={(newMode) => changeMode(newMode)} />
             </div>
           )}
 
@@ -512,7 +522,7 @@ export const AuthCardPage: React.FC = () => {
                   <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest">Password</label>
                   <button
                     type="button"
-                    onClick={() => setMode('forgot')}
+                    onClick={() => changeMode('forgot')}
                     className="text-[10px] font-semibold text-[#4F7CFF] hover:underline"
                   >
                     Forgot Password?
@@ -563,6 +573,17 @@ export const AuthCardPage: React.FC = () => {
                   'Launch Adviser'
                 )}
               </button>
+              
+              <div className="text-center text-xs text-slate-400 mt-4">
+                Don't have an account?{' '}
+                <button
+                  type="button"
+                  onClick={() => changeMode('register')}
+                  className="text-[#4F7CFF] hover:underline font-semibold bg-transparent border-none p-0 cursor-pointer"
+                >
+                  Register here
+                </button>
+              </div>
             </form>
           )}
 
@@ -701,6 +722,17 @@ export const AuthCardPage: React.FC = () => {
                   'Create Account'
                 )}
               </button>
+              
+              <div className="text-center text-xs text-slate-400 mt-4">
+                Already have an account?{' '}
+                <button
+                  type="button"
+                  onClick={() => changeMode('login')}
+                  className="text-[#4F7CFF] hover:underline font-semibold bg-transparent border-none p-0 cursor-pointer"
+                >
+                  Sign In here
+                </button>
+              </div>
             </form>
           )}
 
@@ -852,7 +884,7 @@ export const AuthCardPage: React.FC = () => {
 
               <button
                 type="button"
-                onClick={() => { setMode('login'); setServerError(null); setOtpCodeValue(''); }}
+                onClick={() => { changeMode('login'); setOtpCodeValue(''); }}
                 className="w-full text-center text-xs font-bold text-slate-400 hover:text-white transition-colors duration-200 mt-2 block"
               >
                 Back to Sign In
