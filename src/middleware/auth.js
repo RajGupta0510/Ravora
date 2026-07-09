@@ -28,6 +28,14 @@ export const verifyToken = async (req, res, next) => {
       const phone = user.phone || null;
       const fullName = user.user_metadata?.full_name || 'Ravora Member';
 
+      // Clear any conflicting stale accounts with the same email/phone to prevent constraint failures
+      if (email || phone) {
+        await dbRun(
+          'DELETE FROM users WHERE (email = ? AND ? IS NOT NULL) OR (mobile_number = ? AND ? IS NOT NULL)',
+          [email, email, phone, phone]
+        );
+      }
+
       // Insert user
       await dbRun(
         'INSERT OR IGNORE INTO users (id, email, mobile_number, full_name, password_hash) VALUES (?, ?, ?, ?, ?)',

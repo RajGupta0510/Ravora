@@ -23,15 +23,24 @@ import AuthSwitch from './auth-switch';
 import Demo from './demo';
 
 // Validation Schemas
+const emailOrPhoneSchema = z.string().min(1, 'Email or phone number is required').refine(
+  (val) => {
+    const isEmail = z.string().email().safeParse(val).success;
+    const isPhone = /^\+?[0-9\s\-()]{7,15}$/.test(val.trim());
+    return isEmail || isPhone;
+  },
+  { message: 'Invalid email address or phone number (e.g. +1234567890)' }
+);
+
 const loginSchema = z.object({
-  email: z.string().min(1, 'Email is required').email('Invalid email address'),
+  email: emailOrPhoneSchema,
   password: z.string().min(8, 'Password must be at least 8 characters'),
   rememberMe: z.boolean().default(true),
 });
 
 const signupSchema = z.object({
   fullName: z.string().min(2, 'Name must be at least 2 characters'),
-  email: z.string().min(1, 'Email is required').email('Invalid email address'),
+  email: emailOrPhoneSchema,
   password: z.string()
     .min(8, 'Password must be at least 8 characters')
     .refine((val) => /[A-Z]/.test(val), { message: 'Must contain an uppercase letter' })
@@ -47,7 +56,7 @@ const signupSchema = z.object({
 });
 
 const forgotSchema = z.object({
-  email: z.string().min(1, 'Email is required').email('Invalid email address'),
+  email: emailOrPhoneSchema,
 });
 
 const resetSchema = z.object({
@@ -104,6 +113,7 @@ export const AuthCardPage: React.FC = () => {
 
   // OTP Verification States
   const [otpTarget, setOtpTarget] = useState('');
+  const [isOtpPhone, setIsOtpPhone] = useState(false);
   const [otpUserId, setOtpUserId] = useState('');
   const [otpCodeValue, setOtpCodeValue] = useState('');
   const [sandboxOtp, setSandboxOtp] = useState<string | null>(null);
@@ -163,13 +173,15 @@ export const AuthCardPage: React.FC = () => {
     setIsSubmitting(true);
     setServerError(null);
     try {
-      const res = await login(values.email, false, false, values.password, values.rememberMe);
+      const isPhone = /^\+?[0-9\s\-()]{7,15}$/.test(values.email.trim());
+      const res = await login(values.email, isPhone, false, values.password, values.rememberMe);
       if (res.success) {
         if (res.otpRequired) {
           setOtpTarget(values.email);
+          setIsOtpPhone(isPhone);
           setOtpUserId(res.userId || '');
           setSandboxOtp(res.otpCode || null);
-          toast.success('Security Verification Required', { description: 'Please enter the 6-digit access code sent to your email.' });
+          toast.success('Security Verification Required', { description: `Please enter the 6-digit access code sent to your ${isPhone ? 'phone' : 'email'}.` });
           if (res.otpCode) {
             toast.info(`Sandbox Developer Mode: Auto-generated OTP code is ${res.otpCode}`, { duration: 15000 });
           }
@@ -192,13 +204,15 @@ export const AuthCardPage: React.FC = () => {
     setIsSubmitting(true);
     setServerError(null);
     try {
-      const res = await register(values.fullName, values.email, false, values.password, values.confirmPassword);
+      const isPhone = /^\+?[0-9\s\-()]{7,15}$/.test(values.email.trim());
+      const res = await register(values.fullName, values.email, isPhone, values.password, values.confirmPassword);
       if (res.success) {
         if (res.otpRequired) {
           setOtpTarget(values.email);
+          setIsOtpPhone(isPhone);
           setOtpUserId(res.userId || '');
           setSandboxOtp(res.otpCode || null);
-          toast.success('Account Created', { description: 'Please enter the 6-digit access code sent to your email.' });
+          toast.success('Account Created', { description: `Please enter the 6-digit access code sent to your ${isPhone ? 'phone' : 'email'}.` });
           if (res.otpCode) {
             toast.info(`Sandbox Developer Mode: Auto-generated OTP code is ${res.otpCode}`, { duration: 15000 });
           }
@@ -227,7 +241,7 @@ export const AuthCardPage: React.FC = () => {
     setServerError(null);
     try {
       const rememberMe = loginForm.getValues('rememberMe') ?? true;
-      const res = await verifyOtpCode(otpTarget, false, otpCodeValue, otpUserId, rememberMe);
+      const res = await verifyOtpCode(otpTarget, isOtpPhone, otpCodeValue, otpUserId, rememberMe);
       if (res.success) {
         toast.success('Verification Successful', { description: 'Welcome to Ravora OS!' });
         navigate('/dashboard');
@@ -263,6 +277,12 @@ export const AuthCardPage: React.FC = () => {
     setIsSubmitting(true);
     setServerError(null);
     try {
+      const isPhone = /^\+?[0-9\s\-()]{7,15}$/.test(values.email.trim());
+      if (isPhone) {
+        setServerError('Password recovery is only supported for email addresses. For phone numbers, please sign in using OTP.');
+        setIsSubmitting(false);
+        return;
+      }
       const res = await forgotPassword(values.email);
       if (res.success) {
         if (res.error?.includes('[SANDBOX OTP]')) {
@@ -453,7 +473,7 @@ export const AuthCardPage: React.FC = () => {
             {mode === 'otp' && (
               <>
                 <h3 className="text-2xl font-bold tracking-tight">Shield Verification</h3>
-                <p className="text-slate-400 text-xs mt-1.5">Please enter the 6-digit access code sent to your email.</p>
+                <p className="text-slate-400 text-xs mt-1.5">Please enter the 6-digit access code sent to your {isOtpPhone ? 'phone' : 'email'}.</p>
               </>
             )}
           </div>
@@ -472,12 +492,12 @@ export const AuthCardPage: React.FC = () => {
           {mode === 'login' && (
             <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-5">
               <div>
-                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Email Address</label>
+                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Email Address or Phone Number</label>
                 <div className="relative">
                   <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                   <input
-                    type="email"
-                    placeholder="name@domain.com"
+                    type="text"
+                    placeholder="name@domain.com or +1234567890"
                     autoComplete="username"
                     {...loginForm.register('email')}
                     className="w-full h-12 pl-11 pr-4 bg-white/[0.02] border border-white/10 rounded-xl focus:border-[#4F7CFF] focus:ring-1 focus:ring-[#4F7CFF] outline-none text-sm transition-all placeholder-slate-600"
@@ -568,12 +588,12 @@ export const AuthCardPage: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Email Address</label>
+                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Email Address or Phone Number</label>
                 <div className="relative">
                   <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                   <input
-                    type="email"
-                    placeholder="name@domain.com"
+                    type="text"
+                    placeholder="name@domain.com or +1234567890"
                     autoComplete="email"
                     {...signupForm.register('email')}
                     className="w-full h-11 pl-11 pr-4 bg-white/[0.02] border border-white/10 rounded-xl focus:border-[#4F7CFF] focus:ring-1 focus:ring-[#4F7CFF] outline-none text-sm transition-all placeholder-slate-600"
@@ -689,12 +709,12 @@ export const AuthCardPage: React.FC = () => {
           {mode === 'forgot' && (
             <form onSubmit={forgotForm.handleSubmit(onForgotSubmit)} className="space-y-5">
               <div>
-                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Email Address</label>
+                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Email Address or Phone Number</label>
                 <div className="relative">
                   <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                   <input
-                    type="email"
-                    placeholder="name@domain.com"
+                    type="text"
+                    placeholder="name@domain.com or +1234567890"
                     autoComplete="email"
                     {...forgotForm.register('email')}
                     className="w-full h-12 pl-11 pr-4 bg-white/[0.02] border border-white/10 rounded-xl focus:border-[#4F7CFF] focus:ring-1 focus:ring-[#4F7CFF] outline-none text-sm transition-all placeholder-slate-600"
