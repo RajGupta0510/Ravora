@@ -7,7 +7,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Manually parse .env if it exists in the root directory to populate process.env
-const rootDir = path.resolve(__dirname, '../../..');
+const rootDir = path.resolve(__dirname, '../..');
 const envPath = path.join(rootDir, '.env');
 if (fs.existsSync(envPath)) {
   try {

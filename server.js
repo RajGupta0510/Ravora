@@ -168,6 +168,9 @@ app.use('/v1', apiRouter);
 import fs from 'fs';
 const distPath = path.join(__dirname, 'dist');
 
+// Always serve app directory assets (e.g. oauth-consent.html popups)
+app.use('/app', express.static(path.join(__dirname, 'app')));
+
 if (fs.existsSync(distPath)) {
   console.log('[SPA Server] Serving production React Vite assets from /dist');
   app.use(express.static(distPath));
@@ -177,7 +180,6 @@ if (fs.existsSync(distPath)) {
   });
 } else {
   console.log('[SPA Server] Serving developer legacy static files');
-  app.use('/app', express.static(path.join(__dirname, 'app')));
   app.use(express.static(__dirname));
   app.get('/app*', (req, res) => {
     res.sendFile(path.join(__dirname, 'app/index.html'));

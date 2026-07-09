@@ -17,7 +17,9 @@ import {
 
 // Helper to check if Supabase is configured
 const isSupabaseConfigured = () => {
-  return !!(process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY);
+  const url = process.env.SUPABASE_URL || '';
+  const key = process.env.SUPABASE_ANON_KEY || '';
+  return !!(url && !url.includes('your-project-id') && key && !key.includes('your_anon_public_key'));
 };
 
 // Simple in-memory rate limiter for login/auth attempts
@@ -70,6 +72,15 @@ export const register = async (req, res) => {
   }
 
   try {
+    // Check if user already exists locally
+    const existingUser = await dbGet(
+      'SELECT id FROM users WHERE (email IS NOT NULL AND email = ?) OR (mobile_number IS NOT NULL AND mobile_number = ?)',
+      [email || null, mobileNumber || null]
+    );
+    if (existingUser) {
+      return res.status(400).json({ error: 'An account with this email or mobile number already exists. Please sign in.' });
+    }
+
     let result;
     if (email) {
       result = await signUpWithEmail(email, password, fullName);

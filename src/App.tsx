@@ -1,12 +1,66 @@
 import React from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
-import { AppProvider, useApp } from './context/AppContext';
+import { AppProvider } from './context/AppContext';
+import { Toaster } from 'sonner';
 import LandingPage from './components/landing/LandingPage';
-import OnboardingWizard from './components/dashboard/OnboardingWizard';
-import AppDashboard from './components/dashboard/AppDashboard';
+import { OnboardingWizard } from './components/dashboard/OnboardingWizard';
+import { AppDashboard } from './components/dashboard/AppDashboard';
+import { AuthCardPage } from 'components/ui/auth-card';
+
+// Protected Route Wrapper - redirects unauthenticated users to login, and forces onboarding if not completed
+const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { token, user, loading } = useAuth();
+
+  if (loading) return null;
+
+  if (!token) {
+    return <Navigate to="/auth" replace />;
+  }
+
+  if (!user?.onboardingCompleted) {
+    return <Navigate to="/onboarding" replace />;
+  }
+
+  return <>{children}</>;
+};
+
+// Onboarding Route Wrapper - redirects unauthenticated users to login, and redirects to dashboard if already onboarded
+const OnboardingRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { token, user, loading } = useAuth();
+
+  if (loading) return null;
+
+  if (!token) {
+    return <Navigate to="/auth" replace />;
+  }
+
+  if (user?.onboardingCompleted) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return <>{children}</>;
+};
+
+// Route wrapper for guest pages (login/signup) - redirects authenticated users to dashboard or onboarding
+const GuestRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { token, user, loading } = useAuth();
+
+  if (loading) return null;
+
+  if (token) {
+    if (user?.onboardingCompleted) {
+      return <Navigate to="/dashboard" replace />;
+    } else {
+      return <Navigate to="/onboarding" replace />;
+    }
+  }
+
+  return <>{children}</>;
+};
 
 const AppContent: React.FC = () => {
-  const { token, user, loading } = useAuth();
+  const { loading } = useAuth();
   
   if (loading) {
     return (
@@ -17,7 +71,7 @@ const AppContent: React.FC = () => {
         justifyContent: 'center',
         width: '100vw',
         height: '100vh',
-        background: '#060913',
+        background: '#060B17',
         color: '#fff',
         fontFamily: 'sans-serif'
       }}>
@@ -26,7 +80,7 @@ const AppContent: React.FC = () => {
           height: '36px',
           border: '3px solid rgba(255,255,255,0.1)',
           borderRadius: '50%',
-          borderTopColor: '#7c3aed',
+          borderTopColor: '#4F7CFF',
           animation: 'spin-loader 0.8s linear infinite',
           marginBottom: '16px'
         }}></div>
@@ -42,18 +96,34 @@ const AppContent: React.FC = () => {
     );
   }
 
-  // Session exists and onboarding is complete: Load active dashboard
-  if (token && user?.onboardingCompleted) {
-    return <AppDashboard />;
-  }
-
-  // Session exists but onboarding is not complete: Load onboarding flow
-  if (token && !user?.onboardingCompleted) {
-    return <OnboardingWizard />;
-  }
-
-  // No active session: Serve public landing page
-  return <LandingPage />;
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        
+        <Route path="/auth" element={
+          <GuestRoute>
+            <AuthCardPage />
+          </GuestRoute>
+        } />
+        
+        <Route path="/onboarding" element={
+          <OnboardingRoute>
+            <OnboardingWizard />
+          </OnboardingRoute>
+        } />
+        
+        <Route path="/dashboard" element={
+          <ProtectedRoute>
+            <AppDashboard />
+          </ProtectedRoute>
+        } />
+        
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+      <Toaster theme="dark" position="top-right" richColors />
+    </BrowserRouter>
+  );
 };
 
 const App: React.FC = () => {

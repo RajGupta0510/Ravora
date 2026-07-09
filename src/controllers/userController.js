@@ -85,13 +85,22 @@ export const onboard = async (req, res) => {
     const safetyScores = { 0: 98, 1: 96, 2: 91 };
     const safetyScore = safetyScores[riskLevel] || 96;
 
-    await dbRun(
-      'UPDATE portfolios SET current_balance = ?, safety_score = ?, updated_at = CURRENT_TIMESTAMP WHERE user_id = ?',
-      [capital, safetyScore, userId]
-    );
+    let portfolio = await dbGet('SELECT id FROM portfolios WHERE user_id = ?', [userId]);
+    let portfolioId;
 
-    const portfolio = await dbGet('SELECT id FROM portfolios WHERE user_id = ?', [userId]);
-    const portfolioId = portfolio.id;
+    if (!portfolio) {
+      portfolioId = crypto.randomUUID();
+      await dbRun(
+        'INSERT INTO portfolios (id, user_id, current_balance, safety_score) VALUES (?, ?, ?, ?)',
+        [portfolioId, userId, capital, safetyScore]
+      );
+    } else {
+      portfolioId = portfolio.id;
+      await dbRun(
+        'UPDATE portfolios SET current_balance = ?, safety_score = ?, updated_at = CURRENT_TIMESTAMP WHERE user_id = ?',
+        [capital, safetyScore, userId]
+      );
+    }
 
     // Clear and build portfolio assets based on selection
     await dbRun('DELETE FROM portfolio_assets WHERE portfolio_id = ?', [portfolioId]);
@@ -149,7 +158,7 @@ export const onboard = async (req, res) => {
     return res.json({ success: true, message: 'Onboarding completed successfully.' });
   } catch (err) {
     console.error('Error in onboarding:', err);
-    return res.status(500).json({ error: 'Internal server error completing onboarding.' });
+    return res.status(500).json({ error: `Onboarding failed: ${err.message || String(err)}` });
   }
 };
 

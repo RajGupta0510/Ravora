@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
 export interface User {
   id: string;
@@ -13,13 +14,16 @@ interface AuthContextType {
   user: User | null;
   loading: boolean;
   deviceFingerprint: string;
-  login: (emailOrPhone: string, isPhone: boolean, isOtp: boolean, passwordOrOtp: string, rememberMe: boolean) => Promise<{ success: boolean; otpRequired?: boolean; userId?: string; channel?: string; destination?: string; error?: string }>;
-  register: (fullName: string, emailOrPhone: string, isPhone: boolean, password: string, confirmPassword: string) => Promise<{ success: boolean; otpRequired: boolean; userId: string; channel: string; destination: string; error?: string }>;
+  supabaseClient: SupabaseClient;
+  login: (emailOrPhone: string, isPhone: boolean, isOtp: boolean, passwordOrOtp: string, rememberMe: boolean) => Promise<{ success: boolean; otpRequired?: boolean; error?: string }>;
+  register: (fullName: string, emailOrPhone: string, isPhone: boolean, password: string, confirmPassword: string) => Promise<{ success: boolean; otpRequired?: boolean; error?: string }>;
   verifyOtpCode: (emailOrPhone: string, isPhone: boolean, otpCode: string, userId: string, rememberMe?: boolean) => Promise<{ success: boolean; error?: string }>;
-  logout: () => void;
+  logout: () => Promise<void>;
   checkAuth: () => Promise<void>;
   updateOnboardingCompletedState: (completed: boolean) => void;
-  socialLoginSuccess: (token: string, email: string, onboardingCompleted: boolean) => Promise<void>;
+  forgotPassword: (email: string) => Promise<{ success: boolean; error?: string }>;
+  resetPassword: (password: string) => Promise<{ success: boolean; error?: string }>;
+  signInWithOAuth: (provider: 'google' | 'github' | 'apple') => Promise<{ success: boolean; error?: string }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -30,13 +34,23 @@ export const useAuth = () => {
   return context;
 };
 
+// Initialize Supabase Client directly from Vite env variables
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://your-project-id.supabase.co';
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'mock-key';
+
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: true
+  }
+});
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [token, setToken] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [deviceFingerprint, setDeviceFingerprint] = useState<string>('');
-
-  const API_BASE = '/v1';
 
   // Initialize device fingerprint
   useEffect(() => {
@@ -48,56 +62,80 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setDeviceFingerprint(df);
   }, []);
 
-  const checkAuth = async () => {
+  // Sync profile status from backend using the JWT token
+  const syncAndGetUserProfile = async (accessToken: string, authUser: any) => {
     try {
-      const storedToken = localStorage.getItem('ravora_token') || sessionStorage.getItem('ravora_token');
-      const loggedIn = localStorage.getItem('ravora_logged_in') === 'true';
-      
-      // Remember Me / session storage alignment
-      const rememberMe = localStorage.getItem('ravora_remember_me') === 'true';
-      const sessionActive = sessionStorage.getItem('ravora_session_active') === 'true';
-      const sessionValid = rememberMe || sessionActive;
-
-      if (!storedToken || !loggedIn || !sessionValid) {
-        logout();
-        setLoading(false);
-        return;
-      }
-
-      const res = await fetch(`${API_BASE}/user/profile`, {
-        headers: {
-          'Authorization': `Bearer ${storedToken}`
-        }
+      const response = await fetch('/v1/user/profile', {
+        headers: { 'Authorization': `Bearer ${accessToken}` }
       });
-
-      if (res.ok) {
-        const profileData = await res.json();
-        setToken(storedToken);
-        setUser({
-          id: profileData.id || 'user_id',
-          email: profileData.email || localStorage.getItem('ravora_email') || 'user@ravora.ai',
-          fullName: profileData.fullName || 'User',
-          verified: true,
-          onboardingCompleted: profileData.onboardingCompleted
-        });
-      } else {
-        // Token expired/invalid
-        logout();
+      if (response.ok) {
+        const data = await response.json();
+        return {
+          id: authUser.id,
+          email: authUser.email || authUser.phone || '',
+          fullName: authUser.user_metadata?.full_name || 'Ravora Member',
+          verified: !!authUser.email_confirmed_at || !!authUser.phone_confirmed_at,
+          onboardingCompleted: !!data.onboardingCompleted
+        };
       }
     } catch (err) {
-      console.error('[Auth check error]', err);
-      logout();
-    } finally {
-      setLoading(false);
+      console.error('[AuthContext] Profile sync error:', err);
     }
+    return {
+      id: authUser.id,
+      email: authUser.email || authUser.phone || '',
+      fullName: authUser.user_metadata?.full_name || 'Ravora Member',
+      verified: !!authUser.email_confirmed_at || !!authUser.phone_confirmed_at,
+      onboardingCompleted: false
+    };
   };
 
   useEffect(() => {
-    // Only check auth after deviceFingerprint is initialized
-    if (deviceFingerprint) {
-      checkAuth();
+    // Get initial session
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (session) {
+        setToken(session.access_token);
+        const syncedUser = await syncAndGetUserProfile(session.access_token, session.user);
+        setUser(syncedUser);
+      } else {
+        setToken(null);
+        setUser(null);
+      }
+      setLoading(false);
+    });
+
+    // Listen to changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('[Supabase Auth Event]', event);
+      if (session) {
+        setToken(session.access_token);
+        const syncedUser = await syncAndGetUserProfile(session.access_token, session.user);
+        setUser(syncedUser);
+      } else {
+        setToken(null);
+        setUser(null);
+      }
+      setLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const checkAuth = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        setToken(session.access_token);
+        const syncedUser = await syncAndGetUserProfile(session.access_token, session.user);
+        setUser(syncedUser);
+      } else {
+        setToken(null);
+        setUser(null);
+      }
+    } catch (err) {
+      console.error('[AuthContext] checkAuth error:', err);
     }
-  }, [deviceFingerprint]);
+  };
 
   const login = async (
     emailOrPhone: string,
@@ -107,75 +145,35 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     rememberMe: boolean
   ) => {
     try {
-      const payload: any = {
-        deviceFingerprint,
-        rememberMe
-      };
-
-      if (isPhone) {
-        payload.mobile = emailOrPhone;
-      } else {
-        payload.email = emailOrPhone;
-      }
-
       if (isOtp) {
-        payload.otpCode = passwordOrOtp;
+        const { error } = await supabase.auth.signInWithOtp(
+          isPhone ? { phone: emailOrPhone } : { email: emailOrPhone }
+        );
+        if (error) throw error;
+        return { success: true, otpRequired: true };
       } else {
-        payload.password = passwordOrOtp;
+        const credentials = isPhone
+          ? { phone: emailOrPhone, password: passwordOrOtp }
+          : { email: emailOrPhone, password: passwordOrOtp };
+
+        const { error } = await supabase.auth.signInWithPassword(credentials);
+        if (error) throw error;
+        return { success: true };
       }
-
-      const endpoint = isOtp ? '/auth/otp/verify' : '/auth/login';
-      const res = await fetch(`${API_BASE}${endpoint}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        return { success: false, error: data.error || 'Login failed.' };
-      }
-
-      if (data.otpRequired) {
-        return {
-          success: true,
-          otpRequired: true,
-          destination: data.destination,
-          channel: data.channel,
-          userId: data.userId
-        };
-      }
-
-      // Save session
-      const userToken = data.token;
-      if (!userToken) return { success: false, error: 'Token missing from response.' };
-
-      if (rememberMe) {
-        localStorage.setItem('ravora_token', userToken);
-        localStorage.setItem('ravora_remember_me', 'true');
-      } else {
-        sessionStorage.setItem('ravora_token', userToken);
-        localStorage.setItem('ravora_remember_me', 'false');
-      }
-      
-      localStorage.setItem('ravora_logged_in', 'true');
-      localStorage.setItem('ravora_login_time', Date.now().toString());
-      localStorage.setItem('ravora_email', emailOrPhone);
-      sessionStorage.setItem('ravora_session_active', 'true');
-
-      setToken(userToken);
-      setUser({
-        id: data.user?.id || 'user_id',
-        email: emailOrPhone,
-        fullName: data.user?.full_name || 'Ravora Member',
-        verified: true,
-        onboardingCompleted: data.user?.onboardingCompleted ?? false
-      });
-
-      return { success: true };
     } catch (err: any) {
-      return { success: false, error: err.message || 'An error occurred during login.' };
+      console.error('[AuthContext] Login error:', err);
+      let errMsg = 'An error occurred during sign in.';
+      if (err) {
+        if (typeof err === 'string') {
+          errMsg = err;
+        } else {
+          errMsg = err.message || err.error_description || (err.error && (typeof err.error === 'string' ? err.error : err.error.message)) || '';
+          if (!errMsg || errMsg === '{}') {
+            errMsg = `${err.name || 'Error'}: ${err.status || err.statusCode || ''} (${String(err)})`;
+          }
+        }
+      }
+      return { success: false, error: errMsg };
     }
   };
 
@@ -186,41 +184,37 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     password: string,
     confirmPassword: string
   ) => {
+    if (password !== confirmPassword) {
+      return { success: false, error: 'Passwords do not match.' };
+    }
+
     try {
-      const payload: any = {
-        fullName,
-        password,
-        confirmPassword,
-        acceptTerms: true
-      };
+      const { data, error } = await supabase.auth.signUp(
+        isPhone
+          ? { phone: emailOrPhone, password, options: { data: { full_name: fullName } } }
+          : { email: emailOrPhone, password, options: { data: { full_name: fullName } } }
+      );
+      if (error) throw error;
 
-      if (isPhone) {
-        payload.mobileNumber = emailOrPhone;
-      } else {
-        payload.email = emailOrPhone;
-      }
-
-      const res = await fetch(`${API_BASE}/auth/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        return { success: false, otpRequired: false, userId: '', channel: '', destination: '', error: data.error || 'Registration failed.' };
-      }
-
+      const isConfirmed = !!data.user?.email_confirmed_at || !!data.user?.phone_confirmed_at;
       return {
         success: true,
-        otpRequired: true,
-        userId: data.userId,
-        channel: data.channel,
-        destination: data.destination
+        otpRequired: !isConfirmed
       };
     } catch (err: any) {
-      return { success: false, otpRequired: false, userId: '', channel: '', destination: '', error: err.message || 'An error occurred during registration.' };
+      console.error('[AuthContext] Registration error:', err);
+      let errMsg = 'An error occurred during registration.';
+      if (err) {
+        if (typeof err === 'string') {
+          errMsg = err;
+        } else {
+          errMsg = err.message || err.error_description || (err.error && (typeof err.error === 'string' ? err.error : err.error.message)) || '';
+          if (!errMsg || errMsg === '{}') {
+            errMsg = `${err.name || 'Error'}: ${err.status || err.statusCode || ''} (${String(err)})`;
+          }
+        }
+      }
+      return { success: false, error: errMsg };
     }
   };
 
@@ -232,106 +226,105 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     rememberMe = false
   ) => {
     try {
-      const payload: any = {
-        userId,
-        otpCode,
-        deviceFingerprint,
-        rememberMe
-      };
-
-      if (isPhone) {
-        payload.mobileNumber = emailOrPhone;
-      } else {
-        payload.email = emailOrPhone;
+      const { error } = await supabase.auth.verifyOtp(
+        isPhone
+          ? { phone: emailOrPhone, token: otpCode, type: 'sms' }
+          : { email: emailOrPhone, token: otpCode, type: 'signup' }
+      );
+      if (error) {
+        if (!isPhone) {
+          // Fallback to magiclink verification
+          const fallback = await supabase.auth.verifyOtp({
+            email: emailOrPhone,
+            token: otpCode,
+            type: 'magiclink'
+          });
+          if (fallback.error) throw fallback.error;
+          return { success: true };
+        }
+        throw error;
       }
-
-      const res = await fetch(`${API_BASE}/auth/otp/verify`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        return { success: false, error: data.error || 'OTP verification failed.' };
-      }
-
-      const userToken = data.token;
-      if (!userToken) return { success: false, error: 'Token missing from response.' };
-
-      if (rememberMe) {
-        localStorage.setItem('ravora_token', userToken);
-        localStorage.setItem('ravora_remember_me', 'true');
-      } else {
-        sessionStorage.setItem('ravora_token', userToken);
-        localStorage.setItem('ravora_remember_me', 'false');
-      }
-      
-      localStorage.setItem('ravora_logged_in', 'true');
-      localStorage.setItem('ravora_login_time', Date.now().toString());
-      localStorage.setItem('ravora_email', emailOrPhone);
-      sessionStorage.setItem('ravora_session_active', 'true');
-
-      setToken(userToken);
-      setUser({
-        id: data.user?.id || userId,
-        email: emailOrPhone,
-        fullName: data.user?.full_name || 'Ravora Member',
-        verified: true,
-        onboardingCompleted: data.user?.onboardingCompleted ?? false
-      });
-
       return { success: true };
     } catch (err: any) {
-      return { success: false, error: err.message || 'An error occurred during OTP verification.' };
+      console.error('[AuthContext] OTP verification error:', err);
+      return { success: false, error: err.message || 'OTP verification failed.' };
     }
   };
 
-  const logout = () => {
-    localStorage.removeItem('ravora_token');
-    localStorage.removeItem('ravora_logged_in');
-    localStorage.removeItem('ravora_login_time');
-    localStorage.removeItem('ravora_email');
-    localStorage.removeItem('ravora_onboarding_completed');
-    localStorage.removeItem('ravora_remember_me');
-    sessionStorage.removeItem('ravora_session_active');
-    setToken(null);
-    setUser(null);
+  const logout = async () => {
+    try {
+      await supabase.auth.signOut();
+    } catch (err) {
+      console.error('[AuthContext] Sign out error:', err);
+    } finally {
+      setToken(null);
+      setUser(null);
+    }
   };
 
   const updateOnboardingCompletedState = (completed: boolean) => {
     if (user) {
-      setUser({
-        ...user,
-        onboardingCompleted: completed
-      });
-      localStorage.setItem('ravora_onboarding_completed', completed ? 'true' : 'false');
+      setUser(prev => prev ? { ...prev, onboardingCompleted: completed } : null);
     }
   };
 
-  const socialLoginSuccess = async (token: string, email: string, onboardingCompleted: boolean) => {
-    localStorage.setItem('ravora_token', token);
-    localStorage.setItem('ravora_logged_in', 'true');
-    localStorage.setItem('ravora_login_time', Date.now().toString());
-    localStorage.setItem('ravora_email', email);
-    localStorage.setItem('ravora_remember_me', 'true');
-    sessionStorage.setItem('ravora_session_active', 'true');
+  const forgotPassword = async (email: string) => {
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/auth?mode=reset`
+      });
+      if (error) throw error;
+      return { success: true };
+    } catch (err: any) {
+      console.error('[AuthContext] Forgot password error:', err);
+      return { success: false, error: err.message || 'Failed to send recovery email.' };
+    }
+  };
 
-    setToken(token);
-    setUser({
-      id: 'oauth_user',
-      email,
-      fullName: 'Ravora Member',
-      verified: true,
-      onboardingCompleted
-    });
-    
-    await checkAuth();
+  const resetPassword = async (password: string) => {
+    try {
+      const { error } = await supabase.auth.updateUser({ password });
+      if (error) throw error;
+      return { success: true };
+    } catch (err: any) {
+      console.error('[AuthContext] Reset password error:', err);
+      return { success: false, error: err.message || 'Failed to reset password.' };
+    }
+  };
+
+  const signInWithOAuth = async (provider: 'google' | 'github' | 'apple') => {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: `${window.location.origin}/auth`
+        }
+      });
+      if (error) throw error;
+      return { success: true };
+    } catch (err: any) {
+      console.error('[AuthContext] OAuth error:', err);
+      return { success: false, error: err.message || 'OAuth sign in failed.' };
+    }
   };
 
   return (
-    <AuthContext.Provider value={{ token, user, loading, deviceFingerprint, login, register, verifyOtpCode, logout, checkAuth, updateOnboardingCompletedState, socialLoginSuccess }}>
+    <AuthContext.Provider value={{
+      token,
+      user,
+      loading,
+      deviceFingerprint,
+      supabaseClient: supabase,
+      login,
+      register,
+      verifyOtpCode,
+      logout,
+      checkAuth,
+      updateOnboardingCompletedState,
+      forgotPassword,
+      resetPassword,
+      signInWithOAuth
+    }}>
       {children}
     </AuthContext.Provider>
   );

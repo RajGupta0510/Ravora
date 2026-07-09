@@ -113,7 +113,7 @@ interface AppContextType {
   marketOverview: any[];
   marketSummary: any;
   loading: boolean;
-  onboardUser: (experience: string, capital: number, riskLevel: number, goal: string) => Promise<boolean>;
+  onboardUser: (experience: string, capital: number, riskLevel: number, goal: string) => Promise<{ success: boolean; error?: string }>;
   updateSettings: (executionMode: string, autoHedgeEnabled: boolean, notificationsEnabled: boolean) => Promise<boolean>;
   fetchDashboardData: () => Promise<void>;
   scanMarkets: () => Promise<void>;
@@ -282,12 +282,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       if (res.ok) {
         updateOnboardingCompletedState(true);
         await fetchDashboardData();
-        return true;
+        return { success: true };
       }
-      return false;
-    } catch (err) {
+      const data = await res.json().catch(() => ({}));
+      return { success: false, error: data.error || 'Failed to complete onboarding.' };
+    } catch (err: any) {
       console.error('[Onboarding API error]', err);
-      return false;
+      return { success: false, error: err.message || 'Network error completing onboarding.' };
     }
   };
 

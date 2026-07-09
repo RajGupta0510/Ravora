@@ -30,12 +30,13 @@ export const OnboardingWizard: React.FC = () => {
   const handleSubmit = async () => {
     try {
       setLoading(true);
-      const success = await onboardUser(experience, capital, riskLevel, goal);
-      if (!success) {
-        alert('Failed to complete onboarding. Please try again.');
+      const res = await onboardUser(experience, capital, riskLevel, goal);
+      if (!res.success) {
+        alert(res.error || 'Failed to complete onboarding. Please try again.');
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
+      alert(err.message || 'An unexpected error occurred.');
     } finally {
       setLoading(false);
     }
