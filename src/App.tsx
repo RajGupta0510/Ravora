@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useSearchParams } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { AppProvider } from './context/AppContext';
 import { Toaster } from 'sonner';
@@ -96,12 +96,24 @@ const AppContent: React.FC = () => {
     );
   }
 
+// Redirect legacy query-parameter based auth to the clean path-based routing
+const AuthRedirect: React.FC = () => {
+  const [searchParams] = useSearchParams();
+  const mode = searchParams.get('mode');
+  if (mode === 'register') return <Navigate to="/auth/register" replace />;
+  if (mode === 'forgot') return <Navigate to="/auth/forgot" replace />;
+  if (mode === 'reset') return <Navigate to="/auth/reset" replace />;
+  if (mode === 'otp') return <Navigate to="/auth/otp" replace />;
+  return <Navigate to="/auth/login" replace />;
+};
+
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<LandingPage />} />
         
-        <Route path="/auth" element={
+        <Route path="/auth" element={<AuthRedirect />} />
+        <Route path="/auth/:mode" element={
           <GuestRoute>
             <AuthCardPage />
           </GuestRoute>

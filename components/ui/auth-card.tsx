@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useAuth } from '../../src/context/AuthContext';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import {
   Mail,
@@ -89,30 +89,16 @@ const getErrorMessage = (err: any): string => {
 export const AuthCardPage: React.FC = () => {
   const { login, register, forgotPassword, resetPassword, signInWithOAuth, verifyOtpCode, supabaseClient } = useAuth();
   const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useSearchParams();
-  const resetMode = searchParams.get('mode') === 'reset';
-  const paramMode = searchParams.get('mode');
-  const initialMode = paramMode === 'register' ? 'register' : (paramMode === 'login' ? 'login' : (resetMode ? 'reset' : 'login'));
+  const { mode: pathMode } = useParams<{ mode: string }>();
+  const mode = (pathMode as 'login' | 'register' | 'forgot' | 'reset' | 'otp') || 'login';
 
-  // UI States
-  const [mode, setMode] = useState<'login' | 'register' | 'forgot' | 'reset' | 'otp'>(
-    initialMode
-  );
+  console.log('[DEBUG] AuthCardPage render. Current mode state:', mode);
 
   const changeMode = (newMode: 'login' | 'register' | 'forgot' | 'reset' | 'otp') => {
-    setMode(newMode);
+    console.log('[DEBUG] changeMode called with target:', newMode);
     setServerError(null);
-    if (newMode === 'login' || newMode === 'register' || newMode === 'reset') {
-      setSearchParams({ mode: newMode });
-    }
+    navigate(`/auth/${newMode}`);
   };
-
-  useEffect(() => {
-    const m = searchParams.get('mode');
-    if (m === 'register' || m === 'login' || m === 'reset') {
-      setMode(m as any);
-    }
-  }, [searchParams]);
 
 
   const [showPassword, setShowPassword] = useState(false);
@@ -194,7 +180,7 @@ export const AuthCardPage: React.FC = () => {
           if (res.otpCode) {
             toast.info(`Sandbox Developer Mode: Auto-generated OTP code is ${res.otpCode}`, { duration: 15000 });
           }
-          setMode('otp');
+          changeMode('otp');
         } else {
           toast.success('Login Successful', { description: 'Welcome back to Ravora OS!' });
           navigate('/dashboard');
@@ -225,7 +211,7 @@ export const AuthCardPage: React.FC = () => {
           if (res.otpCode) {
             toast.info(`Sandbox Developer Mode: Auto-generated OTP code is ${res.otpCode}`, { duration: 15000 });
           }
-          setMode('otp');
+          changeMode('otp');
         } else {
           toast.success('Account Created', { description: 'Welcome to Ravora OS!' });
           navigate('/dashboard');
@@ -300,10 +286,10 @@ export const AuthCardPage: React.FC = () => {
           setSandboxOtp(rawCode);
           toast.success('Recovery Request Successful', { description: 'Please enter the recovery OTP code.' });
           toast.info(`Sandbox Developer Mode: Auto-generated Recovery OTP is ${rawCode}`, { duration: 15000 });
-          setMode('otp');
+          changeMode('otp');
         } else {
           toast.success('Recovery Email Sent', { description: 'Verification email has been dispatched.' });
-          setMode('login');
+          changeMode('login');
         }
       } else {
         setServerError(getErrorMessage(res.error) || 'Failed to send recovery email.');
@@ -322,7 +308,7 @@ export const AuthCardPage: React.FC = () => {
       const res = await resetPassword(values.password);
       if (res.success) {
         toast.success('Password Reset Email Sent', { description: 'Your password has been successfully updated.' });
-        setMode('login');
+        changeMode('login');
       } else {
         setServerError(getErrorMessage(res.error) || 'Failed to reset password.');
       }
@@ -340,7 +326,7 @@ export const AuthCardPage: React.FC = () => {
       loginForm.setValue('password', pass);
       toast.info('Demo Credentials Loaded');
     } else {
-      setMode('login');
+      changeMode('login');
       setTimeout(() => {
         loginForm.setValue('email', email);
         loginForm.setValue('password', pass);
