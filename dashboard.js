@@ -6104,7 +6104,26 @@ document.addEventListener('DOMContentLoaded', () => {
   // Handle Logout
   const btnLogout = document.getElementById('btn-logout');
   if (btnLogout) {
-    btnLogout.addEventListener('click', () => {
+    btnLogout.addEventListener('click', async (e) => {
+      if (e) e.preventDefault();
+      if (supabaseClient) {
+        try {
+          await supabaseClient.auth.signOut();
+        } catch (err) {
+          console.error('[Supabase SignOut Error]', err);
+        }
+      }
+      
+      // Clear Supabase client keys directly to bypass third-party CDN storage blocking
+      const keysToRemove = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('sb-')) {
+          keysToRemove.push(key);
+        }
+      }
+      keysToRemove.forEach(key => localStorage.removeItem(key));
+      
       localStorage.removeItem('ravora_token');
       localStorage.removeItem('ravora_logged_in');
       localStorage.removeItem('ravora_login_time');

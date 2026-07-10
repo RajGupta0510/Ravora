@@ -107,6 +107,29 @@ const AuthRedirect: React.FC = () => {
   return <Navigate to="/auth/login" replace />;
 };
 
+// Redirect to legacy HTML/JS dashboard
+const DashboardRedirect: React.FC = () => {
+  React.useEffect(() => {
+    window.location.href = '/app/';
+  }, []);
+  return (
+    <div style={{
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      width: '100vw',
+      height: '100vh',
+      background: '#060B17',
+      color: '#fff',
+      fontFamily: 'sans-serif'
+    }}>
+      <div style={{ fontSize: '0.78rem', letterSpacing: '0.08em', color: '#94a3b8', fontWeight: 600 }}>
+        LOADING WORKSPACE...
+      </div>
+    </div>
+  );
+};
+
   return (
     <BrowserRouter>
       <Routes>
@@ -127,7 +150,7 @@ const AuthRedirect: React.FC = () => {
         
         <Route path="/dashboard" element={
           <ProtectedRoute>
-            <AppDashboard />
+            <DashboardRedirect />
           </ProtectedRoute>
         } />
         

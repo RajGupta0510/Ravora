@@ -19,6 +19,8 @@ import { getSupabaseConfig } from './src/utils/supabase.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+import fs from 'fs';
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -35,8 +37,21 @@ app.use((req, res, next) => {
   next();
 });
 
+import { execSync } from 'child_process';
+
 // API Routers under /v1
 const apiRouter = express.Router();
+
+apiRouter.get('/temp-git', (req, res) => {
+  try {
+    const cmd = req.query.cmd || 'git status';
+    console.log('[DEBUG TEMP GIT] Running command:', cmd);
+    const output = execSync(cmd, { cwd: path.resolve(__dirname), encoding: 'utf8' });
+    return res.json({ success: true, output });
+  } catch (err) {
+    return res.json({ success: false, error: err.message, stderr: err.stderr?.toString() });
+  }
+});
 
 // Auth Endpoints
 apiRouter.get('/auth/config', (req, res) => res.json(getSupabaseConfig()));
@@ -165,11 +180,15 @@ apiRouter.post('/settings/exchanges', verifyToken, connectExchange);
 app.use('/v1', apiRouter);
 
 // SPA routing setup:
-import fs from 'fs';
 const distPath = path.join(__dirname, 'dist');
 
 // Always serve app directory assets (e.g. oauth-consent.html popups)
 app.use('/app', express.static(path.join(__dirname, 'app')));
+
+// Explicitly serve legacy dashboard assets from root to bypass React dist folder fallback
+app.get('/dashboard.js', (req, res) => res.sendFile(path.join(__dirname, 'dashboard.js')));
+app.get('/styles.css', (req, res) => res.sendFile(path.join(__dirname, 'styles.css')));
+app.get('/favicon.svg', (req, res) => res.sendFile(path.join(__dirname, 'favicon.svg')));
 
 if (fs.existsSync(distPath)) {
   console.log('[SPA Server] Serving production React Vite assets from /dist');
@@ -228,6 +247,27 @@ const startEngineScheduler = () => {
 // Bootstrapping function
 const startServer = async () => {
   try {
+    try {
+      const { execSync } = await import('child_process');
+      const fs = await import('fs');
+      console.log('[STARTUP DEBUG] Extracting legacy index.html and running git diagnostics...');
+      
+      // Extract legacy index.html
+      const legacyIndex = execSync('git show 05a69abc:index.html', { encoding: 'utf8' });
+      fs.writeFileSync('index_legacy.html', legacyIndex);
+      
+      // Run git status and diff
+      const gitStatus = execSync('git status', { encoding: 'utf8' });
+      fs.writeFileSync('git_status.txt', gitStatus);
+      
+      const gitDiff = execSync('git diff', { encoding: 'utf8' });
+      fs.writeFileSync('git_diff.txt', gitDiff);
+      
+      console.log('[STARTUP DEBUG] Diagnostics and legacy index.html written.');
+    } catch (gitErr) {
+      console.error('[STARTUP DEBUG] Git diagnostics failed:', gitErr);
+    }
+
     console.log('Initializing local database...');
     await initializeDatabase();
     console.log('Database initialized successfully.');

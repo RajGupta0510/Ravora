@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ravora - Professional AI Trading Operating System</title>
+  <meta name="description"
+    content="Ravora is a premium AI-powered trading operating system. Araiven continuously scans global markets, analyzes price structural support, plans optimal execution ladders, and manages simulated risk parameters automatically.">
+  <link rel="stylesheet" href="styles.css?v=12.0">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=2.0">
+  <script>
+    (function () {
+      try {
+        const loggedIn = localStorage.getItem('ravora_logged_in') === 'true';
+        const loginTime = localStorage.getItem('ravora_login_time');
+        const token = localStorage.getItem('ravora_token');
+        const sevenDays = 7 * 24 * 60 * 60 * 1000;
+        const timeDiff = loginTime ? (Date.now() - parseInt(loginTime)) : null;
+        const isValid = loggedIn && loginTime && token && (timeDiff < sevenDays);
+
+        console.log('[Auth Debug - Landing] loggedIn:', loggedIn, 'loginTime:', loginTime, 'timeDiff:', timeDiff, 'isValid:', isValid);
+
+        if (isValid) {
+          console.log('[Auth Debug - Landing] Session is valid. Redirecting to /app/...');
+          window.location.href = '/app/';
+        } else if (loggedIn) {
+          console.log('[Auth Debug - Landing] Session is invalid or expired. Clearing credentials...');
+          localStorage.removeItem('ravora_token');
+          localStorage.removeItem('ravora_logged_in');
+          localStorage.removeItem('ravora_login_time');
+          localStorage.removeItem('ravora_email');
+          localStorage.removeItem('ravora_onboarding_completed');
+        }
+      } catch (e) {
+        console.warn('LocalStorage is not accessible:', e);
+      }
+    })();
+  </script>
+</head>
+
+<body>
+
+  <!-- Premium Atmospheric Background -->
+  <div class="ambient-glows">
+    <div class="ambient-grid"></div>
+    <div class="glow-blob glow-1"></div>
+    <div class="glow-blob glow-2"></div>
+  </div>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar" id="navbar"
+    style="border-bottom: 1px solid var(--border); background: rgba(6, 9, 19, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; transition: background 0.3s ease;">
+    <div class="container"
+      style="max-width: var(--max-content-width); margin: 0 auto; padding: 0 var(--margin-outer); display: flex; justify-content: space-between; align-items: center; height: 76px;">
+      <a href="#" class="logo" id="nav-logo"
+        style="display: flex; align-items: center; gap: 10px; font-family: var(--font-display); font-size: 1.15rem; font-weight: 700; color: #fff; text-decoration: none;">
+        <div class="logo-icon"
+          style="width: 32px; height: 32px; border-radius: 6px; background: var(--gradient-interactive); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 1.1rem;">
+          R</div>
+        Ravora
+      </a>
+      <ul class="nav-links" id="nav-menu" style="list-style: none; display: flex; gap: 24px; margin: 0; padding: 0;">
+        <li><a href="#problem-section" class="active-nav"
+            style="color: var(--text-secondary); text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: color var(--transition-hover);">The
+            Problem</a></li>
+        <li><a href="#workflow-section"
+            style="color: var(--text-secondary); text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: color var(--transition-hover);">How
+            It Works</a></li>
+        <li><a href="#showcase-section"
+            style="color: var(--text-secondary); text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: color var(--transition-hover);">Showcase</a>
+        </li>
+        <li><a href="#features-section"
+            style="color: var(--text-secondary); text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: color var(--transition-hover);">AI
+            Features</a></li>
+        <li><a href="#faq-section"
+            style="color: var(--text-secondary); text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: color var(--transition-hover);">FAQ</a>
+        </li>
+      </ul>
+      <div class="nav-actions" style="display: flex; align-items: center; gap: 16px;">
+        <a href="/app/?auth=login" class="btn-signin" id="btn-login-nav"
+          style="color: var(--text-secondary); text-decoration: none; font-size: 0.85rem; font-weight: 600; transition: color var(--transition-hover);">Sign
+          In</a>
+        <a href="/app/?auth=register" class="btn btn-primary" id="btn-get-started-nav"
+          style="font-size: 0.82rem; padding: 8px 16px; height: 36px; border-radius: 6px;">Start Free</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero" id="hero-section" style="padding-top: 160px; padding-bottom: 100px;">
+    <div class="container"
+      style="max-width: var(--max-content-width); margin: 0 auto; padding: 0 var(--margin-outer); display: grid; grid-template-columns: 0.9fr 1.1fr; gap: 60px; align-items: center;">
+      <!-- Hero Left (45%) -->
+      <div class="hero-content" style="display: flex; flex-direction: column; align-items: flex-start; gap: 16px;">
+        <div class="hero-badge"
+          style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border); padding: 6px 14px; border-radius: 99px; font-size: 0.72rem; font-weight: 600; color: #fff; display: flex; align-items: center; gap: 6px;">
+          <span
+            style="width: 6px; height: 6px; border-radius: 50%; background: var(--ai-accent); display: inline-block;"></span>
+          Ravora AI-Powered Market Operations
+        </div>
+
+        <h1 class="display-title"
+          style="font-size: 3.1rem; line-height: 1.15; font-family: var(--font-display); font-weight: 700; color: #fff; letter-spacing: -0.02em; margin: 0 0 10px 0;">
+          Trade with <span class="text-accent-gradient">AI</span>, not emotions.
+        </h1>
+
+        <p class="body-text"
+          style="font-size: 1.05rem; color: var(--text-secondary); line-height: 1.55; margin: 0 0 16px 0; max-width: 500px;">
+          Araiven scans global orderbooks, drafts structured execution plan ladders, explains recommendation logic, and
+          handles simulated drawdown limits automatically.
+        </p>
+
+        <div class="hero-actions" style="display: flex; gap: 12px; margin-bottom: 24px;">
+          <a href="/app/?auth=register" class="btn btn-primary" id="hero-cta-primary"
+            style="height: 44px; padding: 0 24px; font-size: 0.9rem; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; font-weight: 600;">Start
+            Free</a>
+          <a href="#" class="btn btn-secondary btn-watch-demo"
+            style="height: 44px; padding: 0 24px; font-size: 0.9rem; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; font-weight: 600;">Watch
+            Demo</a>
+        </div>
+
+        <!-- Small Trust indicators -->
+        <div style="display: flex; flex-direction: column; gap: 8px; font-size: 0.82rem; color: var(--text-secondary);">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="var(--ai-accent)" stroke-width="3">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+            <span>24/7 Autonomous Ingestion & Opportunities Detection</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="var(--ai-accent)" stroke-width="3">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+            <span>Standardised Execution target levels & Stop Losses</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hero Right: Large Animated Product Preview (55%) -->
+      <div class="mini-workspace-mock-wrapper" style="width: 100%;">
+        <div class="card-glass mini-workspace-mock" id="hero-workspace-animation"
+          style="width: 100%; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 12px; background: rgba(14, 19, 37, 0.92); border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 24px 50px rgba(0,0,0,0.5); overflow: hidden; position: relative;">
+          <!-- Scanning Indicator bar overlay -->
+          <div class="state-scanning-indicator"></div>
+
+          <!-- Header bar -->
+          <div
+            style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 10px;">
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span
+                style="width: 8px; height: 8px; border-radius: 50%; background: #10b981; display: inline-block;"></span>
+              <span
+                style="font-family: monospace; font-size: 0.72rem; color: var(--text-secondary); font-weight: 700; letter-spacing: 0.05em;">ARAIVEN
+                OS SIMULATOR</span>
+            </div>
+            <!-- Mock Status tag -->
+            <span style="font-family: monospace; font-size: 0.65rem; color: var(--text-muted);">ACTIVE MULTI-FEED
+              INPUT</span>
+          </div>
+
+          <!-- Workspace Columns -->
+          <div
+            style="display: grid; grid-template-columns: 0.9fr 1.35fr 0.95fr; gap: 14px; height: 240px; position: relative;">
+
+            <!-- Col 1: Scanner Mock -->
+            <div
+              style="border-right: 1px solid rgba(255,255,255,0.06); padding-right: 10px; display: flex; flex-direction: column; gap: 8px;">
+              <span
+                style="font-size: 0.65rem; font-weight: 700; color: var(--text-muted); letter-spacing: 0.02em;">MARKET
+                SCANNER</span>
+              <div style="display: flex; flex-direction: column; gap: 6px;">
+                <!-- BTC opportunity row -->
+                <div class="mini-opportunity-row btc-row"
+                  style="padding: 6px; border-radius: 4px; border: 1px solid transparent; display: flex; flex-direction: column; gap: 2px; transition: all 0.3s ease;">
+                  <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-size: 0.7rem; font-weight: 600; color: #fff;">BTC/USD</span>
+                    <span class="badge-ds badge-long" style="font-size: 0.55rem; padding: 1px 4px;">LONG</span>
+                  </div>
+                  <!-- score increases on active -->
+                  <span style="font-size: 0.6rem; color: #10b981; font-weight: 700;">Opportunity: 94.2%</span>
+                </div>
+                <!-- ETH opportunity row -->
+                <div class="mini-opportunity-row"
+                  style="padding: 6px; display: flex; flex-direction: column; gap: 2px;">
+                  <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-size: 0.7rem; font-weight: 600; color: var(--text-secondary);">ETH/USD</span>
+                    <span class="badge-ds badge-hold" style="font-size: 0.55rem; padding: 1px 4px;">HOLD</span>
+                  </div>
+                  <span style="font-size: 0.6rem; color: var(--text-muted);">Consolidating</span>
+                </div>
+                <!-- SOL opportunity row -->
+                <div class="mini-opportunity-row"
+                  style="padding: 6px; display: flex; flex-direction: column; gap: 2px;">
+                  <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-size: 0.7rem; font-weight: 600; color: var(--text-secondary);">SOL/USD</span>
+                    <span class="badge-ds badge-short" style="font-size: 0.55rem; padding: 1px 4px;">SHORT</span>
+                  </div>
+                  <span style="font-size: 0.6rem; color: #ef4444;">Opportunity: 88.5%</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Col 2: Chart Mock -->
+            <div style="display: flex; flex-direction: column; gap: 6px; justify-content: space-between;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 0.7rem; font-weight: 700; color: #fff;">BTC/USD 1H</span>
+                <span style="font-family: monospace; font-size: 0.62rem; color: var(--text-muted);">REAL-TIME</span>
+              </div>
+              <div style="flex: 1; position: relative;">
+                <svg viewBox="0 0 200 120" style="width: 100%; height: 100%;">
+                  <defs>
+                    <linearGradient id="svg-success-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" stop-color="#10b981" />
+                      <stop offset="100%" stop-color="#06b6d4" />
+                    </linearGradient>
+                    <linearGradient id="svg-primary-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" stop-color="#2563eb" />
+                      <stop offset="50%" stop-color="#4f46e5" />
+                      <stop offset="100%" stop-color="#7c3aed" />
+                    </linearGradient>
+                  </defs>
+
+                  <!-- Support & Resistance lines -->
+                  <line class="chart-line-sr" x1="0" y1="40" x2="200" y2="40" stroke="#10b981" stroke-width="0.5" />
+                  <line class="chart-line-sr" x1="0" y1="85" x2="200" y2="85" stroke="#ef4444" stroke-width="0.5" />
+
+                  <!-- Target Plan Ladder Levels -->
+                  <line class="chart-target-line" x1="10" y1="20" x2="190" y2="20" stroke="url(#svg-success-grad)"
+                    stroke-width="1" />
+                  <text class="chart-target-line" x="12" y="16" fill="url(#svg-success-grad)" font-size="5"
+                    font-family="monospace">TP2: $64,250</text>
+
+                  <line class="chart-target-line" x1="10" y1="35" x2="190" y2="35" stroke="url(#svg-success-grad)"
+                    stroke-width="1" />
+                  <text class="chart-target-line" x="12" y="31" fill="url(#svg-success-grad)" font-size="5"
+                    font-family="monospace">TP1: $63,100</text>
+
+                  <line class="chart-target-line" x1="10" y1="65" x2="190" y2="65" stroke="url(#svg-primary-grad)"
+                    stroke-width="1" />
+                  <text class="chart-target-line" x="12" y="61" fill="url(#svg-primary-grad)" font-size="5"
+                    font-family="monospace">ENTRY: $61,500</text>
+
+                  <line class="chart-target-line" x1="10" y1="95" x2="190" y2="95" stroke="#ef4444" stroke-width="1" />
+                  <text class="chart-target-line" x="12" y="91" fill="#ef4444" font-size="5" font-family="monospace">SL:
+                    $59,800</text>
+
+                  <!-- Candlesticks group -->
+                  <g class="chart-candle-group">
+                    <line x1="30" y1="40" x2="30" y2="90" stroke="rgba(255,255,255,0.1)" stroke-width="1" />
+                    <rect x="25" y="55" width="10" height="25" fill="rgba(239, 68, 68, 0.25)"
+                      stroke="rgba(239, 68, 68, 0.4)" stroke-width="0.5" />
+                    <line x1="80" y1="30" x2="80" y2="80" stroke="rgba(255,255,255,0.1)" stroke-width="1" />
+                    <rect x="75" y="45" width="10" height="25" fill="rgba(16, 185, 129, 0.25)"
+                      stroke="rgba(16, 185, 129, 0.4)" stroke-width="0.5" />
+                    <line x1="130" y1="20" x2="130" y2="70" stroke="rgba(255,255,255,0.1)" stroke-width="1" />
+                    <rect x="125" y="35" width="10" height="25" fill="rgba(16, 185, 129, 0.25)"
+                      stroke="rgba(16, 185, 129, 0.4)" stroke-width="0.5" />
+                  </g>
+                </svg>
+              </div>
+            </div>
+
+            <!-- Col 3: Details & Risk -->
+            <div
+              style="border-left: 1px solid rgba(255,255,255,0.06); padding-left: 10px; display: flex; flex-direction: column; justify-content: space-between;">
+              <div class="plan-details-panel" style="display: flex; flex-direction: column; gap: 4px;">
+                <span
+                  style="font-size: 0.65rem; font-weight: 700; color: var(--text-muted); letter-spacing: 0.02em;">ARAIVEN
+                  PLAN</span>
+
+                <!-- Recommendation switches dynamically -->
+                <div style="display: flex; gap: 4px; align-items: center;">
+                  <span class="badge-ds badge-wait rec-badge-wait"
+                    style="font-size: 0.6rem; padding: 2px 6px;">WAITING</span>
+                  <span class="badge-ds badge-long rec-badge-long"
+                    style="font-size: 0.6rem; padding: 2px 6px; background: rgba(124, 58, 237, 0.15) !important; border-color: rgba(124, 58, 237, 0.3) !important; color: #c084fc !important;">LONG
+                    SIGNAL</span>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 1px; margin-top: 4px;">
+                  <span style="font-size: 0.6rem; color: var(--text-muted);">Simulated Exposure</span>
+                  <span style="font-size: 0.72rem; font-weight: 700; color: #fff;">$5,000 (10x Leverage)</span>
+                </div>
+              </div>
+
+              <!-- Action button updates dynamically -->
+              <button class="btn deploy-action-btn"
+                style="width: 100%; height: 32px; font-size: 0.68rem; font-weight: 700; border-radius: 4px; border: 1px solid transparent;">
+                Deploy Trade
+              </button>
+            </div>
+
+            <!-- Deployed Success overlay message -->
+            <div class="deploy-success-flash">
+              <div
+                style="display: flex; align-items: center; gap: 6px; background: rgba(6, 9, 19, 0.9); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 6px; padding: 12px 18px; box-shadow: 0 10px 25px rgba(0,0,0,0.6);">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#10b981" stroke-width="3">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+                <span style="font-family: monospace; font-size: 0.75rem; color: #fff; font-weight: 700;">TRADE DEPLOYED
+                  SUCCESSFULLY</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Trust Bar -->
+  <section class="trust-bar"
+    style="background: rgba(14, 19, 37, 0.4); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 24px 0;">
+    <div class="container"
+      style="max-width: var(--max-content-width); margin: 0 auto; padding: 0 var(--margin-outer); display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap;">
+      <div
+        style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text-secondary); font-weight: 600;">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--primary)" stroke-width="2">
+          <circle cx="12" cy="12" r="10" />
+          <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+        </svg>
+        <span>AI Powered</span>
+      </div>
+      <div
+        style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text-secondary); font-weight: 600;">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--primary)" stroke-width="2">
+          <path d="M2 17l10 5 10-5M2 12l10 5 10-5M12 2L2 7l10 5 10-5-10-5z" />
+        </svg>
+        <span>Real-Time Market Analysis</span>
+      </div>
+      <div
+        style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text-secondary); font-weight: 600;">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--primary)" stroke-width="2">
+          <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+          <polyline points="14 2 14 8 20 8" />
+        </svg>
+        <span>Paper Trading Simulation</span>
+      </div>
+      <div
+        style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text-secondary); font-weight: 600;">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--primary)" stroke-width="2">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+          <polyline points="22 4 12 14.01 9 11.01" />
+        </svg>
+        <span>Institutional Intelligence</span>
+      </div>
+      <div
+        style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text-secondary); font-weight: 600;">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--primary)" stroke-width="2">
+          <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z" />
+          <path d="M12 6v6l4 2" />
+        </svg>
+        <span>24/7 Monitoring</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 1: Problem -->
+  <section id="problem-section" style="padding: 100px 0;">
+    <div class="container" style="max-width: var(--max-content-width); margin: 0 auto; padding: 0 var(--margin-outer);">
+      <div style="text-align: center; margin-bottom: 60px;">
+        <span class="badge-ds badge-avoid" style="font-size: 0.72rem; padding: 4px 10px; margin-bottom: 12px;">Market
+          Realities</span>
+        <h2 class="section-title" style="font-size: 2.2rem; font-weight: 700; margin-bottom: 16px;">Why Retail Traders
+          <span class="text-accent-gradient">Struggle</span></h2>
+        <p class="body-text" style="max-width: 550px; margin: 0 auto;">Studying hundreds of lagging parameters manually
+          leads to trading bias, emotional fatigue, and delayed executions.</p>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px;">
+        <div class="card-glass"
+          style="display: flex; flex-direction: column; gap: 20px; border-color: rgba(239, 68, 68, 0.15);">
+          <h3 class="card-title"
+            style="color: var(--danger); font-size: 1.15rem; margin: 0; display: flex; align-items: center; gap: 8px;">
+            <span
+              style="width: 8px; height: 8px; border-radius: 50%; background: var(--danger); display: inline-block;"></span>
+            The Manual Limit
+          </h3>
+          <p class="body-text">Endless indicator loops (RSI, MACD, EMAs) and spreadsheet math overload the human
+            decision pipeline, leading to execution delays.</p>
+          <ul
+            style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; font-size: 0.85rem; color: var(--text-secondary);">
+            <li style="display: flex; align-items: flex-start; gap: 8px;">
+              <span style="color: var(--danger); font-weight: bold;">✕</span>
+              Staring at multiple timeframes for hours.
+            </li>
+            <li style="display: flex; align-items: flex-start; gap: 8px;">
+              <span style="color: var(--danger); font-weight: bold;">✕</span>
+              Calculating position sizes and stop ratios manually.
+            </li>
+          </ul>
+        </div>
+
+        <div class="card-glass"
+          style="display: flex; flex-direction: column; gap: 20px; border-color: rgba(16, 185, 129, 0.15);">
+          <h3 class="card-title"
+            style="color: var(--success); font-size: 1.15rem; margin: 0; display: flex; align-items: center; gap: 8px;">
+            <span
+              style="width: 8px; height: 8px; border-radius: 50%; background: var(--success); display: inline-block;"></span>
+            The Autonomous Shift
+          </h3>
+          <p class="body-text">Araiven tracks supporting volume bands, parses structural orderbook support, drafts
+            execution plan levels, and enforces drawdown rules instantly.</p>
+          <ul
+            style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; font-size: 0.85rem; color: var(--text-secondary);">
+            <li style="display: flex; align-items: flex-start; gap: 8px;">
+              <span style="color: var(--success); font-weight: bold;">✓</span>
+              Multi-feed support scanning parses opportunities instantly.
+            </li>
+            <li style="display: flex; align-items: flex-start; gap: 8px;">
+              <span style="color: var(--success); font-weight: bold;">✓</span>
+              Structured target ladders pre-loaded before simulated action.
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 2: Meet Araiven -->
+  <section
+    style="padding: 100px 0; background: rgba(14, 19, 37, 0.4); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
+    <div class="container"
+      style="max-width: var(--max-content-width); margin: 0 auto; padding: 0 var(--margin-outer); display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center;">
+      <div>
+        <span class="badge-ds badge-ai" style="font-size: 0.72rem; padding: 4px 10px; margin-bottom: 12px;">Core
+          Decision Engine</span>
+        <h2 class="section-title" style="font-size: 2.2rem; font-weight: 700; margin-bottom: 20px;">Meet <span
+            class="text-accent-gradient">Araiven Intelligence</span></h2>
+        <p class="body-text" style="font-size: 1.05rem; line-height: 1.6; margin-bottom: 20px;">Araiven is the
+          multi-dimensional decision engine behind the Ravora platform. It continuously evaluates historical supports,
+          order volume clusters, and sentiment shifts to identify simulated trading ideas.</p>
+        <p class="body-text" style="font-size: 1.05rem; line-height: 1.6; margin-bottom: 0;">By matching market feeds
+          against mathematical models, Araiven provides clear, transparent execution planning without retail indicator
+          congestion.</p>
+      </div>
+      <div>
+        <div class="card-glass" style="display: flex; flex-direction: column; gap: 16px; padding: 24px;">
+          <div
+            style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 10px;">
+            <span style="font-family: monospace; font-size: 0.72rem; color: var(--text-muted);">DECISION METRIC
+              INPUT</span>
+            <span style="font-family: monospace; font-size: 0.72rem; color: var(--ai-accent);">SYNCED</span>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 10px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem;">
+              <span style="color: var(--text-secondary);">Feeds Latency</span>
+              <span style="font-weight: 700; color: #fff;">1.2ms (Real-Time)</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem;">
+              <span style="color: var(--text-secondary);">Risk Audits Ingestion</span>
+              <span style="font-weight: 700; color: #fff;">24.4k feeds / sec</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem;">
+              <span style="color: var(--text-secondary);">Drawdown Protection</span>
+              <span style="font-weight: 700; color: #10b981;">ACTIVE GUARD</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 3: How Ravora Works -->
+  <section id="workflow-section" style="padding: 100px 0;">
+    <div class="container" style="max-width: var(--max-content-width); margin: 0 auto; padding: 0 var(--margin-outer);">
+      <div style="text-align: center; margin-bottom: 60px;">
+        <span class="badge-ds badge-long" style="font-size: 0.72rem; padding: 4px 10px; margin-bottom: 12px;">Visual
+          Pipeline</span>
+        <h2 class="section-title" style="font-size: 2.2rem; font-weight: 700; margin-bottom: 16px;">Simple 4-Step <span
+            class="text-accent-gradient">Intelligence</span></h2>
+        <p class="body-text" style="max-width: 550px; margin: 0 auto;">Observe how Ravora translates global market feeds
+          into clean, simulated execution plan ladders.</p>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px;">
+        <div class="card-glass" style="display: flex; flex-direction: column; gap: 12px;">
+          <div
+            style="font-size: 1.8rem; font-weight: 800; color: rgba(255,255,255,0.06); font-family: var(--font-display);">
+            01</div>
+          <h4 class="card-title" style="margin: 0;">Feed Ingestion</h4>
+          <p style="font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5; margin: 0;">Continuously checks
+            orderbook feeds and volume spikes 24/7.</p>
+        </div>
+        <div class="card-glass" style="display: flex; flex-direction: column; gap: 12px;">
+          <div
+            style="font-size: 1.8rem; font-weight: 800; color: rgba(255,255,255,0.06); font-family: var(--font-display);">
+            02</div>
+          <h4 class="card-title" style="margin: 0;">Quant Analysis</h4>
+          <p style="font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5; margin: 0;">Araiven identifies
+            support zones, momentum support, and trends.</p>
+        </div>
+        <div class="card-glass" style="display: flex; flex-direction: column; gap: 12px;">
+          <div
+            style="font-size: 1.8rem; font-weight: 800; color: rgba(255,255,255,0.06); font-family: var(--font-display);">
+            03</div>
+          <h4 class="card-title" style="margin: 0;">Ladders Setup</h4>
+          <p style="font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5; margin: 0;">Generates Execution
+            Plan target ladders outlining Entry, SL, and multiple Take Profits.</p>
+        </div>
+        <div class="card-glass" style="display: flex; flex-direction: column; gap: 12px;">
+          <div
+            style="font-size: 1.8rem; font-weight: 800; color: rgba(255,255,255,0.06); font-family: var(--font-display);">
+            04</div>
+          <h4 class="card-title" style="margin: 0;">Simulated Deployment</h4>
+          <p style="font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5; margin: 0;">Execute recommended
+            trades into simulated sandbox positions with automated drawdown caps.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 4: Interactive Product Showcase -->
+  <section id="showcase-section"
+    style="padding: 100px 0; background: rgba(14, 19, 37, 0.4); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
+    <div class="container" style="max-width: var(--max-content-width); margin: 0 auto; padding: 0 var(--margin-outer);">
+      <div style="text-align: center; margin-bottom: 60px;">
+        <span class="badge-ds badge-hold"
+          style="font-size: 0.72rem; padding: 4px 10px; margin-bottom: 12px;">Interactive Showcase</span>
+        <h2 class="section-title" style="font-size: 2.2rem; font-weight: 700; margin-bottom: 16px;">Platform Workspace
+          <span class="text-accent-gradient">Views</span></h2>
+        <p class="body-text" style="max-width: 550px; margin: 0 auto;">Auditing each critical view inside the Ravora AI
+          Trading Operating System.</p>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px;">
+        <!-- Card 1: Chart -->
+        <div class="card-glass showcase-card" style="display: flex; flex-direction: column; gap: 14px;">
+          <div
+            style="font-weight: 700; color: var(--primary); font-size: 0.72rem; letter-spacing: 0.05em; font-family: monospace;">
+            01 / CHART VIEW</div>
+          <h4 class="card-title" style="margin: 0;">Integrated Price Chart</h4>
+          <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; margin: 0;">A simplified price
+            canvas plotting support/resistance bounds and active ladder levels directly on the candles.</p>
+        </div>
+        <!-- Card 2: Market Scanner -->
+        <div class="card-glass showcase-card" style="display: flex; flex-direction: column; gap: 14px;">
+          <div
+            style="font-weight: 700; color: var(--primary); font-size: 0.72rem; letter-spacing: 0.05em; font-family: monospace;">
+            02 / SCANNER VIEW</div>
+          <h4 class="card-title" style="margin: 0;">AI Opportunity Scanner</h4>
+          <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; margin: 0;">Continuous scanners
+            listing direction bias, opportunity score, and macro sentiment confidence on major pairs.</p>
+        </div>
+        <!-- Card 3: Execution Plan -->
+        <div class="card-glass showcase-card" style="display: flex; flex-direction: column; gap: 14px;">
+          <div
+            style="font-weight: 700; color: var(--primary); font-size: 0.72rem; letter-spacing: 0.05em; font-family: monospace;">
+            03 / EXECUTION PLAN</div>
+          <h4 class="card-title" style="margin: 0;">Structured Target Ladders</h4>
+          <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; margin: 0;">Visual confirmation
+            boards detailing potential PnL multipliers, margin limits, and exposure ratios prior to simulated entries.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 5: AI Features -->
+  <section id="features-section" style="padding: 100px 0;">
+    <div class="container" style="max-width: var(--max-content-width); margin: 0 auto; padding: 0 var(--margin-outer);">
+      <div style="text-align: center; margin-bottom: 60px;">
+        <span class="badge-ds badge-ai" style="font-size: 0.72rem; padding: 4px 10px; margin-bottom: 12px;">Feature
+          Matrix</span>
+        <h2 class="section-title" style="font-size: 2.2rem; font-weight: 700; margin-bottom: 16px;">Core Platform <span
+            class="text-accent-gradient">Capabilities</span></h2>
+        <p class="body-text" style="max-width: 550px; margin: 0 auto;">Standardised tools developed to eliminate manual
+          charting complexity.</p>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px;">
+        <div class="card-glass" style="display: flex; gap: 16px; align-items: flex-start;">
+          <div
+            style="width: 40px; height: 40px; border-radius: 8px; background: rgba(124,58,237,0.06); display: flex; align-items: center; justify-content: center; color: var(--ai-accent); flex-shrink: 0;">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+            </svg>
+          </div>
+          <div>
+            <h4 class="card-title" style="margin: 0 0 6px 0;">Multi-dimensional Models Ingestion</h4>
+            <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; margin: 0;">Araiven
+              coordinates price updates, support blocks, order volume support, and macro indicators simultaneously.</p>
+          </div>
+        </div>
+
+        <div class="card-glass" style="display: flex; gap: 16px; align-items: flex-start;">
+          <div
+            style="width: 40px; height: 40px; border-radius: 8px; background: rgba(124,58,237,0.06); display: flex; align-items: center; justify-content: center; color: var(--ai-accent); flex-shrink: 0;">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+              <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+            </svg>
+          </div>
+          <div>
+            <h4 class="card-title" style="margin: 0 0 6px 0;">Exposure Guard Limiters</h4>
+            <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; margin: 0;">Real-time margin
+              calculators showing exact Max Loss risk, potential PnL wins, and exposure levels inside Deploy modals.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 6: Trading Intelligence (Workflow comparison) -->
+  <section
+    style="padding: 100px 0; background: rgba(14, 19, 37, 0.4); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
+    <div class="container" style="max-width: var(--max-content-width); margin: 0 auto; padding: 0 var(--margin-outer);">
+      <div style="text-align: center; margin-bottom: 60px;">
+        <span class="badge-ds badge-hold" style="font-size: 0.72rem; padding: 4px 10px; margin-bottom: 12px;">Method
+          Comparison</span>
+        <h2 class="section-title" style="font-size: 2.2rem; font-weight: 700; margin-bottom: 16px;">Standardising the
+          <span class="text-accent-gradient">Workflow</span></h2>
+        <p class="body-text" style="max-width: 550px; margin: 0 auto;">A comparison of traditional manual processes vs.
+          Ravora's design tokens.</p>
+      </div>
+
+      <div class="card-glass" style="padding: 0; border-radius: 12px; overflow: hidden;">
+        <table class="table-ds" style="width: 100%; margin: 0;">
+          <thead>
+            <tr>
+              <th style="padding: 16px 20px;">TRADING METRIC</th>
+              <th style="padding: 16px 20px;">TRADITIONAL MANUAL TRADING</th>
+              <th style="padding: 16px 20px; color: var(--primary);">RAVORA AI SYSTEM</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="padding: 16px 20px; font-weight: 600; color: #fff;">Market Screening</td>
+              <td style="padding: 16px 20px; color: var(--text-muted);">8+ hours of screen monitoring per day</td>
+              <td style="padding: 16px 20px; color: #fff; font-weight: 500;">0 hours (Fully autonomous scanning)</td>
+            </tr>
+            <tr>
+              <td style="padding: 16px 20px; font-weight: 600; color: #fff;">Ladder Target Calculators</td>
+              <td style="padding: 16px 20px; color: var(--text-muted);">Manual support calculations on sheets</td>
+              <td style="padding: 16px 20px; color: #fff; font-weight: 500;">Instant visual target ladders</td>
+            </tr>
+            <tr>
+              <td style="padding: 16px 20px; font-weight: 600; color: #fff;">Downside Containment</td>
+              <td style="padding: 16px 20px; color: var(--text-muted);">Delayed or emotional Stop Loss execution</td>
+              <td style="padding: 16px 20px; color: #fff; font-weight: 500;">Automated drawdown protection limit</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 7: Testimonials -->
+  <section style="padding: 100px 0;">
+    <div class="container" style="max-width: var(--max-content-width); margin: 0 auto; padding: 0 var(--margin-outer);">
+      <div style="text-align: center; margin-bottom: 60px;">
+        <span class="badge-ds badge-success" style="font-size: 0.72rem; padding: 4px 10px; margin-bottom: 12px;">Market
+          Feedback</span>
+        <h2 class="section-title" style="font-size: 2.2rem; font-weight: 700; margin-bottom: 16px;">What Traders <span
+            class="text-accent-gradient">Say</span></h2>
+        <p class="body-text" style="max-width: 550px; margin: 0 auto;">Institutional and retail traders outline their
+          simulated performance.</p>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;">
+        <div class="card-glass"
+          style="display: flex; flex-direction: column; gap: 16px; justify-content: space-between;">
+          <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6; margin: 0;">"The execution plan
+            ladders completely changed how I think about targets. No more math on spreadsheets; the system handles risk
+            percentages instantly."</p>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div
+              style="width: 32px; height: 32px; border-radius: 50%; background: var(--primary); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 0.75rem; font-weight: bold;">
+              MK</div>
+            <div style="display: flex; flex-direction: column;">
+              <span style="font-size: 0.8rem; font-weight: 600; color: #fff;">Marcus K.</span>
+              <span style="font-size: 0.65rem; color: var(--text-muted);">Independent Portfolio Trader</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-glass"
+          style="display: flex; flex-direction: column; gap: 16px; justify-content: space-between;">
+          <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6; margin: 0;">"Paper trading feels
+            remarkably close to real execution. The leverage and exposure sliders teach correct risk management
+            protocols effortlessly."</p>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div
+              style="width: 32px; height: 32px; border-radius: 50%; background: var(--ai-accent); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 0.75rem; font-weight: bold;">
+              TL</div>
+            <div style="display: flex; flex-direction: column;">
+              <span style="font-size: 0.8rem; font-weight: 600; color: #fff;">Tanya L.</span>
+              <span style="font-size: 0.65rem; color: var(--text-muted);">Quantitative Analyst</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-glass"
+          style="display: flex; flex-direction: column; gap: 16px; justify-content: space-between;">
+          <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6; margin: 0;">"Araiven's risk
+            index metrics are highly accurate. Having support and supply zones plotted dynamically on the chart keeps
+            trading layouts clean."</p>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div
+              style="width: 32px; height: 32px; border-radius: 50%; background: #3b82f6; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 0.75rem; font-weight: bold;">
+              DL</div>
+            <div style="display: flex; flex-direction: column;">
+              <span style="font-size: 0.8rem; font-weight: 600; color: #fff;">David L.</span>
+              <span style="font-size: 0.65rem; color: var(--text-muted);">Retail Risk Associate</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 8: FAQ -->
+  <section id="faq-section"
+    style="padding: 100px 0; background: rgba(14, 19, 37, 0.4); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
+    <div class="container" style="max-width: var(--max-content-width); margin: 0 auto; padding: 0 var(--margin-outer);">
+      <div style="text-align: center; margin-bottom: 60px;">
+        <span class="badge-ds badge-hold"
+          style="font-size: 0.72rem; padding: 4px 10px; margin-bottom: 12px;">Operational Queries</span>
+        <h2 class="section-title" style="font-size: 2.2rem; font-weight: 700; margin-bottom: 16px;">Frequently Asked
+          <span class="text-accent-gradient">Questions</span></h2>
+        <p class="body-text" style="max-width: 550px; margin: 0 auto;">Answers to key operational queries about the
+          Ravora platform.</p>
+      </div>
+
+      <div style="max-width: 700px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px;">
+        <div class="card-glass faq-item" style="padding: 16px; border-radius: 8px;">
+          <div class="faq-item-header"
+            style="display: flex; justify-content: space-between; align-items: center; cursor: pointer; color: #fff; font-weight: 600; font-size: 0.95rem;">
+            <span>Is it real-money trading?</span>
+            <span style="font-size: 1.2rem; line-height: 1;">+</span>
+          </div>
+          <div class="faq-item-content"
+            style="max-height: 0; overflow: hidden; transition: max-height 0.2s ease-out; font-size: 0.85rem; color: var(--text-secondary); margin-top: 0; line-height: 1.6;">
+            <p style="padding-top: 10px; margin: 0;">No. Ravora is currently configured exclusively for paper trading
+              simulation. It allows you to build mock positions and test strategies against live orderbooks with zero
+              capital risk.</p>
+          </div>
+        </div>
+
+        <div class="card-glass faq-item" style="padding: 16px; border-radius: 8px;">
+          <div class="faq-item-header"
+            style="display: flex; justify-content: space-between; align-items: center; cursor: pointer; color: #fff; font-weight: 600; font-size: 0.95rem;">
+            <span>How does Araiven calculate opportunities?</span>
+            <span style="font-size: 1.2rem; line-height: 1;">+</span>
+          </div>
+          <div class="faq-item-content"
+            style="max-height: 0; overflow: hidden; transition: max-height 0.2s ease-out; font-size: 0.85rem; color: var(--text-secondary); margin-top: 0; line-height: 1.6;">
+            <p style="padding-top: 10px; margin: 0;">Araiven scans orderbooks, structural levels, volume profiles, and
+              news feeds. It calculates probability ranges based on consolidations and overlays targets dynamically on
+              your charts.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 9: Final CTA -->
+  <section style="padding: 100px 0; text-align: center;">
+    <div class="container" style="max-width: var(--max-content-width); margin: 0 auto; padding: 0 var(--margin-outer);">
+      <h2 class="display-title" style="font-size: 2.5rem; font-weight: 700; margin-bottom: 16px; color: #fff;">Ready to
+        upgrade your <span class="text-accent-gradient">workflow</span>?</h2>
+      <p class="body-text" style="max-width: 500px; margin: 0 auto 32px auto;">Link your simulated account today and let
+        Araiven discover market alpha.</p>
+      <a href="/app/?auth=register" class="btn btn-primary"
+        style="height: 48px; padding: 0 32px; border-radius: 6px; font-size: 0.95rem; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; text-decoration: none;">Start
+        Free Now</a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer style="padding: 40px 0; border-top: 1px solid var(--border);">
+    <div class="container"
+      style="max-width: var(--max-content-width); margin: 0 auto; padding: 0 var(--margin-outer); display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; color: var(--text-muted); flex-wrap: wrap; gap: 16px;">
+      <p>&copy; 2026 Ravora Technologies Inc. All rights reserved.</p>
+      <div class="footer-socials" style="display: flex; gap: 12px;">
+        <a href="#" id="btn-sidebar-feedback" title="Feedback"
+          style="color: var(--text-muted); text-decoration: none; font-weight: 600; transition: color var(--transition-hover);">Feedback</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Interactive Demo Video Modal -->
+  <div class="modal-overlay" id="demo-modal">
+    <div class="modal-content"
+      style="background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px; max-width: 500px; width: 100%; position: relative; box-sizing: border-box;">
+      <button class="modal-close" id="modal-close-btn"
+        style="position: absolute; top: 16px; right: 16px; background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer;">&times;</button>
+      <h3 style="font-family: var(--font-display); color: #fff; margin-bottom: 8px; font-size: 1.25rem;">Ravora
+        Experience Tour</h3>
+      <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 16px; line-height: 1.5;">Watch how
+        Ravora links simulated markets, discovers opportunities, and optimizes risk automatically in 90 seconds.</p>
+      <div
+        style="background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 6px; padding: 12px; font-family: monospace; font-size: 0.75rem; color: var(--ai-accent); text-align: left; overflow: hidden; white-space: nowrap;">
+        [SYSTEM] Loading video player configuration...<br>
+        [SYSTEM] API key validated. Buffer initialized.<br>
+        [SYSTEM] Playback ready. Click the button to start simulation.
+      </div>
+    </div>
+  </div>
+
+  <!-- Auth Modal disabled to use /app/ as single auth controller -->
+  <div class="modal-overlay auth-page-overlay" id="auth-modal" style="display: none !important; z-index: 1100;">
+    <div class="auth-split-container" style="display: none !important;">
+      
+      <!-- Left Side: Brand Storytelling (45%) -->
+      <div class="auth-left-story" style="display: none !important;">
+        <div class="ambient-grid"></div>
+        <div class="glow-blob glow-1" style="display: none !important; width: 250px; height: 250px; opacity: 0.15;"></div>
+        
+        <div class="auth-story-content">
+          <!-- Logo -->
+          <a href="#" class="logo" style="display: flex; align-items: center; gap: 10px; font-family: var(--font-display); font-size: 1.25rem; font-weight: 700; color: #fff; text-decoration: none; margin-bottom: 40px;">
+            <div class="logo-icon" style="width: 36px; height: 36px; border-radius: 6px; background: var(--gradient-primary); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 1.2rem;">R</div>
+            Ravora
+          </a>
+          
+          <h2 style="font-family: var(--font-display); font-size: 2.2rem; font-weight: 700; color: #fff; line-height: 1.25; margin-bottom: 16px; letter-spacing: -0.02em;">
+            Enter the future of <span class="text-accent-gradient">automated wealth</span>.
+          </h2>
+          
+          <p style="color: var(--text-secondary); font-size: 1rem; line-height: 1.55; margin-bottom: 40px; max-width: 420px;">
+            Araiven coordinates real-time market orderbooks, builds execution target ladders, and monitors risk parameters 24/7.
+          </p>
+          
+          <!-- Subtle AI/Dashboard preview animation (minimised SVG loop) -->
+          <div class="auth-dashboard-preview" style="border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; background: rgba(14,19,37,0.6); padding: 16px; position: relative; overflow: hidden; box-shadow: 0 12px 30px rgba(0,0,0,0.3); max-width: 440px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 8px; margin-bottom: 12px;">
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <span style="width: 6px; height: 6px; border-radius: 50%; background: #10b981; display: inline-block;"></span>
+                <span style="font-family: monospace; font-size: 0.65rem; color: var(--text-secondary); font-weight: 700;">ARAIVEN FEED STATUS</span>
+              </div>
+              <span style="font-family: monospace; font-size: 0.6rem; color: var(--ai-accent); font-weight: 700;">STREAMING LIVE</span>
+            </div>
+            
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 0.72rem; color: #fff; font-weight: 600;">BTC/USD Opportunity Score</span>
+                <span class="text-accent-gradient" style="font-size: 0.75rem; font-weight: 700; font-family: monospace;">94.2%</span>
+              </div>
+              <!-- Animated progress bar -->
+              <div style="height: 6px; background: rgba(255,255,255,0.02); border-radius: 99px; overflow: hidden; border: 1px solid rgba(255,255,255,0.04);">
+                <div class="auth-preview-bar-fill" style="width: 94.2%; height: 100%; background: var(--gradient-primary); border-radius: 99px;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Trust Points -->
+          <div style="display: flex; flex-direction: column; gap: 10px; font-size: 0.8rem; color: var(--text-secondary); margin-top: 40px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="var(--primary)" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+              <span>256-bit Secure TLS Data Transmission</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="var(--primary)" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+              <span>Simulated Sandbox Environment (No real capital required)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Right Side: Auth Forms (55%) -->
+      <div class="auth-right-form-wrapper">
+        <!-- Close button -->
+        <button class="modal-close" id="auth-modal-close" style="position: absolute; top: 24px; right: 24px; background: none; border: none; color: var(--text-muted); font-size: 1.8rem; cursor: pointer; line-height: 1; z-index: 100; transition: color 0.2s;">&times;</button>
+        
+        <div class="auth-form-card" style="width: 100%; max-width: 440px; padding: 32px !important; border-radius: 16px !important; background: rgba(14, 19, 37, 0.8) !important; border: 1px solid rgba(255,255,255,0.06); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5) !important; box-sizing: border-box;">
+          
+          <!-- 1. SIGN IN VIEW -->
+          <div id="auth-login-view" style="display: block; width: 100%;">
+            <form id="landing-login-form" class="auth-form" style="width: 100%;">
+              <h3 style="margin-bottom: 6px; text-align: left; font-family: var(--font-display); font-size: 1.45rem; font-weight: 700; color: #fff;">Welcome to Ravora</h3>
+              <p class="body-text" style="margin-bottom: 20px; text-align: left; font-size: 0.85rem; color: var(--text-secondary); line-height: 1.45;">Enter your credentials to access your active wealth copilot.</p>
+              
+              <!-- Tab toggle: Email vs Mobile -->
+              <div class="filter-segmented" style="display: flex; margin-bottom: 20px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 6px; padding: 2px;">
+                <button type="button" class="segmented-tab active" id="login-tab-email" style="flex: 1; padding: 8px; font-size: 0.72rem; font-weight: 600; border: none; background: transparent; color: #fff; cursor: pointer;">Email Address</button>
+                <button type="button" class="segmented-tab" id="login-tab-mobile" style="flex: 1; padding: 8px; font-size: 0.72rem; font-weight: 600; border: none; background: transparent; color: var(--text-secondary); cursor: pointer;">Mobile Number</button>
+              </div>
+
+              <!-- Email Block -->
+              <div id="login-email-container" class="auth-input-group" style="margin-bottom: 16px; text-align: left;">
+                <label style="display: block; font-size: 0.72rem; font-weight: 600; color: #a5b4fc; margin-bottom: 6px; letter-spacing: 0.05em;">EMAIL ADDRESS</label>
+                <input type="email" id="landing-login-email" class="form-input" placeholder="name@domain.com" style="width: 100%; box-sizing: border-box;">
+              </div>
+
+              <!-- Mobile Block -->
+              <div id="login-mobile-container" class="auth-input-group" style="margin-bottom: 16px; text-align: left; display: none;">
+                <label style="display: block; font-size: 0.72rem; font-weight: 600; color: #a5b4fc; margin-bottom: 6px; letter-spacing: 0.05em;">MOBILE NUMBER</label>
+                <input type="text" id="landing-login-mobile" class="form-input" placeholder="+1 (555) 000-0000" style="width: 100%; box-sizing: border-box;">
+              </div>
+
+              <!-- Password Block -->
+              <div id="login-password-container" class="auth-input-group" style="margin-bottom: 20px; text-align: left; position: relative;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                  <label style="margin-bottom: 0; font-size: 0.72rem; font-weight: 600; color: #a5b4fc; letter-spacing: 0.05em;">PASSWORD</label>
+                  <a href="#" class="auth-forgot-link" id="login-forgot-btn" style="font-size: 0.72rem; color: var(--accent); text-decoration: none; font-weight: 600;">Forgot Password?</a>
+                </div>
+                <div style="position: relative; width: 100%;">
+                  <input type="password" id="landing-login-password" class="form-input" placeholder="••••••••" style="width: 100%; padding-right: 40px; box-sizing: border-box;">
+                  <button type="button" class="btn-toggle-password" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0;">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Login with OTP toggle -->
+              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 20px; font-size: 0.8rem; color: var(--text-secondary); text-align: left;">
+                <input type="checkbox" id="login-otp-toggle" style="accent-color: var(--primary); cursor: pointer; width: 15px; height: 15px;">
+                <label for="login-otp-toggle" style="margin: 0; font-weight: 500; cursor: pointer;">Sign in with OTP code instead of password</label>
+              </div>
+
+              <!-- Remember Me & Trust settings -->
+              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 20px; font-size: 0.8rem; color: var(--text-secondary); text-align: left;">
+                <input type="checkbox" id="login-remember-me" style="accent-color: var(--primary); cursor: pointer; width: 15px; height: 15px;">
+                <label for="login-remember-me" style="margin: 0; font-weight: 500; cursor: pointer;">Trust this device (skip future OTPs)</label>
+              </div>
+
+              <div id="landing-login-error" class="auth-error-msg" style="display: none;"></div>
+              
+              <button type="submit" class="btn btn-primary auth-submit-btn" style="width: 100%; padding: 14px; margin-bottom: 20px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; height: 46px;">
+                <span>Sign In</span>
+                <span class="auth-spinner" style="display: none; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff; animation: spin-loader 0.8s linear infinite;"></span>
+              </button>
+
+              <!-- Social Divider -->
+              <div class="social-divider" style="text-align: center; margin: 20px 0; position: relative; font-size: 0.72rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">
+                <span style="background: rgb(8, 11, 22); padding: 0 10px; position: relative; z-index: 2;">OR CONTINUE WITH</span>
+                <div style="position: absolute; top: 50%; left: 0; width: 100%; height: 1px; background: rgba(255,255,255,0.06); z-index: 1;"></div>
+              </div>
+
+              <!-- Social Buttons -->
+              <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 24px;">
+                <button type="button" class="btn btn-secondary social-btn btn-social-login" data-provider="google" style="height: 38px; font-size: 0.76rem; padding: 0; font-weight: 600; background: rgba(255,255,255,0.01);">Google</button>
+                <button type="button" class="btn btn-secondary social-btn btn-social-login" data-provider="github" style="height: 38px; font-size: 0.76rem; padding: 0; font-weight: 600; background: rgba(255,255,255,0.01);">GitHub</button>
+                <button type="button" class="btn btn-secondary social-btn btn-social-login" data-provider="apple" style="height: 38px; font-size: 0.76rem; padding: 0; font-weight: 600; background: rgba(255,255,255,0.01);">Apple</button>
+              </div>
+
+              <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0; text-align: center;">Don't have an account? <a href="#" id="switch-to-signup" class="auth-switch-link" style="color: var(--accent); font-weight: 600;">Create Account</a></p>
+            </form>
+          </div>
+
+          <!-- 2. REGISTRATION VIEW -->
+          <div id="auth-register-view" style="display: none; width: 100%;">
+            <form id="landing-register-form" class="auth-form" style="width: 100%;">
+              <h3 style="margin-bottom: 6px; text-align: left; font-family: var(--font-display); font-size: 1.45rem; font-weight: 700; color: #fff;">Create Account</h3>
+              <p class="body-text" style="margin-bottom: 20px; text-align: left; font-size: 0.85rem; color: var(--text-secondary); line-height: 1.45;">Initialize your institutional-grade AI wealth management workspace.</p>
+
+              <!-- Tab toggle: Email vs Mobile -->
+              <div class="filter-segmented" style="display: flex; margin-bottom: 20px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 6px; padding: 2px;">
+                <button type="button" class="segmented-tab active" id="register-tab-email" style="flex: 1; padding: 8px; font-size: 0.72rem; font-weight: 600; border: none; background: transparent; color: #fff; cursor: pointer;">Email Address</button>
+                <button type="button" class="segmented-tab" id="register-tab-mobile" style="flex: 1; padding: 8px; font-size: 0.72rem; font-weight: 600; border: none; background: transparent; color: var(--text-secondary); cursor: pointer;">Mobile Number</button>
+              </div>
+
+              <div class="auth-input-group" style="margin-bottom: 16px; text-align: left;">
+                <label style="display: block; font-size: 0.72rem; font-weight: 600; color: #a5b4fc; margin-bottom: 6px; letter-spacing: 0.05em;">FULL NAME</label>
+                <input type="text" id="landing-register-name" class="form-input" placeholder="Alex Mercer" required style="width: 100%; box-sizing: border-box;">
+              </div>
+
+              <!-- Email Block -->
+              <div id="register-email-container" class="auth-input-group" style="margin-bottom: 16px; text-align: left;">
+                <label style="display: block; font-size: 0.72rem; font-weight: 600; color: #a5b4fc; margin-bottom: 6px; letter-spacing: 0.05em;">EMAIL ADDRESS</label>
+                <input type="email" id="landing-register-email" class="form-input" placeholder="name@domain.com" style="width: 100%; box-sizing: border-box;">
+              </div>
+
+              <!-- Mobile Block -->
+              <div id="register-mobile-container" class="auth-input-group" style="margin-bottom: 16px; text-align: left; display: none;">
+                <label style="display: block; font-size: 0.72rem; font-weight: 600; color: #a5b4fc; margin-bottom: 6px; letter-spacing: 0.05em;">MOBILE NUMBER</label>
+                <input type="text" id="landing-register-mobile" class="form-input" placeholder="+1 (555) 000-0000" style="width: 100%; box-sizing: border-box;">
+              </div>
+
+              <!-- Passwords -->
+              <div class="auth-input-group" style="margin-bottom: 16px; text-align: left; position: relative;">
+                <label style="display: block; font-size: 0.72rem; font-weight: 600; color: #a5b4fc; margin-bottom: 6px; letter-spacing: 0.05em;">PASSWORD</label>
+                <div style="position: relative; width: 100%;">
+                  <input type="password" id="landing-register-password" class="form-input" placeholder="••••••••" required style="width: 100%; padding-right: 40px; box-sizing: border-box;">
+                  <button type="button" class="btn-toggle-password" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0;">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  </button>
+                </div>
+                <!-- Strength bar -->
+                <div class="pwd-strength-container" style="margin-top: 8px; display: flex; gap: 4px; height: 3px; width: 100%;">
+                  <div class="pwd-strength-bar" style="flex: 1; border-radius: 99px; background: rgba(255,255,255,0.06); transition: background 0.3s;"></div>
+                  <div class="pwd-strength-bar" style="flex: 1; border-radius: 99px; background: rgba(255,255,255,0.06); transition: background 0.3s;"></div>
+                  <div class="pwd-strength-bar" style="flex: 1; border-radius: 99px; background: rgba(255,255,255,0.06); transition: background 0.3s;"></div>
+                </div>
+                <span id="pwd-strength-desc" style="font-size: 0.62rem; color: var(--text-muted); margin-top: 4px; display: block; font-weight: 600;">Password must be at least 8 characters.</span>
+              </div>
+
+              <div class="auth-input-group" style="margin-bottom: 20px; text-align: left; position: relative;">
+                <label style="display: block; font-size: 0.72rem; font-weight: 600; color: #a5b4fc; margin-bottom: 6px; letter-spacing: 0.05em;">CONFIRM PASSWORD</label>
+                <div style="position: relative; width: 100%;">
+                  <input type="password" id="landing-register-confirm-password" class="form-input" placeholder="••••••••" required style="width: 100%; padding-right: 40px; box-sizing: border-box;">
+                  <button type="button" class="btn-toggle-password" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0;">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Terms Checkbox -->
+              <div style="display: flex; align-items: flex-start; gap: 8px; margin-bottom: 20px; font-size: 0.8rem; color: var(--text-secondary); line-height: 1.4; text-align: left;">
+                <input type="checkbox" id="register-terms" required style="accent-color: var(--primary); cursor: pointer; width: 15px; height: 15px; margin-top: 2px;">
+                <label for="register-terms" style="margin: 0; font-weight: 500; cursor: pointer;">I agree to Ravora's <a href="#" style="color: var(--accent); text-decoration: none;">Terms of Service</a> and <a href="#" style="color: var(--accent); text-decoration: none;">Privacy Policy</a>.</label>
+              </div>
+
+              <div id="landing-register-error" class="auth-error-msg" style="display: none;"></div>
+
+              <button type="submit" class="btn btn-primary auth-submit-btn" style="width: 100%; padding: 14px; margin-bottom: 20px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; height: 46px;">
+                <span>Create Account</span>
+                <span class="auth-spinner" style="display: none; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff; animation: spin-loader 0.8s linear infinite;"></span>
+              </button>
+
+              <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0; text-align: center;">Already have an account? <a href="#" id="switch-to-login" class="auth-switch-link" style="color: var(--accent); font-weight: 600;">Sign In</a></p>
+            </form>
+          </div>
+
+          <!-- 3. OTP VERIFICATION VIEW -->
+          <div id="auth-otp-view" style="display: none; width: 100%;">
+            <form id="landing-verify-form" class="auth-form" style="width: 100%;">
+              <h3 style="margin-bottom: 6px; text-align: left; font-family: var(--font-display); font-size: 1.45rem; font-weight: 700; color: #fff;">Verify Account</h3>
+              <p class="body-text" id="otp-description" style="margin-bottom: 20px; text-align: left; font-size: 0.85rem; color: var(--text-secondary); line-height: 1.45;">We've sent a 6-digit verification code. Enter it below to secure access.</p>
+
+              <div class="auth-input-group" style="margin-bottom: 20px;">
+                <label style="text-align: center; display: block; margin-bottom: 12px; font-size: 0.72rem; font-weight: 600; color: #a5b4fc; letter-spacing: 0.05em;">VERIFICATION CODE</label>
+                <div style="display: flex; gap: 8px; justify-content: center;" class="digit-inputs-group">
+                  <input type="text" maxlength="1" class="verify-digit-input" id="otp-1" required style="width: 44px; height: 48px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.03); color: #fff; text-align: center; font-size: 1.25rem; font-weight: 700; outline: none;">
+                  <input type="text" maxlength="1" class="verify-digit-input" id="otp-2" required style="width: 44px; height: 48px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.03); color: #fff; text-align: center; font-size: 1.25rem; font-weight: 700; outline: none;">
+                  <input type="text" maxlength="1" class="verify-digit-input" id="otp-3" required style="width: 44px; height: 48px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.03); color: #fff; text-align: center; font-size: 1.25rem; font-weight: 700; outline: none;">
+                  <input type="text" maxlength="1" class="verify-digit-input" id="otp-4" required style="width: 44px; height: 48px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.03); color: #fff; text-align: center; font-size: 1.25rem; font-weight: 700; outline: none;">
+                  <input type="text" maxlength="1" class="verify-digit-input" id="otp-5" required style="width: 44px; height: 48px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.03); color: #fff; text-align: center; font-size: 1.25rem; font-weight: 700; outline: none;">
+                  <input type="text" maxlength="1" class="verify-digit-input" id="otp-6" required style="width: 44px; height: 48px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.03); color: #fff; text-align: center; font-size: 1.25rem; font-weight: 700; outline: none;">
+                </div>
+              </div>
+
+              <!-- Timers & WhatsApp Option -->
+              <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; font-size: 0.8rem; color: var(--text-secondary); text-align: center;">
+                <div>OTP expires in: <strong id="otp-expiry-timer" style="color: #fff;">5:00</strong></div>
+                <div style="margin-top: 4px;">
+                  Didn't receive code? <a href="#" id="otp-resend-link" style="color: var(--accent); font-weight: 600; text-decoration: none; pointer-events: none; opacity: 0.4;">Resend Code (30s)</a>
+                </div>
+                <button type="button" id="btn-otp-whatsapp" class="btn btn-secondary" style="height: 32px; font-size: 0.72rem; padding: 0 10px; align-self: center; margin-top: 8px; display: none;">Send duplicate code to WhatsApp</button>
+              </div>
+
+              <div id="landing-verify-error" class="auth-error-msg" style="display: none;"></div>
+
+              <button type="submit" class="btn btn-primary auth-submit-btn" style="width: 100%; padding: 14px; margin-bottom: 20px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; height: 46px;">
+                <span>Verify OTP</span>
+                <span class="auth-spinner" style="display: none; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff; animation: spin-loader 0.8s linear infinite;"></span>
+              </button>
+
+              <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0; text-align: center;"><a href="#" class="go-back-to-login" style="color: var(--text-secondary); text-decoration: none; font-weight: 600;">Back to Sign In</a></p>
+            </form>
+          </div>
+
+          <!-- 4. FORGOT PASSWORD VIEW -->
+          <div id="auth-forgot-view" style="display: none; width: 100%;">
+            <form id="landing-forgot-form" class="auth-form" style="width: 100%;">
+              <h3 style="margin-bottom: 6px; text-align: left; font-family: var(--font-display); font-size: 1.45rem; font-weight: 700; color: #fff;">Reset Password</h3>
+              <p class="body-text" style="margin-bottom: 20px; text-align: left; font-size: 0.85rem; color: var(--text-secondary); line-height: 1.45;">Enter your registered email address or mobile number to receive a verification code.</p>
+
+              <div class="auth-input-group" style="margin-bottom: 20px; text-align: left;">
+                <label style="display: block; font-size: 0.72rem; font-weight: 600; color: #a5b4fc; margin-bottom: 6px; letter-spacing: 0.05em;">EMAIL OR MOBILE NUMBER</label>
+                <input type="text" id="forgot-target" class="form-input" placeholder="name@domain.com or +1555..." required style="width: 100%; box-sizing: border-box;">
+              </div>
+
+              <div id="landing-forgot-error" class="auth-error-msg" style="display: none;"></div>
+
+              <button type="submit" class="btn btn-primary auth-submit-btn" style="width: 100%; padding: 14px; margin-bottom: 20px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; height: 46px;">
+                <span>Send Recovery Code</span>
+                <span class="auth-spinner" style="display: none; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff; animation: spin-loader 0.8s linear infinite;"></span>
+              </button>
+
+              <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0; text-align: center;"><a href="#" class="go-back-to-login" style="color: var(--text-secondary); text-decoration: none; font-weight: 600;">Back to Sign In</a></p>
+            </form>
+          </div>
+
+          <!-- 5. RESET PASSWORD VIEW -->
+          <div id="auth-reset-view" style="display: none; width: 100%;">
+            <form id="landing-reset-form" class="auth-form" style="width: 100%;">
+              <h3 style="margin-bottom: 6px; text-align: left; font-family: var(--font-display); font-size: 1.45rem; font-weight: 700; color: #fff;">New Password</h3>
+              <p class="body-text" style="margin-bottom: 20px; text-align: left; font-size: 0.85rem; color: var(--text-secondary); line-height: 1.45;">Enter the verification code sent to your device along with your new password.</p>
+
+              <div class="auth-input-group" style="margin-bottom: 16px; text-align: left;">
+                <label style="display: block; font-size: 0.72rem; font-weight: 600; color: #a5b4fc; margin-bottom: 6px; letter-spacing: 0.05em;">VERIFICATION CODE</label>
+                <input type="text" id="reset-otp-code" class="form-input" placeholder="6-digit code" required style="width: 100%; box-sizing: border-box; text-align: center; letter-spacing: 0.2em; font-weight: 700;">
+              </div>
+
+              <div class="auth-input-group" style="margin-bottom: 16px; text-align: left; position: relative;">
+                <label style="display: block; font-size: 0.72rem; font-weight: 600; color: #a5b4fc; margin-bottom: 6px; letter-spacing: 0.05em;">NEW PASSWORD</label>
+                <div style="position: relative; width: 100%;">
+                  <input type="password" id="reset-password" class="form-input" placeholder="••••••••" required style="width: 100%; padding-right: 40px; box-sizing: border-box;">
+                  <button type="button" class="btn-toggle-password" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0;">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  </button>
+                </div>
+                <!-- Strength bar -->
+                <div class="pwd-strength-container" style="margin-top: 8px; display: flex; gap: 4px; height: 3px; width: 100%;">
+                  <div class="pwd-strength-bar" style="flex: 1; border-radius: 99px; background: rgba(255,255,255,0.06); transition: background 0.3s;"></div>
+                  <div class="pwd-strength-bar" style="flex: 1; border-radius: 99px; background: rgba(255,255,255,0.06); transition: background 0.3s;"></div>
+                  <div class="pwd-strength-bar" style="flex: 1; border-radius: 99px; background: rgba(255,255,255,0.06); transition: background 0.3s;"></div>
+                </div>
+                <span id="reset-pwd-strength-desc" style="font-size: 0.62rem; color: var(--text-muted); margin-top: 4px; display: block; font-weight: 600;">Password must be at least 8 characters.</span>
+              </div>
+
+              <div class="auth-input-group" style="margin-bottom: 20px; text-align: left; position: relative;">
+                <label style="display: block; font-size: 0.72rem; font-weight: 600; color: #a5b4fc; margin-bottom: 6px; letter-spacing: 0.05em;">CONFIRM PASSWORD</label>
+                <div style="position: relative; width: 100%;">
+                  <input type="password" id="reset-confirm-password" class="form-input" placeholder="••••••••" required style="width: 100%; padding-right: 40px; box-sizing: border-box;">
+                  <button type="button" class="btn-toggle-password" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0;">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  </button>
+                </div>
+              </div>
+
+              <div id="reset-error" class="auth-error-msg" style="display: none;"></div>
+
+              <button type="submit" class="btn btn-primary auth-submit-btn" style="width: 100%; padding: 14px; margin-bottom: 20px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; height: 46px;">
+                <span>Reset Password & Login</span>
+                <span class="auth-spinner" style="display: none; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff; animation: spin-loader 0.8s linear infinite;"></span>
+              </button>
+
+              <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0; text-align: center;"><a href="#" class="go-back-to-login" style="color: var(--text-secondary); text-decoration: none; font-weight: 600;">Back to Sign In</a></p>
+            </form>
+          </div>
+
+          <!-- 6. SUCCESS VIEW -->
+          <div id="auth-success-view" style="display: none; width: 100%; text-align: center; padding: 20px 0;">
+            <div style="width: 64px; height: 64px; border-radius: 50%; background: rgba(16, 185, 129, 0.08); border: 2px solid #10b981; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px auto; animation: pulse-dot 2s infinite ease-in-out;">
+              <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="#10b981" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            </div>
+            <h3 style="font-family: var(--font-display); font-size: 1.45rem; font-weight: 700; color: #fff; margin-bottom: 10px;">Security Verified</h3>
+            <p class="body-text" id="success-view-msg" style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 24px; max-width: 320px; margin-left: auto; margin-right: auto;">Your identity has been authenticated. Launching secure sandbox environment...</p>
+            <div class="loader-circle-small" style="width: 24px; height: 24px; border: 3px solid rgba(255,255,255,0.06); border-top-color: var(--accent); border-radius: 50%; animation: spin-loader 0.8s linear infinite; margin: 0 auto;"></div>
+          </div>
+
+        </div>
+      </div>
+      
+    </div>
+  </div>
+    </div>
+  </div>
+
+  <script src="app.js?v=5.0"></script>
+  <!-- Tiny inline FAQ toggle handler -->
+  <script>
+    document.querySelectorAll('.faq-item-header').forEach(header => {
+      header.addEventListener('click', () => {
+        const item = header.closest('.faq-item');
+        const content = item.querySelector('.faq-item-content');
+        const indicator = header.querySelector('span:last-child');
+
+        item.classList.toggle('active');
+        if (item.classList.contains('active')) {
+          content.style.maxHeight = content.scrollHeight + 'px';
+          indicator.textContent = '−';
+        } else {
+          content.style.maxHeight = '0';
+          indicator.textContent = '+';
+        }
+      });
+    });
+  </script>
+</body>
+
+</html>

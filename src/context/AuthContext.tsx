@@ -90,6 +90,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
   };
 
+  const saveLegacySession = (session: any, onboardingCompleted: boolean) => {
+    if (!session) return;
+    localStorage.setItem('ravora_token', session.access_token);
+    localStorage.setItem('ravora_logged_in', 'true');
+    if (!localStorage.getItem('ravora_login_time')) {
+      localStorage.setItem('ravora_login_time', Date.now().toString());
+    }
+    localStorage.setItem('ravora_email', session.user?.email || session.user?.phone || '');
+    localStorage.setItem('ravora_onboarding_completed', onboardingCompleted ? 'true' : 'false');
+    localStorage.setItem('ravora_remember_me', 'true');
+    sessionStorage.setItem('ravora_session_active', 'true');
+  };
+
+  const clearLegacySession = () => {
+    localStorage.removeItem('ravora_token');
+    localStorage.removeItem('ravora_logged_in');
+    localStorage.removeItem('ravora_login_time');
+    localStorage.removeItem('ravora_email');
+    localStorage.removeItem('ravora_onboarding_completed');
+    localStorage.removeItem('ravora_remember_me');
+    sessionStorage.removeItem('ravora_session_active');
+  };
+
   useEffect(() => {
     // Get initial session
     supabase.auth.getSession().then(async ({ data: { session } }) => {
@@ -97,9 +120,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setToken(session.access_token);
         const syncedUser = await syncAndGetUserProfile(session.access_token, session.user);
         setUser(syncedUser);
+        saveLegacySession(session, syncedUser.onboardingCompleted);
       } else {
         setToken(null);
         setUser(null);
+        clearLegacySession();
       }
       setLoading(false);
     });
@@ -111,9 +136,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setToken(session.access_token);
         const syncedUser = await syncAndGetUserProfile(session.access_token, session.user);
         setUser(syncedUser);
+        saveLegacySession(session, syncedUser.onboardingCompleted);
       } else {
         setToken(null);
         setUser(null);
+        clearLegacySession();
       }
       setLoading(false);
     });
@@ -128,9 +155,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setToken(session.access_token);
         const syncedUser = await syncAndGetUserProfile(session.access_token, session.user);
         setUser(syncedUser);
+        saveLegacySession(session, syncedUser.onboardingCompleted);
       } else {
         setToken(null);
         setUser(null);
+        clearLegacySession();
       }
     } catch (err) {
       console.error('[AuthContext] checkAuth error:', err);
@@ -259,12 +288,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } finally {
       setToken(null);
       setUser(null);
+      clearLegacySession();
     }
   };
 
   const updateOnboardingCompletedState = (completed: boolean) => {
     if (user) {
       setUser(prev => prev ? { ...prev, onboardingCompleted: completed } : null);
+      localStorage.setItem('ravora_onboarding_completed', completed ? 'true' : 'false');
     }
   };
 
