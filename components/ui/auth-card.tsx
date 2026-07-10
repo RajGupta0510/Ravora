@@ -430,17 +430,17 @@ export const AuthCardPage: React.FC = () => {
         </div>
 
         {/* Main Glassmorphic Wrapper */}
-        <div className="max-w-[440px] w-full bg-[#0F172A]/70 backdrop-blur-xl border border-white/10 rounded-2xl p-6 lg:p-8 shadow-[0_20px_50px_rgba(0,0,0,0.5)] transition-all duration-300">
+        <div className="max-w-[420px] w-full bg-[#0F172A]/70 backdrop-blur-xl border border-white/10 rounded-2xl p-5 lg:p-6 shadow-[0_20px_50px_rgba(0,0,0,0.5)] transition-all duration-300">
           
           {/* Mode Switch Tab Bar */}
           {mode !== 'forgot' && mode !== 'reset' && mode !== 'otp' && (
-            <div className="mb-8">
+            <div className="mb-5">
               <AuthSwitch mode={mode} onChange={(newMode) => changeMode(newMode)} />
             </div>
           )}
 
           {/* Heading */}
-          <div className="mb-6 text-center">
+          <div className="mb-4 text-center">
             {mode === 'login' && (
               <>
                 <h3 className="text-2xl font-bold tracking-tight">Welcome Back</h3>
@@ -485,9 +485,9 @@ export const AuthCardPage: React.FC = () => {
 
           {/* 1. SIGN IN FORM */}
           {mode === 'login' && (
-            <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-5">
+            <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-3.5">
               <div>
-                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Email Address or Phone Number</label>
+                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Email Address or Phone Number</label>
                 <div className="relative">
                   <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                   <input
@@ -495,7 +495,7 @@ export const AuthCardPage: React.FC = () => {
                     placeholder="name@domain.com or +1234567890"
                     autoComplete="username"
                     {...loginForm.register('email')}
-                    className="w-full h-12 pl-11 pr-4 bg-white/[0.02] border border-white/10 rounded-xl focus:border-[#4F7CFF] focus:ring-1 focus:ring-[#4F7CFF] outline-none text-sm transition-all placeholder-slate-600"
+                    className="w-full h-10 pl-11 pr-4 bg-white/[0.02] border border-white/10 rounded-xl focus:border-[#4F7CFF] focus:ring-1 focus:ring-[#4F7CFF] outline-none text-sm transition-all placeholder-slate-600"
                   />
                 </div>
                 {loginForm.formState.errors.email && (
@@ -504,7 +504,7 @@ export const AuthCardPage: React.FC = () => {
               </div>
 
               <div>
-                <div className="flex justify-between items-center mb-2">
+                <div className="flex justify-between items-center mb-1.5">
                   <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest">Password</label>
                   <button
                     type="button"
@@ -521,7 +521,7 @@ export const AuthCardPage: React.FC = () => {
                     placeholder="••••••••"
                     autoComplete="current-password"
                     {...loginForm.register('password')}
-                    className="w-full h-12 pl-11 pr-11 bg-white/[0.02] border border-white/10 rounded-xl focus:border-[#4F7CFF] focus:ring-1 focus:ring-[#4F7CFF] outline-none text-sm transition-all placeholder-slate-600"
+                    className="w-full h-10 pl-11 pr-11 bg-white/[0.02] border border-white/10 rounded-xl focus:border-[#4F7CFF] focus:ring-1 focus:ring-[#4F7CFF] outline-none text-sm transition-all placeholder-slate-600"
                   />
                   <button
                     type="button"
@@ -551,7 +551,7 @@ export const AuthCardPage: React.FC = () => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full h-12 bg-gradient-to-r from-[#4F7CFF] to-[#7A5AF8] hover:opacity-95 transition-all text-white font-bold rounded-xl text-sm flex items-center justify-center gap-2.5 shadow-[0_4px_20px_rgba(79,124,255,0.2)] disabled:opacity-50"
+                className="w-full h-10 bg-gradient-to-r from-[#4F7CFF] to-[#7A5AF8] hover:opacity-95 transition-all text-white font-bold rounded-xl text-sm flex items-center justify-center gap-2.5 shadow-[0_4px_20px_rgba(79,124,255,0.2)] disabled:opacity-50"
               >
                 {isSubmitting ? (
                   <LoaderCircle className="w-4.5 h-4.5 animate-spin" />
@@ -560,7 +560,7 @@ export const AuthCardPage: React.FC = () => {
                 )}
               </button>
               
-              <div className="text-center text-xs text-slate-400 mt-4">
+              <div className="text-center text-xs text-slate-400 mt-3">
                 Don't have an account?{' '}
                 <button
                   type="button"
@@ -575,9 +575,9 @@ export const AuthCardPage: React.FC = () => {
 
           {/* 2. SIGN UP FORM */}
           {mode === 'register' && (
-            <form onSubmit={signupForm.handleSubmit(onSignupSubmit)} className="space-y-4">
+            <form onSubmit={signupForm.handleSubmit(onSignupSubmit)} className="space-y-3">
               <div>
-                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Full Name</label>
+                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Full Name</label>
                 <div className="relative">
                   <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                   <input
@@ -585,7 +585,7 @@ export const AuthCardPage: React.FC = () => {
                     placeholder="John Doe"
                     autoComplete="name"
                     {...signupForm.register('fullName')}
-                    className="w-full h-11 pl-11 pr-4 bg-white/[0.02] border border-white/10 rounded-xl focus:border-[#4F7CFF] focus:ring-1 focus:ring-[#4F7CFF] outline-none text-sm transition-all placeholder-slate-600"
+                    className="w-full h-10 pl-11 pr-4 bg-white/[0.02] border border-white/10 rounded-xl focus:border-[#4F7CFF] focus:ring-1 focus:ring-[#4F7CFF] outline-none text-sm transition-all placeholder-slate-600"
                   />
                 </div>
                 {signupForm.formState.errors.fullName && (
@@ -594,7 +594,7 @@ export const AuthCardPage: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Email Address or Phone Number</label>
+                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Email Address or Phone Number</label>
                 <div className="relative">
                   <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                   <input
@@ -602,7 +602,7 @@ export const AuthCardPage: React.FC = () => {
                     placeholder="name@domain.com or +1234567890"
                     autoComplete="email"
                     {...signupForm.register('email')}
-                    className="w-full h-11 pl-11 pr-4 bg-white/[0.02] border border-white/10 rounded-xl focus:border-[#4F7CFF] focus:ring-1 focus:ring-[#4F7CFF] outline-none text-sm transition-all placeholder-slate-600"
+                    className="w-full h-10 pl-11 pr-4 bg-white/[0.02] border border-white/10 rounded-xl focus:border-[#4F7CFF] focus:ring-1 focus:ring-[#4F7CFF] outline-none text-sm transition-all placeholder-slate-600"
                   />
                 </div>
                 {signupForm.formState.errors.email && (
@@ -611,7 +611,7 @@ export const AuthCardPage: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Password</label>
+                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Password</label>
                 <div className="relative">
                   <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                   <input
@@ -619,7 +619,7 @@ export const AuthCardPage: React.FC = () => {
                     placeholder="••••••••"
                     autoComplete="new-password"
                     {...signupForm.register('password')}
-                    className="w-full h-11 pl-11 pr-11 bg-white/[0.02] border border-white/10 rounded-xl focus:border-[#4F7CFF] focus:ring-1 focus:ring-[#4F7CFF] outline-none text-sm transition-all placeholder-slate-600"
+                    className="w-full h-10 pl-11 pr-11 bg-white/[0.02] border border-white/10 rounded-xl focus:border-[#4F7CFF] focus:ring-1 focus:ring-[#4F7CFF] outline-none text-sm transition-all placeholder-slate-600"
                   />
                   <button
                     type="button"
@@ -657,7 +657,7 @@ export const AuthCardPage: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Confirm Password</label>
+                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Confirm Password</label>
                 <div className="relative">
                   <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                   <input
@@ -665,7 +665,7 @@ export const AuthCardPage: React.FC = () => {
                     placeholder="••••••••"
                     autoComplete="new-password"
                     {...signupForm.register('confirmPassword')}
-                    className="w-full h-11 pl-11 pr-11 bg-white/[0.02] border border-white/10 rounded-xl focus:border-[#4F7CFF] focus:ring-1 focus:ring-[#4F7CFF] outline-none text-sm transition-all placeholder-slate-600"
+                    className="w-full h-10 pl-11 pr-11 bg-white/[0.02] border border-white/10 rounded-xl focus:border-[#4F7CFF] focus:ring-1 focus:ring-[#4F7CFF] outline-none text-sm transition-all placeholder-slate-600"
                   />
                   <button
                     type="button"
@@ -700,7 +700,7 @@ export const AuthCardPage: React.FC = () => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full h-11 bg-gradient-to-r from-[#4F7CFF] to-[#7A5AF8] hover:opacity-95 transition-all text-white font-bold rounded-xl text-sm flex items-center justify-center gap-2.5 shadow-[0_4px_20px_rgba(79,124,255,0.2)] disabled:opacity-50 mt-2"
+                className="w-full h-10 bg-gradient-to-r from-[#4F7CFF] to-[#7A5AF8] hover:opacity-95 transition-all text-white font-bold rounded-xl text-sm flex items-center justify-center gap-2.5 shadow-[0_4px_20px_rgba(79,124,255,0.2)] disabled:opacity-50 mt-1.5"
               >
                 {isSubmitting ? (
                   <LoaderCircle className="w-4.5 h-4.5 animate-spin" />
@@ -709,7 +709,7 @@ export const AuthCardPage: React.FC = () => {
                 )}
               </button>
               
-              <div className="text-center text-xs text-slate-400 mt-4">
+              <div className="text-center text-xs text-slate-400 mt-3">
                 Already have an account?{' '}
                 <button
                   type="button"
@@ -724,9 +724,9 @@ export const AuthCardPage: React.FC = () => {
 
           {/* 3. FORGOT PASSWORD FORM */}
           {mode === 'forgot' && (
-            <form onSubmit={forgotForm.handleSubmit(onForgotSubmit)} className="space-y-5">
+            <form onSubmit={forgotForm.handleSubmit(onForgotSubmit)} className="space-y-3.5">
               <div>
-                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Email Address or Phone Number</label>
+                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Email Address or Phone Number</label>
                 <div className="relative">
                   <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                   <input
@@ -734,7 +734,7 @@ export const AuthCardPage: React.FC = () => {
                     placeholder="name@domain.com or +1234567890"
                     autoComplete="email"
                     {...forgotForm.register('email')}
-                    className="w-full h-12 pl-11 pr-4 bg-white/[0.02] border border-white/10 rounded-xl focus:border-[#4F7CFF] focus:ring-1 focus:ring-[#4F7CFF] outline-none text-sm transition-all placeholder-slate-600"
+                    className="w-full h-10 pl-11 pr-4 bg-white/[0.02] border border-white/10 rounded-xl focus:border-[#4F7CFF] focus:ring-1 focus:ring-[#4F7CFF] outline-none text-sm transition-all placeholder-slate-600"
                   />
                 </div>
                 {forgotForm.formState.errors.email && (
@@ -745,7 +745,7 @@ export const AuthCardPage: React.FC = () => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full h-12 bg-gradient-to-r from-[#4F7CFF] to-[#7A5AF8] hover:opacity-95 transition-all text-white font-bold rounded-xl text-sm flex items-center justify-center gap-2.5 shadow-[0_4px_20px_rgba(79,124,255,0.2)] disabled:opacity-50"
+                className="w-full h-10 bg-gradient-to-r from-[#4F7CFF] to-[#7A5AF8] hover:opacity-95 transition-all text-white font-bold rounded-xl text-sm flex items-center justify-center gap-2.5 shadow-[0_4px_20px_rgba(79,124,255,0.2)] disabled:opacity-50"
               >
                 {isSubmitting ? (
                   <LoaderCircle className="w-4.5 h-4.5 animate-spin" />
@@ -766,9 +766,9 @@ export const AuthCardPage: React.FC = () => {
 
           {/* 4. RESET PASSWORD FORM */}
           {mode === 'reset' && (
-            <form onSubmit={resetForm.handleSubmit(onResetSubmit)} className="space-y-5">
+            <form onSubmit={resetForm.handleSubmit(onResetSubmit)} className="space-y-3.5">
               <div>
-                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">New Password</label>
+                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">New Password</label>
                 <div className="relative">
                   <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                   <input
@@ -776,7 +776,7 @@ export const AuthCardPage: React.FC = () => {
                     placeholder="••••••••"
                     autoComplete="new-password"
                     {...resetForm.register('password')}
-                    className="w-full h-12 pl-11 pr-11 bg-white/[0.02] border border-white/10 rounded-xl focus:border-[#4F7CFF] focus:ring-1 focus:ring-[#4F7CFF] outline-none text-sm transition-all placeholder-slate-600"
+                    className="w-full h-10 pl-11 pr-11 bg-white/[0.02] border border-white/10 rounded-xl focus:border-[#4F7CFF] focus:ring-1 focus:ring-[#4F7CFF] outline-none text-sm transition-all placeholder-slate-600"
                   />
                   <button
                     type="button"
@@ -792,7 +792,7 @@ export const AuthCardPage: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Confirm New Password</label>
+                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Confirm New Password</label>
                 <div className="relative">
                   <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                   <input
@@ -800,7 +800,7 @@ export const AuthCardPage: React.FC = () => {
                     placeholder="••••••••"
                     autoComplete="new-password"
                     {...resetForm.register('confirmPassword')}
-                    className="w-full h-12 pl-11 pr-11 bg-white/[0.02] border border-white/10 rounded-xl focus:border-[#4F7CFF] focus:ring-1 focus:ring-[#4F7CFF] outline-none text-sm transition-all placeholder-slate-600"
+                    className="w-full h-10 pl-11 pr-11 bg-white/[0.02] border border-white/10 rounded-xl focus:border-[#4F7CFF] focus:ring-1 focus:ring-[#4F7CFF] outline-none text-sm transition-all placeholder-slate-600"
                   />
                   <button
                     type="button"
@@ -818,7 +818,7 @@ export const AuthCardPage: React.FC = () => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full h-12 bg-gradient-to-r from-[#4F7CFF] to-[#7A5AF8] hover:opacity-95 transition-all text-white font-bold rounded-xl text-sm flex items-center justify-center gap-2.5 shadow-[0_4px_20px_rgba(79,124,255,0.2)] disabled:opacity-50"
+                className="w-full h-10 bg-gradient-to-r from-[#4F7CFF] to-[#7A5AF8] hover:opacity-95 transition-all text-white font-bold rounded-xl text-sm flex items-center justify-center gap-2.5 shadow-[0_4px_20px_rgba(79,124,255,0.2)] disabled:opacity-50"
               >
                 {isSubmitting ? (
                   <LoaderCircle className="w-4.5 h-4.5 animate-spin" />
@@ -831,9 +831,9 @@ export const AuthCardPage: React.FC = () => {
 
           {/* 5. OTP VERIFICATION FORM */}
           {mode === 'otp' && (
-            <form onSubmit={onOtpSubmit} className="space-y-5 animate-fadeIn">
+            <form onSubmit={onOtpSubmit} className="space-y-3.5 animate-fadeIn">
               <div>
-                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">8-Digit Verification Code</label>
+                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">8-Digit Verification Code</label>
                 <div className="relative">
                   <LockKeyhole className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                   <input
@@ -842,7 +842,7 @@ export const AuthCardPage: React.FC = () => {
                     placeholder="••••••••"
                     value={otpCodeValue}
                     onChange={(e) => setOtpCodeValue(e.target.value.replace(/\D/g, ''))}
-                    className="w-full h-12 pl-11 pr-4 bg-[#0A0F1D] border border-white/10 rounded-xl focus:border-[#4F7CFF] focus:ring-1 focus:ring-[#4F7CFF] outline-none text-sm transition-all placeholder-slate-600 text-center font-mono text-lg tracking-[0.3em]"
+                    className="w-full h-10 pl-11 pr-4 bg-[#0A0F1D] border border-white/10 rounded-xl focus:border-[#4F7CFF] focus:ring-1 focus:ring-[#4F7CFF] outline-none text-sm transition-all placeholder-slate-600 text-center font-mono text-lg tracking-[0.3em]"
                   />
                 </div>
                 {sandboxOtp && (
@@ -859,7 +859,7 @@ export const AuthCardPage: React.FC = () => {
               <button
                 type="submit"
                 disabled={isSubmitting || otpCodeValue.length !== 8}
-                className="w-full h-12 bg-gradient-to-r from-[#4F7CFF] to-[#7A5AF8] hover:opacity-95 transition-all text-white font-bold rounded-xl text-sm flex items-center justify-center gap-2.5 shadow-[0_4px_20px_rgba(79,124,255,0.2)] disabled:opacity-50"
+                className="w-full h-10 bg-gradient-to-r from-[#4F7CFF] to-[#7A5AF8] hover:opacity-95 transition-all text-white font-bold rounded-xl text-sm flex items-center justify-center gap-2.5 shadow-[0_4px_20px_rgba(79,124,255,0.2)] disabled:opacity-50"
               >
                 {isSubmitting ? (
                   <LoaderCircle className="w-4.5 h-4.5 animate-spin" />
@@ -880,7 +880,7 @@ export const AuthCardPage: React.FC = () => {
 
           {/* Social Sign In (Only for login and register modes) */}
           {(mode === 'login' || mode === 'register') && (
-            <div className="mt-6 pt-6 border-t border-white/5 space-y-4">
+            <div className="mt-4 pt-4 border-t border-white/5 space-y-3">
               <div className="relative flex py-1 items-center">
                 <div className="flex-grow border-t border-white/5"></div>
                 <span className="flex-shrink mx-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Or continue with</span>
@@ -892,7 +892,7 @@ export const AuthCardPage: React.FC = () => {
                   type="button"
                   onClick={() => handleSocialLogin('google')}
                   disabled={isSubmitting}
-                  className="flex h-11 items-center justify-center bg-white/[0.02] border border-white/10 hover:bg-white/[0.06] hover:border-[#4F7CFF]/50 transition-all rounded-xl disabled:opacity-50"
+                  className="flex h-10 items-center justify-center bg-white/[0.02] border border-white/10 hover:bg-white/[0.06] hover:border-[#4F7CFF]/50 transition-all rounded-xl disabled:opacity-50"
                   title="Sign in with Google"
                 >
                   <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -906,7 +906,7 @@ export const AuthCardPage: React.FC = () => {
                   type="button"
                   onClick={() => handleSocialLogin('github')}
                   disabled={isSubmitting}
-                  className="flex h-11 items-center justify-center bg-white/[0.02] border border-white/10 hover:bg-white/[0.06] hover:border-[#4F7CFF]/50 transition-all rounded-xl disabled:opacity-50"
+                  className="flex h-10 items-center justify-center bg-white/[0.02] border border-white/10 hover:bg-white/[0.06] hover:border-[#4F7CFF]/50 transition-all rounded-xl disabled:opacity-50"
                   title="Sign in with GitHub"
                 >
                   <svg className="w-5 h-5 fill-white" viewBox="0 0 24 24">
@@ -917,7 +917,7 @@ export const AuthCardPage: React.FC = () => {
                   type="button"
                   onClick={() => handleSocialLogin('twitter')}
                   disabled={isSubmitting}
-                  className="flex h-11 items-center justify-center bg-white/[0.02] border border-white/10 hover:bg-white/[0.06] hover:border-[#4F7CFF]/50 transition-all rounded-xl disabled:opacity-50"
+                  className="flex h-10 items-center justify-center bg-white/[0.02] border border-white/10 hover:bg-white/[0.06] hover:border-[#4F7CFF]/50 transition-all rounded-xl disabled:opacity-50"
                   title="Sign in with X"
                 >
                   <svg className="w-5 h-5 fill-white" viewBox="0 0 24 24">
