@@ -113,7 +113,7 @@ interface AppContextType {
   marketOverview: any[];
   marketSummary: any;
   loading: boolean;
-  onboardUser: (experience: string, capital: number, riskLevel: number, goal: string) => Promise<{ success: boolean; error?: string }>;
+  onboardUser: (experience: string, capital: number, riskLevel: number, goal: string, markets: string[], workspace: string, araiven: string[]) => Promise<{ success: boolean; error?: string }>;
   updateSettings: (executionMode: string, autoHedgeEnabled: boolean, notificationsEnabled: boolean) => Promise<boolean>;
   fetchDashboardData: () => Promise<void>;
   scanMarkets: () => Promise<void>;
@@ -272,11 +272,19 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   }, [token, user?.onboardingCompleted]);
 
-  const onboardUser = async (experience: string, capital: number, riskLevel: number, goal: string) => {
+  const onboardUser = async (
+    experience: string,
+    capital: number,
+    riskLevel: number,
+    goal: string,
+    markets: string[],
+    workspace: string,
+    araiven: string[]
+  ) => {
     try {
       const res = await fetchWithAuth(`${API_BASE}/user/onboard`, {
         method: 'POST',
-        body: JSON.stringify({ experience, capital, riskLevel, goal })
+        body: JSON.stringify({ experience, capital, riskLevel, goal, markets, workspace, araiven })
       });
 
       if (res.ok) {

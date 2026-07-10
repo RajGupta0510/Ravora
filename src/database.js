@@ -636,6 +636,26 @@ export const initializeDatabase = async () => {
       );
     }
   }
+
+  // Migrations for Onboarding V2: preferred_markets, dashboard_layout, ai_preferences
+  try {
+    await dbRun('ALTER TABLE user_profiles ADD COLUMN preferred_markets TEXT;');
+    console.log('[Migration] Added preferred_markets column to user_profiles');
+  } catch (e) {
+    // Ignore error if column already exists
+  }
+  try {
+    await dbRun('ALTER TABLE user_profiles ADD COLUMN dashboard_layout TEXT;');
+    console.log('[Migration] Added dashboard_layout column to user_profiles');
+  } catch (e) {
+    // Ignore error if column already exists
+  }
+  try {
+    await dbRun('ALTER TABLE user_profiles ADD COLUMN ai_preferences TEXT;');
+    console.log('[Migration] Added ai_preferences column to user_profiles');
+  } catch (e) {
+    // Ignore error if column already exists
+  }
 };
 
 export default db;

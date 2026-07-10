@@ -24,7 +24,10 @@ export const getProfile = async (req, res) => {
         primary_goal: profile.primary_goal,
         risk_stance: risk ? risk.risk_stance : 'balanced',
         max_drawdown_cap: risk ? risk.max_drawdown_cap : 3.50,
-        capital: portfolio ? portfolio.current_balance : 0.00
+        capital: portfolio ? portfolio.current_balance : 0.00,
+        preferred_markets: profile.preferred_markets ? JSON.parse(profile.preferred_markets) : ['Crypto'],
+        dashboard_layout: profile.dashboard_layout || 'balanced',
+        ai_preferences: profile.ai_preferences ? JSON.parse(profile.ai_preferences) : ['opportunities', 'trends', 'plans']
       },
       settings: {
         auto_hedge_enabled: settings ? settings.auto_hedge_enabled : 1,
@@ -40,24 +43,31 @@ export const getProfile = async (req, res) => {
 
 export const onboard = async (req, res) => {
   const userId = req.user.id;
-  const { experience, capital, riskLevel, goal } = req.body;
-
-  if (experience === undefined || capital === undefined || riskLevel === undefined || goal === undefined) {
-    return res.status(400).json({ error: 'All onboarding fields (experience, capital, riskLevel, goal) are required.' });
-  }
+  const { 
+    experience = 'active', 
+    capital = 100000, 
+    riskLevel = 1, 
+    goal = 'growth',
+    markets = ['Crypto'],
+    workspace = 'balanced',
+    araiven = ['opportunities', 'trends', 'plans']
+  } = req.body;
 
   try {
     // 1. Save profile
     const existingProfile = await dbGet('SELECT id FROM user_profiles WHERE user_id = ?', [userId]);
+    const preferredMarketsJson = JSON.stringify(markets);
+    const aiPreferencesJson = JSON.stringify(araiven);
+
     if (existingProfile) {
       await dbRun(
-        'UPDATE user_profiles SET experience_level = ?, primary_goal = ?, updated_at = CURRENT_TIMESTAMP WHERE user_id = ?',
-        [experience, goal, userId]
+        'UPDATE user_profiles SET experience_level = ?, primary_goal = ?, preferred_markets = ?, dashboard_layout = ?, ai_preferences = ?, updated_at = CURRENT_TIMESTAMP WHERE user_id = ?',
+        [experience, goal, preferredMarketsJson, workspace, aiPreferencesJson, userId]
       );
     } else {
       await dbRun(
-        'INSERT INTO user_profiles (id, user_id, experience_level, primary_goal) VALUES (?, ?, ?, ?)',
-        [crypto.randomUUID(), userId, experience, goal]
+        'INSERT INTO user_profiles (id, user_id, experience_level, primary_goal, preferred_markets, dashboard_layout, ai_preferences) VALUES (?, ?, ?, ?, ?, ?, ?)',
+        [crypto.randomUUID(), userId, experience, goal, preferredMarketsJson, workspace, aiPreferencesJson]
       );
     }
 
@@ -138,6 +148,16 @@ export const onboard = async (req, res) => {
       await dbRun(
         'INSERT INTO portfolio_assets (id, portfolio_id, asset_symbol, allocation_pct, balance_amount, average_entry_price, position_type, leverage) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
         [crypto.randomUUID(), portfolioId, asset.symbol, asset.allocation, balanceAmount, asset.price, 'Long', 1.0]
+      );
+    }
+
+    // Seeding Watchlist based on preferred markets or default cryptos
+    await dbRun('DELETE FROM watchlists WHERE user_id = ?', [userId]);
+    const defaultSymbols = ['BTC', 'ETH', 'SOL', 'BNB', 'SUI'];
+    for (const sym of defaultSymbols) {
+      await dbRun(
+        'INSERT OR IGNORE INTO watchlists (id, user_id, asset_symbol) VALUES (?, ?, ?)',
+        [crypto.randomUUID(), userId, sym]
       );
     }
 
