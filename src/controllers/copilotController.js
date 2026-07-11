@@ -105,6 +105,32 @@ export const markNotificationsRead = async (req, res) => {
   }
 };
 
+export const markSingleNotificationRead = async (req, res) => {
+  const userId = req.user.id;
+  const { id } = req.params;
+
+  try {
+    await dbRun('UPDATE notifications SET is_read = 1 WHERE id = ? AND user_id = ?', [id, userId]);
+    return res.json({ status: 'success' });
+  } catch (err) {
+    console.error('Error marking single notification read:', err);
+    return res.status(500).json({ error: 'Internal server error marking notification read.' });
+  }
+};
+
+export const deleteNotification = async (req, res) => {
+  const userId = req.user.id;
+  const { id } = req.params;
+
+  try {
+    await dbRun('DELETE FROM notifications WHERE id = ? AND user_id = ?', [id, userId]);
+    return res.json({ status: 'success' });
+  } catch (err) {
+    console.error('Error deleting notification:', err);
+    return res.status(500).json({ error: 'Internal server error deleting notification.' });
+  }
+};
+
 export const connectExchange = async (req, res) => {
   const userId = req.user.id;
   const { exchangeName, apiKey, apiSecret } = req.body;

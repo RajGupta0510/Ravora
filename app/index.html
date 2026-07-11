@@ -2130,13 +2130,134 @@
            7. NOTIFICATIONS VIEW
            ==================================================================== -->
         <section class="app-view-panel" id="view-notifications">
-          <div class="card-glass notifications-page-card">
-            <div class="card-header-row" style="margin-bottom: 20px;">
-              <h4 class="text-accent-gradient">Araiven Notifications & Safety Alerts</h4>
-              <button class="btn btn-secondary btn-sm" id="btn-page-clear-all-notifs">Clear All Alerts</button>
+          
+          <!-- TODAY'S BRIEFING BANNER -->
+          <div class="card-glass briefing-card" style="padding: 24px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.06); background: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(14, 19, 37, 0.4) 100%); margin-bottom: 24px;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; margin-bottom: 16px;">
+              <div>
+                <h3 id="briefing-greeting" style="color: #fff; font-size: 1.45rem; font-family: var(--font-display); font-weight: 700; margin: 0 0 6px 0;">Good morning, Raj</h3>
+                <p id="briefing-summary-text" style="color: var(--text-secondary); font-size: 0.85rem; margin: 0; line-height: 1.5;">Markets remain bullish while BTC approaches major resistance. You currently have 3 active positions requiring attention.</p>
+              </div>
+              <button class="btn btn-secondary btn-sm" id="btn-page-clear-all-notifs" style="font-size: 0.8rem; font-weight: 600;">Mark All Read</button>
             </div>
-            <div class="notif-list-container" id="page-notif-alerts-list" style="display: flex; flex-direction: column; gap: 12px; margin-top: 20px;">
-              <!-- Dynamic notifications loaded here -->
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-top: 20px;">
+              <div class="card-glass" style="padding: 12px 16px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.04); background: rgba(0,0,0,0.15);">
+                <span style="display: block; font-size: 0.62rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 4px;">Market Summary</span>
+                <span id="briefing-market-status" style="font-size: 0.85rem; color: #fff; font-weight: 600;">Bullish Consolidation</span>
+              </div>
+              <div class="card-glass" style="padding: 12px 16px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.04); background: rgba(0,0,0,0.15);">
+                <span style="display: block; font-size: 0.62rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 4px;">Portfolio Summary</span>
+                <span id="briefing-portfolio-status" style="font-size: 0.85rem; color: #fff; font-weight: 600;">3 Active Trades</span>
+              </div>
+              <div class="card-glass" style="padding: 12px 16px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.04); background: rgba(0,0,0,0.15);">
+                <span style="display: block; font-size: 0.62rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 4px;">Highest Risk Position</span>
+                <span id="briefing-risk-position" style="font-size: 0.85rem; color: #ef4444; font-weight: 600;">SOL Long (High Volatility)</span>
+              </div>
+              <div class="card-glass" style="padding: 12px 16px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.04); background: rgba(0,0,0,0.15);">
+                <span style="display: block; font-size: 0.62rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 4px;">Upcoming Events</span>
+                <span id="briefing-upcoming-events" style="font-size: 0.82rem; color: var(--accent); font-weight: 600;">US CPI Release (Tomorrow)</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- INTELLIGENCE HUB MAIN GRID -->
+          <div class="notifications-center-grid" style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px; width: 100%; box-sizing: border-box; align-items: start;">
+            
+            <!-- LEFT COLUMN: ALERTS FEED -->
+            <div style="display: flex; flex-direction: column; gap: 20px;">
+              
+              <!-- FILTER & SEARCH BAR -->
+              <div class="card-glass" style="padding: 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; gap: 14px;">
+                <div style="display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap;">
+                  <!-- Category Filters -->
+                  <div style="display: flex; gap: 6px; flex-wrap: wrap;" id="notif-filter-tabs">
+                    <button class="notif-tab active" data-filter="all" style="padding: 6px 12px; font-size: 0.72rem; border-radius: 6px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.03); color: #fff; cursor: pointer; font-weight: 600; outline: none;">All</button>
+                    <button class="notif-tab" data-filter="unread" style="padding: 6px 12px; font-size: 0.72rem; border-radius: 6px; border: 1px solid rgba(255,255,255,0.08); background: transparent; color: var(--text-secondary); cursor: pointer; font-weight: 600; outline: none;">Unread</button>
+                    <button class="notif-tab" data-filter="high" style="padding: 6px 12px; font-size: 0.72rem; border-radius: 6px; border: 1px solid rgba(255,255,255,0.08); background: transparent; color: var(--text-secondary); cursor: pointer; font-weight: 600; outline: none;">High Priority</button>
+                    <button class="notif-tab" data-filter="portfolio" style="padding: 6px 12px; font-size: 0.72rem; border-radius: 6px; border: 1px solid rgba(255,255,255,0.08); background: transparent; color: var(--text-secondary); cursor: pointer; font-weight: 600; outline: none;">Portfolio</button>
+                    <button class="notif-tab" data-filter="market" style="padding: 6px 12px; font-size: 0.72rem; border-radius: 6px; border: 1px solid rgba(255,255,255,0.08); background: transparent; color: var(--text-secondary); cursor: pointer; font-weight: 600; outline: none;">Market</button>
+                    <button class="notif-tab" data-filter="system" style="padding: 6px 12px; font-size: 0.72rem; border-radius: 6px; border: 1px solid rgba(255,255,255,0.08); background: transparent; color: var(--text-secondary); cursor: pointer; font-weight: 600; outline: none;">System</button>
+                  </div>
+                  <!-- Priority select -->
+                  <div style="display: flex; gap: 8px;">
+                    <select id="notif-filter-priority" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); color: #fff; font-size: 0.72rem; padding: 4px 8px; border-radius: 6px; outline: none; cursor: pointer;">
+                      <option value="all">All Priorities</option>
+                      <option value="critical">Critical</option>
+                      <option value="high">High</option>
+                      <option value="medium">Medium</option>
+                      <option value="low">Low</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div style="display: flex; gap: 10px; align-items: center; position: relative;">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" style="position: absolute; left: 12px; color: var(--text-muted);">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                  </svg>
+                  <input type="text" id="notif-search-input" placeholder="Search alerts by asset (e.g. BTC), keyword, or category..." style="width: 100%; font-size: 0.78rem; padding: 8px 12px 8px 34px; background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; color: #fff; outline: none;" />
+                </div>
+              </div>
+
+              <!-- ALERTS FEED LIST -->
+              <div id="notif-main-feed-list" style="display: flex; flex-direction: column; gap: 12px;">
+                <!-- Alerts rendered dynamically -->
+              </div>
+
+              <!-- EMPTY FEED STATE -->
+              <div id="notif-empty-state" class="port-empty-state-container" style="display: none; padding: 60px 40px; text-align: center; background: rgba(14, 19, 37, 0.45); border: 1px dashed rgba(255, 255, 255, 0.08); border-radius: 16px;">
+                <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 16px; display: inline-block;">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                  <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+                <h3 style="color: #fff; margin-bottom: 8px; font-size: 1.25rem; font-family: var(--font-display); font-weight: 700;">You're all caught up.</h3>
+                <p style="color: var(--text-secondary); font-size: 0.85rem; max-width: 360px; margin: 0 auto; line-height: 1.5;">Araiven will notify you here when meaningful market, portfolio, or system events occur.</p>
+              </div>
+            </div>
+
+            <!-- RIGHT COLUMN: AI INSIGHTS & SYSTEM STATUS -->
+            <div style="display: flex; flex-direction: column; gap: 20px;">
+              
+              <!-- SECTION 5: ARAIVEN INSIGHTS -->
+              <div class="card-glass" style="padding: 20px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.06); display: flex; flex-direction: column; gap: 14px;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--accent)" stroke-width="2">
+                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                  </svg>
+                  <h4 style="margin: 0; font-size: 0.95rem; font-weight: 700; color: #fff; font-family: var(--font-display);">Araiven AI Insights</h4>
+                </div>
+                
+                <div id="notif-insights-container" style="display: flex; flex-direction: column; gap: 12px;">
+                  <!-- Dynamic Insights (2-3 sentences max) -->
+                </div>
+              </div>
+
+              <!-- SYSTEM STATUS WIDGET -->
+              <div class="card-glass" style="padding: 20px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.06); display: flex; flex-direction: column; gap: 14px;">
+                <h4 style="margin: 0; font-size: 0.95rem; font-weight: 700; color: #fff; font-family: var(--font-display);">System & API Status</h4>
+                
+                <div style="display: flex; flex-direction: column; gap: 10px; font-size: 0.76rem;">
+                  <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="color: var(--text-secondary);">Supabase DB Link</span>
+                    <span style="display: inline-flex; align-items: center; gap: 6px; color: #10b981; font-weight: 600;">
+                      <span style="display:inline-block; width:6px; height:6px; border-radius:50%; background:#10b981;"></span> Operational
+                    </span>
+                  </div>
+                  <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="color: var(--text-secondary);">Exchange KMS ARN</span>
+                    <span style="display: inline-flex; align-items: center; gap: 6px; color: #10b981; font-weight: 600;">
+                      <span style="display:inline-block; width:6px; height:6px; border-radius:50%; background:#10b981;"></span> Encrypted
+                    </span>
+                  </div>
+                  <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="color: var(--text-secondary);">Market Data Socket</span>
+                    <span style="display: inline-flex; align-items: center; gap: 6px; color: #10b981; font-weight: 600;">
+                      <span style="display:inline-block; width:6px; height:6px; border-radius:50%; background:#10b981;"></span> Connected
+                    </span>
+                  </div>
+                </div>
+              </div>
+
             </div>
           </div>
         </section>

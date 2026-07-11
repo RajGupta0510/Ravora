@@ -6771,43 +6771,306 @@ document.addEventListener('DOMContentLoaded', () => {
     renderPageNotificationsFeed();
   }
 
-  function renderPageNotificationsFeed() {
-    const pageNotifList = document.getElementById('page-notif-alerts-list');
-    if (!pageNotifList) return;
-    pageNotifList.innerHTML = '';
-
-    if (state.notifications.length === 0) {
-      pageNotifList.innerHTML = '<div class="card-glass" style="padding: 40px; text-align: center; color: var(--text-secondary);">No active security alerts or notifications.</div>';
-      return;
+  let activeNotifFilterCategory = 'all';
+  let defaultPlaceholderAlerts = [
+    {
+      notificationId: 'mock-m1',
+      channel: 'market',
+      priority: 'high',
+      title: 'BTC Resistance Broken',
+      body: 'Bitcoin expanded past the local resistance boundary of $62,000 on high volume delta. Short-term momentum indicators suggest upward compression.',
+      isRead: false,
+      symbol: 'BTC'
+    },
+    {
+      notificationId: 'mock-p1',
+      channel: 'portfolio',
+      priority: 'critical',
+      title: 'Portfolio Exposure Alert',
+      body: 'Your total exposure to Memecoin assets has exceeded the 15% safety limit defined in your conservative risk stance.',
+      isRead: false,
+      symbol: 'PEPE'
+    },
+    {
+      notificationId: 'mock-p2',
+      channel: 'portfolio',
+      priority: 'medium',
+      title: 'SOL Long Take Profit Triggered',
+      body: 'Simulated paper trade for SOL Long reached its defined take-profit target at $138.40, securing a net return of +12.4%.',
+      isRead: true,
+      symbol: 'SOL'
+    },
+    {
+      notificationId: 'mock-m2',
+      channel: 'market',
+      priority: 'medium',
+      title: 'SUI Breakout Pattern Detected',
+      body: 'SUI/USD is consolidating near support bands with an active opportunity score of 94. Bullish divergence indicators verified.',
+      isRead: false,
+      symbol: 'SUI'
+    },
+    {
+      notificationId: 'mock-s1',
+      channel: 'system',
+      priority: 'low',
+      title: 'Secure KMS Key Synced',
+      body: 'Brokerage encryption certificates successfully verified via AWS Key Management Service (KMS). Withdrawal permissions remain disabled.',
+      isRead: true,
+      symbol: ''
+    },
+    {
+      notificationId: 'mock-ai1',
+      channel: 'ai',
+      priority: 'medium',
+      title: 'Araiven Portfolio Advice',
+      body: 'Aggregated yields on stablecoin pools expanded. Consider allocation adjustment into lending spreads to capture 2.4% APY lift.',
+      isRead: false,
+      symbol: ''
     }
+  ];
 
-    state.notifications.forEach(n => {
-      const item = document.createElement('div');
-      item.className = 'notif-alert-item';
-      item.style.display = 'flex';
-      item.style.justifyContent = 'space-between';
-      item.style.alignItems = 'center';
-      item.style.padding = '16px';
-      item.style.marginBottom = '12px';
-      item.style.border = '1px solid rgba(255,255,255,0.06)';
-      item.style.borderRadius = '8px';
-      item.style.background = 'rgba(255, 255, 255, 0.02)';
-      
-      if (!n.isRead) {
-        item.style.borderColor = 'rgba(124, 58, 237, 0.25)';
-        item.style.background = 'rgba(124, 58, 237, 0.03)';
+  function renderPageNotificationsFeed() {
+    const pageNotifList = document.getElementById('notif-main-feed-list');
+    const emptyStateEl = document.getElementById('notif-empty-state');
+    if (!pageNotifList) return;
+
+    const baseNotifs = state.notifications || [];
+    const mergedList = [...baseNotifs];
+    defaultPlaceholderAlerts.forEach(mock => {
+      if (!mergedList.some(n => n.notificationId === mock.notificationId)) {
+        mergedList.push(mock);
+      }
+    });
+
+    const searchVal = (document.getElementById('notif-search-input')?.value || '').toLowerCase();
+    const priorityVal = document.getElementById('notif-filter-priority')?.value || 'all';
+
+    const filtered = mergedList.filter(n => {
+      if (activeNotifFilterCategory === 'unread' && n.isRead) return false;
+      if (activeNotifFilterCategory === 'high' && !(n.priority === 'high' || n.priority === 'critical')) return false;
+      if (activeNotifFilterCategory !== 'all' && activeNotifFilterCategory !== 'unread' && activeNotifFilterCategory !== 'high') {
+        if (n.channel !== activeNotifFilterCategory) return false;
       }
 
-      item.innerHTML = `
-        <div style="flex-grow: 1; margin-right: 16px;">
-          <h5 style="margin: 0 0 4px 0; color: #fff; font-size: 0.95rem;">${n.title}</h5>
-          <p style="margin: 0 0 6px 0; font-size: 0.8rem; color: var(--text-secondary); line-height: 1.4;">${n.body}</p>
-          <span style="font-size: 0.7rem; color: var(--text-muted); font-family: monospace;">Alert</span>
-        </div>
-        <button class="notif-dismiss" data-id="${n.notificationId}" style="background: none; border: none; color: var(--text-muted); font-size: 1.2rem; cursor: pointer; padding: 4px; line-height: 1;">×</button>
-      `;
+      if (priorityVal !== 'all' && n.priority !== priorityVal) return false;
 
-      pageNotifList.appendChild(item);
+      const matchesSearch = !searchVal ||
+                            n.title.toLowerCase().includes(searchVal) ||
+                            n.body.toLowerCase().includes(searchVal) ||
+                            n.channel.toLowerCase().includes(searchVal) ||
+                            (n.symbol && n.symbol.toLowerCase().includes(searchVal));
+
+      return matchesSearch;
+    });
+
+    const greetingEl = document.getElementById('briefing-greeting');
+    const briefingText = document.getElementById('briefing-summary-text');
+    const portfolioStatusEl = document.getElementById('briefing-portfolio-status');
+    const riskPositionEl = document.getElementById('briefing-risk-position');
+
+    const activeCount = state.activePositions ? state.activePositions.length : 1;
+    const userName = state.profile?.name || 'Raj';
+
+    if (greetingEl) greetingEl.textContent = `Good afternoon, ${userName}`;
+    if (briefingText) {
+      briefingText.textContent = `Markets remain bullish while BTC consolidates near resistance. You currently have ${activeCount} active simulated position${activeCount !== 1 ? 's' : ''} requiring attention.`;
+    }
+    if (portfolioStatusEl) portfolioStatusEl.textContent = `${activeCount} Active Position${activeCount !== 1 ? 's' : ''}`;
+    if (riskPositionEl) {
+      if (activeCount > 0 && state.activePositions && state.activePositions.length > 0) {
+        riskPositionEl.textContent = `${state.activePositions[0].symbol} Long (${state.activePositions[0].leverage}x Leverage)`;
+      } else {
+        riskPositionEl.textContent = 'None (Safe Zone)';
+      }
+    }
+
+    const insightsContainer = document.getElementById('notif-insights-container');
+    if (insightsContainer) {
+      insightsContainer.innerHTML = '';
+      const aiInsights = mergedList.filter(n => n.channel === 'ai' || n.channel === 'intelligence');
+      
+      if (aiInsights.length === 0) {
+        insightsContainer.innerHTML = `<div style="font-size:0.72rem; color:var(--text-muted); padding: 8px;">No AI observations compiled today.</div>`;
+      } else {
+        aiInsights.forEach(ins => {
+          const card = document.createElement('div');
+          card.style.cssText = 'padding: 10px; background: rgba(99, 102, 241, 0.03); border: 1px solid rgba(99, 102, 241, 0.08); border-radius: 8px; font-size:0.72rem; line-height:1.4; color:var(--text-secondary);';
+          card.innerHTML = `<strong>${ins.title}</strong><p style="margin:4px 0 0 0; font-size: 0.68rem; color: var(--text-secondary);">${ins.body}</p>`;
+          insightsContainer.appendChild(card);
+        });
+      }
+    }
+
+    pageNotifList.innerHTML = '';
+    
+    filtered.sort((a, b) => {
+      const aPriority = (a.priority === 'critical' || a.priority === 'high') ? 1 : 0;
+      const bPriority = (b.priority === 'critical' || b.priority === 'high') ? 1 : 0;
+      if (aPriority !== bPriority) return bPriority - aPriority;
+      
+      const aUnread = a.isRead ? 0 : 1;
+      const bUnread = b.isRead ? 0 : 1;
+      return bUnread - aUnread;
+    });
+
+    if (filtered.length === 0) {
+      if (emptyStateEl) emptyStateEl.style.display = 'block';
+    } else {
+      if (emptyStateEl) emptyStateEl.style.display = 'none';
+
+      filtered.forEach(n => {
+        const item = document.createElement('div');
+        item.className = 'notif-alert-item card-glass';
+        item.style.cssText = 'padding: 16px 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); background: rgba(14,19,37,0.3); display: flex; flex-direction: column; gap: 12px; transition: all 0.2s ease; margin-bottom: 12px;';
+
+        if (!n.isRead) {
+          item.style.borderColor = 'rgba(99, 102, 241, 0.2)';
+          item.style.background = 'linear-gradient(135deg, rgba(99, 102, 241, 0.04) 0%, rgba(14, 19, 37, 0.3) 100%)';
+        }
+
+        let categoryIcon = '';
+        if (n.channel === 'portfolio') {
+          categoryIcon = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="var(--accent)" stroke-width="2" style="vertical-align: middle;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`;
+        } else if (n.channel === 'market') {
+          categoryIcon = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#10b981" stroke-width="2" style="vertical-align: middle;"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>`;
+        } else if (n.channel === 'system') {
+          categoryIcon = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="var(--text-muted)" stroke-width="2" style="vertical-align: middle;"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>`;
+        } else {
+          categoryIcon = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#a5b4fc" stroke-width="2" style="vertical-align: middle;"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>`;
+        }
+
+        let priorityBg = 'rgba(255,255,255,0.05)';
+        let priorityColor = 'var(--text-secondary)';
+        if (n.priority === 'critical') {
+          priorityBg = 'rgba(239, 68, 68, 0.15)';
+          priorityColor = '#f87171';
+        } else if (n.priority === 'high') {
+          priorityBg = 'rgba(245, 158, 11, 0.15)';
+          priorityColor = '#fbbf24';
+        } else if (n.priority === 'medium') {
+          priorityBg = 'rgba(59, 130, 246, 0.15)';
+          priorityColor = '#60a5fa';
+        }
+
+        let recommendedAction = '';
+        if (n.channel === 'portfolio') {
+          recommendedAction = 'Verify risk allocations and rebalance portfolio layers inside settings.';
+        } else if (n.channel === 'market') {
+          recommendedAction = 'Observe the live chart consolidation bands on the main trading workspace.';
+        } else {
+          recommendedAction = 'No manual action required. Safety parameters are fully compliant.';
+        }
+
+        item.innerHTML = `
+          <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              ${categoryIcon}
+              <span class="badge-ds" style="background: rgba(255,255,255,0.03) !important; color: var(--text-secondary) !important; font-size: 0.65rem; text-transform: uppercase;">${n.channel}</span>
+              <span class="badge-ds" style="background: ${priorityBg} !important; color: ${priorityColor} !important; font-size: 0.65rem; text-transform: uppercase; font-weight: 700;">${n.priority}</span>
+            </div>
+            <span style="font-size: 0.68rem; color: var(--text-muted);">Just now</span>
+          </div>
+
+          <div>
+            <h5 style="margin: 0 0 6px 0; color: #fff; font-size: 1rem; font-family: var(--font-display); font-weight: 700;">${n.title}</h5>
+            <p style="margin: 0 0 10px 0; font-size: 0.8rem; color: var(--text-secondary); line-height: 1.5;">${n.body}</p>
+          </div>
+
+          <div style="padding: 10px 12px; background: rgba(0,0,0,0.15); border-radius: 8px; border-left: 3px solid var(--accent); font-size: 0.72rem; line-height: 1.4;">
+            <strong style="color: #fff; display: block; margin-bottom: 2px;">Recommended Action:</strong>
+            <span style="color: var(--text-secondary);">${recommendedAction}</span>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px; flex-wrap: wrap; gap: 8px;">
+            <div style="display: flex; gap: 6px;">
+              ${!n.isRead ? `<button class="btn btn-secondary btn-xs btn-notif-mark-read" style="font-size: 0.68rem; font-weight: 600;" data-id="${n.notificationId}">Mark Read</button>` : ''}
+              <button class="btn btn-secondary btn-xs btn-notif-dismiss" style="font-size: 0.68rem; font-weight: 600; color: #ef4444;" data-id="${n.notificationId}">Dismiss</button>
+            </div>
+            ${n.symbol ? `<button class="btn btn-primary btn-xs btn-notif-analyze" style="font-size: 0.68rem; font-weight: 600;" data-symbol="${n.symbol}">Open Analysis</button>` : ''}
+          </div>
+        `;
+
+        const markReadBtn = item.querySelector('.btn-notif-mark-read');
+        if (markReadBtn) {
+          markReadBtn.addEventListener('click', async (e) => {
+            e.stopPropagation();
+            try {
+              if (n.notificationId.startsWith('mock-')) {
+                n.isRead = true;
+              } else {
+                await apiCall(`/notifications/${n.notificationId}/read`, { method: 'PUT' });
+              }
+              showToast('Alert marked as read');
+              loadNotifications();
+            } catch (err) {
+              console.error(err);
+            }
+          });
+        }
+
+        item.querySelector('.btn-notif-dismiss').addEventListener('click', async (e) => {
+          e.stopPropagation();
+          try {
+            if (n.notificationId.startsWith('mock-')) {
+              const idx = defaultPlaceholderAlerts.findIndex(m => m.notificationId === n.notificationId);
+              if (idx !== -1) defaultPlaceholderAlerts.splice(idx, 1);
+            } else {
+              await apiCall(`/notifications/${n.notificationId}`, { method: 'DELETE' });
+            }
+            item.style.opacity = '0';
+            setTimeout(() => {
+              item.remove();
+              loadNotifications();
+            }, 200);
+          } catch (err) {
+            console.error(err);
+          }
+        });
+
+        const analyzeBtn = item.querySelector('.btn-notif-analyze');
+        if (analyzeBtn) {
+          analyzeBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            state.selectedAsset = n.symbol;
+            navigateTo('dashboard', true);
+          });
+        }
+
+        pageNotifList.appendChild(item);
+      });
+    }
+  }
+
+  function initializeNotificationsCenterEvents() {
+    const searchInput = document.getElementById('notif-search-input');
+    if (searchInput) {
+      searchInput.addEventListener('input', () => {
+        renderPageNotificationsFeed();
+      });
+    }
+
+    const prioritySelect = document.getElementById('notif-filter-priority');
+    if (prioritySelect) {
+      prioritySelect.addEventListener('change', () => {
+        renderPageNotificationsFeed();
+      });
+    }
+
+    const filterTabs = document.querySelectorAll('#notif-filter-tabs .notif-tab');
+    filterTabs.forEach(btn => {
+      btn.addEventListener('click', () => {
+        filterTabs.forEach(b => {
+          b.classList.remove('active');
+          b.style.background = 'transparent';
+          b.style.color = 'var(--text-secondary)';
+        });
+        btn.classList.add('active');
+        btn.style.background = 'rgba(255, 255, 255, 0.03)';
+        btn.style.color = '#fff';
+
+        activeNotifFilterCategory = btn.getAttribute('data-filter');
+        renderPageNotificationsFeed();
+      });
     });
   }
 
@@ -7118,6 +7381,7 @@ document.addEventListener('DOMContentLoaded', () => {
       initializePerfTimelineEvents();
       initializeJournalFilterEvents();
       initializeWatchlistCenterEvents();
+      initializeNotificationsCenterEvents();
       state.terminalEventsInitialized = true;
     }
   }

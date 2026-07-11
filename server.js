@@ -8,7 +8,7 @@ import { register, login, verifyOtp, resendOtp, requestPasswordRecovery, resetPa
 import { getProfile, onboard, updateSettings, getWatchlist, addToWatchlist, removeFromWatchlist } from './src/controllers/userController.js';
 import { getPortfolio, getPortfolioHistory, getTransactions, closePosition } from './src/controllers/portfolioController.js';
 import { getOpportunities, getRecommendations, executeRecommendation, deployOpportunity, scanMarkets } from './src/controllers/opportunityController.js';
-import { copilotMessage, getNotifications, markNotificationsRead, connectExchange } from './src/controllers/copilotController.js';
+import { copilotMessage, getNotifications, markNotificationsRead, connectExchange, markSingleNotificationRead, deleteNotification } from './src/controllers/copilotController.js';
 import { openPaperPosition, getActivePaperPositions, closePaperPosition, closeAllPaperPositions, getPaperTradeHistory, updatePaperTradeNotes } from './src/controllers/paperTradingController.js';
 import { MarketDataService } from './src/services/marketDataService.js';
 import { RecommendationEngine } from './src/services/recommendations/recommendationEngine.js';
@@ -176,6 +176,8 @@ apiRouter.post('/copilot/message', verifyToken, copilotMessage);
 // Notifications (Protected)
 apiRouter.get('/notifications', verifyToken, getNotifications);
 apiRouter.post('/notifications/read', verifyToken, markNotificationsRead);
+apiRouter.put('/notifications/:id/read', verifyToken, markSingleNotificationRead);
+apiRouter.delete('/notifications/:id', verifyToken, deleteNotification);
 
 // Settings Exchanges (Protected)
 apiRouter.post('/settings/exchanges', verifyToken, connectExchange);
