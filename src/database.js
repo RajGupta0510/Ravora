@@ -656,6 +656,12 @@ export const initializeDatabase = async () => {
   } catch (e) {
     // Ignore error if column already exists
   }
+  try {
+    await dbRun('ALTER TABLE paper_trade_history ADD COLUMN notes TEXT;');
+    console.log('[Migration] Added notes column to paper_trade_history');
+  } catch (e) {
+    // Ignore error if column already exists
+  }
 };
 
 export default db;

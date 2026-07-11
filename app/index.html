@@ -1285,44 +1285,184 @@
            2. WATCHLIST VIEW
            ==================================================================== -->
         <section class="app-view-panel" id="view-watchlist">
-          <div class="card-glass watchlist-page-card">
-            <div class="card-header-row" style="margin-bottom: 20px;">
-              <h4 class="text-accent-gradient">Market Watchlist</h4>
-              <span class="tag-alert-green">LIVE UPDATES</span>
+          
+          <!-- EMPTY STATE CONTAINER -->
+          <div id="watch-empty-state" class="port-empty-state-container" style="display: none; padding: 80px 40px; text-align: center; background: rgba(14, 19, 37, 0.45); border: 1px dashed rgba(255, 255, 255, 0.08); border-radius: 16px; margin-bottom: 24px;">
+            <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 16px; display: inline-block;">
+              <circle cx="12" cy="12" r="10"></circle>
+              <circle cx="12" cy="12" r="6"></circle>
+              <circle cx="12" cy="12" r="2"></circle>
+            </svg>
+            <h3 style="color: #fff; margin-bottom: 10px; font-size: 1.45rem; font-family: var(--font-display); font-weight: 700;">AI Opportunity Center</h3>
+            <p style="color: var(--text-secondary); font-size: 0.9rem; max-width: 460px; margin: 0 auto 20px auto; line-height: 1.6;">
+              Your watchlist is currently empty. Add assets from the workspace scanner to begin tracking AI opportunity scores, confidence ratings, and market indicators.
+            </p>
+            <button class="btn btn-primary btn-onboard-start-scan" id="btn-watchlist-empty-browse" style="font-size: 0.88rem; font-weight: 600; padding: 10px 24px;">Browse Markets</button>
+          </div>
+
+          <!-- MAIN WATCHLIST & OPPORTUNITY CONTENT -->
+          <div id="watch-main-content" style="display: flex; flex-direction: column; gap: 24px;">
+            
+            <!-- GLOBAL HEADER & FILTERS -->
+            <div class="card-glass" style="padding: 16px 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; gap: 12px; box-sizing: border-box; width: 100%;">
+              <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+                <h4 style="margin: 0; color: #fff; font-family: var(--font-display); font-weight: 700;">Araiven Opportunity Command</h4>
+                <span class="tag-alert-green" style="background: rgba(16, 185, 129, 0.08); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.15); font-size: 0.65rem;">DECISION ENGINE v1</span>
+              </div>
+              
+              <div style="display: flex; gap: 12px; width: 100%; flex-wrap: wrap;">
+                <!-- Search bar -->
+                <input type="text" class="search-input" id="watch-search-input" placeholder="Search by asset, symbol or sector..." style="flex: 1.5; min-width: 180px; padding: 8px 12px; font-size: 0.8rem; background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 6px; color:#fff;">
+                
+                <!-- Sector filter -->
+                <select id="watch-filter-sector" style="flex: 1; min-width: 100px; padding: 8px 12px; font-size: 0.8rem; background: rgba(14,19,37,0.8); border: 1px solid var(--border); border-radius: 6px; color:#fff; cursor: pointer;">
+                  <option value="all">All Sectors</option>
+                  <option value="layer1">Layer 1</option>
+                  <option value="defi">DeFi</option>
+                  <option value="ai">AI</option>
+                  <option value="infrastructure">Infrastructure</option>
+                  <option value="memecoins">Memecoins</option>
+                </select>
+
+                <!-- Risk filter -->
+                <select id="watch-filter-risk" style="flex: 1; min-width: 100px; padding: 8px 12px; font-size: 0.8rem; background: rgba(14,19,37,0.8); border: 1px solid var(--border); border-radius: 6px; color:#fff; cursor: pointer;">
+                  <option value="all">All Risk Levels</option>
+                  <option value="low">Low Risk</option>
+                  <option value="medium">Medium Risk</option>
+                  <option value="high">High Risk</option>
+                </select>
+
+                <!-- Opp Score filter -->
+                <select id="watch-filter-score" style="flex: 1; min-width: 100px; padding: 8px 12px; font-size: 0.8rem; background: rgba(14,19,37,0.8); border: 1px solid var(--border); border-radius: 6px; color:#fff; cursor: pointer;">
+                  <option value="all">All Scores</option>
+                  <option value="80">80+ Opp Score</option>
+                  <option value="90">90+ Opp Score</option>
+                </select>
+
+                <!-- Toggle watchlist only -->
+                <div style="display: flex; align-items: center; gap: 8px; font-size: 0.8rem; color: var(--text-secondary); margin-left: auto;">
+                  <input type="checkbox" id="watch-filter-watchlist-only" style="cursor: pointer; accent-color: var(--accent);">
+                  <label for="watch-filter-watchlist-only" style="cursor: pointer; user-select: none;">Watchlist Only</label>
+                </div>
+              </div>
             </div>
-            <p class="step-desc">High-priority asset tickers flagged by Araiven intelligence.</p>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-top: 24px;">
-              <div class="card-glass metric-card-glow" style="padding: 20px; display: flex; flex-direction: column; justify-content: space-between;">
-                <div>
-                  <strong style="font-size: 1.1rem; color: #fff;">Ethereum (ETH)</strong>
-                  <span style="display: block; font-size: 0.75rem; color: var(--text-secondary); margin-top: 4px;">Liquidity Accumulation</span>
-                </div>
-                <div style="margin-top: 20px; display: flex; justify-content: space-between; align-items: baseline;">
-                  <span style="font-size: 1.25rem; font-weight: 700; color: #fff;">$3,485.10</span>
-                  <span class="text-green">+2.15%</span>
-                </div>
-              </div>
-              <div class="card-glass metric-card-glow" style="padding: 20px; display: flex; flex-direction: column; justify-content: space-between;">
-                <div>
-                  <strong style="font-size: 1.1rem; color: #fff;">Bitcoin (BTC)</strong>
-                  <span style="display: block; font-size: 0.75rem; color: var(--text-secondary); margin-top: 4px;">ETF Inflow Wave</span>
-                </div>
-                <div style="margin-top: 20px; display: flex; justify-content: space-between; align-items: baseline;">
-                  <span style="font-size: 1.25rem; font-weight: 700; color: #fff;">$64,120.10</span>
-                  <span class="text-green">+1.40%</span>
-                </div>
-              </div>
-              <div class="card-glass metric-card-glow" style="padding: 20px; display: flex; flex-direction: column; justify-content: space-between;">
-                <div>
-                  <strong style="font-size: 1.1rem; color: #fff;">Solana (SOL)</strong>
-                  <span style="display: block; font-size: 0.75rem; color: var(--text-secondary); margin-top: 4px;">DEX Volume Breakout</span>
-                </div>
-                <div style="margin-top: 20px; display: flex; justify-content: space-between; align-items: baseline;">
-                  <span style="font-size: 1.25rem; font-weight: 700; color: #fff;">$134.20</span>
-                  <span class="text-error">-0.85%</span>
-                </div>
+
+            <!-- SECTION 1: TODAY'S OPPORTUNITIES -->
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+              <h4 style="margin: 0; font-size: 0.95rem; font-weight: 700; color: #fff; font-family: var(--font-display);">Top AI Market Opportunities</h4>
+              <div id="watch-today-opps-list" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(310px, 1fr)); gap: 16px;">
+                <!-- Dynamically filled with top ranked opportunities -->
               </div>
             </div>
+
+            <!-- SECTION 2: AI WATCHLIST TABLE -->
+            <div class="card-glass" style="padding: 20px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.06); width: 100%; box-sizing: border-box; overflow: hidden;">
+              <h4 style="margin: 0 0 16px 0; font-size: 0.95rem; font-weight: 700; color: #fff; font-family: var(--font-display);">AI Watchlist Detail Ticker</h4>
+              <div style="overflow-x: auto; width: 100%;">
+                <table style="width: 100%; border-collapse: collapse; min-width: 800px; font-size: 0.76rem;">
+                  <thead>
+                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.06); text-align: left;">
+                      <th style="padding: 8px 12px; color: var(--text-muted); font-weight: 600; width: 60px;">Pin</th>
+                      <th style="padding: 8px 12px; color: var(--text-muted); font-weight: 600;">Asset</th>
+                      <th style="padding: 8px 12px; color: var(--text-muted); font-weight: 600; text-align: right;">Price</th>
+                      <th style="padding: 8px 12px; color: var(--text-muted); font-weight: 600; text-align: right;">24H Change</th>
+                      <th style="padding: 8px 12px; color: var(--text-muted); font-weight: 600; text-align: center;">Trend</th>
+                      <th style="padding: 8px 12px; color: var(--text-muted); font-weight: 600; text-align: center;">Opp Score</th>
+                      <th style="padding: 8px 12px; color: var(--text-muted); font-weight: 600; text-align: center;">AI Confidence</th>
+                      <th style="padding: 8px 12px; color: var(--text-muted); font-weight: 600; text-align: center;">Risk Level</th>
+                      <th style="padding: 8px 12px; color: var(--text-muted); font-weight: 600; text-align: right;">Next review</th>
+                      <th style="padding: 8px 12px; color: var(--text-muted); font-weight: 600; text-align: right; width: 140px;">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="watch-watchlist-rows">
+                    <!-- Watched assets rendered dynamically -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- SECTION 3 & 4 SPLIT: Market Movers & Opportunity Radar -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; width: 100%; box-sizing: border-box; align-items: start;">
+              
+              <!-- SECTION 3: MARKET MOVERS -->
+              <div class="card-glass" style="padding: 20px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.06); display: flex; flex-direction: column; gap: 14px;">
+                <h4 style="margin: 0; font-size: 0.95rem; font-weight: 700; color: #fff; font-family: var(--font-display);">Top Market Movers</h4>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                  <div>
+                    <span style="display: block; font-size: 0.68rem; color: var(--text-muted); font-weight: 700; margin-bottom: 6px; text-transform: uppercase;">Top Gainers</span>
+                    <div id="movers-gainers-list" style="display: flex; flex-direction: column; gap: 6px;"></div>
+                  </div>
+                  <div>
+                    <span style="display: block; font-size: 0.68rem; color: var(--text-muted); font-weight: 700; margin-bottom: 6px; text-transform: uppercase;">Top Losers</span>
+                    <div id="movers-losers-list" style="display: flex; flex-direction: column; gap: 6px;"></div>
+                  </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; border-top: 1px solid rgba(255,255,255,0.04); padding-top: 12px;">
+                  <div>
+                    <span style="display: block; font-size: 0.68rem; color: var(--text-muted); font-weight: 700; margin-bottom: 6px; text-transform: uppercase;">Opportunity Risers</span>
+                    <div id="movers-risers-list" style="display: flex; flex-direction: column; gap: 6px;"></div>
+                  </div>
+                  <div>
+                    <span style="display: block; font-size: 0.68rem; color: var(--text-muted); font-weight: 700; margin-bottom: 6px; text-transform: uppercase;">Opportunity Fallers</span>
+                    <div id="movers-fallers-list" style="display: flex; flex-direction: column; gap: 6px;"></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- SECTION 4: OPPORTUNITY RADAR -->
+              <div class="card-glass" style="padding: 20px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.06); display: flex; flex-direction: column; gap: 14px;">
+                <h4 style="margin: 0; font-size: 0.95rem; font-weight: 700; color: #fff; font-family: var(--font-display);">Araiven Opportunity Radar</h4>
+                
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                  <!-- Strengthening signals -->
+                  <div style="padding: 10px; background: rgba(16, 185, 129, 0.02); border: 1px solid rgba(16, 185, 129, 0.08); border-radius: 8px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.72rem; margin-bottom: 4px;">
+                      <strong style="color: #10b981; display: inline-flex; align-items: center; gap: 6px;"><span style="display:inline-block; width: 8px; height: 8px; border-radius: 50%; background: #10b981; flex-shrink: 0;"></span> Strengthening Signals</strong>
+                      <span id="radar-strengthening-count" style="color: var(--text-muted);">0 Assets</span>
+                    </div>
+                    <span id="radar-strengthening-text" style="font-size: 0.68rem; color: var(--text-secondary);">Waiting for live indicator stream...</span>
+                  </div>
+
+                  <!-- Weakening signals -->
+                  <div style="padding: 10px; background: rgba(239, 68, 68, 0.02); border: 1px solid rgba(239, 68, 68, 0.08); border-radius: 8px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.72rem; margin-bottom: 4px;">
+                      <strong style="color: #ef4444; display: inline-flex; align-items: center; gap: 6px;"><span style="display:inline-block; width: 8px; height: 8px; border-radius: 50%; background: #ef4444; flex-shrink: 0;"></span> Weakening Signals</strong>
+                      <span id="radar-weakening-count" style="color: var(--text-muted);">0 Assets</span>
+                    </div>
+                    <span id="radar-weakening-text" style="font-size: 0.68rem; color: var(--text-secondary);">Waiting for live indicator stream...</span>
+                  </div>
+
+                  <!-- Breakouts and Reversals -->
+                  <div style="padding: 10px; background: rgba(99, 102, 241, 0.02); border: 1px solid rgba(99, 102, 241, 0.08); border-radius: 8px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.72rem; margin-bottom: 4px;">
+                      <strong style="color: #a5b4fc; display: inline-flex; align-items: center; gap: 6px;"><span style="display:inline-block; width: 8px; height: 8px; border-radius: 50%; background: #a5b4fc; flex-shrink: 0;"></span> Trend Reversals & Breakouts</strong>
+                      <span id="radar-breakout-count" style="color: var(--text-muted);">0 Assets</span>
+                    </div>
+                    <span id="radar-breakout-text" style="font-size: 0.68rem; color: var(--text-secondary);">Waiting for live breakouts...</span>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- SECTION 5: MARKET HEATMAP -->
+            <div class="card-glass" style="padding: 20px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.06); display: flex; flex-direction: column; gap: 14px;">
+              <h4 style="margin: 0; font-size: 0.95rem; font-weight: 700; color: #fff; font-family: var(--font-display);">Interactive Sector Heatmap</h4>
+              <div id="watch-heatmap-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; width: 100%;">
+                <!-- Dynamic sectors color-coded by average 24h performance -->
+              </div>
+            </div>
+
+            <!-- SECTION 6: OPPORTUNITY ALERTS -->
+            <div class="card-glass" style="padding: 20px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.06); display: flex; flex-direction: column; gap: 14px;">
+              <h4 style="margin: 0; font-size: 0.95rem; font-weight: 700; color: #fff; font-family: var(--font-display);">AI Signal Alerts</h4>
+              <div id="watch-alerts-list" style="display: flex; flex-direction: column; gap: 10px;">
+                <!-- Real-time opportunities alerts feed -->
+              </div>
+            </div>
+
           </div>
         </section>
 
@@ -1490,240 +1630,315 @@
            5. PORTFOLIO INTELLIGENCE VIEW
            ==================================================================== -->
         <section class="app-view-panel" id="view-portfolio">
-          <!-- 1. Top Summary Bar -->
-          <div class="portfolio-summary-bar" style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 16px; margin-bottom: 24px;">
-            
-            <div class="card-glass summary-compact-card" style="padding: 14px 18px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); text-align: left; background: rgba(14,19,37,0.4);">
-              <span style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; display: block; margin-bottom: 4px;">Portfolio Value</span>
-              <strong id="port-summary-value" style="font-size: 1.35rem; color: #fff; font-family: var(--font-display); font-weight: 700;">$132,194.10</strong>
-            </div>
-            
-            <div class="card-glass summary-compact-card" style="padding: 14px 18px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); text-align: left; background: rgba(14,19,37,0.4);">
-              <span style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; display: block; margin-bottom: 4px;">Today's P&L</span>
-              <strong id="port-summary-today-pnl" class="text-green" style="font-size: 1.35rem; font-family: var(--font-display); font-weight: 700;">+$1,240.50</strong>
-            </div>
-
-            <div class="card-glass summary-compact-card" style="padding: 14px 18px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); text-align: left; background: rgba(14,19,37,0.4);">
-              <span style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; display: block; margin-bottom: 4px;">Total Return</span>
-              <strong id="port-summary-total-pnl" class="text-green" style="font-size: 1.35rem; font-family: var(--font-display); font-weight: 700;">+$10,194.10</strong>
-            </div>
-
-            <div class="card-glass summary-compact-card" style="padding: 14px 18px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); text-align: left; background: rgba(14,19,37,0.4);">
-              <span style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; display: block; margin-bottom: 4px;">Win Rate</span>
-              <strong id="port-summary-winrate" style="font-size: 1.35rem; color: #fff; font-family: var(--font-display); font-weight: 700;">78.4%</strong>
-            </div>
-
-            <div class="card-glass summary-compact-card" style="padding: 14px 18px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); text-align: left; background: rgba(14,19,37,0.4);">
-              <span style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; display: block; margin-bottom: 4px;">Active Positions</span>
-              <strong id="port-summary-open-count" style="font-size: 1.35rem; color: #fff; font-family: var(--font-display); font-weight: 700;">3 Trades</strong>
-            </div>
-
-            <div class="card-glass summary-compact-card" style="padding: 14px 18px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); text-align: left; background: rgba(14,19,37,0.4);">
-              <span style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; display: block; margin-bottom: 4px;">Available Cash</span>
-              <strong id="port-summary-balance" style="font-size: 1.35rem; color: #fff; font-family: var(--font-display); font-weight: 700;">$39,600.00</strong>
-            </div>
-
+          <!-- EMPTY STATE CONTAINER (Shown if no trades have been made) -->
+          <div id="portfolio-empty-state" class="port-empty-state-container" style="display: none; padding: 60px 40px; text-align: center; background: rgba(14, 19, 37, 0.45); border: 1px dashed rgba(255, 255, 255, 0.08); border-radius: 16px; margin-bottom: 24px;">
+            <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 16px; display: inline-block;">
+              <line x1="18" y1="20" x2="18" y2="10"></line>
+              <line x1="12" y1="20" x2="12" y2="4"></line>
+              <line x1="6" y1="20" x2="6" y2="14"></line>
+            </svg>
+            <h4 style="color: #fff; margin-bottom: 8px; font-size: 1.25rem; font-family: var(--font-display); font-weight: 700;">Build Your Performance Record</h4>
+            <p style="color: var(--text-secondary); font-size: 0.88rem; max-width: 440px; margin: 0 auto 20px auto; line-height: 1.5;">Deploy a trading opportunity recommendation or close your first active position in the workspace to populate this premium Performance Center.</p>
+            <button class="btn btn-primary btn-onboard-start-scan" id="btn-portfolio-empty-explore" style="font-size: 0.85rem; font-weight: 600; padding: 10px 24px;">Start Exploring Markets</button>
           </div>
 
-          <!-- 2. Portfolio Secondary Tabs Navigation -->
-          <div class="portfolio-sub-nav" style="display: flex; gap: 8px; border-bottom: 1px solid var(--border); padding-bottom: 1px; margin-bottom: 24px; overflow-x: auto;">
-            <button class="port-sub-tab active" data-tab="active-positions" style="background: none; border: none; padding: 10px 16px; color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; white-space: nowrap;">Active Positions</button>
-            <button class="port-sub-tab" data-tab="closed-trades" style="background: none; border: none; padding: 10px 16px; color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; white-space: nowrap;">Closed Trades</button>
-            <button class="port-sub-tab" data-tab="holdings" style="background: none; border: none; padding: 10px 16px; color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; white-space: nowrap;">Holdings & Diversification</button>
-            <button class="port-sub-tab" data-tab="insights" style="background: none; border: none; padding: 10px 16px; color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; white-space: nowrap;">Portfolio Insights</button>
-            <button class="port-sub-tab" data-tab="ledger" style="background: none; border: none; padding: 10px 16px; color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; white-space: nowrap;">Transaction History</button>
-          </div>
-
-          <!-- 3. Portfolio Sub-Views Container -->
-          <div class="portfolio-sub-views-wrapper">
+          <!-- MAIN PERFORMANCE CENTER CONTENT -->
+          <div id="portfolio-performance-content" style="display: flex; flex-direction: column; gap: 24px;">
             
-            <!-- SUB-VIEW 1: ACTIVE POSITIONS -->
-            <div class="port-sub-view active" id="port-view-active-positions">
-              <div id="port-empty-positions" class="port-empty-state-container" style="display: none; padding: 60px 40px; text-align: center;">
-                <div style="font-size: 3rem; margin-bottom: 16px;">🔍</div>
-                <h4 style="color: #fff; margin-bottom: 8px; font-size: 1.15rem; font-family: var(--font-display);">No Active Positions</h4>
-                <p style="color: var(--text-secondary); font-size: 0.88rem; max-width: 400px; margin: 0 auto 20px auto; line-height: 1.5;">You do not have any open trades in your simulated paper portfolio. Araiven is ready to scan opportunities.</p>
-                <button class="btn btn-primary btn-onboard-start-scan" style="font-size: 0.85rem; font-weight: 600; padding: 8px 20px;">Scan Markets Now</button>
-              </div>
-
-              <div class="positions-cards-container" id="port-positions-cards-list" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
-                <!-- Positions cards are injected dynamically -->
-              </div>
-            </div>
-
-            <!-- SUB-VIEW 2: CLOSED TRADES -->
-            <div class="port-sub-view" id="port-view-closed-trades" style="display: none;">
-              <div id="port-empty-closed" class="port-empty-state-container" style="display: none; padding: 60px 40px; text-align: center;">
-                <div style="font-size: 3rem; margin-bottom: 16px;">📁</div>
-                <h4 style="color: #fff; margin-bottom: 8px; font-size: 1.15rem; font-family: var(--font-display);">No Closed Trades</h4>
-                <p style="color: var(--text-secondary); font-size: 0.88rem; max-width: 400px; margin: 0 auto 20px auto; line-height: 1.5;">You haven't completed any trades yet. Deploy an opportunity from the scan queue to build history.</p>
-                <button class="btn btn-primary btn-onboard-start-scan" style="font-size: 0.85rem; font-weight: 600; padding: 8px 20px;">Scan Markets</button>
-              </div>
-
-              <div class="card-glass" id="port-closed-trades-panel" style="padding: 0; border-radius: 12px; overflow: hidden;">
-                <div class="holdings-table-container">
-                  <table class="table-ds holdings-table" style="width: 100%; margin: 0;">
-                    <thead>
-                      <tr>
-                        <th>Closed Time</th>
-                        <th>Asset</th>
-                        <th>Direction</th>
-                        <th>Entry Price</th>
-                        <th>Exit Price</th>
-                        <th>Profit/Loss</th>
-                        <th>Holding Time</th>
-                        <th>Exit Reason</th>
-                        <th>AI Confidence</th>
-                        <th>Setup Score</th>
-                      </tr>
-                    </thead>
-                    <tbody id="port-closed-trades-rows">
-                      <!-- Closed trades injected dynamically -->
-                    </tbody>
-                  </table>
+            <!-- SECTION 1: PORTFOLIO OVERVIEW -->
+            <div class="portfolio-grid-overview" style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 16px;">
+              
+              <!-- Total Value Card -->
+              <div class="card-glass" style="padding: 16px 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); text-align: left; background: rgba(14,19,37,0.4); display: flex; flex-direction: column; justify-content: space-between;">
+                <span style="font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; display: block; margin-bottom: 4px;">Total Portfolio Value</span>
+                <div>
+                  <strong id="port-summary-value" style="font-size: 1.35rem; color: #fff; font-family: var(--font-display); font-weight: 700; display: block; line-height: 1.2;">$100,000.00</strong>
+                  <div style="display: flex; align-items: center; gap: 4px; margin-top: 6px;">
+                    <span id="perf-value-change-indicator" style="font-size: 0.68rem; font-weight: 600; display: inline-flex; align-items: center; gap: 2px;">
+                      <span class="trend-icon">↑</span> <span class="trend-val">+0.00%</span>
+                    </span>
+                    <span style="font-size: 0.58rem; color: var(--text-muted);">vs initial</span>
+                  </div>
                 </div>
               </div>
+
+              <!-- Today's P/L Card -->
+              <div class="card-glass" style="padding: 16px 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); text-align: left; background: rgba(14,19,37,0.4); display: flex; flex-direction: column; justify-content: space-between;">
+                <span style="font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; display: block; margin-bottom: 4px;">Today's P/L</span>
+                <div>
+                  <strong id="port-summary-today-pnl" style="font-size: 1.35rem; color: #fff; font-family: var(--font-display); font-weight: 700; display: block; line-height: 1.2;">$0.00</strong>
+                  <div style="display: flex; align-items: center; gap: 4px; margin-top: 6px;">
+                    <span id="perf-today-change-indicator" style="font-size: 0.68rem; font-weight: 600; display: inline-flex; align-items: center; gap: 2px;">
+                      <span class="trend-icon">↑</span> <span class="trend-val">+0.00%</span>
+                    </span>
+                    <span style="font-size: 0.58rem; color: var(--text-muted);">24h flow</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Total Return Card -->
+              <div class="card-glass" style="padding: 16px 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); text-align: left; background: rgba(14,19,37,0.4); display: flex; flex-direction: column; justify-content: space-between;">
+                <span style="font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; display: block; margin-bottom: 4px;">Total Return</span>
+                <div>
+                  <strong id="port-summary-total-pnl" style="font-size: 1.35rem; color: #fff; font-family: var(--font-display); font-weight: 700; display: block; line-height: 1.2;">$0.00</strong>
+                  <div style="display: flex; align-items: center; gap: 4px; margin-top: 6px;">
+                    <span id="perf-return-change-indicator" style="font-size: 0.68rem; font-weight: 600; display: inline-flex; align-items: center; gap: 2px;">
+                      <span class="trend-icon">↑</span> <span class="trend-val">+0.00%</span>
+                    </span>
+                    <span style="font-size: 0.58rem; color: var(--text-muted);">cumulative</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Unrealized P&L Card -->
+              <div class="card-glass" style="padding: 16px 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); text-align: left; background: rgba(14,19,37,0.4); display: flex; flex-direction: column; justify-content: space-between;">
+                <span style="font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; display: block; margin-bottom: 4px;">Unrealized P&L</span>
+                <div>
+                  <strong id="port-summary-unrealized" style="font-size: 1.35rem; color: #fff; font-family: var(--font-display); font-weight: 700; display: block; line-height: 1.2;">$0.00</strong>
+                  <div style="display: flex; align-items: center; gap: 4px; margin-top: 6px;">
+                    <span id="perf-unrealized-pct-indicator" style="font-size: 0.68rem; font-weight: 600; display: inline-flex; align-items: center; gap: 2px;">
+                      <span class="trend-icon">↑</span> <span class="trend-val">+0.00%</span>
+                    </span>
+                    <span style="font-size: 0.58rem; color: var(--text-muted);">open trades</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Cash Balance Card -->
+              <div class="card-glass" style="padding: 16px 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); text-align: left; background: rgba(14,19,37,0.4); display: flex; flex-direction: column; justify-content: space-between;">
+                <span style="font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; display: block; margin-bottom: 4px;">Cash Balance</span>
+                <div>
+                  <strong id="port-summary-balance" style="font-size: 1.35rem; color: #fff; font-family: var(--font-display); font-weight: 700; display: block; line-height: 1.2;">$100,000.00</strong>
+                  <div style="display: flex; align-items: center; gap: 4px; margin-top: 6px;">
+                    <span id="perf-cash-allocation-ratio" style="font-size: 0.68rem; font-weight: 600; color: var(--text-muted);">100% Allocation</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Active Positions Card -->
+              <div class="card-glass" style="padding: 16px 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); text-align: left; background: rgba(14,19,37,0.4); display: flex; flex-direction: column; justify-content: space-between;">
+                <span style="font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; display: block; margin-bottom: 4px;">Active Positions</span>
+                <div>
+                  <strong id="port-summary-open-count" style="font-size: 1.35rem; color: #fff; font-family: var(--font-display); font-weight: 700; display: block; line-height: 1.2;">0 Trades</strong>
+                  <div style="display: flex; align-items: center; gap: 4px; margin-top: 6px;">
+                    <span id="perf-last-updated-time" style="font-size: 0.58rem; color: var(--text-muted);">Updated just now</span>
+                  </div>
+                </div>
+              </div>
+
             </div>
 
-            <!-- SUB-VIEW 3: HOLDINGS & DIVERSIFICATION -->
-            <div class="port-sub-view" id="port-view-holdings" style="display: none;">
-              <div class="portfolio-grid-container" style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 24px;">
+            <!-- SECTION 7: PERFORMANCE TIMELINE -->
+            <div class="card-glass" style="padding: 20px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.06); display: flex; flex-direction: column; gap: 16px; height: 320px; overflow: hidden; box-sizing: border-box; width: 100%;">
+              <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; box-sizing: border-box;">
+                <div>
+                  <h4 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: #fff; font-family: var(--font-display);">Performance Timeline</h4>
+                  <span style="font-size: 0.72rem; color: var(--text-muted); display: block; margin-top: 2px;">Simulated equity growth over select historical intervals</span>
+                </div>
                 
-                <!-- Left Side: Holdings Distribution -->
-                <div class="card-glass portfolio-holdings-card" style="padding: 24px; border-radius: 16px;">
-                  <h4 style="margin-bottom: 16px; color: #fff;">Current Asset Holdings</h4>
-                  <div class="holdings-table-container" style="overflow-x: auto;">
-                    <table class="holdings-table" style="width: 100%;">
+                <!-- Timeframe filters -->
+                <div class="filter-segmented" id="perf-timeline-segmented-controls" style="display: flex; background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.04); border-radius: 6px; padding: 2px; box-sizing: border-box;">
+                  <button class="segmented-tab" data-period="24h" style="padding: 5px 10px; font-size: 0.68rem; font-weight: 600; border: none; background: transparent; color: var(--text-secondary); cursor: pointer; border-radius: 4px;">1D</button>
+                  <button class="segmented-tab active" data-period="7d" style="padding: 5px 10px; font-size: 0.68rem; font-weight: 600; border: none; background: transparent; color: var(--text-secondary); cursor: pointer; border-radius: 4px;">1W</button>
+                  <button class="segmented-tab" data-period="30d" style="padding: 5px 10px; font-size: 0.68rem; font-weight: 600; border: none; background: transparent; color: var(--text-secondary); cursor: pointer; border-radius: 4px;">1M</button>
+                  <button class="segmented-tab" data-period="1y" style="padding: 5px 10px; font-size: 0.68rem; font-weight: 600; border: none; background: transparent; color: var(--text-secondary); cursor: pointer; border-radius: 4px;">1Y</button>
+                  <button class="segmented-tab" data-period="all" style="padding: 5px 10px; font-size: 0.68rem; font-weight: 600; border: none; background: transparent; color: var(--text-secondary); cursor: pointer; border-radius: 4px;">ALL</button>
+                </div>
+              </div>
+              
+              <!-- Chart Workspace container -->
+              <div id="perf-timeline-chart-canvas" style="flex: 1; width: 100%; min-height: 0; position: relative;">
+                <!-- TradingView Lightweight Chart injected here -->
+              </div>
+            </div>
+
+            <!-- PERFORMANCE DETAILS GRID (Columns: Metrics/Positions & Allocation/Risk/AI) -->
+            <div style="display: grid; grid-template-columns: 1.25fr 0.75fr; gap: 24px; width: 100%; box-sizing: border-box; align-items: start;">
+              
+              <!-- Left Column: Metrics & Open Positions -->
+              <div style="display: flex; flex-direction: column; gap: 24px;">
+                
+                <!-- SECTION 2: PERFORMANCE ANALYTICS -->
+                <div class="card-glass" style="padding: 20px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.06);">
+                  <h4 style="margin: 0 0 16px 0; font-size: 1rem; font-weight: 700; color: #fff; font-family: var(--font-display);">Performance Analytics</h4>
+                  
+                  <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; width: 100%;">
+                    
+                    <div style="background: rgba(255,255,255,0.015); border: 1px solid rgba(255,255,255,0.04); border-radius: 8px; padding: 10px 12px; text-align: left;">
+                      <span style="font-size: 0.6rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; display: block; margin-bottom: 2px;">Win Rate</span>
+                      <strong id="port-summary-winrate" style="font-size: 1.15rem; color: #10b981; font-weight: 700; display: block;">0.0%</strong>
+                    </div>
+
+                    <div style="background: rgba(255,255,255,0.015); border: 1px solid rgba(255,255,255,0.04); border-radius: 8px; padding: 10px 12px; text-align: left;">
+                      <span style="font-size: 0.6rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; display: block; margin-bottom: 2px;">Profit Factor</span>
+                      <strong id="insight-winloss-ratio" style="font-size: 1.15rem; color: #3b82f6; font-weight: 700; display: block;">0.00</strong>
+                    </div>
+
+                    <div style="background: rgba(255,255,255,0.015); border: 1px solid rgba(255,255,255,0.04); border-radius: 8px; padding: 10px 12px; text-align: left;">
+                      <span style="font-size: 0.6rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; display: block; margin-bottom: 2px;">Average Profit</span>
+                      <strong id="perf-metric-avg-profit" style="font-size: 1.15rem; color: #10b981; font-weight: 700; display: block;">$0.00</strong>
+                    </div>
+
+                    <div style="background: rgba(255,255,255,0.015); border: 1px solid rgba(255,255,255,0.04); border-radius: 8px; padding: 10px 12px; text-align: left;">
+                      <span style="font-size: 0.6rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; display: block; margin-bottom: 2px;">Average Loss</span>
+                      <strong id="perf-metric-avg-loss" style="font-size: 1.15rem; color: #ef4444; font-weight: 700; display: block;">$0.00</strong>
+                    </div>
+
+                    <div style="background: rgba(255,255,255,0.015); border: 1px solid rgba(255,255,255,0.04); border-radius: 8px; padding: 10px 12px; text-align: left;">
+                      <span style="font-size: 0.6rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; display: block; margin-bottom: 2px;">Sharpe Ratio</span>
+                      <strong id="perf-metric-sharpe-ratio" style="font-size: 1.15rem; color: #a5b4fc; font-weight: 700; display: block;">2.15</strong>
+                    </div>
+
+                    <div style="background: rgba(255,255,255,0.015); border: 1px solid rgba(255,255,255,0.04); border-radius: 8px; padding: 10px 12px; text-align: left;">
+                      <span style="font-size: 0.6rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; display: block; margin-bottom: 2px;">Avg Hold Time</span>
+                      <strong id="insight-holding-time" style="font-size: 1.15rem; color: #fff; font-weight: 700; display: block;">0h 0m</strong>
+                    </div>
+
+                    <div style="background: rgba(255,255,255,0.015); border: 1px solid rgba(255,255,255,0.04); border-radius: 8px; padding: 10px 12px; text-align: left; grid-column: span 2;">
+                      <span style="font-size: 0.6rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; display: block; margin-bottom: 2px;">Best Trade Result</span>
+                      <strong id="insight-best-asset" style="font-size: 0.95rem; color: #10b981; font-weight: 700; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">No closed trades</strong>
+                    </div>
+
+                    <div style="background: rgba(255,255,255,0.015); border: 1px solid rgba(255,255,255,0.04); border-radius: 8px; padding: 10px 12px; text-align: left; grid-column: span 4;">
+                      <span style="font-size: 0.6rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; display: block; margin-bottom: 2px;">Worst Mitigated Trade</span>
+                      <strong id="insight-worst-trade" style="font-size: 0.95rem; color: var(--text-secondary); font-weight: 700; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">No losses logged</strong>
+                    </div>
+
+                  </div>
+                </div>
+
+                <!-- SECTION 6: OPEN POSITIONS SUMMARY -->
+                <div class="card-glass" style="padding: 20px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.06); display: flex; flex-direction: column;">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; width: 100%; box-sizing: border-box;">
+                    <h4 style="margin: 0; font-size: 1rem; font-weight: 700; color: #fff; font-family: var(--font-display);">Open Positions Summary</h4>
+                    <button class="btn btn-secondary btn-sm" id="btn-perf-nav-workspace" style="font-size: 0.7rem; font-weight: 600; padding: 4px 10px; border: 1px solid rgba(255,255,255,0.08);">Trading Workspace &rarr;</button>
+                  </div>
+
+                  <div class="holdings-table-container" style="overflow-x: auto; width: 100%; max-height: 240px;">
+                    <table class="table-ds holdings-table" style="width: 100%; border-collapse: collapse; margin: 0;">
                       <thead>
-                        <tr>
-                          <th>Asset</th>
-                          <th>Allocation</th>
-                          <th>Balance</th>
-                          <th>Avg Entry</th>
-                          <th>24h Change</th>
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.06);">
+                          <th style="font-size: 0.65rem; color: var(--text-muted); padding: 8px; font-weight: 700; text-align: left; text-transform: uppercase;">Asset</th>
+                          <th style="font-size: 0.65rem; color: var(--text-muted); padding: 8px; font-weight: 700; text-align: left; text-transform: uppercase;">Direction</th>
+                          <th style="font-size: 0.65rem; color: var(--text-muted); padding: 8px; font-weight: 700; text-align: right; text-transform: uppercase;">Entry</th>
+                          <th style="font-size: 0.65rem; color: var(--text-muted); padding: 8px; font-weight: 700; text-align: right; text-transform: uppercase;">Current</th>
+                          <th style="font-size: 0.65rem; color: var(--text-muted); padding: 8px; font-weight: 700; text-align: right; text-transform: uppercase;">P/L</th>
+                          <th style="font-size: 0.65rem; color: var(--text-muted); padding: 8px; font-weight: 700; text-align: center; text-transform: uppercase;">Risk</th>
+                          <th style="font-size: 0.65rem; color: var(--text-muted); padding: 8px; font-weight: 700; text-align: right; text-transform: uppercase;">Status</th>
                         </tr>
                       </thead>
-                      <tbody id="portfolio-holdings-rows">
-                        <!-- Holdings rows injected dynamically -->
+                      <tbody id="perf-open-positions-tbody">
+                        <!-- Positions will be injected dynamically -->
                       </tbody>
                     </table>
                   </div>
                 </div>
-                
-                <!-- Right Side: Diversification visual Donut -->
-                <div class="card-glass allocation-donut-card" style="padding: 24px; border-radius: 16px;">
-                  <h4 style="margin-bottom: 16px; color: #fff;">Asset Diversification</h4>
-                  <div class="donut-chart-container" style="display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative;">
-                    <svg class="donut-svg" viewBox="0 0 200 200" style="width: 160px; height: 160px;">
-                      <circle cx="100" cy="100" r="70" fill="none" stroke="rgba(255,255,255,0.02)" stroke-width="20"/>
-                      <!-- Donut segments -->
-                      <circle cx="100" cy="100" r="70" class="donut-seg donut-eth" stroke="#2563eb" stroke-width="20" stroke-dasharray="197.9 439.8" stroke-dashoffset="109.9"/>
-                      <circle cx="100" cy="100" r="70" class="donut-seg donut-usdc" stroke="#10b981" stroke-width="20" stroke-dasharray="131.9 439.8" stroke-dashoffset="-88"/>
-                      <circle cx="100" cy="100" r="70" class="donut-seg donut-btc" stroke="#6366f1" stroke-width="20" stroke-dasharray="87.9 439.8" stroke-dashoffset="-219.9"/>
-                      <circle cx="100" cy="100" r="70" class="donut-seg donut-cash" stroke="#475569" stroke-width="20" stroke-dasharray="22 439.8" stroke-dashoffset="-307.8"/>
-                    </svg>
-                    <div class="donut-inner-metrics" style="position: absolute; display: flex; flex-direction: column; align-items: center; justify-content: center; transform: translate(-50%, -50%); left: 50%; top: 50%;">
-                      <span class="donut-label" style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase;">Total Assets</span>
-                      <strong class="donut-val" style="font-size: 1.15rem; color: #fff; font-weight: 700;">$132,194</strong>
-                    </div>
-                  </div>
-                  <div class="donut-legend" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 20px; font-size: 0.78rem;">
-                    <div class="legend-item" style="display: flex; align-items: center; gap: 6px;"><span class="legend-dot" style="background:#2563eb; width:8px; height:8px; border-radius:50%;"></span><span>ETH (45%)</span></div>
-                    <div class="legend-item" style="display: flex; align-items: center; gap: 6px;"><span class="legend-dot" style="background:#10b981; width:8px; height:8px; border-radius:50%;"></span><span>USDC (30%)</span></div>
-                    <div class="legend-item" style="display: flex; align-items: center; gap: 6px;"><span class="legend-dot" style="background:#6366f1; width:8px; height:8px; border-radius:50%;"></span><span>BTC (20%)</span></div>
-                    <div class="legend-item" style="display: flex; align-items: center; gap: 6px;"><span class="legend-dot" style="background:#475569; width:8px; height:8px; border-radius:50%;"></span><span>Cash (5%)</span></div>
-                  </div>
-                </div>
 
               </div>
-            </div>
 
-            <!-- SUB-VIEW 4: PORTFOLIO INSIGHTS -->
-            <div class="port-sub-view" id="port-view-insights" style="display: none;">
-              <div class="insights-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
+              <!-- Right Column: Asset Allocation, Risk Analysis & AI Insights -->
+              <div style="display: flex; flex-direction: column; gap: 24px;">
                 
-                <div class="card-glass insight-card" style="padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.06); text-align: left;">
-                  <div style="font-size: 1.5rem; margin-bottom: 10px;">🏆</div>
-                  <h5 style="color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; margin-bottom: 4px; font-weight: 600;">Best Performing Asset</h5>
-                  <strong id="insight-best-asset" style="font-size: 1.2rem; color: #fff; display: block;">BTC (+12.4% yield)</strong>
-                  <span style="font-size: 0.72rem; color: var(--text-muted); margin-top: 4px; display: block;">Contributed 42% of total capital profits</span>
-                </div>
-
-                <div class="card-glass insight-card" style="padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.06); text-align: left;">
-                  <div style="font-size: 1.5rem; margin-bottom: 10px;">📉</div>
-                  <h5 style="color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; margin-bottom: 4px; font-weight: 600;">Worst Trade Exposure</h5>
-                  <strong id="insight-worst-trade" style="font-size: 1.2rem; color: var(--text-secondary); display: block;">SUI (-1.80% manual close)</strong>
-                  <span style="font-size: 0.72rem; color: var(--text-muted); margin-top: 4px; display: block;">Loss mitigated by Araiven Stop Loss ladders</span>
-                </div>
-
-                <div class="card-glass insight-card" style="padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.06); text-align: left;">
-                  <div style="font-size: 1.5rem; margin-bottom: 10px;">⏱️</div>
-                  <h5 style="color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; margin-bottom: 4px; font-weight: 600;">Average Holding Time</h5>
-                  <strong id="insight-holding-time" style="font-size: 1.2rem; color: #fff; display: block;">1d 14h 22m</strong>
-                  <span style="font-size: 0.72rem; color: var(--text-muted); margin-top: 4px; display: block;">Perfect fit for Swing trading profiles</span>
-                </div>
-
-                <div class="card-glass insight-card" style="padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.06); text-align: left;">
-                  <div style="font-size: 1.5rem; margin-bottom: 10px;">⚖️</div>
-                  <h5 style="color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; margin-bottom: 4px; font-weight: 600;">Win/Loss Ratio</h5>
-                  <strong id="insight-winloss-ratio" style="font-size: 1.2rem; color: #fff; display: block;">4.2 (Win to Loss Factor)</strong>
-                  <span style="font-size: 0.72rem; color: var(--text-muted); margin-top: 4px; display: block;">Calculated over completed paper setups</span>
-                </div>
-
-                <div class="card-glass insight-card" style="padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.06); text-align: left;">
-                  <div style="font-size: 1.5rem; margin-bottom: 10px;">🔥</div>
-                  <h5 style="color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; margin-bottom: 4px; font-weight: 600;">Most Traded Asset</h5>
-                  <strong id="insight-most-traded" style="font-size: 1.2rem; color: #fff; display: block;">ETH (8 Transactions)</strong>
-                  <span style="font-size: 0.72rem; color: var(--text-muted); margin-top: 4px; display: block;">Highly active correlation spreads scanned</span>
-                </div>
-
-                <div class="card-glass insight-card" style="padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.06); text-align: left;">
-                  <div style="font-size: 1.5rem; margin-bottom: 10px;">🛡️</div>
-                  <h5 style="color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; margin-bottom: 4px; font-weight: 600;">Risk Distribution</h5>
-                  <strong id="insight-risk-level" style="font-size: 1.2rem; color: #fff; display: block;">Balanced (100% compliant)</strong>
-                  <span style="font-size: 0.72rem; color: var(--text-muted); margin-top: 4px; display: block;">0 protective guard rule breaches detected</span>
-                </div>
-
-              </div>
-            </div>
-
-            <!-- SUB-VIEW 5: TRANSACTION HISTORY LEDGER -->
-            <div class="port-sub-view" id="port-view-ledger" style="display: none;">
-              <div class="card-glass" style="padding: 24px; border-radius: 16px;">
-                <div class="card-header-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
-                  <h4 style="color: #fff; margin: 0;">Historical Transaction Ledger</h4>
+                <!-- SECTION 3: ASSET ALLOCATION -->
+                <div class="card-glass" style="padding: 20px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.06);">
+                  <h4 style="margin: 0 0 16px 0; font-size: 1rem; font-weight: 700; color: #fff; font-family: var(--font-display);">Asset Allocation</h4>
                   
-                  <div style="display: flex; gap: 10px;" class="ledger-actions-group">
-                    <input type="text" class="search-input" placeholder="Search transactions..." id="ledger-search" style="padding: 8px 12px; font-size: 0.8rem; background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 6px; color:#fff; width: 200px;">
-                    <select id="ledger-type-filter" style="padding: 8px 12px; font-size: 0.8rem; background: rgba(14,19,37,0.8); border: 1px solid var(--border); border-radius: 6px; color:#fff; cursor: pointer;">
-                      <option value="all">All Types</option>
-                      <option value="buy">BUY</option>
-                      <option value="sell">SELL</option>
-                      <option value="fee">FEES</option>
-                    </select>
-                    <button class="btn btn-secondary btn-sm" id="btn-ledger-export" style="font-size:0.8rem; font-weight:600;">Export CSV</button>
+                  <div style="display: flex; align-items: center; justify-content: space-around; gap: 20px;">
+                    <!-- Allocation Donut -->
+                    <div class="donut-chart-container" style="display: flex; align-items: center; justify-content: center; position: relative;">
+                      <svg class="donut-svg" viewBox="0 0 200 200" style="width: 110px; height: 110px;">
+                        <circle cx="100" cy="100" r="70" fill="none" stroke="rgba(255,255,255,0.02)" stroke-width="20"/>
+                        <!-- SEGMENTS INJECTED BY JS OR SVG -->
+                        <circle cx="100" cy="100" r="70" class="donut-seg donut-eth" stroke="#2563eb" stroke-width="20" stroke-dasharray="197.9 439.8" stroke-dashoffset="109.9"/>
+                        <circle cx="100" cy="100" r="70" class="donut-seg donut-usdc" stroke="#10b981" stroke-width="20" stroke-dasharray="131.9 439.8" stroke-dashoffset="-88"/>
+                        <circle cx="100" cy="100" r="70" class="donut-seg donut-btc" stroke="#6366f1" stroke-width="20" stroke-dasharray="87.9 439.8" stroke-dashoffset="-219.9"/>
+                        <circle cx="100" cy="100" r="70" class="donut-seg donut-cash" stroke="#475569" stroke-width="20" stroke-dasharray="22 439.8" stroke-dashoffset="-307.8"/>
+                      </svg>
+                      <div class="donut-inner-metrics" style="position: absolute; display: flex; flex-direction: column; align-items: center; justify-content: center; transform: translate(-50%, -50%); left: 50%; top: 50%;">
+                        <span class="donut-label" style="font-size: 0.55rem; color: var(--text-muted); text-transform: uppercase;">Holdings</span>
+                        <strong class="donut-val" id="perf-donut-total-value" style="font-size: 0.95rem; color: #fff; font-weight: 700;">$100k</strong>
+                      </div>
+                    </div>
+
+                    <!-- Allocation Legend & Table -->
+                    <div style="flex: 1; overflow: hidden;">
+                      <table style="width: 100%; border-collapse: collapse; font-size: 0.72rem; color: var(--text-secondary);">
+                        <thead>
+                          <tr style="border-bottom: 1px solid rgba(255,255,255,0.04); text-align: left;">
+                            <th style="padding: 4px 0; color: var(--text-muted);">Asset</th>
+                            <th style="padding: 4px 0; color: var(--text-muted); text-align: right;">Alloc</th>
+                            <th style="padding: 4px 0; color: var(--text-muted); text-align: right;">Value</th>
+                          </tr>
+                        </thead>
+                        <tbody id="portfolio-holdings-rows">
+                          <!-- Legend rows dynamically injected -->
+                        </tbody>
+                      </table>
+                    </div>
+
                   </div>
                 </div>
 
-                <div class="holdings-table-container">
-                  <table class="table-ds holdings-table" style="width: 100%; margin: 0;">
-                    <thead>
-                      <tr>
-                        <th>Timestamp</th>
-                        <th>Type</th>
-                        <th>Asset</th>
-                        <th>Amount</th>
-                        <th>Price</th>
-                        <th>Fee</th>
-                        <th>Status</th>
-                      </tr>
-                    </thead>
-                    <tbody id="port-ledger-rows">
-                      <!-- History transactions injected dynamically -->
-                    </tbody>
-                  </table>
+                <!-- SECTION 4: RISK ANALYSIS -->
+                <div class="card-glass" style="padding: 20px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.06); display: flex; flex-direction: column; gap: 12px;">
+                  <h4 style="margin: 0; font-size: 1rem; font-weight: 700; color: #fff; font-family: var(--font-display);">Risk Analysis</h4>
+                  
+                  <div style="display: flex; flex-direction: column; gap: 8px; font-size: 0.76rem;">
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                      <span style="color: var(--text-secondary);">Risk Level</span>
+                      <strong id="perf-risk-stance-display" style="text-transform: uppercase; color: var(--accent);">BALANCED</strong>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                      <span style="color: var(--text-secondary);">Diversification</span>
+                      <strong id="perf-risk-diversification" style="color: #fff;">Medium (3 assets)</strong>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                      <span style="color: var(--text-secondary);">Largest Position</span>
+                      <strong id="perf-risk-largest-position" style="color: #fff;">USDC (100%)</strong>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                      <span style="color: var(--text-secondary);">Maximum Drawdown</span>
+                      <strong id="perf-risk-max-drawdown" style="color: #ef4444;">-3.5%</strong>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                      <span style="color: var(--text-secondary);">Current Exposure</span>
+                      <strong id="perf-risk-exposure-pct" style="color: #fff;">0.0%</strong>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                      <span style="color: var(--text-secondary);">Average Leverage</span>
+                      <strong id="perf-risk-avg-leverage" style="color: #fff;">1.0x</strong>
+                    </div>
+
+                  </div>
+
+                  <!-- Progress risk gauge bar -->
+                  <div style="width: 100%; height: 5px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 99px; overflow: hidden; position: relative; margin-top: 4px;">
+                    <div id="portfolio-risk-meter-fill" style="height: 100%; width: 42%; background: linear-gradient(90deg, #10b981 0%, #3b82f6 50%, #ef4444 100%); border-radius: 99px;"></div>
+                  </div>
                 </div>
+
+                <!-- SECTION 5: AI INSIGHTS (Araiven Insights) -->
+                <div class="card-glass" style="padding: 20px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.06); display: flex; flex-direction: column; gap: 12px; background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(14, 19, 37, 0.8) 100%);">
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    <div style="background: rgba(139, 92, 246, 0.15); width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(139, 92, 246, 0.25);">
+                      <span style="color: #c084fc; font-size: 0.72rem; font-weight: bold; font-family: var(--font-display);">A</span>
+                    </div>
+                    <h4 style="margin: 0; font-size: 1rem; font-weight: 700; color: #fff; font-family: var(--font-display);">Araiven Performance Insights</h4>
+                  </div>
+                  
+                  <ul id="perf-ai-insights-list" style="margin: 0; padding-left: 16px; display: flex; flex-direction: column; gap: 8px; font-size: 0.74rem; color: var(--text-secondary); line-height: 1.45;">
+                    <!-- Injected dynamically based on active risk level and portfolio diversification -->
+                  </ul>
+                </div>
+
               </div>
+
             </div>
 
           </div>
@@ -1733,40 +1948,181 @@
            6. TRADE HISTORY VIEW
            ==================================================================== -->
         <section class="app-view-panel" id="view-history">
-          <div class="card-glass" style="padding: 24px; border-radius: 16px;">
-            <div class="card-header-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
-              <h4 style="color: #fff; margin: 0;">Historical Transaction Ledger</h4>
+          <!-- EMPTY STATE CONTAINER -->
+          <div id="journal-empty-state" class="port-empty-state-container" style="display: none; padding: 80px 40px; text-align: center; background: rgba(14, 19, 37, 0.45); border: 1px dashed rgba(255, 255, 255, 0.08); border-radius: 16px; margin-bottom: 24px;">
+            <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 16px; display: inline-block;">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+            </svg>
+            <h3 style="color: #fff; margin-bottom: 10px; font-size: 1.45rem; font-family: var(--font-display); font-weight: 700;">Your Intelligent Trading Journal</h3>
+            <p style="color: var(--text-secondary); font-size: 0.9rem; max-width: 460px; margin: 0 auto 20px auto; line-height: 1.6;">
+              Completed paper trades will automatically populate this journal with market context, Araiven AI review audits, performance analytics, and personal trading logs.
+            </p>
+            <button class="btn btn-primary btn-onboard-start-scan" id="btn-journal-empty-trade" style="font-size: 0.88rem; font-weight: 600; padding: 10px 24px;">Start Trading</button>
+          </div>
+
+          <!-- MAIN TRADING JOURNAL CONTENT -->
+          <div id="journal-main-content" style="display: flex; flex-direction: column; gap: 24px;">
+            
+            <!-- ROW 1: JOURNAL OVERVIEW -->
+            <div class="portfolio-grid-overview" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 12px; width: 100%;">
               
-              <div style="display: flex; gap: 10px;" class="ledger-actions-group">
-                <input type="text" class="search-input" placeholder="Search transactions..." id="history-search" style="padding: 8px 12px; font-size: 0.8rem; background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 6px; color:#fff; width: 200px;">
-                <select id="history-type-filter" style="padding: 8px 12px; font-size: 0.8rem; background: rgba(14,19,37,0.8); border: 1px solid var(--border); border-radius: 6px; color:#fff; cursor: pointer;">
-                  <option value="all">All Types</option>
-                  <option value="buy">BUY</option>
-                  <option value="sell">SELL</option>
-                  <option value="fee">FEES</option>
-                </select>
-                <button class="btn btn-secondary btn-sm" id="btn-history-export" style="font-size:0.8rem; font-weight:600;">Export CSV</button>
+              <!-- Total Trades -->
+              <div class="card-glass" style="padding: 14px 16px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05); text-align: left; background: rgba(14,19,37,0.4);">
+                <span style="font-size: 0.62rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; display: block; margin-bottom: 4px;">Total Trades</span>
+                <strong id="journal-stat-total-trades" style="font-size: 1.25rem; color: #fff; font-family: var(--font-display); font-weight: 700; display: block;">0</strong>
               </div>
+
+              <!-- Win Rate -->
+              <div class="card-glass" style="padding: 14px 16px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05); text-align: left; background: rgba(14,19,37,0.4);">
+                <span style="font-size: 0.62rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; display: block; margin-bottom: 4px;">Win Rate</span>
+                <strong id="journal-stat-win-rate" style="font-size: 1.25rem; color: #fff; font-family: var(--font-display); font-weight: 700; display: block;">0.0%</strong>
+              </div>
+
+              <!-- Net P&L -->
+              <div class="card-glass" style="padding: 14px 16px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05); text-align: left; background: rgba(14,19,37,0.4);">
+                <span style="font-size: 0.62rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; display: block; margin-bottom: 4px;">Net P&L</span>
+                <strong id="journal-stat-net-pnl" style="font-size: 1.25rem; color: #fff; font-family: var(--font-display); font-weight: 700; display: block;">$0.00</strong>
+              </div>
+
+              <!-- Average Return -->
+              <div class="card-glass" style="padding: 14px 16px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05); text-align: left; background: rgba(14,19,37,0.4);">
+                <span style="font-size: 0.62rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; display: block; margin-bottom: 4px;">Average Return</span>
+                <strong id="journal-stat-avg-return" style="font-size: 1.25rem; color: #fff; font-family: var(--font-display); font-weight: 700; display: block;">$0.00</strong>
+              </div>
+
+              <!-- Avg Holding Time -->
+              <div class="card-glass" style="padding: 14px 16px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05); text-align: left; background: rgba(14,19,37,0.4);">
+                <span style="font-size: 0.62rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; display: block; margin-bottom: 4px;">Avg Hold Time</span>
+                <strong id="journal-stat-avg-hold" style="font-size: 1.25rem; color: #fff; font-family: var(--font-display); font-weight: 700; display: block;">0h 0m</strong>
+              </div>
+
+              <!-- Best Trade -->
+              <div class="card-glass" style="padding: 14px 16px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05); text-align: left; background: rgba(14,19,37,0.4); overflow: hidden;">
+                <span style="font-size: 0.62rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; display: block; margin-bottom: 4px;">Best Trade</span>
+                <strong id="journal-stat-best" style="font-size: 0.88rem; color: #10b981; font-family: var(--font-display); font-weight: 700; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">N/A</strong>
+              </div>
+
+              <!-- Worst Trade -->
+              <div class="card-glass" style="padding: 14px 16px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05); text-align: left; background: rgba(14,19,37,0.4); overflow: hidden;">
+                <span style="font-size: 0.62rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; display: block; margin-bottom: 4px;">Worst Trade</span>
+                <strong id="journal-stat-worst" style="font-size: 0.88rem; color: #ef4444; font-family: var(--font-display); font-weight: 700; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">N/A</strong>
+              </div>
+
             </div>
 
-            <div class="history-table-container">
-              <table class="table-ds holdings-table" style="width: 100%; margin: 0;">
-                <thead>
-                  <tr>
-                    <th>Timestamp</th>
-                    <th>Type</th>
-                    <th>Asset</th>
-                    <th>Amount</th>
-                    <th>Price</th>
-                    <th>Fee</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody id="history-rows-container">
-                  <!-- History transactions injected dynamically -->
-                </tbody>
-              </table>
+            <!-- ROW 2: SPLIT LAYOUT (Timeline on Left, Performance Breakdown on Right) -->
+            <div style="display: grid; grid-template-columns: 1.35fr 0.65fr; gap: 24px; width: 100%; box-sizing: border-box; align-items: start;">
+              
+              <!-- LEFT COLUMN: Filters, Search & Trade Timeline Cards -->
+              <div style="display: flex; flex-direction: column; gap: 16px;">
+                
+                <!-- SECTION 6: FILTERS & SEARCH -->
+                <div class="card-glass" style="padding: 16px 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; gap: 12px; box-sizing: border-box;">
+                  <div style="display: flex; gap: 12px; width: 100%; flex-wrap: wrap;">
+                    <!-- Search -->
+                    <input type="text" class="search-input" id="journal-filter-search" placeholder="Search by asset or notes..." style="flex: 1.5; min-width: 180px; padding: 8px 12px; font-size: 0.8rem; background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 6px; color:#fff;">
+                    
+                    <!-- Asset filter -->
+                    <select id="journal-filter-asset" style="flex: 1; min-width: 100px; padding: 8px 12px; font-size: 0.8rem; background: rgba(14,19,37,0.8); border: 1px solid var(--border); border-radius: 6px; color:#fff; cursor: pointer;">
+                      <option value="all">All Assets</option>
+                      <option value="BTC">BTC</option>
+                      <option value="ETH">ETH</option>
+                      <option value="SOL">SOL</option>
+                      <option value="BNB">BNB</option>
+                      <option value="SUI">SUI</option>
+                    </select>
+
+                    <!-- Direction filter -->
+                    <select id="journal-filter-direction" style="flex: 1; min-width: 100px; padding: 8px 12px; font-size: 0.8rem; background: rgba(14,19,37,0.8); border: 1px solid var(--border); border-radius: 6px; color:#fff; cursor: pointer;">
+                      <option value="all">All Directions</option>
+                      <option value="long">LONG</option>
+                      <option value="short">SHORT</option>
+                    </select>
+
+                    <!-- Result filter -->
+                    <select id="journal-filter-result" style="flex: 1; min-width: 100px; padding: 8px 12px; font-size: 0.8rem; background: rgba(14,19,37,0.8); border: 1px solid var(--border); border-radius: 6px; color:#fff; cursor: pointer;">
+                      <option value="all">All Results</option>
+                      <option value="win">WINS</option>
+                      <option value="loss">LOSSES</option>
+                    </select>
+                  </div>
+                </div>
+
+                <!-- SECTION 2: TIMELINE CARDS -->
+                <div style="display: flex; flex-direction: column; gap: 12px;" id="journal-timeline-container">
+                  <!-- Timeline entries rendered here -->
+                </div>
+
+              </div>
+
+              <!-- RIGHT COLUMN: Performance Breakdown -->
+              <div style="display: flex; flex-direction: column; gap: 24px;">
+                
+                <!-- SECTION 5: PERFORMANCE BREAKDOWN -->
+                <div class="card-glass" style="padding: 20px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.06); display: flex; flex-direction: column; gap: 16px;">
+                  <h4 style="margin: 0; font-size: 1rem; font-weight: 700; color: #fff; font-family: var(--font-display);">Performance Breakdown</h4>
+                  
+                  <!-- Win/Loss Distribution -->
+                  <div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.72rem; margin-bottom: 6px;">
+                      <span style="color: var(--text-secondary);">Win / Loss Distribution</span>
+                      <strong id="journal-breakdown-wl-ratio" style="color: #fff;">0W - 0L</strong>
+                    </div>
+                    <div style="height: 6px; background: rgba(239, 68, 68, 0.2); border-radius: 99px; overflow: hidden; position: relative;">
+                      <div id="journal-breakdown-wl-bar" style="height: 100%; width: 50%; background: #10b981;"></div>
+                    </div>
+                  </div>
+
+                  <!-- Profit By Asset Table -->
+                  <div>
+                    <span style="display: block; font-size: 0.72rem; color: var(--text-secondary); margin-bottom: 8px;">Net Profit by Asset</span>
+                    <table style="width: 100%; border-collapse: collapse; font-size: 0.72rem; color: var(--text-secondary);">
+                      <thead>
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.04); text-align: left;">
+                          <th style="padding: 4px 0; color: var(--text-muted); font-weight: 600;">Asset</th>
+                          <th style="padding: 4px 0; color: var(--text-muted); text-align: right; font-weight: 600;">Total Return</th>
+                          <th style="padding: 4px 0; color: var(--text-muted); text-align: right; font-weight: 600;">Win Rate</th>
+                        </tr>
+                      </thead>
+                      <tbody id="journal-breakdown-asset-rows">
+                        <!-- Dynamically filled -->
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <!-- Trading Frequency & Day stats -->
+                  <div style="display: flex; flex-direction: column; gap: 8px; font-size: 0.76rem; border-top: 1px solid rgba(255,255,255,0.04); padding-top: 12px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                      <span style="color: var(--text-secondary);">Best Trading Day</span>
+                      <strong id="journal-breakdown-best-day" style="color: #10b981;">N/A</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                      <span style="color: var(--text-secondary);">Trading Frequency</span>
+                      <strong id="journal-breakdown-frequency" style="color: #fff;">N/A</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                      <span style="color: var(--text-secondary);">Average Win Yield</span>
+                      <strong id="journal-breakdown-avg-yield" style="color: #10b981;">+0.00%</strong>
+                    </div>
+                  </div>
+
+                </div>
+
+                <!-- EXPORT ARCHITECTURE DESIGN PANEL (Section 6 - Export Concept) -->
+                <div class="card-glass" style="padding: 16px 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.04); background: rgba(0,0,0,0.15);">
+                  <span style="font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; display: block; margin-bottom: 6px;">Data Portability Architecture</span>
+                  <p style="font-size: 0.72rem; color: var(--text-secondary); margin: 0 0 12px 0; line-height: 1.4;">Future releases support exporting compliance-ready journals. Integrated handlers ready for:</p>
+                  <div style="display: flex; gap: 10px;">
+                    <button class="btn btn-secondary btn-xs" style="font-size: 0.68rem; padding: 4px 10px; cursor: not-allowed; opacity: 0.6;" disabled>CSV Schema (Ready)</button>
+                    <button class="btn btn-secondary btn-xs" style="font-size: 0.68rem; padding: 4px 10px; cursor: not-allowed; opacity: 0.6;" disabled>PDF Report (Ready)</button>
+                  </div>
+                </div>
+
+              </div>
+
             </div>
+
           </div>
         </section>
 

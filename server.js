@@ -5,11 +5,11 @@ import { fileURLToPath } from 'url';
 import { initializeDatabase, dbQuery } from './src/database.js';
 import { verifyToken } from './src/middleware/auth.js';
 import { register, login, verifyOtp, resendOtp, requestPasswordRecovery, resetPassword, socialLogin, checkAccount } from './src/controllers/authController.js';
-import { getProfile, onboard, updateSettings } from './src/controllers/userController.js';
+import { getProfile, onboard, updateSettings, getWatchlist, addToWatchlist, removeFromWatchlist } from './src/controllers/userController.js';
 import { getPortfolio, getPortfolioHistory, getTransactions, closePosition } from './src/controllers/portfolioController.js';
 import { getOpportunities, getRecommendations, executeRecommendation, deployOpportunity, scanMarkets } from './src/controllers/opportunityController.js';
 import { copilotMessage, getNotifications, markNotificationsRead, connectExchange } from './src/controllers/copilotController.js';
-import { openPaperPosition, getActivePaperPositions, closePaperPosition, closeAllPaperPositions, getPaperTradeHistory } from './src/controllers/paperTradingController.js';
+import { openPaperPosition, getActivePaperPositions, closePaperPosition, closeAllPaperPositions, getPaperTradeHistory, updatePaperTradeNotes } from './src/controllers/paperTradingController.js';
 import { MarketDataService } from './src/services/marketDataService.js';
 import { RecommendationEngine } from './src/services/recommendations/recommendationEngine.js';
 import { PaperTradingService } from './src/services/paperTradingService.js';
@@ -146,6 +146,9 @@ apiRouter.get('/market/opportunities/top', async (req, res) => {
 apiRouter.get('/user/profile', verifyToken, getProfile);
 apiRouter.post('/user/onboard', verifyToken, onboard);
 apiRouter.post('/user/settings', verifyToken, updateSettings);
+apiRouter.get('/watchlist', verifyToken, getWatchlist);
+apiRouter.post('/watchlist', verifyToken, addToWatchlist);
+apiRouter.delete('/watchlist/:symbol', verifyToken, removeFromWatchlist);
 
 // Portfolio Endpoints (Protected)
 apiRouter.get('/portfolio', verifyToken, getPortfolio);
@@ -165,6 +168,7 @@ apiRouter.get('/paper/positions', verifyToken, getActivePaperPositions);
 apiRouter.delete('/paper/positions', verifyToken, closeAllPaperPositions);
 apiRouter.delete('/paper/positions/:id', verifyToken, closePaperPosition);
 apiRouter.get('/paper/history', verifyToken, getPaperTradeHistory);
+apiRouter.put('/paper/history/:id/notes', verifyToken, updatePaperTradeNotes);
 
 // Copilot conversation (Protected)
 apiRouter.post('/copilot/message', verifyToken, copilotMessage);

@@ -205,3 +205,57 @@ export const updateSettings = async (req, res) => {
     return res.status(500).json({ error: 'Internal server error updating settings.' });
   }
 };
+
+/**
+ * Get user watchlist.
+ */
+export const getWatchlist = async (req, res) => {
+  const userId = req.user.id;
+  try {
+    const list = await dbQuery('SELECT asset_symbol FROM watchlists WHERE user_id = ?', [userId]);
+    const symbols = list.map(item => item.asset_symbol);
+    return res.json(symbols);
+  } catch (err) {
+    console.error('Error fetching watchlist:', err);
+    return res.status(500).json({ error: 'Failed to fetch watchlist.' });
+  }
+};
+
+/**
+ * Add an asset symbol to the user watchlist.
+ */
+export const addToWatchlist = async (req, res) => {
+  const userId = req.user.id;
+  const { symbol } = req.body;
+  if (!symbol) {
+    return res.status(400).json({ error: 'Asset symbol is required.' });
+  }
+  try {
+    await dbRun(
+      'INSERT OR IGNORE INTO watchlists (id, user_id, asset_symbol) VALUES (?, ?, ?)',
+      [crypto.randomUUID(), userId, symbol]
+    );
+    return res.json({ success: true, message: `${symbol} added to watchlist.` });
+  } catch (err) {
+    console.error('Error adding to watchlist:', err);
+    return res.status(500).json({ error: 'Failed to add to watchlist.' });
+  }
+};
+
+/**
+ * Remove an asset symbol from the user watchlist.
+ */
+export const removeFromWatchlist = async (req, res) => {
+  const userId = req.user.id;
+  const { symbol } = req.params;
+  try {
+    await dbRun(
+      'DELETE FROM watchlists WHERE user_id = ? AND asset_symbol = ?',
+      [userId, symbol]
+    );
+    return res.json({ success: true, message: `${symbol} removed from watchlist.` });
+  } catch (err) {
+    console.error('Error removing from watchlist:', err);
+    return res.status(500).json({ error: 'Failed to remove from watchlist.' });
+  }
+};

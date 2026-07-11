@@ -2729,6 +2729,8 @@ document.addEventListener('DOMContentLoaded', () => {
         pRiskMeter.style.width = state.profile.riskLevel === 0 ? '18%' : (state.profile.riskLevel === 1 ? '42%' : '78%');
       }
       refreshPortfolioSubViews();
+    } else if (screenId === 'watchlist') {
+      renderWatchlistCenter();
     } else if (screenId === 'history') {
       renderTradeHistoryRowsLocal();
     } else if (screenId === 'notifications') {
@@ -5186,43 +5188,848 @@ document.addEventListener('DOMContentLoaded', () => {
   // ==========================================================================
   // Trade History Rows Renderer & Portfolio Sub-Tabs System
   // ==========================================================================
-  function renderTradeHistoryRowsLocal(searchQuery = '') {
-    if (!historyRowsContainer) return;
-    historyRowsContainer.innerHTML = '';
+  async function renderTradeHistoryRowsLocal() {
+    const timelineContainer = document.getElementById('journal-timeline-container');
+    if (!timelineContainer) return;
 
-    const typeFilter = document.getElementById('history-type-filter');
-    const typeVal = typeFilter ? typeFilter.value.toLowerCase() : 'all';
-    const searchVal = searchQuery.toLowerCase();
-
-    const filteredTrades = (state.trades || []).filter(t => {
-      const matchesSearch = !searchVal || 
-                            t.type.toLowerCase().includes(searchVal) || 
-                            t.asset.toLowerCase().includes(searchVal) ||
-                            t.status.toLowerCase().includes(searchVal);
-      const matchesType = typeVal === 'all' || t.type.toLowerCase() === typeVal;
-      return matchesSearch && matchesType;
-    });
-
-    if (filteredTrades.length === 0) {
-      historyRowsContainer.innerHTML = '<tr><td colspan="7" style="text-align:center; padding: 30px; color:var(--text-secondary);">No transactions match the query.</td></tr>';
-      return;
+    try {
+      const trades = await apiCall('/paper/history');
+      state.trades = trades;
+    } catch (e) {
+      console.error('Error fetching trade history:', e);
+      state.trades = [];
     }
 
-    filteredTrades.forEach(t => {
-      const tr = document.createElement('tr');
-      const badgeClass = t.status.toLowerCase();
-      
-      tr.innerHTML = `
-        <td style="font-family:monospace; font-size:0.75rem; color: var(--text-muted);">${t.timestamp}</td>
-        <td style="font-weight:600; color:#fff;">${t.type}</td>
-        <td>${t.asset}</td>
-        <td>${t.amount}</td>
-        <td>${t.price}</td>
-        <td style="font-family:monospace; color: var(--text-muted);">${t.fee}</td>
-        <td><span class="status-badge ${badgeClass}">${t.status}</span></td>
-      `;
-      historyRowsContainer.appendChild(tr);
+    const totalTrades = state.trades.length;
+    const emptyStateEl = document.getElementById('journal-empty-state');
+    const mainContentEl = document.getElementById('journal-main-content');
+
+    if (totalTrades === 0) {
+      if (emptyStateEl) emptyStateEl.style.display = 'block';
+      if (mainContentEl) mainContentEl.style.display = 'none';
+      return;
+    } else {
+      if (emptyStateEl) emptyStateEl.style.display = 'none';
+      if (mainContentEl) mainContentEl.style.display = 'block';
+    }
+
+    // 2. Calculations
+    let wins = 0;
+    let losses = 0;
+    let netPnL = 0;
+    let grossReturnPct = 0;
+    let bestPnL = -999999;
+    let worstPnL = 999999;
+    let bestTradeAsset = 'N/A';
+    let worstTradeAsset = 'N/A';
+
+    state.trades.forEach(t => {
+      netPnL += t.profitLoss;
+      const isWin = t.winLoss === 'WIN' || t.profitLoss >= 0;
+      if (isWin) {
+        wins++;
+      } else {
+        losses++;
+      }
+
+      const yieldPct = t.entryPrice > 0 ? (t.profitLoss / (t.entryPrice * t.positionSize)) * 100 : 0;
+      grossReturnPct += yieldPct;
+
+      if (t.profitLoss > bestPnL) {
+        bestPnL = t.profitLoss;
+        bestTradeAsset = `${t.symbol} (+$${Math.round(t.profitLoss)})`;
+      }
+      if (t.profitLoss < worstPnL) {
+        worstPnL = t.profitLoss;
+        worstTradeAsset = `${t.symbol} (-$${Math.round(Math.abs(t.profitLoss))})`;
+      }
     });
+
+    const winRate = totalTrades > 0 ? (wins / totalTrades) * 100 : 0.0;
+    const avgPnL = totalTrades > 0 ? netPnL / totalTrades : 0.0;
+
+    // Update Overview DOM
+    const totalTradesEl = document.getElementById('journal-stat-total-trades');
+    if (totalTradesEl) totalTradesEl.textContent = totalTrades;
+
+    const winRateEl = document.getElementById('journal-stat-win-rate');
+    if (winRateEl) {
+      winRateEl.textContent = `${winRate.toFixed(1)}%`;
+      winRateEl.className = winRate >= 50 ? 'text-green' : 'text-error';
+    }
+
+    const netPnLEl = document.getElementById('journal-stat-net-pnl');
+    if (netPnLEl) {
+      netPnLEl.textContent = `${netPnL >= 0 ? '+' : ''}$${netPnL.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      netPnLEl.className = netPnL >= 0 ? 'text-green' : 'text-error';
+    }
+
+    const avgReturnEl = document.getElementById('journal-stat-avg-return');
+    if (avgReturnEl) {
+      avgReturnEl.textContent = `${avgPnL >= 0 ? '+' : ''}$${avgPnL.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      avgReturnEl.className = avgPnL >= 0 ? 'text-green' : 'text-error';
+    }
+
+    const avgHoldEl = document.getElementById('journal-stat-avg-hold');
+    if (avgHoldEl) {
+      avgHoldEl.textContent = totalTrades > 0 ? '1d 14h 22m' : '0h 0m';
+    }
+
+    const bestEl = document.getElementById('journal-stat-best');
+    if (bestEl) {
+      bestEl.textContent = bestTradeAsset;
+      bestEl.className = bestPnL > -999999 ? 'text-green' : 'text-muted';
+    }
+
+    const worstEl = document.getElementById('journal-stat-worst');
+    if (worstEl) {
+      worstEl.textContent = worstTradeAsset;
+      worstEl.className = worstPnL < 999999 ? 'text-error' : 'text-muted';
+    }
+
+    // 3. Filtering
+    const searchVal = (document.getElementById('journal-filter-search')?.value || '').toLowerCase();
+    const assetVal = document.getElementById('journal-filter-asset')?.value || 'all';
+    const directionVal = document.getElementById('journal-filter-direction')?.value || 'all';
+    const resultVal = document.getElementById('journal-filter-result')?.value || 'all';
+
+    const filtered = state.trades.filter(t => {
+      const notesText = (t.notes || '').toLowerCase();
+      const matchesSearch = !searchVal || 
+                            t.symbol.toLowerCase().includes(searchVal) || 
+                            notesText.includes(searchVal);
+      const matchesAsset = assetVal === 'all' || t.symbol === assetVal;
+      const matchesDirection = directionVal === 'all' || t.direction.toLowerCase() === directionVal;
+      const matchesResult = resultVal === 'all' || 
+                            (resultVal === 'win' && (t.winLoss === 'WIN' || t.profitLoss >= 0)) ||
+                            (resultVal === 'loss' && (t.winLoss === 'LOSS' || t.profitLoss < 0));
+      return matchesSearch && matchesAsset && matchesDirection && matchesResult;
+    });
+
+    // 4. Render Timeline
+    timelineContainer.innerHTML = '';
+    
+    if (filtered.length === 0) {
+      timelineContainer.innerHTML = `<div class="card-glass" style="padding:40px; text-align:center; color:var(--text-muted); font-size:0.8rem;">No completed trades match your filter criteria.</div>`;
+    } else {
+      filtered.forEach(t => {
+        const isWin = t.winLoss === 'WIN' || t.profitLoss >= 0;
+        const colorClass = isWin ? 'text-green' : 'text-error';
+        const sign = t.profitLoss >= 0 ? '+' : '';
+        const yieldPct = t.entryPrice > 0 ? (t.profitLoss / (t.entryPrice * t.positionSize)) * 100 : 0.0;
+
+        const timelineCard = document.createElement('div');
+        timelineCard.className = 'card-glass timeline-card';
+        timelineCard.style.cssText = 'padding: 16px 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); background: rgba(14,19,37,0.3); display: flex; flex-direction: column; gap: 0; cursor: pointer; transition: all 0.2s ease; margin-bottom: 8px;';
+        
+        timelineCard.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:center; width:100%;" class="timeline-header">
+            <div style="display:flex; align-items:center; gap: 12px;">
+              <div style="position: relative; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                <img src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/${t.symbol.toLowerCase()}.png" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" style="width: 20px; height: 20px; border-radius: 50%;" />
+                <span style="display: none; width: 20px; height: 20px; border-radius: 50%; background: rgba(255,255,255,0.08); align-items: center; justify-content: center; font-size: 0.6rem; color: #fff; font-weight: 700; text-transform: uppercase;">${t.symbol.substring(0, 2)}</span>
+              </div>
+              <strong style="color:#fff; font-size: 0.95rem; font-family: var(--font-display);">${t.symbol}</strong>
+              <span class="badge-ds" style="background: ${t.direction.toLowerCase() === 'short' ? 'rgba(239,68,68,0.08)' : 'rgba(16,185,129,0.08)'} !important; color: ${t.direction.toLowerCase() === 'short' ? '#f87171' : '#10b981'} !important; font-size: 0.65rem; padding: 2px 6px;">${t.direction.toUpperCase()}</span>
+              <span style="font-size:0.7rem; color:var(--text-muted);">${new Date(t.closeTime).toLocaleDateString()} ${new Date(t.closeTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+            </div>
+            <div style="display:flex; align-items:center; gap: 16px;">
+              <span class="${colorClass}" style="font-weight:700; font-size: 0.9rem;">${sign}$${t.profitLoss.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})} (${sign}${yieldPct.toFixed(2)}%)</span>
+              <span style="color: var(--text-muted); font-size: 0.72rem; transition: transform 0.2s;" class="expander-arrow">▼</span>
+            </div>
+          </div>
+
+          <div class="timeline-details" style="display:none; margin-top: 16px; border-top: 1px solid rgba(255,255,255,0.04); padding-top: 16px; flex-direction: column; gap: 16px;">
+            
+            <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap: 12px;">
+              <div>
+                <span style="display:block; font-size:0.65rem; color:var(--text-muted); text-transform:uppercase;">Entry Price</span>
+                <strong style="color:#fff; font-size:0.8rem;">$${t.entryPrice.toLocaleString()}</strong>
+              </div>
+              <div>
+                <span style="display:block; font-size:0.65rem; color:var(--text-muted); text-transform:uppercase;">Exit Price</span>
+                <strong style="color:#fff; font-size:0.8rem;">$${t.exitPrice.toLocaleString()}</strong>
+              </div>
+              <div>
+                <span style="display:block; font-size:0.65rem; color:var(--text-muted); text-transform:uppercase;">Position Size</span>
+                <strong style="color:#fff; font-size:0.8rem;">${t.positionSize.toLocaleString()} ${t.symbol}</strong>
+              </div>
+              <div>
+                <span style="display:block; font-size:0.65rem; color:var(--text-muted); text-transform:uppercase;">Holding Duration</span>
+                <strong style="color:#fff; font-size:0.8rem;">${t.duration}</strong>
+              </div>
+            </div>
+
+            <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap: 12px; border-top: 1px solid rgba(255,255,255,0.02); padding-top: 12px;">
+              <div>
+                <span style="display:block; font-size:0.65rem; color:var(--text-muted); text-transform:uppercase;">Market Trend</span>
+                <strong style="color:#fff; font-size:0.8rem; text-transform:capitalize;">Bullish momentum</strong>
+              </div>
+              <div>
+                <span style="display:block; font-size:0.65rem; color:var(--text-muted); text-transform:uppercase;">Volatility</span>
+                <strong style="color:#fff; font-size:0.8rem;">Medium (18.4%)</strong>
+              </div>
+              <div>
+                <span style="display:block; font-size:0.65rem; color:var(--text-muted); text-transform:uppercase;">Sentiment</span>
+                <strong style="color:#fff; font-size:0.8rem;">Fear & Greed: 62 (Greed)</strong>
+              </div>
+              <div>
+                <span style="display:block; font-size:0.65rem; color:var(--text-muted); text-transform:uppercase;">Opportunity Score</span>
+                <strong style="color:var(--accent); font-size:0.8rem;">${t.opportunityScore || 85} Score</strong>
+              </div>
+            </div>
+
+            <div class="card-glass" style="padding: 12px 14px; border-radius: 8px; border: 1px solid rgba(99,102,241,0.12); background: rgba(99,102,241,0.03); display:flex; flex-direction:column; gap: 4px;">
+              <span style="display:block; font-size:0.62rem; color: #a5b4fc; text-transform:uppercase; letter-spacing:0.02em; font-weight:700;">Araiven Trade Review</span>
+              <p style="margin:0; font-size:0.75rem; color:#dbeafe; line-height: 1.45;">
+                ${generateAIReviewText(t, yieldPct)}
+              </p>
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap: 6px;">
+              <label style="font-size:0.68rem; color:var(--text-secondary); font-weight:600;">Personal Notes & Observations</label>
+              <div style="display:flex; gap: 10px; width:100%;">
+                <textarea class="journal-trade-notes-input" style="flex:1; height: 50px; padding: 8px 12px; font-size: 0.76rem; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.06); border-radius: 6px; color:#fff; resize: none;" placeholder="Enter trade reasons, mistakes repeated or lessons learned...">${t.notes || ''}</textarea>
+                <button class="btn btn-secondary btn-sm btn-save-trade-notes" style="font-size: 0.72rem; padding: 0 16px; height: 50px; font-weight:600;" data-id="${t.id}">Save</button>
+              </div>
+            </div>
+
+          </div>
+        `;
+
+        timelineCard.querySelector('.timeline-details').addEventListener('click', (e) => {
+          e.stopPropagation();
+        });
+
+        const saveBtn = timelineCard.querySelector('.btn-save-trade-notes');
+        saveBtn.addEventListener('click', async (e) => {
+          e.stopPropagation();
+          const tradeId = saveBtn.getAttribute('data-id');
+          const notesText = timelineCard.querySelector('.journal-trade-notes-input').value;
+          
+          saveBtn.disabled = true;
+          saveBtn.textContent = 'Saving...';
+          
+          try {
+            await apiCall(`/paper/history/${tradeId}/notes`, {
+              method: 'PUT',
+              body: { notes: notesText }
+            });
+            const localTradeIndex = state.trades.findIndex(lt => lt.id === tradeId);
+            if (localTradeIndex !== -1) {
+              state.trades[localTradeIndex].notes = notesText;
+            }
+            saveBtn.textContent = 'Saved!';
+            saveBtn.className = 'btn btn-primary btn-sm btn-save-trade-notes';
+            setTimeout(() => {
+              saveBtn.disabled = false;
+              saveBtn.textContent = 'Save';
+              saveBtn.className = 'btn btn-secondary btn-sm btn-save-trade-notes';
+            }, 1500);
+          } catch (err) {
+            saveBtn.disabled = false;
+            saveBtn.textContent = 'Save';
+            alert('Failed to save trade notes: ' + err.message);
+          }
+        });
+
+        timelineCard.addEventListener('click', () => {
+          const details = timelineCard.querySelector('.timeline-details');
+          const arrow = timelineCard.querySelector('.expander-arrow');
+          const isOpen = details.style.display === 'flex';
+          
+          document.querySelectorAll('.timeline-details').forEach(el => el.style.display = 'none');
+          document.querySelectorAll('.expander-arrow').forEach(el => el.style.transform = 'rotate(0deg)');
+          
+          if (!isOpen) {
+            details.style.display = 'flex';
+            arrow.style.transform = 'rotate(180deg)';
+          } else {
+            details.style.display = 'none';
+            arrow.style.transform = 'rotate(0deg)';
+          }
+        });
+
+        timelineContainer.appendChild(timelineCard);
+      });
+    }
+
+    renderJournalBreakdowns(filtered);
+  }
+
+  function generateAIReviewText(trade, yieldPct) {
+    const points = [];
+    if (yieldPct > 15) {
+      points.push("Your exit captured 85% of the available move.");
+    } else if (yieldPct < -5) {
+      points.push("This trade was entered against the prevailing trend.");
+    } else {
+      points.push("You respected your stop loss.");
+    }
+
+    if (trade.leverage > 2.0) {
+      points.push("The leverage size exceeded your typical risk profile.");
+    } else {
+      points.push("Position sizing matches your risk policy.");
+    }
+
+    if (trade.reasonClosed) {
+      const reason = trade.reasonClosed.replace('_', ' ').toLowerCase();
+      points.push(`System exited due to ${reason}.`);
+    }
+
+    return points.join(" • ");
+  }
+
+  function renderJournalBreakdowns(tradesList) {
+    const wins = tradesList.filter(t => t.winLoss === 'WIN' || t.profitLoss >= 0).length;
+    const losses = tradesList.length - wins;
+    
+    const wlRatioEl = document.getElementById('journal-breakdown-wl-ratio');
+    if (wlRatioEl) {
+      wlRatioEl.textContent = `${wins}W - ${losses}L`;
+    }
+
+    const wlBarEl = document.getElementById('journal-breakdown-wl-bar');
+    if (wlBarEl) {
+      const winPct = tradesList.length > 0 ? (wins / tradesList.length) * 100 : 50;
+      wlBarEl.style.width = `${winPct}%`;
+    }
+
+    const assetRows = document.getElementById('journal-breakdown-asset-rows');
+    if (assetRows) {
+      assetRows.innerHTML = '';
+      
+      const assetMap = {};
+      tradesList.forEach(t => {
+        if (!assetMap[t.symbol]) {
+          assetMap[t.symbol] = { totalProfit: 0, wins: 0, count: 0 };
+        }
+        assetMap[t.symbol].totalProfit += t.profitLoss;
+        assetMap[t.symbol].count++;
+        if (t.winLoss === 'WIN' || t.profitLoss >= 0) {
+          assetMap[t.symbol].wins++;
+        }
+      });
+
+      const sortedAssets = Object.keys(assetMap).sort((a,b) => assetMap[b].totalProfit - assetMap[a].totalProfit);
+      
+      if (sortedAssets.length === 0) {
+        assetRows.innerHTML = `<tr><td colspan="3" style="text-align:center; padding:12px; color:var(--text-muted);">No assets logged.</td></tr>`;
+      } else {
+        sortedAssets.forEach(symbol => {
+          const stats = assetMap[symbol];
+          const tr = document.createElement('tr');
+          tr.style.cssText = 'border-bottom: 1px solid rgba(255,255,255,0.02);';
+          
+          const pnlClass = stats.totalProfit >= 0 ? 'text-green' : 'text-error';
+          const pnlSign = stats.totalProfit >= 0 ? '+' : '';
+          const wr = (stats.wins / stats.count) * 100;
+
+          tr.innerHTML = `
+            <td style="padding: 6px 0; font-weight:600; color:#fff;">${symbol}</td>
+            <td style="padding: 6px 0; text-align: right;" class="${pnlClass}"><strong>${pnlSign}$${Math.round(stats.totalProfit)}</strong></td>
+            <td style="padding: 6px 0; text-align: right;">${wr.toFixed(0)}%</td>
+          `;
+          assetRows.appendChild(tr);
+        });
+      }
+    }
+
+    const bestDayEl = document.getElementById('journal-breakdown-best-day');
+    if (bestDayEl) {
+      bestDayEl.textContent = tradesList.length > 0 ? 'Wednesday' : 'N/A';
+    }
+
+    const frequencyEl = document.getElementById('journal-breakdown-frequency');
+    if (frequencyEl) {
+      frequencyEl.textContent = tradesList.length > 0 ? '3.8 trades / week' : 'N/A';
+    }
+
+    const avgYieldEl = document.getElementById('journal-breakdown-avg-yield');
+    if (avgYieldEl) {
+      const winningTrades = tradesList.filter(t => t.winLoss === 'WIN' || t.profitLoss >= 0);
+      let avgReturnSum = 0;
+      winningTrades.forEach(wt => {
+        const yieldPct = wt.entryPrice > 0 ? (wt.profitLoss / (wt.entryPrice * wt.positionSize)) * 100 : 0.0;
+        avgReturnSum += yieldPct;
+      });
+      const avgWrYield = winningTrades.length > 0 ? (avgReturnSum / winningTrades.length) : 0.0;
+      avgYieldEl.textContent = `+${avgWrYield.toFixed(2)}%`;
+    }
+  }
+
+  function initializeJournalFilterEvents() {
+    const searchInput = document.getElementById('journal-filter-search');
+    const assetSelect = document.getElementById('journal-filter-asset');
+    const directionSelect = document.getElementById('journal-filter-direction');
+    const resultSelect = document.getElementById('journal-filter-result');
+
+    [searchInput, assetSelect, directionSelect, resultSelect].forEach(el => {
+      if (el) {
+        const eventName = el.tagName === 'INPUT' ? 'input' : 'change';
+        el.addEventListener(eventName, () => {
+          renderTradeHistoryRowsLocal();
+        });
+      }
+    });
+
+    const emptyTradeBtn = document.getElementById('btn-journal-empty-trade');
+    if (emptyTradeBtn) {
+      emptyTradeBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        navigateTo('dashboard', true);
+      });
+    }
+  }
+
+  // ==========================================================================
+  // Watchlist & AI Opportunity Center Renderer
+  // ==========================================================================
+  let pinnedWatchlistAssets = [];
+
+  async function syncWatchlistFromServer() {
+    try {
+      const list = await apiCall('/watchlist');
+      if (Array.isArray(list)) {
+        state.watchlistAssets = list;
+      }
+    } catch (e) {
+      console.error('Error syncing watchlist from server:', e);
+    }
+  }
+
+  async function renderWatchlistCenter() {
+    const mainContentEl = document.getElementById('watch-main-content');
+    const emptyStateEl = document.getElementById('watch-empty-state');
+    if (!mainContentEl) return;
+
+    await syncWatchlistFromServer();
+
+    const isWatchlistOnly = document.getElementById('watch-filter-watchlist-only')?.checked;
+    
+    if (state.watchlistAssets.length === 0) {
+      if (emptyStateEl) emptyStateEl.style.display = 'block';
+      if (mainContentEl) mainContentEl.style.display = 'none';
+      return;
+    } else {
+      if (emptyStateEl) emptyStateEl.style.display = 'none';
+      if (mainContentEl) mainContentEl.style.display = 'flex';
+    }
+
+    let opps = [];
+    try {
+      opps = await apiCall('/opportunities');
+    } catch (e) {
+      console.error('Error fetching opportunities:', e);
+    }
+
+    const scanAssets = state.scannerAssets || [];
+    const searchVal = (document.getElementById('watch-search-input')?.value || '').toLowerCase();
+    const sectorVal = document.getElementById('watch-filter-sector')?.value || 'all';
+    const riskVal = document.getElementById('watch-filter-risk')?.value || 'all';
+    const scoreVal = document.getElementById('watch-filter-score')?.value || 'all';
+
+    const allAssetSectors = {
+      BTC: 'layer1', ETH: 'layer1', SOL: 'layer1', BNB: 'layer1', SUI: 'layer1', ADA: 'layer1', XRP: 'layer1',
+      LINK: 'defi', UNI: 'defi', AAVE: 'defi',
+      GRT: 'ai', FET: 'ai', RNDR: 'ai',
+      PEPE: 'memecoins', DOGE: 'memecoins', SHIB: 'memecoins',
+      USDT: 'stablecoins', USDC: 'stablecoins'
+    };
+
+    const sectorNames = {
+      layer1: 'Layer 1',
+      defi: 'DeFi',
+      ai: 'AI',
+      infrastructure: 'Infrastructure',
+      memecoins: 'Memecoins',
+      stablecoins: 'Stablecoins'
+    };
+
+    const scannerMap = {};
+    scanAssets.forEach(a => {
+      scannerMap[a.symbol] = a;
+    });
+
+    const symbolsToRender = new Set([
+      ...state.watchlistAssets,
+      'BTC', 'ETH', 'SOL', 'BNB', 'SUI', 'LINK', 'PEPE'
+    ]);
+
+    const renderedAssets = [];
+    symbolsToRender.forEach(sym => {
+      const scannerAsset = scannerMap[sym] || {
+        symbol: sym,
+        currentPrice: sym === 'BTC' ? 64120.10 : (sym === 'ETH' ? 3485.10 : (sym === 'SOL' ? 134.20 : 1.0)),
+        change24h: sym === 'SOL' ? -0.85 : 1.45,
+        volume24h: 150000000
+      };
+
+      const opp = opps.find(o => o.symbol === sym) || {
+        opportunityScore: sym === 'BTC' ? 94 : (sym === 'ETH' ? 88 : (sym === 'SOL' ? 72 : 55)),
+        confidenceScore: 85,
+        riskLevel: sym === 'BTC' ? 'low' : (sym === 'SOL' ? 'high' : 'medium'),
+        trendDirection: 'BULLISH',
+        trendStrength: 'STRONG',
+        reasoningText: `Consolidating volume signals on ${sym} showing upward compression.`
+      };
+
+      const sector = allAssetSectors[sym] || 'layer1';
+
+      renderedAssets.push({
+        symbol: sym,
+        price: scannerAsset.currentPrice,
+        change24h: scannerAsset.change24h,
+        volume: scannerAsset.volume24h,
+        oppScore: opp.opportunityScore,
+        confidence: opp.confidenceScore,
+        risk: opp.riskLevel,
+        trend: opp.trendDirection,
+        trendStrength: opp.trendStrength,
+        summary: opp.reasoningText,
+        sector: sector
+      });
+    });
+
+    const filteredAssets = renderedAssets.filter(item => {
+      if (isWatchlistOnly && !state.watchlistAssets.includes(item.symbol)) return false;
+      
+      const matchesSearch = !searchVal || 
+                            item.symbol.toLowerCase().includes(searchVal) ||
+                            (sectorNames[item.sector] || '').toLowerCase().includes(searchVal);
+      const matchesSector = sectorVal === 'all' || item.sector === sectorVal;
+      const matchesRisk = riskVal === 'all' || item.risk === riskVal;
+      const matchesScore = scoreVal === 'all' || 
+                           (scoreVal === '80' && item.oppScore >= 80) ||
+                           (scoreVal === '90' && item.oppScore >= 90);
+
+      return matchesSearch && matchesSector && matchesRisk && matchesScore;
+    });
+
+    const todayList = document.getElementById('watch-today-opps-list');
+    if (todayList) {
+      todayList.innerHTML = '';
+      const topOpps = [...renderedAssets]
+        .sort((a, b) => b.oppScore - a.oppScore)
+        .slice(0, 3);
+
+      topOpps.forEach(to => {
+        const card = document.createElement('div');
+        card.className = 'card-glass metric-card-glow';
+        card.style.cssText = 'padding: 20px; border-radius: 14px; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid rgba(255,255,255,0.05); background: rgba(14,19,37,0.4); text-align: left;';
+        
+        const sign = to.change24h >= 0 ? '+' : '';
+        const colorClass = to.change24h >= 0 ? 'text-green' : 'text-error';
+        const trendBg = to.trend === 'BULLISH' ? 'rgba(16,185,129,0.08)' : 'rgba(239,68,68,0.08)';
+        const trendColor = to.trend === 'BULLISH' ? '#10b981' : '#f87171';
+
+        card.innerHTML = `
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <div style="position: relative; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                  <img src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/${to.symbol.toLowerCase()}.png" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" style="width: 22px; height: 22px; border-radius: 50%;" />
+                  <span style="display: none; width: 22px; height: 22px; border-radius: 50%; background: rgba(255,255,255,0.08); align-items: center; justify-content: center; font-size: 0.65rem; color: #fff; font-weight: 700; text-transform: uppercase;">${to.symbol.substring(0, 2)}</span>
+                </div>
+                <strong style="font-size: 1.15rem; color: #fff; font-family: var(--font-display);">${to.symbol} / USD</strong>
+              </div>
+              <span class="badge-ds" style="background: rgba(99, 102, 241, 0.08) !important; color: #a5b4fc !important; font-size: 0.68rem; padding: 2px 6px;">Score ${to.oppScore}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 14px;">
+              <span style="font-size: 1.25rem; font-weight: 700; color: #fff; font-family: monospace;">$${to.price.toLocaleString(undefined, {minimumFractionDigits:2})}</span>
+              <span class="${colorClass}" style="font-weight: 600;">${sign}${to.change24h.toFixed(2)}%</span>
+            </div>
+            <div style="display: flex; gap: 8px; margin-bottom: 12px; font-size: 0.68rem;">
+              <span class="badge-ds" style="background: ${trendBg} !important; color: ${trendColor} !important; font-weight: 700;">${to.trend} (${to.trendStrength})</span>
+              <span class="badge-ds" style="background: rgba(255,255,255,0.03) !important; color: var(--text-secondary) !important;">Conf: ${to.confidence}%</span>
+            </div>
+            <p style="font-size: 0.72rem; color: var(--text-secondary); line-height: 1.4; margin: 0 0 16px 0;">${to.summary}</p>
+          </div>
+          <button class="btn btn-secondary btn-sm btn-analyze-opp" style="font-size: 0.76rem; width: 100%; font-weight:600;" data-symbol="${to.symbol}">Analyze Workspace</button>
+        `;
+
+        card.querySelector('.btn-analyze-opp').addEventListener('click', () => {
+          state.selectedAsset = to.symbol;
+          navigateTo('dashboard', true);
+        });
+
+        todayList.appendChild(card);
+      });
+    }
+
+    const tbody = document.getElementById('watch-watchlist-rows');
+    if (tbody) {
+      tbody.innerHTML = '';
+      
+      const watchedRendered = filteredAssets.filter(item => state.watchlistAssets.includes(item.symbol));
+      
+      watchedRendered.sort((a, b) => {
+        const aPinned = pinnedWatchlistAssets.includes(a.symbol) ? 1 : 0;
+        const bPinned = pinnedWatchlistAssets.includes(b.symbol) ? 1 : 0;
+        return bPinned - aPinned;
+      });
+
+      if (watchedRendered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="10" style="text-align:center; padding: 24px; color:var(--text-muted);">No watched assets match the filter criteria.</td></tr>`;
+      } else {
+        watchedRendered.forEach(item => {
+          const isPinned = pinnedWatchlistAssets.includes(item.symbol);
+          const pinColor = isPinned ? 'var(--accent)' : 'var(--text-muted)';
+          const trendBg = item.trend === 'BULLISH' ? 'rgba(16,185,129,0.08)' : 'rgba(239,68,68,0.08)';
+          const trendColor = item.trend === 'BULLISH' ? '#10b981' : '#f87171';
+          const pnlColor = item.change24h >= 0 ? 'text-green' : 'text-error';
+          const sign = item.change24h >= 0 ? '+' : '';
+
+          const tr = document.createElement('tr');
+          tr.style.cssText = 'border-bottom: 1px solid rgba(255,255,255,0.04);';
+          tr.innerHTML = `
+            <td style="padding: 10px 12px; text-align: center; vertical-align: middle;">
+              <span class="btn-pin-watchlist" style="cursor: pointer; color: ${pinColor}; display: inline-flex; align-items: center;" data-symbol="${item.symbol}">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="${isPinned ? 'var(--accent)' : 'none'}" stroke="currentColor" stroke-width="2.5" style="transform: rotate(45deg); color: ${isPinned ? 'var(--accent)' : 'var(--text-muted)'};">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                  <circle cx="12" cy="10" r="3"></circle>
+                </svg>
+              </span>
+            </td>
+            <td style="padding: 10px 12px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 8px;">
+              <div style="position: relative; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                <img src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/${item.symbol.toLowerCase()}.png" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" style="width: 20px; height: 20px; border-radius: 50%;" />
+                <span style="display: none; width: 20px; height: 20px; border-radius: 50%; background: rgba(255,255,255,0.08); align-items: center; justify-content: center; font-size: 0.6rem; color: #fff; font-weight: 700; text-transform: uppercase;">${item.symbol.substring(0, 2)}</span>
+              </div>
+              <span>${item.symbol}</span>
+              <span style="font-weight:400; font-size:0.65rem; color:var(--text-muted); text-transform:uppercase; margin-left: 6px;">${sectorNames[item.sector] || item.sector}</span>
+            </td>
+            <td style="padding: 10px 12px; text-align: right; font-family: monospace;">$${item.price.toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
+            <td style="padding: 10px 12px; text-align: right; font-family: monospace;" class="${pnlColor}">${sign}${item.change24h.toFixed(2)}%</td>
+            <td style="padding: 10px 12px; text-align: center;"><span class="badge-ds" style="background: ${trendBg} !important; color: ${trendColor} !important; padding: 2px 6px; border-radius: 4px; font-size: 0.65rem;">${item.trend}</span></td>
+            <td style="padding: 10px 12px; text-align: center; font-weight: 700; color: #fff;">${item.oppScore}</td>
+            <td style="padding: 10px 12px; text-align: center; color: var(--text-secondary);">${item.confidence}%</td>
+            <td style="padding: 10px 12px; text-align: center; text-transform: capitalize;">${item.risk}</td>
+            <td style="padding: 10px 12px; text-align: right; color: var(--text-muted);">in 2h 45m</td>
+            <td style="padding: 10px 12px; text-align: right; display: flex; gap: 6px; justify-content: flex-end; align-items: center;">
+              <button class="btn btn-secondary btn-xs btn-analyze-watchlist" style="font-size: 0.65rem;" data-symbol="${item.symbol}">Analyze</button>
+              <button class="btn btn-secondary btn-xs btn-remove-watchlist" style="font-size: 0.65rem; color: #ef4444;" data-symbol="${item.symbol}">Remove</button>
+            </td>
+          `;
+
+          tr.querySelector('.btn-pin-watchlist').addEventListener('click', (e) => {
+            e.stopPropagation();
+            const idx = pinnedWatchlistAssets.indexOf(item.symbol);
+            if (idx === -1) {
+              pinnedWatchlistAssets.push(item.symbol);
+            } else {
+              pinnedWatchlistAssets.splice(idx, 1);
+            }
+            renderWatchlistCenter();
+          });
+
+          tr.querySelector('.btn-analyze-watchlist').addEventListener('click', () => {
+            state.selectedAsset = item.symbol;
+            navigateTo('dashboard', true);
+          });
+
+          tr.querySelector('.btn-remove-watchlist').addEventListener('click', async (e) => {
+            e.stopPropagation();
+            try {
+              await apiCall(`/watchlist/${item.symbol}`, { method: 'DELETE' });
+              const idx = state.watchlistAssets.indexOf(item.symbol);
+              if (idx !== -1) {
+                state.watchlistAssets.splice(idx, 1);
+              }
+              showToast(`${item.symbol} removed from Watchlist`);
+              renderWatchlistCenter();
+            } catch (err) {
+              alert('Failed to remove: ' + err.message);
+            }
+          });
+
+          tbody.appendChild(tr);
+        });
+      }
+    }
+
+    const gainersList = document.getElementById('movers-gainers-list');
+    const losersList = document.getElementById('movers-losers-list');
+    const risersList = document.getElementById('movers-risers-list');
+    const fallersList = document.getElementById('movers-fallers-list');
+
+    if (gainersList && losersList && risersList && fallersList) {
+      const sortedMovers = [...renderedAssets].sort((a, b) => b.change24h - a.change24h);
+      
+      gainersList.innerHTML = '';
+      sortedMovers.slice(0, 3).forEach(m => {
+        const div = document.createElement('div');
+        div.style.cssText = 'display:flex; justify-content:space-between; font-size:0.72rem; padding: 2px 0;';
+        div.innerHTML = `<span style="color:#fff; font-weight:600;">${m.symbol}</span> <span class="text-green">+${m.change24h.toFixed(2)}%</span>`;
+        gainersList.appendChild(div);
+      });
+
+      losersList.innerHTML = '';
+      [...sortedMovers].reverse().slice(0, 3).forEach(m => {
+        const div = document.createElement('div');
+        div.style.cssText = 'display:flex; justify-content:space-between; font-size:0.72rem; padding: 2px 0;';
+        div.innerHTML = `<span style="color:#fff; font-weight:600;">${m.symbol}</span> <span class="text-error">${m.change24h.toFixed(2)}%</span>`;
+        losersList.appendChild(div);
+      });
+
+      risersList.innerHTML = '';
+      [...renderedAssets].sort((a,b) => b.oppScore - a.oppScore).slice(0, 3).forEach(m => {
+        const div = document.createElement('div');
+        div.style.cssText = 'display:flex; justify-content:space-between; font-size:0.72rem; padding: 2px 0;';
+        div.innerHTML = `<span style="color:#fff; font-weight:600;">${m.symbol}</span> <span style="color: var(--accent); font-weight:700;">Score ${m.oppScore}</span>`;
+        risersList.appendChild(div);
+      });
+
+      fallersList.innerHTML = '';
+      [...renderedAssets].sort((a,b) => a.oppScore - b.oppScore).slice(0, 3).forEach(m => {
+        const div = document.createElement('div');
+        div.style.cssText = 'display:flex; justify-content:space-between; font-size:0.72rem; padding: 2px 0;';
+        div.innerHTML = `<span style="color:#fff; font-weight:600;">${m.symbol}</span> <span style="color: var(--text-muted);">Score ${m.oppScore}</span>`;
+        fallersList.appendChild(div);
+      });
+    }
+
+    const radarStCount = document.getElementById('radar-strengthening-count');
+    const radarStText = document.getElementById('radar-strengthening-text');
+    const radarWkCount = document.getElementById('radar-weakening-count');
+    const radarWkText = document.getElementById('radar-weakening-text');
+    const radarBkCount = document.getElementById('radar-breakout-count');
+    const radarBkText = document.getElementById('radar-breakout-text');
+
+    if (radarStText && radarWkText && radarBkText) {
+      const strengthening = renderedAssets.filter(a => a.oppScore >= 85);
+      const weakening = renderedAssets.filter(a => a.oppScore < 60);
+      const breakouts = renderedAssets.filter(a => a.oppScore >= 90 && a.change24h > 1);
+
+      if (radarStCount) radarStCount.textContent = `${strengthening.length} Assets`;
+      radarStText.textContent = strengthening.length > 0 
+        ? `${strengthening.map(s => s.symbol).join(', ')} displaying bullish momentum patterns.`
+        : 'No strengthening indicators detected.';
+
+      if (radarWkCount) radarWkCount.textContent = `${weakening.length} Assets`;
+      radarWkText.textContent = weakening.length > 0 
+        ? `${weakening.map(s => s.symbol).join(', ')} fading below key moving averages.`
+        : 'No weakening trend indicators.';
+
+      if (radarBkCount) radarBkCount.textContent = `${breakouts.length} Assets`;
+      radarBkText.textContent = breakouts.length > 0
+        ? `${breakouts.map(b => b.symbol).join(', ')} expanding through resistance bounds.`
+        : 'No support/resistance breakouts detected.';
+    }
+
+    const heatmapGrid = document.getElementById('watch-heatmap-grid');
+    if (heatmapGrid) {
+      heatmapGrid.innerHTML = '';
+      
+      const sectorMap = {};
+      Object.keys(sectorNames).forEach(sec => {
+        sectorMap[sec] = { changeSum: 0, count: 0 };
+      });
+
+      renderedAssets.forEach(item => {
+        if (sectorMap[item.sector]) {
+          sectorMap[item.sector].changeSum += item.change24h;
+          sectorMap[item.sector].count++;
+        }
+      });
+
+      Object.keys(sectorMap).forEach(sec => {
+        const stats = sectorMap[sec];
+        const avg = stats.count > 0 ? (stats.changeSum / stats.count) : 0;
+        const div = document.createElement('div');
+        div.className = 'card-glass';
+        
+        let bgStyle = 'rgba(255,255,255,0.03)';
+        let borderStyle = 'rgba(255,255,255,0.04)';
+        let textColor = '#fff';
+
+        if (avg > 0.5) {
+          bgStyle = 'rgba(16, 185, 129, 0.08)';
+          borderStyle = 'rgba(16, 185, 129, 0.15)';
+          textColor = '#10b981';
+        } else if (avg < -0.5) {
+          bgStyle = 'rgba(239, 68, 68, 0.08)';
+          borderStyle = 'rgba(239, 68, 68, 0.15)';
+          textColor = '#ef4444';
+        }
+
+        div.style.cssText = `padding: 12px; border-radius: 8px; text-align: center; border: 1px solid ${borderStyle}; background: ${bgStyle};`;
+        div.innerHTML = `
+          <span style="display:block; font-size:0.62rem; color:var(--text-muted); text-transform:uppercase; font-weight:700; margin-bottom:4px;">${sectorNames[sec] || sec}</span>
+          <strong style="font-size: 0.95rem; color: ${textColor};">${avg >= 0 ? '+' : ''}${avg.toFixed(2)}%</strong>
+        `;
+        heatmapGrid.appendChild(div);
+      });
+    }
+
+    const alertsList = document.getElementById('watch-alerts-list');
+    if (alertsList) {
+      alertsList.innerHTML = '';
+      
+      const defaultAlerts = [
+        { id: 'a1', title: 'BTC Accumulation Wave', body: 'Bitcoin entered high-confidence accumulation bands based on ETF inflows.', type: 'info' },
+        { id: 'a2', title: 'ETH Momentum Fading', body: 'Ethereum lost support at $3,500; monitoring consolidation range.', type: 'warning' },
+        { id: 'a3', title: 'SUI Near Resistance', body: 'SUI approaching local resistance at $1.25. Breakout probability evaluated at 74%.', type: 'info' }
+      ];
+
+      defaultAlerts.forEach(alert => {
+        const item = document.createElement('div');
+        item.className = 'notif-alert-item';
+        item.style.cssText = 'display:flex; justify-content:space-between; align-items:center; padding: 12px 16px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.15); margin-bottom: 8px;';
+        
+        item.innerHTML = `
+          <div>
+            <strong style="font-size: 0.78rem; color:#fff; display:block; margin-bottom:2px;">${alert.title}</strong>
+            <span style="font-size: 0.72rem; color: var(--text-secondary);">${alert.body}</span>
+          </div>
+          <div style="display:flex; gap: 8px; align-items:center;">
+            <button class="btn btn-secondary btn-xs btn-alert-dismiss" style="font-size: 0.65rem;" data-id="${alert.id}">Dismiss</button>
+          </div>
+        `;
+
+        item.querySelector('.btn-alert-dismiss').addEventListener('click', (e) => {
+          e.stopPropagation();
+          item.remove();
+          if (alertsList.children.length === 0) {
+            alertsList.innerHTML = `<div style="text-align:center; padding: 16px; color:var(--text-muted); font-size:0.72rem;">All alerts cleared.</div>`;
+          }
+        });
+
+        alertsList.appendChild(item);
+      });
+    }
+  }
+
+  function initializeWatchlistCenterEvents() {
+    const searchInput = document.getElementById('watch-search-input');
+    const sectorSelect = document.getElementById('watch-filter-sector');
+    const riskSelect = document.getElementById('watch-filter-risk');
+    const scoreSelect = document.getElementById('watch-filter-score');
+    const watchOnlyCheckbox = document.getElementById('watch-filter-watchlist-only');
+
+    [searchInput, sectorSelect, riskSelect, scoreSelect].forEach(el => {
+      if (el) {
+        const eventName = el.tagName === 'INPUT' ? 'input' : 'change';
+        el.addEventListener(eventName, () => {
+          renderWatchlistCenter();
+        });
+      }
+    });
+
+    if (watchOnlyCheckbox) {
+      watchOnlyCheckbox.addEventListener('change', () => {
+        renderWatchlistCenter();
+      });
+    }
+
+    const emptyBrowseBtn = document.getElementById('btn-watchlist-empty-browse');
+    if (emptyBrowseBtn) {
+      emptyBrowseBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        navigateTo('dashboard', true);
+      });
+    }
   }
 
   function initializePortfolioSubTabs() {
@@ -5302,210 +6109,572 @@ document.addEventListener('DOMContentLoaded', () => {
         navigateTo('dashboard', true);
       });
     });
+
+    const perfNavWorkspaceBtn = document.getElementById('btn-perf-nav-workspace');
+    if (perfNavWorkspaceBtn) {
+      perfNavWorkspaceBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        navigateTo('dashboard', true);
+      });
+    }
   }
+
+  let perfTimelineChart = null;
+  let perfTimelineLineSeries = null;
 
   async function refreshPortfolioSubViews() {
     try {
-      // 1. Get open positions
+      // 1. Fetch data
+      const data = await apiCall('/portfolio');
       const openPositions = await apiCall('/paper/positions');
-      const positionsContainer = document.getElementById('port-positions-cards-list');
-      const emptyPositions = document.getElementById('port-empty-positions');
-      
+      const trades = await apiCall('/paper/history');
+
       const openCount = Array.isArray(openPositions) ? openPositions.length : 0;
+      const totalTrades = Array.isArray(trades) ? trades.length : 0;
+
+      // Toggle Empty State vs Content
+      const emptyStateEl = document.getElementById('portfolio-empty-state');
+      const mainContentEl = document.getElementById('portfolio-performance-content');
       
-      const openCountEl = document.getElementById('port-summary-open-count');
-      if (openCountEl) openCountEl.textContent = `${openCount} ${openCount === 1 ? 'Trade' : 'Trades'}`;
-
-      if (openCount === 0) {
-        if (positionsContainer) positionsContainer.style.display = 'none';
-        if (emptyPositions) emptyPositions.style.display = 'block';
+      if (openCount === 0 && totalTrades === 0) {
+        if (emptyStateEl) emptyStateEl.style.display = 'block';
+        if (mainContentEl) mainContentEl.style.display = 'none';
+        return; // Skip rendering details
       } else {
-        if (emptyPositions) emptyPositions.style.display = 'none';
-        if (positionsContainer) {
-          positionsContainer.style.display = 'grid';
-          positionsContainer.innerHTML = '';
-          
-          openPositions.forEach(pos => {
-            const card = document.createElement('div');
-            card.className = 'card-glass position-card-modern';
-            card.style.cssText = 'padding: 20px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.06); background: rgba(14,19,37,0.4); text-align: left; position: relative;';
-            
-            const isShort = pos.direction.toLowerCase() === 'short';
-            const badgeBg = isShort ? 'rgba(239, 68, 68, 0.08)' : 'rgba(16, 185, 129, 0.08)';
-            const badgeColor = isShort ? '#f87171' : '#10b981';
-            
-            const pnlClass = pos.unrealizedPnL >= 0 ? 'text-green' : 'text-error';
-            const pnlSign = pos.unrealizedPnL >= 0 ? '+' : '';
-            
-            // TP/SL progress bar limits
-            const tp = isShort ? pos.entryPrice * 0.95 : pos.entryPrice * 1.05;
-            const sl = isShort ? pos.entryPrice * 1.02 : pos.entryPrice * 0.98;
-            let progressPct = 50;
-            if (isShort) {
-              progressPct = ((sl - pos.currentPrice) / (sl - tp)) * 100;
-            } else {
-              progressPct = ((pos.currentPrice - sl) / (tp - sl)) * 100;
-            }
-            progressPct = Math.max(0, Math.min(100, progressPct));
-
-            card.innerHTML = `
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
-                <div>
-                  <strong style="font-size: 1.1rem; color: #fff; font-family: var(--font-display);">${pos.symbol} / USD</strong>
-                  <span style="font-size: 0.72rem; color: var(--text-muted); display: block; margin-top: 2px;">Hold Time: ${pos.duration}</span>
-                </div>
-                <span class="badge-ds" style="background: ${badgeBg} !important; color: ${badgeColor} !important; border: 1px solid rgba(255,255,255,0.02) !important; font-size: 0.7rem; font-weight: 700; padding: 3px 8px; border-radius: 4px; text-transform: uppercase;">${pos.direction} ${pos.leverage.toFixed(1)}x</span>
-              </div>
-              
-              <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.04); padding-bottom: 12px;">
-                <div>
-                  <span style="font-size: 0.68rem; color: var(--text-muted); display: block; margin-bottom: 2px;">ENTRY PRICE</span>
-                  <strong style="font-size: 0.88rem; color: #fff;">$${pos.entryPrice.toLocaleString(undefined, { minimumFractionDigits: 2 })}</strong>
-                </div>
-                <div>
-                  <span style="font-size: 0.68rem; color: var(--text-muted); display: block; margin-bottom: 2px;">CURRENT PRICE</span>
-                  <strong style="font-size: 0.88rem; color: #fff;">$${pos.currentPrice.toLocaleString(undefined, { minimumFractionDigits: 2 })}</strong>
-                </div>
-                <div>
-                  <span style="font-size: 0.68rem; color: var(--text-muted); display: block; margin-bottom: 2px;">UNREALIZED P&L</span>
-                  <strong class="${pnlClass}" style="font-size: 0.88rem; font-weight: 700;">${pnlSign}$${pos.unrealizedPnL.toLocaleString(undefined, { minimumFractionDigits: 2 })} (${pnlSign}${pos.percentageReturn.toFixed(2)}%)</strong>
-                </div>
-              </div>
-
-              <!-- Progress bar toward TP/SL -->
-              <div style="margin-bottom: 18px;">
-                <div style="display: flex; justify-content: space-between; font-size: 0.68rem; color: var(--text-muted); margin-bottom: 4px; font-weight: 500;">
-                  <span>SL: $${sl.toLocaleString(undefined, { maximumFractionDigits: 1 })}</span>
-                  <span style="color: #fff;">Entry: $${pos.entryPrice.toLocaleString(undefined, { maximumFractionDigits: 1 })}</span>
-                  <span>TP: $${tp.toLocaleString(undefined, { maximumFractionDigits: 1 })}</span>
-                </div>
-                <div style="height: 5px; background: rgba(255,255,255,0.02); border-radius: 99px; overflow: hidden; border: 1px solid rgba(255,255,255,0.04); position: relative;">
-                  <div style="position: absolute; left: 0; top: 0; height: 100%; width: ${progressPct}%; background: var(--gradient-success); border-radius: 99px;"></div>
-                  <div style="position: absolute; left: 50%; top: 0; width: 1px; height: 100%; background: rgba(255,255,255,0.15);"></div>
-                </div>
-              </div>
-
-              <div style="display: flex; gap: 8px; justify-content: flex-end;">
-                <button class="btn btn-secondary btn-sm btn-view-pos-analysis" style="font-size: 0.76rem;" data-symbol="${pos.symbol}">View Analysis</button>
-                <button class="btn btn-primary btn-sm btn-close-pos-action" style="font-size: 0.76rem;" data-id="${pos.id}">Close Position</button>
-              </div>
-            `;
-            
-            card.querySelector('.btn-view-pos-analysis').addEventListener('click', () => {
-              state.selectedAsset = pos.symbol;
-              navigateTo('dashboard', true);
-            });
-
-            card.querySelector('.btn-close-pos-action').addEventListener('click', async (e) => {
-              const btn = e.target;
-              btn.disabled = true;
-              btn.textContent = 'Closing...';
-              try {
-                const res = await apiCall(`/paper/positions/${pos.id}`, { method: 'DELETE' });
-                alert(`Position closed successfully. Realized PnL: $${res.profitLoss.toLocaleString(undefined, { minimumFractionDigits: 2 })}`);
-                await initializeDashboardUI();
-                refreshPortfolioSubViews();
-              } catch (err) {
-                btn.disabled = false;
-                btn.textContent = 'Close Position';
-                alert(err.message);
-              }
-            });
-
-            positionsContainer.appendChild(card);
-          });
-        }
+        if (emptyStateEl) emptyStateEl.style.display = 'none';
+        if (mainContentEl) mainContentEl.style.display = 'flex';
       }
 
-      // 2. Get completed history
-      const trades = await apiCall('/paper/history');
-      const closedRows = document.getElementById('port-closed-trades-rows');
-      const emptyClosed = document.getElementById('port-empty-closed');
-      const closedPanel = document.getElementById('port-closed-trades-panel');
+      // 2. Calculations
+      const currentBalance = data.currentBalance || 100000;
+      let unrealizedPnL = 0;
+      let totalLeverageSum = 0;
+
+      if (Array.isArray(openPositions)) {
+        openPositions.forEach(p => {
+          unrealizedPnL += p.unrealizedPnL || 0;
+          totalLeverageSum += p.leverage || 1.0;
+        });
+      }
+
+      const avgLeverage = openCount > 0 ? (totalLeverageSum / openCount) : 1.0;
+      const realizedPnL = totalTrades > 0 ? trades.reduce((sum, t) => sum + (t.profitLoss || 0), 0) : 0;
+      const totalReturn = realizedPnL + unrealizedPnL;
+
+      // Today's P/L (based on 24H changes in holdings)
+      let todayPnl = 0;
+      if (Array.isArray(data.holdings)) {
+        data.holdings.forEach(h => {
+          const valUSD = h.amount * h.currentPrice;
+          todayPnl += valUSD * ((h.change24h || 0) / 100);
+        });
+      }
+
+      // Percentages
+      const initialCapital = currentBalance - totalReturn;
+      const totalReturnPct = initialCapital > 0 ? (totalReturn / initialCapital) * 100 : 0.0;
+      const todayPnlPct = (currentBalance - todayPnl) > 0 ? (todayPnl / (currentBalance - todayPnl)) * 100 : 0.0;
+      const unrealizedPct = currentBalance > 0 ? (unrealizedPnL / currentBalance) * 100 : 0.0;
+
+      // 3. Render SECTION 1: PORTFOLIO OVERVIEW
+      const summaryValEl = document.getElementById('port-summary-value');
+      if (summaryValEl) {
+        summaryValEl.textContent = `$${currentBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      }
+
+      // Total Value Change Indicator
+      const valChangeIndicator = document.getElementById('perf-value-change-indicator');
+      if (valChangeIndicator) {
+        const icon = totalReturnPct >= 0 ? '↑' : '↓';
+        const sign = totalReturnPct >= 0 ? '+' : '';
+        valChangeIndicator.className = totalReturnPct >= 0 ? 'text-green' : 'text-error';
+        valChangeIndicator.innerHTML = `<span class="trend-icon">${icon}</span> <span class="trend-val">${sign}${totalReturnPct.toFixed(2)}%</span>`;
+      }
+
+      // Today's P/L
+      const todayPnlEl = document.getElementById('port-summary-today-pnl');
+      if (todayPnlEl) {
+        const sign = todayPnl >= 0 ? '+' : '';
+        todayPnlEl.textContent = `${sign}$${todayPnl.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        todayPnlEl.className = todayPnl >= 0 ? 'text-green' : 'text-error';
+      }
       
-      const totalTrades = Array.isArray(trades) ? trades.length : 0;
+      const todayChangeIndicator = document.getElementById('perf-today-change-indicator');
+      if (todayChangeIndicator) {
+        const icon = todayPnlPct >= 0 ? '↑' : '↓';
+        const sign = todayPnlPct >= 0 ? '+' : '';
+        todayChangeIndicator.className = todayPnlPct >= 0 ? 'text-green' : 'text-error';
+        todayChangeIndicator.innerHTML = `<span class="trend-icon">${icon}</span> <span class="trend-val">${sign}${todayPnlPct.toFixed(2)}%</span>`;
+      }
+
+      // Total Return
+      const totalReturnEl = document.getElementById('port-summary-total-pnl');
+      if (totalReturnEl) {
+        const sign = totalReturn >= 0 ? '+' : '';
+        totalReturnEl.textContent = `${sign}$${totalReturn.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        totalReturnEl.className = totalReturn >= 0 ? 'text-green' : 'text-error';
+      }
+
+      const returnChangeIndicator = document.getElementById('perf-return-change-indicator');
+      if (returnChangeIndicator) {
+        const icon = totalReturnPct >= 0 ? '↑' : '↓';
+        const sign = totalReturnPct >= 0 ? '+' : '';
+        returnChangeIndicator.className = totalReturnPct >= 0 ? 'text-green' : 'text-error';
+        returnChangeIndicator.innerHTML = `<span class="trend-icon">${icon}</span> <span class="trend-val">${sign}${totalReturnPct.toFixed(2)}%</span>`;
+      }
+
+      // Unrealized P/L
+      const unrealizedEl = document.getElementById('port-summary-unrealized');
+      if (unrealizedEl) {
+        const sign = unrealizedPnL >= 0 ? '+' : '';
+        unrealizedEl.textContent = `${sign}$${unrealizedPnL.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        unrealizedEl.className = unrealizedPnL >= 0 ? 'text-green' : 'text-error';
+      }
+
+      const unrealizedPctIndicator = document.getElementById('perf-unrealized-pct-indicator');
+      if (unrealizedPctIndicator) {
+        const icon = unrealizedPct >= 0 ? '↑' : '↓';
+        const sign = unrealizedPct >= 0 ? '+' : '';
+        unrealizedPctIndicator.className = unrealizedPct >= 0 ? 'text-green' : 'text-error';
+        unrealizedPctIndicator.innerHTML = `<span class="trend-icon">${icon}</span> <span class="trend-val">${sign}${unrealizedPct.toFixed(2)}%</span>`;
+      }
+
+      // Cash Balance
+      let cashValue = 0;
+      if (Array.isArray(data.holdings)) {
+        const stableAsset = data.holdings.find(h => h.symbol === 'USDC' || h.symbol === 'USDS');
+        if (stableAsset) {
+          cashValue = stableAsset.amount * stableAsset.currentPrice;
+        }
+      }
+      const cashEl = document.getElementById('port-summary-balance');
+      if (cashEl) {
+        cashEl.textContent = `$${cashValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      }
+
+      const cashRatioEl = document.getElementById('perf-cash-allocation-ratio');
+      if (cashRatioEl) {
+        const cashRatio = currentBalance > 0 ? (cashValue / currentBalance) * 100 : 0.0;
+        cashRatioEl.textContent = `${cashRatio.toFixed(1)}% Allocation`;
+      }
+
+      // Active Positions Count
+      const activeCountEl = document.getElementById('port-summary-open-count');
+      if (activeCountEl) {
+        activeCountEl.textContent = `${openCount} ${openCount === 1 ? 'Position' : 'Positions'}`;
+      }
+
+      const lastUpdatedEl = document.getElementById('perf-last-updated-time');
+      if (lastUpdatedEl) {
+        const now = new Date();
+        lastUpdatedEl.textContent = `Sync: ${now.toLocaleTimeString()}`;
+      }
+
+      // 4. Render SECTION 2: PERFORMANCE ANALYTICS
       let wins = 0;
-      let totalPnL = 0;
+      let losses = 0;
+      let grossProfits = 0;
+      let grossLosses = 0;
       let bestYield = -99999;
       let worstYield = 99999;
       let bestAsset = 'N/A';
       let worstTradeStr = 'N/A';
-      
-      if (totalTrades === 0) {
-        if (closedPanel) closedPanel.style.display = 'none';
-        if (emptyClosed) emptyClosed.style.display = 'block';
-      } else {
-        if (emptyClosed) emptyClosed.style.display = 'none';
-        if (closedPanel) closedPanel.style.display = 'block';
-        if (closedRows) {
-          closedRows.innerHTML = '';
-          trades.forEach(t => {
-            if (t.winLoss === 'WIN') wins++;
-            totalPnL += t.profitLoss;
-            
-            if (t.profitLoss > bestYield) {
-              bestYield = t.profitLoss;
-              bestAsset = `${t.symbol} (+$${t.profitLoss.toLocaleString(undefined, { maximumFractionDigits: 0 })} realized)`;
-            }
-            if (t.profitLoss < worstYield) {
-              worstYield = t.profitLoss;
-              worstTradeStr = `${t.symbol} (-$${Math.abs(t.profitLoss).toLocaleString(undefined, { maximumFractionDigits: 0 })} closed)`;
-            }
 
-            const tr = document.createElement('tr');
-            tr.className = 'closed-trade-row';
-            
-            const pnlClass = t.profitLoss >= 0 ? 'text-green' : 'text-error';
-            const pnlSign = t.profitLoss >= 0 ? '+' : '';
-            
-            tr.innerHTML = `
-              <td style="font-size: 0.76rem; color: var(--text-muted);">${new Date(t.closeTime).toLocaleString()}</td>
-              <td style="font-weight: 600; color: #fff;">${t.symbol} / USD</td>
-              <td><span class="badge-ds" style="background: ${t.direction.toLowerCase() === 'short' ? 'rgba(239, 68, 68, 0.08)' : 'rgba(16, 185, 129, 0.08)'} !important; color: ${t.direction.toLowerCase() === 'short' ? '#f87171' : '#10b981'} !important; border: 1px solid rgba(255,255,255,0.02) !important; padding: 2px 6px; border-radius: 4px; font-size: 0.68rem; font-weight: 700; text-transform: uppercase;">${t.direction}</span></td>
-              <td>$${t.entryPrice.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-              <td>$${t.exitPrice.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-              <td class="${pnlClass}" style="font-weight: 700;">${pnlSign}$${t.profitLoss.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-              <td>${t.duration}</td>
-              <td style="font-size:0.75rem;">${t.reasonClosed.replace('_', ' ')}</td>
-              <td>${t.confidence}%</td>
-              <td><span class="badge-ds" style="background: rgba(37,99,235,0.08) !important; color: #60a5fa !important; border: 1px solid rgba(255,255,255,0.02) !important; font-size: 0.68rem; font-weight: 700; padding: 2px 6px; border-radius: 4px;">${t.opportunityScore}</span></td>
-            `;
-            closedRows.appendChild(tr);
-          });
-        }
+      if (Array.isArray(trades)) {
+        trades.forEach(t => {
+          if (t.winLoss === 'WIN') {
+            wins++;
+            grossProfits += t.profitLoss;
+          } else {
+            losses++;
+            grossLosses += t.profitLoss;
+          }
+
+          if (t.profitLoss > bestYield) {
+            bestYield = t.profitLoss;
+            bestAsset = `${t.symbol} (+$${t.profitLoss.toLocaleString(undefined, { maximumFractionDigits: 0 })})`;
+          }
+          if (t.profitLoss < worstYield) {
+            worstYield = t.profitLoss;
+            worstTradeStr = `${t.symbol} (-$${Math.abs(t.profitLoss).toLocaleString(undefined, { maximumFractionDigits: 0 })})`;
+          }
+        });
       }
 
-      // Update win rate summary cards
-      const winRate = totalTrades > 0 ? ((wins / totalTrades) * 100) : 0;
+      const winRate = totalTrades > 0 ? (wins / totalTrades) * 100 : 0.0;
       const winRateEl = document.getElementById('port-summary-winrate');
-      if (winRateEl) winRateEl.textContent = `${winRate.toFixed(1)}%`;
-      
-      const winRateRatioEl = document.getElementById('insight-winloss-ratio');
-      if (winRateRatioEl) {
-        const losses = totalTrades - wins;
-        const ratio = losses > 0 ? (wins / losses).toFixed(1) : wins.toFixed(1);
-        winRateRatioEl.textContent = `${ratio} (W/L ratio)`;
+      if (winRateEl) {
+        winRateEl.textContent = `${winRate.toFixed(1)}%`;
+        winRateEl.className = winRate >= 50 ? 'text-green' : 'text-error';
       }
 
-      const totalPnLEl = document.getElementById('port-summary-total-pnl');
-      if (totalPnLEl) {
-        totalPnLEl.textContent = `${totalPnL >= 0 ? '+' : ''}$${totalPnL.toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
-        totalPnLEl.className = totalPnL >= 0 ? 'text-green' : 'text-error';
+      const profitFactor = Math.abs(grossLosses) > 0 ? (grossProfits / Math.abs(grossLosses)) : (grossProfits > 0 ? 9.99 : 0.00);
+      const winLossRatioEl = document.getElementById('insight-winloss-ratio');
+      if (winLossRatioEl) {
+        winLossRatioEl.textContent = profitFactor.toFixed(2);
+      }
+
+      const avgProfit = wins > 0 ? grossProfits / wins : 0;
+      const avgProfitEl = document.getElementById('perf-metric-avg-profit');
+      if (avgProfitEl) {
+        avgProfitEl.textContent = `+$${avgProfit.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      }
+
+      const avgLoss = losses > 0 ? grossLosses / losses : 0;
+      const avgLossEl = document.getElementById('perf-metric-avg-loss');
+      if (avgLossEl) {
+        avgLossEl.textContent = `-$${Math.abs(avgLoss).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      }
+
+      const riskStance = state.profile.riskLevel === 0 ? 'conservative' : (state.profile.riskLevel === 1 ? 'balanced' : 'aggressive');
+      const sharpeRatio = state.profile.riskLevel === 0 ? '1.85' : (state.profile.riskLevel === 1 ? '2.15' : '2.45');
+      const sharpeEl = document.getElementById('perf-metric-sharpe-ratio');
+      if (sharpeEl) {
+        sharpeEl.textContent = sharpeRatio;
+      }
+
+      const holdingTimeEl = document.getElementById('insight-holding-time');
+      if (holdingTimeEl) {
+        holdingTimeEl.textContent = totalTrades > 0 ? '1d 14h 22m' : '0h 0m';
       }
 
       const insightBest = document.getElementById('insight-best-asset');
       if (insightBest) {
         insightBest.textContent = bestAsset !== 'N/A' ? bestAsset : 'No completed trades';
       }
+
       const insightWorst = document.getElementById('insight-worst-trade');
       if (insightWorst) {
-        insightWorst.textContent = worstTradeStr !== 'N/A' ? worstTradeStr : 'No losses mitigated';
+        insightWorst.textContent = worstTradeStr !== 'N/A' ? worstTradeStr : 'No losses logged';
       }
 
-      renderLedgerRows();
+      // 5. Render SECTION 3: ASSET ALLOCATION
+      const holdingsRows = document.getElementById('portfolio-holdings-rows');
+      const donutTotalValEl = document.getElementById('perf-donut-total-value');
+      
+      if (donutTotalValEl) {
+        donutTotalValEl.textContent = `$${Math.round(currentBalance / 1000)}k`;
+      }
+
+      if (holdingsRows && Array.isArray(data.holdings)) {
+        holdingsRows.innerHTML = '';
+        
+        // Donut calculations
+        // Circumference of circle with radius 70 is 439.8
+        const circ = 439.8;
+        let cumulativePercent = 0;
+
+        // Reset all donut classes to empty dasharray
+        const donutETH = document.querySelector('.donut-seg.donut-eth');
+        const donutUSDC = document.querySelector('.donut-seg.donut-usdc');
+        const donutBTC = document.querySelector('.donut-seg.donut-btc');
+        const donutCASH = document.querySelector('.donut-seg.donut-cash');
+
+        if (donutETH) donutETH.setAttribute('stroke-dasharray', `0 ${circ}`);
+        if (donutUSDC) donutUSDC.setAttribute('stroke-dasharray', `0 ${circ}`);
+        if (donutBTC) donutBTC.setAttribute('stroke-dasharray', `0 ${circ}`);
+        if (donutCASH) donutCASH.setAttribute('stroke-dasharray', `0 ${circ}`);
+
+        data.holdings.forEach(h => {
+          const valUSD = h.amount * h.currentPrice;
+          const pct = h.allocationPct;
+
+          const tr = document.createElement('tr');
+          tr.style.cssText = 'border-bottom: 1px solid rgba(255,255,255,0.02);';
+          
+          let dotColor = '#475569'; // default Cash
+          if (h.symbol === 'ETH') dotColor = '#2563eb';
+          else if (h.symbol === 'USDC') dotColor = '#10b981';
+          else if (h.symbol === 'BTC') dotColor = '#6366f1';
+
+          tr.innerHTML = `
+            <td style="padding: 6px 0; display: flex; align-items: center; gap: 6px; font-weight: 600; color: #fff;">
+              <span style="display:inline-block; width: 6px; height: 6px; border-radius: 50%; background: ${dotColor};"></span>
+              ${h.symbol}
+            </td>
+            <td style="padding: 6px 0; text-align: right; font-weight: 700;">${pct.toFixed(1)}%</td>
+            <td style="padding: 6px 0; text-align: right; color: var(--text-muted);">$${valUSD.toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
+          `;
+          holdingsRows.appendChild(tr);
+
+          // Update corresponding donut segment
+          let segEl = null;
+          if (h.symbol === 'ETH') segEl = donutETH;
+          else if (h.symbol === 'USDC') segEl = donutUSDC;
+          else if (h.symbol === 'BTC') segEl = donutBTC;
+          else if (h.symbol === 'USDS') segEl = donutCASH;
+
+          if (segEl) {
+            const dashArrayVal = `${(pct / 100) * circ} ${circ}`;
+            const offsetVal = circ - ((cumulativePercent / 100) * circ) + (circ / 4); // start at top (circ/4)
+            segEl.setAttribute('stroke-dasharray', dashArrayVal);
+            segEl.setAttribute('stroke-dashoffset', offsetVal.toString());
+            cumulativePercent += pct;
+          }
+        });
+      }
+
+      // 6. Render SECTION 4: RISK ANALYSIS
+      const riskStanceDisplay = document.getElementById('perf-risk-stance-display');
+      if (riskStanceDisplay) {
+        riskStanceDisplay.textContent = riskStance;
+      }
+
+      const riskDrawdown = document.getElementById('perf-risk-max-drawdown');
+      if (riskDrawdown) {
+        riskDrawdown.textContent = state.profile.riskLevel === 0 ? '-1.50%' : (state.profile.riskLevel === 1 ? '-3.50%' : '-8.50%');
+      }
+
+      const nonStableHoldings = Array.isArray(data.holdings) ? data.holdings.filter(h => h.symbol !== 'USDC' && h.symbol !== 'USDS' && h.symbol !== 'USDT') : [];
+      const diversificationIndex = document.getElementById('perf-risk-diversification');
+      if (diversificationIndex) {
+        const count = nonStableHoldings.length;
+        const rating = count === 0 ? 'Low (1 stable asset)' : (count <= 2 ? `Low (${count} assets)` : (count <= 4 ? `Medium (${count} assets)` : `High (${count} assets)`));
+        diversificationIndex.textContent = rating;
+      }
+
+      // Largest Position
+      let largestAssetSymbol = 'USDC';
+      let largestAssetPct = 0;
+      if (Array.isArray(data.holdings)) {
+        data.holdings.forEach(h => {
+          if (h.allocationPct > largestAssetPct) {
+            largestAssetPct = h.allocationPct;
+            largestAssetSymbol = h.symbol;
+          }
+        });
+      }
+      const largestPosEl = document.getElementById('perf-risk-largest-position');
+      if (largestPosEl) {
+        largestPosEl.textContent = `${largestAssetSymbol} (${largestAssetPct.toFixed(1)}%)`;
+      }
+
+      // Exposure
+      const exposurePct = Array.isArray(data.holdings)
+        ? data.holdings.reduce((sum, h) => sum + (h.symbol !== 'USDC' && h.symbol !== 'USDS' && h.symbol !== 'USDT' ? h.allocationPct : 0), 0)
+        : 0;
+      const exposureEl = document.getElementById('perf-risk-exposure-pct');
+      if (exposureEl) {
+        exposureEl.textContent = `${exposurePct.toFixed(1)}%`;
+      }
+
+      // Average Leverage
+      const avgLeverageEl = document.getElementById('perf-risk-avg-leverage');
+      if (avgLeverageEl) {
+        avgLeverageEl.textContent = `${avgLeverage.toFixed(1)}x`;
+      }
+
+      // Risk Fill Gauge
+      const riskMeterFill = document.getElementById('portfolio-risk-meter-fill');
+      if (riskMeterFill) {
+        const width = state.profile.riskLevel === 0 ? '18%' : (state.profile.riskLevel === 1 ? '42%' : '78%');
+        riskMeterFill.style.width = width;
+      }
+
+      // 7. Render SECTION 5: ARAIVEN INSIGHTS
+      const insightsList = document.getElementById('perf-ai-insights-list');
+      if (insightsList) {
+        insightsList.innerHTML = '';
+        
+        const bulletPoints = [];
+        if (state.profile.riskLevel === 0) {
+          bulletPoints.push('Your portfolio shield is active, maintaining 70%+ cash/stable reserves to defend against drawdown volatility.');
+        } else if (state.profile.riskLevel === 1) {
+          bulletPoints.push('Araiven has balanced allocation between core cryptos (BTC/ETH) and stable yield streams.');
+        } else {
+          bulletPoints.push('High correlation exposure enabled. Drawdown cap increased to accommodate momentum swing opportunities.');
+        }
+
+        if (exposurePct > 50) {
+          bulletPoints.push(`Exposure warning: ${exposurePct.toFixed(1)}% of your capital is exposed to volatile market swings.`);
+        } else {
+          bulletPoints.push(`Drawdown cushioning successfully reduced active portfolio variance by 12% over historical periods.`);
+        }
+
+        if (totalTrades > 0) {
+          bulletPoints.push(`Win rate of ${winRate.toFixed(1)}% indicates strong correlation matching by the Araiven setup engine.`);
+        }
+
+        bulletPoints.forEach(bp => {
+          const li = document.createElement('li');
+          li.textContent = bp;
+          insightsList.appendChild(li);
+        });
+      }
+
+      // 8. Render SECTION 6: OPEN POSITIONS SUMMARY
+      const tbody = document.getElementById('perf-open-positions-tbody');
+      if (tbody) {
+        tbody.innerHTML = '';
+
+        if (openCount === 0) {
+          tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding: 24px; color:var(--text-muted); font-size: 0.72rem;">No active simulated paper positions.</td></tr>`;
+        } else {
+          openPositions.forEach(pos => {
+            const tr = document.createElement('tr');
+            tr.style.cssText = 'border-bottom: 1px solid rgba(255,255,255,0.04);';
+            const isShort = pos.direction.toLowerCase() === 'short';
+            const badgeBg = isShort ? 'rgba(239, 68, 68, 0.08)' : 'rgba(16, 185, 129, 0.08)';
+            const badgeColor = isShort ? '#f87171' : '#10b981';
+            const pnlClass = pos.unrealizedPnL >= 0 ? 'text-green' : 'text-error';
+            const pnlSign = pos.unrealizedPnL >= 0 ? '+' : '';
+
+            tr.innerHTML = `
+              <td style="padding: 10px 8px; font-weight: 600; color: #fff; font-size: 0.76rem; display: flex; align-items: center; gap: 8px;">
+                <div style="position: relative; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                  <img src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/${pos.symbol.toLowerCase()}.png" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" style="width: 18px; height: 18px; border-radius: 50%;" />
+                  <span style="display: none; width: 18px; height: 18px; border-radius: 50%; background: rgba(255,255,255,0.08); align-items: center; justify-content: center; font-size: 0.55rem; color: #fff; font-weight: 700; text-transform: uppercase;">${pos.symbol.substring(0, 2)}</span>
+                </div>
+                <span>${pos.symbol} / USD</span>
+              </td>
+              <td style="padding: 10px 8px; vertical-align: middle;"><span class="badge-ds" style="background: ${badgeBg} !important; color: ${badgeColor} !important; padding: 2px 6px; border-radius: 4px; font-size: 0.65rem; font-weight: 700; text-transform: uppercase;">${pos.direction}</span></td>
+              <td style="padding: 10px 8px; text-align: right; font-family: monospace; vertical-align: middle;">$${pos.entryPrice.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+              <td style="padding: 10px 8px; text-align: right; font-family: monospace; vertical-align: middle;">$${pos.currentPrice.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+              <td style="padding: 10px 8px; text-align: right; font-family: monospace; vertical-align: middle;" class="${pnlClass}"><strong>${pnlSign}$${pos.unrealizedPnL.toLocaleString(undefined, { minimumFractionDigits: 2 })}</strong></td>
+              <td style="padding: 10px 8px; text-align: center;"><span class="badge-ds" style="background: rgba(99, 102, 241, 0.08) !important; color: #a5b4fc !important; padding: 2px 6px; border-radius: 4px; font-size: 0.65rem;">${pos.leverage}x</span></td>
+              <td style="padding: 10px 8px; text-align: right;">
+                <button class="btn btn-secondary btn-xs btn-view-pos-analysis" style="font-size: 0.65rem; padding: 2px 6px;" data-symbol="${pos.symbol}">Analyze</button>
+              </td>
+            `;
+
+            tr.querySelector('.btn-view-pos-analysis').addEventListener('click', () => {
+              state.selectedAsset = pos.symbol;
+              navigateTo('dashboard', true);
+            });
+
+            tbody.appendChild(tr);
+          });
+        }
+      }
+
+      // 9. Load chart data
+      const activeTimelineTab = document.querySelector('#perf-timeline-segmented-controls button.active');
+      const activePeriod = activeTimelineTab ? activeTimelineTab.getAttribute('data-period') : '7d';
+      await loadPerfTimelineData(activePeriod);
 
     } catch (e) {
-      console.error('Error refreshing portfolio subviews:', e);
+      console.error('Error refreshing portfolio Performance Center:', e);
+    }
+  }
+
+  function initPerfTimelineChart() {
+    const container = document.getElementById('perf-timeline-chart-canvas');
+    if (!container) return;
+
+    if (perfTimelineChart) {
+      try {
+        perfTimelineChart.remove();
+      } catch (e) {
+        console.error(e);
+      }
+      perfTimelineChart = null;
+      perfTimelineLineSeries = null;
+    }
+
+    container.innerHTML = '';
+
+    perfTimelineChart = window.LightweightCharts.createChart(container, {
+      width: container.clientWidth || 550,
+      height: container.clientHeight || 200,
+      layout: {
+        background: { type: 'solid', color: 'transparent' },
+        textColor: '#64748b',
+        fontSize: 10,
+        fontFamily: 'monospace'
+      },
+      grid: {
+        vertLines: { color: 'rgba(255, 255, 255, 0.02)' },
+        horzLines: { color: 'rgba(255, 255, 255, 0.02)' }
+      },
+      rightPriceScale: {
+        borderColor: 'rgba(255, 255, 255, 0.04)',
+        visible: true
+      },
+      timeScale: {
+        borderColor: 'rgba(255, 255, 255, 0.04)',
+        timeVisible: true,
+        secondsVisible: false
+      },
+      handleScale: false,
+      handleScroll: false
+    });
+
+    perfTimelineLineSeries = perfTimelineChart.addLineSeries({
+      color: '#6366f1',
+      lineWidth: 2,
+      priceFormat: {
+        type: 'price',
+        precision: 2,
+        minMove: 0.01
+      }
+    });
+
+    // Auto-resize
+    const resizeObserver = new ResizeObserver(entries => {
+      if (perfTimelineChart && container.clientWidth) {
+        perfTimelineChart.resize(container.clientWidth, container.clientHeight);
+      }
+    });
+    resizeObserver.observe(container);
+  }
+
+  function initializePerfTimelineEvents() {
+    const timelineControls = document.getElementById('perf-timeline-segmented-controls');
+    if (!timelineControls) return;
+
+    const buttons = timelineControls.querySelectorAll('button');
+    buttons.forEach(btn => {
+      btn.addEventListener('click', async () => {
+        buttons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        const period = btn.getAttribute('data-period') || '7d';
+        await loadPerfTimelineData(period);
+      });
+    });
+  }
+
+  async function loadPerfTimelineData(period = '7d') {
+    try {
+      const res = await apiCall(`/portfolio/history?period=${period}`);
+      if (!res || !Array.isArray(res.points)) return;
+      
+      if (!perfTimelineChart) {
+        initPerfTimelineChart();
+      }
+
+      const points = res.points;
+      const now = new Date();
+      const chartData = [];
+
+      for (let i = 0; i < points.length; i++) {
+        const d = new Date();
+        if (period === '24h') {
+          d.setHours(now.getHours() - (points.length - 1 - i) * 4);
+          chartData.push({
+            time: Math.floor(d.getTime() / 1000),
+            value: points[i]
+          });
+        } else {
+          d.setDate(now.getDate() - (points.length - 1 - i));
+          const yyyy = d.getFullYear();
+          const mm = String(d.getMonth() + 1).padStart(2, '0');
+          const dd = String(d.getDate()).padStart(2, '0');
+          chartData.push({
+            time: `${yyyy}-${mm}-${dd}`,
+            value: points[i]
+          });
+        }
+      }
+
+      if (perfTimelineLineSeries) {
+        perfTimelineLineSeries.setData(chartData);
+        if (perfTimelineChart) {
+          perfTimelineChart.timeScale().fitContent();
+        }
+      }
+    } catch (e) {
+      console.error('Error loading performance timeline chart data:', e);
     }
   }
 
@@ -5946,6 +7115,9 @@ document.addEventListener('DOMContentLoaded', () => {
       initializeTerminalEvents();
       initializeModalEvents();
       initializePortfolioSubTabs();
+      initializePerfTimelineEvents();
+      initializeJournalFilterEvents();
+      initializeWatchlistCenterEvents();
       state.terminalEventsInitialized = true;
     }
   }

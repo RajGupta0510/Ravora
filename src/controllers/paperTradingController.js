@@ -179,7 +179,8 @@ export const getPaperTradeHistory = async (req, res) => {
         winLoss: h.win_loss,
         confidence: h.recommendation_confidence,
         opportunityScore: h.opportunity_score,
-        duration: durationStr
+        duration: durationStr,
+        notes: h.notes || ''
       };
     });
 
@@ -187,5 +188,22 @@ export const getPaperTradeHistory = async (req, res) => {
   } catch (err) {
     console.error('[PaperTradingController] Error fetching trade history:', err);
     return res.status(500).json({ error: 'Failed to fetch trade history.' });
+  }
+};
+
+/**
+ * Update trade notes.
+ */
+export const updatePaperTradeNotes = async (req, res) => {
+  const userId = req.user.id;
+  const { id } = req.params;
+  const { notes } = req.body;
+
+  try {
+    await TradeHistoryService.updateNotes(userId, id, notes);
+    return res.json({ success: true, message: 'Trade notes updated successfully.' });
+  } catch (err) {
+    console.error('[PaperTradingController] Error updating trade notes:', err);
+    return res.status(500).json({ error: 'Failed to update trade notes.' });
   }
 };

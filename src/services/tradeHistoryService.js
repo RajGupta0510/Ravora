@@ -59,4 +59,14 @@ export class TradeHistoryService {
       [userId]
     );
   }
+
+  /**
+   * Update notes for a trade in history.
+   */
+  static async updateNotes(userId, tradeId, notes) {
+    await dbRun(
+      'UPDATE paper_trade_history SET notes = ? WHERE id = ? AND user_id = ?',
+      [notes, tradeId, userId]
+    );
+  }
 }
