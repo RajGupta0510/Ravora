@@ -686,3 +686,29 @@ export const checkAccount = async (req, res) => {
     return res.status(500).json({ error: 'Internal server error.' });
   }
 };
+
+export const changePassword = async (req, res) => {
+  const userId = req.user.id;
+  const { currentPassword, newPassword, confirmPassword } = req.body;
+
+  if (!currentPassword || !newPassword || !confirmPassword) {
+    return res.status(400).json({ error: 'All password fields are required.' });
+  }
+
+  if (newPassword !== confirmPassword) {
+    return res.status(400).json({ error: 'New passwords do not match.' });
+  }
+
+  try {
+    const user = await dbGet('SELECT * FROM users WHERE id = ?', [userId]);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found.' });
+    }
+
+    await dbRun('UPDATE users SET password_hash = ? WHERE id = ?', [newPassword, userId]);
+    return res.json({ success: true, message: 'Password updated successfully.' });
+  } catch (err) {
+    console.error('Error changing password:', err);
+    return res.status(500).json({ error: 'Internal server error changing password.' });
+  }
+};

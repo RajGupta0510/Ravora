@@ -2266,43 +2266,561 @@
            8. SETTINGS VIEW
            ==================================================================== -->
         <section class="app-view-panel" id="view-settings">
-          <div class="card-glass settings-page-card">
-            <div class="card-header-row" style="margin-bottom: 20px;">
-              <h4 class="text-accent-gradient">SaaS Settings & Connections</h4>
-              <span class="tag-alert-green">SECURE API</span>
+          <style>
+            .settings-menu-btn {
+              padding: 10px 14px;
+              background: transparent;
+              border: none;
+              border-radius: 8px;
+              color: var(--text-secondary);
+              font-size: 0.82rem;
+              font-weight: 600;
+              text-align: left;
+              cursor: pointer;
+              outline: none;
+              transition: all 0.2s ease;
+              width: 100%;
+              display: block;
+              box-sizing: border-box;
+            }
+            .settings-menu-btn:hover {
+              background: rgba(255, 255, 255, 0.03);
+              color: #fff;
+            }
+            .settings-menu-btn.active {
+              background: rgba(99, 102, 241, 0.08) !important;
+              color: var(--accent) !important;
+            }
+            @media (max-width: 768px) {
+              .settings-grid {
+                grid-template-columns: 1fr !important;
+              }
+              #settings-panes-container {
+                border-left: none !important;
+                padding-left: 0 !important;
+                border-top: 1px solid rgba(255,255,255,0.04);
+                padding-top: 20px;
+              }
+            }
+          </style>
+
+          <div class="card-glass" style="padding: 24px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.06); background: rgba(14, 19, 37, 0.45);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 16px;">
+              <div>
+                <h3 style="color: #fff; font-size: 1.45rem; font-family: var(--font-display); font-weight: 700; margin: 0 0 4px 0;">Control Center</h3>
+                <p style="color: var(--text-secondary); font-size: 0.82rem; margin: 0;">Configure your account, AI strategy preferences, exchange API keys, and appearance.</p>
+              </div>
+              <span class="tag-alert-green">SECURE CORE</span>
             </div>
-            <p class="step-desc">Manage API credentials, user tiers, security settings, and rebalancing preferences.</p>
-            <div style="margin-top: 24px; display: flex; flex-direction: column; gap: 20px;">
-              <div style="display: flex; flex-direction: column; gap: 8px;">
-                <label style="font-weight: 600; color: #fff;">Integrated Brokerage APIs</label>
-                <div class="card-glass" style="padding: 16px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.06);">
-                  <div>
-                    <strong style="color: #fff;">Binance US & Coinbase Pro</strong>
-                    <span style="display: block; font-size: 0.75rem; color: var(--text-secondary); margin-top: 4px;">Read/Write API keys authenticated. Withdrawal disabled.</span>
-                  </div>
-                  <button class="btn btn-secondary btn-sm">Configure</button>
-                </div>
+
+            <div style="display: grid; grid-template-columns: 220px 1fr; gap: 24px; width: 100%; align-items: start;" class="settings-grid">
+              
+              <!-- LEFT NAVIGATION MENU -->
+              <div style="display: flex; flex-direction: column; gap: 6px;" id="settings-nav-menu">
+                <button class="settings-menu-btn active" data-pane="profile">Profile</button>
+                <button class="settings-menu-btn" data-pane="security">Security</button>
+                <button class="settings-menu-btn" data-pane="ai">AI Preferences</button>
+                <button class="settings-menu-btn" data-pane="notifications">Notifications</button>
+                <button class="settings-menu-btn" data-pane="trading">Trading Preferences</button>
+                <button class="settings-menu-btn" data-pane="exchanges">Connected Exchanges</button>
+                <button class="settings-menu-btn" data-pane="appearance">Appearance</button>
+                <button class="settings-menu-btn" data-pane="privacy">Data & Privacy</button>
+                <button class="settings-menu-btn" data-pane="about">About Ravora</button>
               </div>
-              <div style="display: flex; flex-direction: column; gap: 8px;">
-                <label style="font-weight: 600; color: #fff;">Araiven Risk Strategy Stance</label>
-                <div class="card-glass" style="padding: 16px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.06);">
-                  <div>
-                    <strong style="color: #fff;">Trailing Drawdown Stop-Loss</strong>
-                    <span style="display: block; font-size: 0.75rem; color: var(--text-secondary); margin-top: 4px;">Automatic re-hedging activates if portfolio variance exceeds active threshold.</span>
+
+              <!-- RIGHT CONFIGURATION PANES -->
+              <div style="border-left: 1px solid rgba(255,255,255,0.04); padding-left: 24px; min-height: 480px;" id="settings-panes-container">
+                
+                <!-- PANE 1: PROFILE -->
+                <div class="settings-pane active" id="pane-profile" style="display: block;">
+                  <h4 style="color:#fff; font-size:1.15rem; font-family:var(--font-display); margin:0 0 16px 0;">Profile Settings</h4>
+                  <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 24px;">
+                    <div style="width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, var(--accent) 0%, #a5b4fc 100%); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: #fff; font-weight: 700; border: 2px solid rgba(255,255,255,0.1);" id="profile-avatar-placeholder">R</div>
+                    <div>
+                      <strong style="color: #fff; font-size: 0.95rem; display: block;" id="profile-meta-fullname">Raj Gupta</strong>
+                      <span style="font-size: 0.76rem; color: var(--text-muted);" id="profile-meta-email">raj@ravora.ai</span>
+                    </div>
                   </div>
-                  <div class="status-badge active" style="margin: 0; padding: 4px 8px; border-radius: 4px; background: rgba(16, 185, 129, 0.1); color: #10b981; font-size: 0.75rem; font-weight: 600; border: 1px solid rgba(16, 185, 129, 0.2);">ENABLED</div>
+
+                  <form id="form-settings-profile" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <div style="display:flex; flex-direction:column; gap:6px;">
+                      <label style="font-size:0.75rem; color:var(--text-secondary); font-weight:600;">Full Name</label>
+                      <input type="text" id="settings-profile-fullname" style="padding:8px 12px; background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.08); border-radius:8px; color:#fff; font-size:0.8rem; outline:none;" />
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:6px;">
+                      <label style="font-size:0.75rem; color:var(--text-secondary); font-weight:600;">Username</label>
+                      <input type="text" id="settings-profile-username" style="padding:8px 12px; background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.08); border-radius:8px; color:#fff; font-size:0.8rem; outline:none;" />
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:6px;">
+                      <label style="font-size:0.75rem; color:var(--text-secondary); font-weight:600;">Email Address</label>
+                      <input type="email" id="settings-profile-email" disabled style="padding:8px 12px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.04); border-radius:8px; color:var(--text-muted); font-size:0.8rem; outline:none;" />
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:6px;">
+                      <label style="font-size:0.75rem; color:var(--text-secondary); font-weight:600;">Phone Number</label>
+                      <input type="text" id="settings-profile-phone" style="padding:8px 12px; background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.08); border-radius:8px; color:#fff; font-size:0.8rem; outline:none;" />
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:6px;">
+                      <label style="font-size:0.75rem; color:var(--text-secondary); font-weight:600;">Country</label>
+                      <input type="text" id="settings-profile-country" style="padding:8px 12px; background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.08); border-radius:8px; color:#fff; font-size:0.8rem; outline:none;" />
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:6px;">
+                      <label style="font-size:0.75rem; color:var(--text-secondary); font-weight:600;">Timezone</label>
+                      <select id="settings-profile-timezone" style="padding:8px 12px; background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.08); border-radius:8px; color:#fff; font-size:0.8rem; outline:none; cursor:pointer;">
+                        <option value="UTC">UTC (GMT+0)</option>
+                        <option value="EST">EST (GMT-5)</option>
+                        <option value="PST">PST (GMT-8)</option>
+                        <option value="IST">IST (GMT+5:30)</option>
+                        <option value="GMT">GMT (GMT+0)</option>
+                      </select>
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:6px;">
+                      <label style="font-size:0.75rem; color:var(--text-secondary); font-weight:600;">Preferred Currency</label>
+                      <select id="settings-profile-currency" style="padding:8px 12px; background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.08); border-radius:8px; color:#fff; font-size:0.8rem; outline:none; cursor:pointer;">
+                        <option value="USD">USD ($)</option>
+                        <option value="EUR">EUR (€)</option>
+                        <option value="GBP">GBP (£)</option>
+                        <option value="INR">INR (₹)</option>
+                      </select>
+                    </div>
+                    <div style="grid-column: span 2; display: flex; justify-content: flex-end; margin-top: 12px;">
+                      <button type="submit" class="btn btn-primary" style="font-size:0.8rem; font-weight:600; padding:10px 24px;">Save Profile Changes</button>
+                    </div>
+                  </form>
                 </div>
-              </div>
-              <div style="display: flex; flex-direction: column; gap: 8px;">
-                <label style="font-weight: 600; color: #fff;">Product Tour</label>
-                <div class="card-glass" style="padding: 16px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.06);">
-                  <div>
-                    <strong style="color: #fff;">Interactive Product Tour</strong>
-                    <span style="display: block; font-size: 0.75rem; color: var(--text-secondary); margin-top: 4px;">Start the interactive tour of the Ravora platform to explore the Araiven AI framework.</span>
+
+                <!-- PANE 2: SECURITY -->
+                <div class="settings-pane" id="pane-security" style="display: none;">
+                  <h4 style="color:#fff; font-size:1.15rem; font-family:var(--font-display); margin:0 0 16px 0;">Security Settings</h4>
+                  
+                  <!-- VERIFICATION FLAGS -->
+                  <div style="display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap;">
+                    <div class="card-glass" style="padding: 12px 16px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.04); display: flex; align-items: center; gap: 8px;">
+                      <span style="display: block; width: 8px; height: 8px; border-radius: 50%;" id="badge-email-verification-dot"></span>
+                      <span style="font-size: 0.72rem; color: #fff; font-weight: 600;" id="badge-email-verification-text">Email Unverified</span>
+                    </div>
+                    <div class="card-glass" style="padding: 12px 16px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.04); display: flex; align-items: center; gap: 8px;">
+                      <span style="display: block; width: 8px; height: 8px; border-radius: 50%;" id="badge-phone-verification-dot"></span>
+                      <span style="font-size: 0.72rem; color: #fff; font-weight: 600;" id="badge-phone-verification-text">Phone Unverified</span>
+                    </div>
+                    <div class="card-glass" style="padding: 12px 16px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.04); display: flex; align-items: center; gap: 8px; opacity: 0.75;">
+                      <span style="display: block; width: 8px; height: 8px; border-radius: 50%; background: var(--text-muted);"></span>
+                      <span style="font-size: 0.72rem; color: var(--text-secondary); font-weight: 600;">MFA / 2FA (Coming Soon)</span>
+                    </div>
                   </div>
-                  <button class="btn btn-secondary btn-sm" id="btn-trigger-product-tour">Start Tour</button>
+
+                  <!-- PASSWORD CHANGE -->
+                  <div class="card-glass" style="padding: 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 24px;">
+                    <strong style="color: #fff; font-size: 0.88rem; display: block; margin-bottom: 12px;">Change Account Password</strong>
+                    <form id="form-settings-password" style="display: flex; flex-direction: column; gap: 12px; max-width: 440px;">
+                      <div style="display:flex; flex-direction:column; gap:4px;">
+                        <label style="font-size:0.72rem; color:var(--text-secondary); font-weight:600;">Current Password</label>
+                        <input type="password" id="settings-pwd-current" style="padding:8px 12px; background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.08); border-radius:8px; color:#fff; font-size:0.8rem; outline:none;" />
+                      </div>
+                      <div style="display:flex; flex-direction:column; gap:4px;">
+                        <label style="font-size:0.72rem; color:var(--text-secondary); font-weight:600;">New Password</label>
+                        <input type="password" id="settings-pwd-new" style="padding:8px 12px; background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.08); border-radius:8px; color:#fff; font-size:0.8rem; outline:none;" />
+                      </div>
+                      <div style="display:flex; flex-direction:column; gap:4px;">
+                        <label style="font-size:0.72rem; color:var(--text-secondary); font-weight:600;">Confirm New Password</label>
+                        <input type="password" id="settings-pwd-confirm" style="padding:8px 12px; background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.08); border-radius:8px; color:#fff; font-size:0.8rem; outline:none;" />
+                      </div>
+                      <div style="margin-top: 8px;">
+                        <button type="submit" class="btn btn-secondary" style="font-size: 0.78rem; padding: 8px 16px;">Update Password</button>
+                      </div>
+                    </form>
+                  </div>
+
+                  <!-- ACTIVE SESSIONS / DEVICES -->
+                  <div class="card-glass" style="padding: 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 24px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+                      <strong style="color: #fff; font-size: 0.88rem;">Active Sessions & Trusted Devices</strong>
+                      <button class="btn btn-secondary btn-xs" id="btn-settings-signout-others" style="color: #ef4444; font-size:0.7rem; font-weight:700;">Sign Out Other Devices</button>
+                    </div>
+                    
+                    <div style="overflow-x: auto; width: 100%;">
+                      <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.72rem;">
+                        <thead>
+                          <tr style="border-bottom: 1px solid rgba(255,255,255,0.04); color: var(--text-muted);">
+                            <th style="padding: 6px 8px;">IP Address</th>
+                            <th style="padding: 6px 8px;">Device Type</th>
+                            <th style="padding: 6px 8px;">Last Activity</th>
+                          </tr>
+                        </thead>
+                        <tbody id="settings-sessions-tbody">
+                          <!-- Filled dynamically -->
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  <!-- LOGIN HISTORY (Placeholder) -->
+                  <div class="card-glass" style="padding: 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); opacity: 0.85;">
+                    <strong style="color: #fff; font-size: 0.88rem; display: block; margin-bottom: 8px;">Recent Login Audits</strong>
+                    <div style="font-size:0.72rem; color:var(--text-muted); font-style:italic;">No anomalies detected. Last 10 verification records are archived.</div>
+                  </div>
                 </div>
+
+                <!-- PANE 3: AI PREFERENCES -->
+                <div class="settings-pane" id="pane-ai" style="display: none;">
+                  <h4 style="color:#fff; font-size:1.15rem; font-family:var(--font-display); margin:0 0 16px 0;">Araiven AI Configurations</h4>
+                  
+                  <form id="form-settings-ai" style="display: flex; flex-direction: column; gap: 20px;">
+                    <!-- Risk Level -->
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                      <label style="font-size:0.76rem; color: #fff; font-weight:600;">Preferred Strategy Risk Level</label>
+                      <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                        <label style="display: flex; align-items: center; gap: 8px; font-size: 0.78rem; cursor: pointer; color: var(--text-secondary);">
+                          <input type="radio" name="ai-risk" value="0" /> Conservative
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; font-size: 0.78rem; cursor: pointer; color: var(--text-secondary);">
+                          <input type="radio" name="ai-risk" value="1" checked /> Balanced
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; font-size: 0.78rem; cursor: pointer; color: var(--text-secondary);">
+                          <input type="radio" name="ai-risk" value="2" /> Aggressive
+                        </label>
+                      </div>
+                    </div>
+
+                    <!-- Preferred Markets -->
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                      <label style="font-size:0.76rem; color: #fff; font-weight:600;">Preferred Traded Asset Markets</label>
+                      <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+                        <label style="display: flex; align-items: center; gap: 8px; font-size: 0.78rem; cursor: pointer; color: var(--text-secondary);">
+                          <input type="checkbox" name="ai-markets" value="Crypto" checked /> Crypto
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; font-size: 0.78rem; cursor: pointer; color: var(--text-secondary); opacity: 0.75;">
+                          <input type="checkbox" name="ai-markets" value="Stocks" /> Stocks (Coming Soon)
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; font-size: 0.78rem; cursor: pointer; color: var(--text-secondary); opacity: 0.75;">
+                          <input type="checkbox" name="ai-markets" value="Forex" /> Forex (Coming Soon)
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; font-size: 0.78rem; cursor: pointer; color: var(--text-secondary); opacity: 0.75;">
+                          <input type="checkbox" name="ai-markets" value="Futures" /> Futures (Coming Soon)
+                        </label>
+                      </div>
+                    </div>
+
+                    <!-- AI Response Style -->
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                      <label style="font-size:0.76rem; color: #fff; font-weight:600;">Preferred AI Advisor Response Style</label>
+                      <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                        <label style="display: flex; align-items: center; gap: 8px; font-size: 0.78rem; cursor: pointer; color: var(--text-secondary);">
+                          <input type="radio" name="ai-response-style" value="brief" /> Brief
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; font-size: 0.78rem; cursor: pointer; color: var(--text-secondary);">
+                          <input type="radio" name="ai-response-style" value="balanced" checked /> Balanced
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; font-size: 0.78rem; cursor: pointer; color: var(--text-secondary);">
+                          <input type="radio" name="ai-response-style" value="detailed" /> Detailed
+                        </label>
+                      </div>
+                    </div>
+
+                    <!-- Toggles -->
+                    <div style="display: flex; flex-direction: column; gap: 12px;">
+                      <label style="display: flex; align-items: center; gap: 10px; font-size: 0.78rem; cursor: pointer; color: var(--text-secondary);">
+                        <input type="checkbox" id="settings-ai-trade-plans" checked /> Auto-generate trade plans and target zones.
+                      </label>
+                      <label style="display: flex; align-items: center; gap: 10px; font-size: 0.78rem; cursor: pointer; color: var(--text-secondary);">
+                        <input type="checkbox" id="settings-ai-morning-brief" checked /> Deliver Morning Market Intelligence briefing.
+                      </label>
+                    </div>
+
+                    <div style="margin-top: 10px;">
+                      <button type="submit" class="btn btn-primary" style="font-size:0.8rem; font-weight:600;">Save AI Preferences</button>
+                    </div>
+                  </form>
+                </div>
+
+                <!-- PANE 4: NOTIFICATIONS -->
+                <div class="settings-pane" id="pane-notifications" style="display: none;">
+                  <h4 style="color:#fff; font-size:1.15rem; font-family:var(--font-display); margin:0 0 16px 0;">Notification Subscriptions</h4>
+                  
+                  <form id="form-settings-notif" style="display: flex; flex-direction: column; gap: 20px;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                      <div class="card-glass" style="padding: 12px 16px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.04);">
+                        <strong style="color:#fff; font-size:0.8rem; display:block; margin-bottom:8px;">Alert Categories</strong>
+                        <div style="display:flex; flex-direction:column; gap:8px;">
+                          <label style="display:flex; align-items:center; gap:8px; font-size:0.75rem; color:var(--text-secondary); cursor:pointer;">
+                            <input type="checkbox" id="notif-cat-price" checked /> Price Alerts
+                          </label>
+                          <label style="display:flex; align-items:center; gap:8px; font-size:0.75rem; color:var(--text-secondary); cursor:pointer;">
+                            <input type="checkbox" id="notif-cat-portfolio" checked /> Portfolio Alerts
+                          </label>
+                          <label style="display:flex; align-items:center; gap:8px; font-size:0.75rem; color:var(--text-secondary); cursor:pointer;">
+                            <input type="checkbox" id="notif-cat-risk" checked /> Risk Safety Warnings
+                          </label>
+                          <label style="display:flex; align-items:center; gap:8px; font-size:0.75rem; color:var(--text-secondary); cursor:pointer;">
+                            <input type="checkbox" id="notif-cat-opp" checked /> AI Opportunity Alerts
+                          </label>
+                        </div>
+                      </div>
+
+                      <div class="card-glass" style="padding: 12px 16px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.04);">
+                        <strong style="color:#fff; font-size:0.8rem; display:block; margin-bottom:8px;">Delivery Channels</strong>
+                        <div style="display:flex; flex-direction:column; gap:8px;">
+                          <label style="display:flex; align-items:center; gap:8px; font-size:0.75rem; color:var(--text-secondary); cursor:pointer;">
+                            <input type="checkbox" id="notif-chan-email" checked /> Email Notifications
+                          </label>
+                          <label style="display:flex; align-items:center; gap:8px; font-size:0.75rem; color:var(--text-secondary); cursor:pointer;">
+                            <input type="checkbox" id="notif-chan-push" checked /> Web Push Alerts
+                          </label>
+                          <label style="display:flex; align-items:center; gap:8px; font-size:0.75rem; color:var(--text-secondary); cursor:pointer; opacity: 0.65;">
+                            <input type="checkbox" disabled /> Telegram Bot (Coming Soon)
+                          </label>
+                          <label style="display:flex; align-items:center; gap:8px; font-size:0.75rem; color:var(--text-secondary); cursor:pointer; opacity: 0.65;">
+                            <input type="checkbox" disabled /> Discord Webhooks (Coming Soon)
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div>
+                      <button type="submit" class="btn btn-primary" style="font-size:0.8rem; font-weight:600;">Save Subscriptions</button>
+                    </div>
+                  </form>
+                </div>
+
+                <!-- PANE 5: TRADING PREFERENCES -->
+                <div class="settings-pane" id="pane-trading" style="display: none;">
+                  <h4 style="color:#fff; font-size:1.15rem; font-family:var(--font-display); margin:0 0 16px 0;">Trading Configuration</h4>
+                  
+                  <form id="form-settings-trading" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <div style="display:flex; flex-direction:column; gap:4px;">
+                      <label style="font-size:0.75rem; color:var(--text-secondary); font-weight:600;">Default Chart Timeframe</label>
+                      <select id="settings-trading-timeframe" style="padding:8px 12px; background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.08); border-radius:8px; color:#fff; font-size:0.8rem; outline:none; cursor:pointer;">
+                        <option value="1h">1 Hour (1H)</option>
+                        <option value="4h" selected>4 Hours (4H)</option>
+                        <option value="1d">1 Day (1D)</option>
+                        <option value="15m">15 Minutes (15M)</option>
+                      </select>
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:4px;">
+                      <label style="font-size:0.75rem; color:var(--text-secondary); font-weight:600;">Preferred Chart Style</label>
+                      <select id="settings-trading-charttype" style="padding:8px 12px; background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.08); border-radius:8px; color:#fff; font-size:0.8rem; outline:none; cursor:pointer;">
+                        <option value="candlestick" selected>Candles</option>
+                        <option value="line">Line Graph</option>
+                      </select>
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:4px;">
+                      <label style="font-size:0.75rem; color:var(--text-secondary); font-weight:600;">Default Position Size ($ USD)</label>
+                      <input type="number" id="settings-trading-size" value="10000" style="padding:8px 12px; background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.08); border-radius:8px; color:#fff; font-size:0.8rem; outline:none;" />
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:4px;">
+                      <label style="font-size:0.75rem; color:var(--text-secondary); font-weight:600;">Default Risk limit per trade (% of Balance)</label>
+                      <input type="number" id="settings-trading-riskpct" value="2" max="100" min="1" style="padding:8px 12px; background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.08); border-radius:8px; color:#fff; font-size:0.8rem; outline:none;" />
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:4px;">
+                      <label style="font-size:0.75rem; color:var(--text-secondary); font-weight:600;">Currency Display Format</label>
+                      <select id="settings-trading-currencyfmt" style="padding:8px 12px; background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.08); border-radius:8px; color:#fff; font-size:0.8rem; outline:none; cursor:pointer;">
+                        <option value="prefix" selected>Prefix (e.g. $100)</option>
+                        <option value="suffix">Suffix (e.g. 100 USD)</option>
+                      </select>
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:4px;">
+                      <label style="font-size:0.75rem; color:var(--text-secondary); font-weight:600;">Preferred Date Format</label>
+                      <select id="settings-trading-datefmt" style="padding:8px 12px; background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.08); border-radius:8px; color:#fff; font-size:0.8rem; outline:none; cursor:pointer;">
+                        <option value="us" selected>MM/DD/YYYY</option>
+                        <option value="eu">DD/MM/YYYY</option>
+                        <option value="iso">YYYY-MM-DD</option>
+                      </select>
+                    </div>
+                    <div style="grid-column: span 2; display: flex; justify-content: flex-end; margin-top: 12px;">
+                      <button type="submit" class="btn btn-primary" style="font-size:0.8rem; font-weight:600;">Save Trading Configuration</button>
+                    </div>
+                  </form>
+                </div>
+
+                <!-- PANE 6: CONNECTED EXCHANGES -->
+                <div class="settings-pane" id="pane-exchanges" style="display: none;">
+                  <h4 style="color:#fff; font-size:1.15rem; font-family:var(--font-display); margin:0 0 16px 0;">Connected Exchanges</h4>
+                  <p style="font-size:0.78rem; color:var(--text-secondary); line-height:1.5; margin-bottom: 20px;">
+                    Integrate your exchange accounts to execute trades generated by Araiven. API credentials require withdrawal permissions to be disabled.
+                  </p>
+
+                  <div style="display: flex; flex-direction: column; gap: 14px;" id="settings-exchanges-list">
+                    <!-- Binance US -->
+                    <div class="card-glass" style="padding: 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+                      <div>
+                        <strong style="color: #fff; font-size: 0.88rem; display: block;">Binance US</strong>
+                        <span style="display: block; font-size: 0.72rem; color: #10b981; margin-top: 4px; font-weight: 600;" id="exchange-status-binance">Connected | API: Read/Write | Sync: Just now</span>
+                      </div>
+                      <button class="btn btn-secondary btn-sm" id="btn-exchange-disconnect-binance" style="color: #ef4444; font-size: 0.76rem;">Disconnect</button>
+                    </div>
+
+                    <!-- Coinbase Pro -->
+                    <div class="card-glass" style="padding: 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+                      <div>
+                        <strong style="color: #fff; font-size: 0.88rem; display: block;">Coinbase Pro</strong>
+                        <span style="display: block; font-size: 0.72rem; color: #10b981; margin-top: 4px; font-weight: 600;" id="exchange-status-coinbase">Connected | API: Read/Write | Sync: Just now</span>
+                      </div>
+                      <button class="btn btn-secondary btn-sm" id="btn-exchange-disconnect-coinbase" style="color: #ef4444; font-size: 0.76rem;">Disconnect</button>
+                    </div>
+
+                    <!-- Bybit (Placeholder) -->
+                    <div class="card-glass" style="padding: 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; opacity: 0.85;">
+                      <div>
+                        <strong style="color: #fff; font-size: 0.88rem; display: block;">Bybit (Coming Soon)</strong>
+                        <span style="display: block; font-size: 0.72rem; color: var(--text-muted); margin-top: 4px;">Unconnected</span>
+                      </div>
+                      <button class="btn btn-secondary btn-sm" style="font-size: 0.76rem;" onclick="alert('Bybit integration is coming soon.')">Connect</button>
+                    </div>
+
+                    <!-- OKX (Placeholder) -->
+                    <div class="card-glass" style="padding: 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; opacity: 0.85;">
+                      <div>
+                        <strong style="color: #fff; font-size: 0.88rem; display: block;">OKX (Coming Soon)</strong>
+                        <span style="display: block; font-size: 0.72rem; color: var(--text-muted); margin-top: 4px;">Unconnected</span>
+                      </div>
+                      <button class="btn btn-secondary btn-sm" style="font-size: 0.76rem;" onclick="alert('OKX integration is coming soon.')">Connect</button>
+                    </div>
+
+                    <!-- Kraken (Placeholder) -->
+                    <div class="card-glass" style="padding: 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; opacity: 0.85;">
+                      <div>
+                        <strong style="color: #fff; font-size: 0.88rem; display: block;">Kraken (Coming Soon)</strong>
+                        <span style="display: block; font-size: 0.72rem; color: var(--text-muted); margin-top: 4px;">Unconnected</span>
+                      </div>
+                      <button class="btn btn-secondary btn-sm" style="font-size: 0.76rem;" onclick="alert('Kraken integration is coming soon.')">Connect</button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- PANE 7: APPEARANCE -->
+                <div class="settings-pane" id="pane-appearance" style="display: none;">
+                  <h4 style="color:#fff; font-size:1.15rem; font-family:var(--font-display); margin:0 0 16px 0;">Visual Configuration</h4>
+                  
+                  <form id="form-settings-appearance" style="display: flex; flex-direction: column; gap: 20px;">
+                    <!-- Theme -->
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                      <label style="font-size:0.76rem; color: #fff; font-weight:600;">Color Theme Mode</label>
+                      <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                        <label style="display: flex; align-items: center; gap: 8px; font-size: 0.78rem; cursor: pointer; color: var(--text-secondary);">
+                          <input type="radio" name="ui-theme" value="glassmorphism" checked /> Dark Glassmorphism (Default)
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; font-size: 0.78rem; cursor: pointer; color: var(--text-secondary); opacity: 0.65;">
+                          <input type="radio" name="ui-theme" value="light" disabled /> Obsidian Light (Coming Soon)
+                        </label>
+                      </div>
+                    </div>
+
+                    <!-- Accent Color -->
+                    <div style="display: flex; flex-direction: column; gap: 6px; opacity: 0.85;">
+                      <label style="font-size:0.76rem; color: #fff; font-weight:600;">Accent Color Theme (Coming Soon)</label>
+                      <div style="display: flex; gap: 8px;">
+                        <span style="display:inline-block; width:20px; height:20px; border-radius:50%; background:var(--accent); border:2px solid #fff; cursor:pointer;"></span>
+                        <span style="display:inline-block; width:20px; height:20px; border-radius:50%; background:#10b981; opacity:0.65; cursor:not-allowed;"></span>
+                        <span style="display:inline-block; width:20px; height:20px; border-radius:50%; background:#f59e0b; opacity:0.65; cursor:not-allowed;"></span>
+                        <span style="display:inline-block; width:20px; height:20px; border-radius:50%; background:#ec4899; opacity:0.65; cursor:not-allowed;"></span>
+                      </div>
+                    </div>
+
+                    <!-- Layout Preferences -->
+                    <div style="display: flex; flex-direction: column; gap: 12px;">
+                      <label style="display: flex; align-items: center; gap: 10px; font-size: 0.78rem; cursor: pointer; color: var(--text-secondary);">
+                        <input type="checkbox" id="settings-ui-compact" /> Enable Compact Density spacing layout.
+                      </label>
+                      <label style="display: flex; align-items: center; gap: 10px; font-size: 0.78rem; cursor: pointer; color: var(--text-secondary);">
+                        <input type="checkbox" id="settings-ui-animations" checked /> Enable smooth visual transition animations.
+                      </label>
+                    </div>
+
+                    <!-- Language select -->
+                    <div style="display:flex; flex-direction:column; gap:4px; opacity: 0.85;">
+                      <label style="font-size:0.75rem; color:var(--text-secondary); font-weight:600;">System Language (Coming Soon)</label>
+                      <select disabled style="padding:8px 12px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.04); border-radius:8px; color:var(--text-muted); font-size:0.8rem; outline:none; cursor:not-allowed;">
+                        <option value="en">English (US)</option>
+                      </select>
+                    </div>
+
+                    <div style="margin-top: 10px;">
+                      <button type="submit" class="btn btn-primary" style="font-size:0.8rem; font-weight:600;">Save Preferences</button>
+                    </div>
+                  </form>
+                </div>
+
+                <!-- PANE 8: DATA & PRIVACY -->
+                <div class="settings-pane" id="pane-privacy" style="display: none;">
+                  <h4 style="color:#fff; font-size:1.15rem; font-family:var(--font-display); margin:0 0 16px 0;">Data & Privacy Center</h4>
+                  <p style="font-size:0.78rem; color:var(--text-secondary); line-height:1.5; margin-bottom: 20px;">
+                    Take control of your personal information, export historical database assets, or delete your registration credentials from the system.
+                  </p>
+
+                  <div style="display: flex; flex-direction: column; gap: 16px;">
+                    <!-- Download data -->
+                    <div class="card-glass" style="padding: 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+                      <div>
+                        <strong style="color: #fff; font-size: 0.88rem; display: block;">Archive & Port Data</strong>
+                        <span style="display: block; font-size: 0.72rem; color: var(--text-secondary); margin-top: 4px;">Download a JSON copy of all user details, trade archives, and settings records.</span>
+                      </div>
+                      <button class="btn btn-secondary btn-sm" id="btn-settings-download-data" style="font-size: 0.76rem;">Download Data</button>
+                    </div>
+
+                    <!-- Manage Privacy -->
+                    <div class="card-glass" style="padding: 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                      <strong style="color: #fff; font-size: 0.88rem; display: block; margin-bottom: 12px;">Privacy Settings</strong>
+                      <div style="display:flex; flex-direction:column; gap:8px;">
+                        <label style="display:flex; align-items:center; gap:8px; font-size:0.75rem; color:var(--text-secondary); cursor:pointer;">
+                          <input type="checkbox" id="settings-privacy-analytics" checked /> Share anonymous usage telemetry data.
+                        </label>
+                        <label style="display:flex; align-items:center; gap:8px; font-size:0.75rem; color:var(--text-secondary); cursor:pointer;">
+                          <input type="checkbox" id="settings-privacy-marketing" /> Receive promotional product emails and announcements.
+                        </label>
+                      </div>
+                    </div>
+
+                    <!-- Export Trades (Placeholder) -->
+                    <div class="card-glass" style="padding: 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); opacity: 0.85;">
+                      <div>
+                        <strong style="color: #fff; font-size: 0.88rem; display: block;">Export Trade Data (Coming Soon)</strong>
+                        <span style="display: block; font-size: 0.72rem; color: var(--text-muted); margin-top: 4px;">Sync and export transaction data directly to tax software layers.</span>
+                      </div>
+                    </div>
+
+                    <!-- Delete Account -->
+                    <div class="card-glass" style="padding: 16px; border-radius: 12px; border: 1px solid rgba(239,68,68,0.15); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; background: rgba(239,68,68,0.02);">
+                      <div>
+                        <strong style="color: #f87171; font-size: 0.88rem; display: block;">Delete Ravora Account</strong>
+                        <span style="display: block; font-size: 0.72rem; color: var(--text-secondary); margin-top: 4px;">Permanently delete your profile, credentials, and paper simulation records. This is irreversible.</span>
+                      </div>
+                      <button class="btn btn-secondary btn-sm" id="btn-settings-delete-account" style="background: rgba(239,68,68,0.15) !important; color: #f87171 !important; border: 1px solid rgba(239,68,68,0.3) !important; font-size: 0.76rem;">Delete Account</button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- PANE 9: ABOUT RAVORA -->
+                <div class="settings-pane" id="pane-about" style="display: none;">
+                  <h4 style="color:#fff; font-size:1.15rem; font-family:var(--font-display); margin:0 0 16px 0;">About Ravora</h4>
+                  
+                  <div style="display: flex; flex-direction: column; gap: 16px;">
+                    <div class="card-glass" style="padding: 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); display: flex; gap: 16px; align-items: center;">
+                      <div style="width: 48px; height: 48px; background: url('/favicon.svg?v=2.0') no-repeat center/contain; border-radius: 8px;"></div>
+                      <div>
+                        <strong style="color: #fff; font-size: 1rem; display: block; font-family: var(--font-display);">Ravora Wealth AI</strong>
+                        <span style="display: block; font-size: 0.75rem; color: var(--accent); font-weight: 600; margin-top: 2px;">Version 2.0.4 (Stable Release)</span>
+                      </div>
+                    </div>
+
+                    <div class="card-glass" style="padding: 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                      <strong style="color: #fff; font-size: 0.88rem; display: block; margin-bottom: 8px;">Release Notes (v2.0.4)</strong>
+                      <ul style="font-size:0.75rem; color:var(--text-secondary); line-height:1.5; padding-left: 16px; margin:0;">
+                        <li>Implemented institutional-grade AI Opportunity Center and Watchlist details grid.</li>
+                        <li>Built high-fidelity Trading Journal collapsible timeline logs.</li>
+                        <li>Configured AWS Key Management Service (KMS) encryption protocols for exchange APIs.</li>
+                        <li>Integrated Supabase JWT security architecture and verification structures.</li>
+                      </ul>
+                    </div>
+
+                    <div style="display: flex; gap: 16px; font-size: 0.72rem; flex-wrap: wrap;">
+                      <a href="#" style="color: var(--accent); font-weight: 600; text-decoration: none;" onclick="alert('Opening Terms of Service.')">Terms of Service</a>
+                      <a href="#" style="color: var(--accent); font-weight: 600; text-decoration: none;" onclick="alert('Opening Privacy Policy.')">Privacy Policy</a>
+                      <a href="#" style="color: var(--accent); font-weight: 600; text-decoration: none;" onclick="alert('Opening Support documentation.')">Support & Documentation</a>
+                    </div>
+                  </div>
+                </div>
+
               </div>
+
             </div>
           </div>
         </section>

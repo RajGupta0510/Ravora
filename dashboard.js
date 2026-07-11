@@ -2734,10 +2734,11 @@ document.addEventListener('DOMContentLoaded', () => {
     } else if (screenId === 'history') {
       renderTradeHistoryRowsLocal();
     } else if (screenId === 'notifications') {
-      // Mark notifications read on the backend
       apiCall('/notifications/read', { method: 'POST' }).then(() => {
         loadNotifications();
       });
+    } else if (screenId === 'settings') {
+      loadSettingsCenter();
     }
 
     if (pushState) {
@@ -7144,7 +7145,478 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ==========================================================================
+  // Settings & Personalization Center
+  // ==========================================================================
+  async function loadSettingsCenter() {
+    try {
+      const data = await apiCall('/user/profile');
+      if (!data) return;
+
+      const fullNameInput = document.getElementById('settings-profile-fullname');
+      const usernameInput = document.getElementById('settings-profile-username');
+      const emailInput = document.getElementById('settings-profile-email');
+      const phoneInput = document.getElementById('settings-profile-phone');
+      const countryInput = document.getElementById('settings-profile-country');
+      const timezoneSelect = document.getElementById('settings-profile-timezone');
+      const currencySelect = document.getElementById('settings-profile-currency');
+
+      const metaFullName = document.getElementById('profile-meta-fullname');
+      const metaEmail = document.getElementById('profile-meta-email');
+      const avatarPlaceholder = document.getElementById('profile-avatar-placeholder');
+
+      if (fullNameInput) fullNameInput.value = data.profile.full_name || '';
+      if (usernameInput) usernameInput.value = data.profile.username || '';
+      if (emailInput) emailInput.value = data.email || '';
+      if (phoneInput) phoneInput.value = data.profile.mobile_number || '';
+      if (countryInput) countryInput.value = data.profile.country || '';
+      if (timezoneSelect) timezoneSelect.value = data.profile.timezone || 'UTC';
+      if (currencySelect) currencySelect.value = data.profile.preferred_currency || 'USD';
+
+      if (metaFullName) metaFullName.textContent = data.profile.full_name || 'User';
+      if (metaEmail) metaEmail.textContent = data.email || '';
+      if (avatarPlaceholder) {
+        const nameChar = (data.profile.full_name || data.email || 'U')[0].toUpperCase();
+        avatarPlaceholder.textContent = nameChar;
+      }
+
+      const emailDot = document.getElementById('badge-email-verification-dot');
+      const emailText = document.getElementById('badge-email-verification-text');
+      const phoneDot = document.getElementById('badge-phone-verification-dot');
+      const phoneText = document.getElementById('badge-phone-verification-text');
+
+      if (emailDot && emailText) {
+        if (data.profile.verified_email) {
+          emailDot.style.background = '#10b981';
+          emailText.textContent = 'Email Verified';
+        } else {
+          emailDot.style.background = '#f59e0b';
+          emailText.textContent = 'Email Unverified';
+        }
+      }
+
+      if (phoneDot && phoneText) {
+        if (data.profile.verified_mobile) {
+          phoneDot.style.background = '#10b981';
+          phoneText.textContent = 'Phone Verified';
+        } else {
+          phoneDot.style.background = '#ef4444';
+          phoneText.textContent = 'Phone Unverified';
+        }
+      }
+
+      const riskStance = data.profile.risk_stance || 'balanced';
+      const riskVal = riskStance === 'conservative' ? '0' : (riskStance === 'aggressive' ? '2' : '1');
+      const riskRadio = document.querySelector(`input[name="ai-risk"][value="${riskVal}"]`);
+      if (riskRadio) riskRadio.checked = true;
+
+      const preferredMarkets = data.profile.preferred_markets || ['Crypto'];
+      document.querySelectorAll('input[name="ai-markets"]').forEach(chk => {
+        chk.checked = preferredMarkets.includes(chk.value);
+      });
+
+      const respStyle = localStorage.getItem('ravora_ai_response_style') || 'balanced';
+      const respRadio = document.querySelector(`input[name="ai-response-style"][value="${respStyle}"]`);
+      if (respRadio) respRadio.checked = true;
+
+      const tradePlansChk = document.getElementById('settings-ai-trade-plans');
+      const morningBriefChk = document.getElementById('settings-ai-morning-brief');
+      if (tradePlansChk) tradePlansChk.checked = localStorage.getItem('ravora_ai_trade_plans') !== 'false';
+      if (morningBriefChk) morningBriefChk.checked = localStorage.getItem('ravora_ai_morning_brief') !== 'false';
+
+      const notifCatPrice = document.getElementById('notif-cat-price');
+      const notifCatPortfolio = document.getElementById('notif-cat-portfolio');
+      const notifCatRisk = document.getElementById('notif-cat-risk');
+      const notifCatOpp = document.getElementById('notif-cat-opp');
+      const notifChanEmail = document.getElementById('notif-chan-email');
+      const notifChanPush = document.getElementById('notif-chan-push');
+
+      if (notifCatPrice) notifCatPrice.checked = localStorage.getItem('ravora_notif_price') !== 'false';
+      if (notifCatPortfolio) notifCatPortfolio.checked = localStorage.getItem('ravora_notif_portfolio') !== 'false';
+      if (notifCatRisk) notifCatRisk.checked = localStorage.getItem('ravora_notif_risk') !== 'false';
+      if (notifCatOpp) notifCatOpp.checked = localStorage.getItem('ravora_notif_opp') !== 'false';
+      if (notifChanEmail) notifChanEmail.checked = localStorage.getItem('ravora_notif_email') !== 'false';
+      if (notifChanPush) notifChanPush.checked = localStorage.getItem('ravora_notif_push') !== 'false';
+
+      const timeframeSelect = document.getElementById('settings-trading-timeframe');
+      const chartTypeSelect = document.getElementById('settings-trading-charttype');
+      const sizeInput = document.getElementById('settings-trading-size');
+      const riskPctInput = document.getElementById('settings-trading-riskpct');
+      const currencyFmtSelect = document.getElementById('settings-trading-currencyfmt');
+      const dateFmtSelect = document.getElementById('settings-trading-datefmt');
+
+      if (timeframeSelect) timeframeSelect.value = localStorage.getItem('ravora_trading_timeframe') || '4h';
+      if (chartTypeSelect) chartTypeSelect.value = localStorage.getItem('ravora_trading_charttype') || 'candlestick';
+      if (sizeInput) sizeInput.value = localStorage.getItem('ravora_trading_size') || '10000';
+      if (riskPctInput) riskPctInput.value = localStorage.getItem('ravora_trading_riskpct') || '2';
+      if (currencyFmtSelect) currencyFmtSelect.value = localStorage.getItem('ravora_trading_currencyfmt') || 'prefix';
+      if (dateFmtSelect) dateFmtSelect.value = localStorage.getItem('ravora_trading_datefmt') || 'us';
+
+      const statusBinance = document.getElementById('exchange-status-binance');
+      const statusCoinbase = document.getElementById('exchange-status-coinbase');
+      const binanceDisconnected = localStorage.getItem('ravora_exchange_disconnected_binance') === 'true';
+      const coinbaseDisconnected = localStorage.getItem('ravora_exchange_disconnected_coinbase') === 'true';
+
+      if (statusBinance) {
+        if (binanceDisconnected) {
+          statusBinance.textContent = 'Unconnected';
+          statusBinance.style.color = 'var(--text-muted)';
+          document.getElementById('btn-exchange-disconnect-binance').textContent = 'Connect';
+          document.getElementById('btn-exchange-disconnect-binance').style.color = 'var(--accent)';
+        } else {
+          statusBinance.textContent = 'Connected | API: Read/Write | Sync: Just now';
+          statusBinance.style.color = '#10b981';
+          document.getElementById('btn-exchange-disconnect-binance').textContent = 'Disconnect';
+          document.getElementById('btn-exchange-disconnect-binance').style.color = '#ef4444';
+        }
+      }
+
+      if (statusCoinbase) {
+        if (coinbaseDisconnected) {
+          statusCoinbase.textContent = 'Unconnected';
+          statusCoinbase.style.color = 'var(--text-muted)';
+          document.getElementById('btn-exchange-disconnect-coinbase').textContent = 'Connect';
+          document.getElementById('btn-exchange-disconnect-coinbase').style.color = 'var(--accent)';
+        } else {
+          statusCoinbase.textContent = 'Connected | API: Read/Write | Sync: Just now';
+          statusCoinbase.style.color = '#10b981';
+          document.getElementById('btn-exchange-disconnect-coinbase').textContent = 'Disconnect';
+          document.getElementById('btn-exchange-disconnect-coinbase').style.color = '#ef4444';
+        }
+      }
+
+      const compactChk = document.getElementById('settings-ui-compact');
+      const animationsChk = document.getElementById('settings-ui-animations');
+      
+      if (compactChk) compactChk.checked = localStorage.getItem('ravora_ui_compact') === 'true';
+      if (animationsChk) animationsChk.checked = localStorage.getItem('ravora_ui_animations') !== 'false';
+
+      await refreshActiveSessionsList();
+    } catch (err) {
+      console.error('Error loading settings center:', err);
+    }
+  }
+
+  async function refreshActiveSessionsList() {
+    const tbody = document.getElementById('settings-sessions-tbody');
+    if (!tbody) return;
+
+    try {
+      const devices = await apiCall('/user/profile/devices');
+      if (devices && devices.length > 0) {
+        tbody.innerHTML = devices.map(dev => `
+          <tr style="border-bottom: 1px solid rgba(255,255,255,0.02); height: 36px;">
+            <td style="padding: 6px 8px; color: #fff;">${dev.ip_address || '127.0.0.1'}</td>
+            <td style="padding: 6px 8px; color: var(--text-secondary); max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${dev.user_agent || 'Chrome / Windows'}</td>
+            <td style="padding: 6px 8px; color: var(--text-muted);">${new Date(dev.last_login_at || Date.now()).toLocaleTimeString()}</td>
+          </tr>
+        `).join('');
+      } else {
+        tbody.innerHTML = `
+          <tr style="border-bottom: 1px solid rgba(255,255,255,0.02); height: 36px;">
+            <td style="padding: 6px 8px; color: #fff;">127.0.0.1</td>
+            <td style="padding: 6px 8px; color: var(--text-secondary);">Chrome (Windows)</td>
+            <td style="padding: 6px 8px; color: var(--text-muted);">Current Session</td>
+          </tr>
+        `;
+      }
+    } catch (err) {
+      tbody.innerHTML = `
+        <tr style="border-bottom: 1px solid rgba(255,255,255,0.02); height: 36px;">
+          <td style="padding: 6px 8px; color: #fff;">127.0.0.1</td>
+          <td style="padding: 6px 8px; color: var(--text-secondary);">Chrome (Windows)</td>
+          <td style="padding: 6px 8px; color: var(--text-muted);">Current Session</td>
+        </tr>
+      `;
+    }
+  }
+
+  function initializeSettingsCenterEvents() {
+    const navButtons = document.querySelectorAll('#settings-nav-menu .settings-menu-btn');
+    const panes = document.querySelectorAll('#settings-panes-container .settings-pane');
+
+    navButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        navButtons.forEach(b => b.classList.remove('active'));
+        panes.forEach(p => {
+          p.classList.remove('active');
+          p.style.display = 'none';
+        });
+
+        btn.classList.add('active');
+        const targetPane = document.getElementById(`pane-${btn.getAttribute('data-pane')}`);
+        if (targetPane) {
+          targetPane.classList.add('active');
+          targetPane.style.display = 'block';
+        }
+      });
+    });
+
+    const formProfile = document.getElementById('form-settings-profile');
+    if (formProfile) {
+      formProfile.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const fullName = document.getElementById('settings-profile-fullname').value;
+        const username = document.getElementById('settings-profile-username').value;
+        const phone = document.getElementById('settings-profile-phone').value;
+        const country = document.getElementById('settings-profile-country').value;
+        const timezone = document.getElementById('settings-profile-timezone').value;
+        const currency = document.getElementById('settings-profile-currency').value;
+
+        try {
+          const res = await apiCall('/user/profile', {
+            method: 'PUT',
+            body: {
+              fullName,
+              mobileNumber: phone,
+              username,
+              country,
+              timezone,
+              preferredCurrency: currency
+            }
+          });
+          if (res && res.success) {
+            showToast('Profile updated successfully.');
+            const headerUserNameEl = document.getElementById('header-user-display-name');
+            if (headerUserNameEl) {
+              headerUserNameEl.textContent = fullName;
+            }
+            loadSettingsCenter();
+          } else {
+            showToast('Error updating profile.');
+          }
+        } catch (e) {
+          showToast('Failed to update profile settings.');
+        }
+      });
+    }
+
+    const formPassword = document.getElementById('form-settings-password');
+    if (formPassword) {
+      formPassword.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const currentPassword = document.getElementById('settings-pwd-current').value;
+        const newPassword = document.getElementById('settings-pwd-new').value;
+        const confirmPassword = document.getElementById('settings-pwd-confirm').value;
+
+        if (!currentPassword || !newPassword || !confirmPassword) {
+          showToast('Please fill in all password fields.');
+          return;
+        }
+
+        try {
+          const res = await apiCall('/auth/change-password', {
+            method: 'POST',
+            body: { currentPassword, newPassword, confirmPassword }
+          });
+          if (res && res.success) {
+            showToast('Password updated successfully.');
+            formPassword.reset();
+          } else {
+            showToast(res.error || 'Error changing password.');
+          }
+        } catch (err) {
+          showToast('Failed to change password.');
+        }
+      });
+    }
+
+    const btnSignoutOthers = document.getElementById('btn-settings-signout-others');
+    if (btnSignoutOthers) {
+      btnSignoutOthers.addEventListener('click', async () => {
+        if (!confirm('Are you sure you want to sign out other devices?')) return;
+        try {
+          const res = await apiCall('/user/profile/devices/all-others', { method: 'DELETE' });
+          if (res && res.success) {
+            showToast('Signed out of other devices.');
+            refreshActiveSessionsList();
+          } else {
+            showToast('Error signing out of other devices.');
+          }
+        } catch (e) {
+          showToast('Failed to sign out other devices.');
+        }
+      });
+    }
+
+    const formAi = document.getElementById('form-settings-ai');
+    if (formAi) {
+      formAi.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const riskLevel = document.querySelector('input[name="ai-risk"]:checked').value;
+        const preferredMarkets = Array.from(document.querySelectorAll('input[name="ai-markets"]:checked')).map(el => el.value);
+        const responseStyle = document.querySelector('input[name="ai-response-style"]:checked').value;
+        const tradePlans = document.getElementById('settings-ai-trade-plans').checked;
+        const morningBrief = document.getElementById('settings-ai-morning-brief').checked;
+
+        localStorage.setItem('ravora_ai_response_style', responseStyle);
+        localStorage.setItem('ravora_ai_trade_plans', tradePlans ? 'true' : 'false');
+        localStorage.setItem('ravora_ai_morning_brief', morningBrief ? 'true' : 'false');
+
+        try {
+          const res = await apiCall('/user/onboard', {
+            method: 'POST',
+            body: {
+              experience: state.profile.experience_level || 'active',
+              goal: state.profile.primary_goal || 'growth',
+              riskLevel: parseInt(riskLevel),
+              markets: preferredMarkets,
+              workspace: state.profile.dashboard_layout || 'balanced',
+              araiven: ['opportunities', 'trends', 'plans']
+            }
+          });
+          if (res && res.success) {
+            showToast('AI preferences saved successfully.');
+            state.profile.riskLevel = parseInt(riskLevel);
+          } else {
+            showToast('Error saving AI preferences.');
+          }
+        } catch (err) {
+          showToast('Failed to save AI preferences.');
+        }
+      });
+    }
+
+    const formNotif = document.getElementById('form-settings-notif');
+    if (formNotif) {
+      formNotif.addEventListener('submit', (e) => {
+        e.preventDefault();
+        localStorage.setItem('ravora_notif_price', document.getElementById('notif-cat-price').checked ? 'true' : 'false');
+        localStorage.setItem('ravora_notif_portfolio', document.getElementById('notif-cat-portfolio').checked ? 'true' : 'false');
+        localStorage.setItem('ravora_notif_risk', document.getElementById('notif-cat-risk').checked ? 'true' : 'false');
+        localStorage.setItem('ravora_notif_opp', document.getElementById('notif-cat-opp').checked ? 'true' : 'false');
+        localStorage.setItem('ravora_notif_email', document.getElementById('notif-chan-email').checked ? 'true' : 'false');
+        localStorage.setItem('ravora_notif_push', document.getElementById('notif-chan-push').checked ? 'true' : 'false');
+        showToast('Notification subscriptions saved.');
+      });
+    }
+
+    const formTrading = document.getElementById('form-settings-trading');
+    if (formTrading) {
+      formTrading.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const timeframe = document.getElementById('settings-trading-timeframe').value;
+        const chartType = document.getElementById('settings-trading-charttype').value;
+        const size = document.getElementById('settings-trading-size').value;
+        const riskPct = document.getElementById('settings-trading-riskpct').value;
+        const currencyFmt = document.getElementById('settings-trading-currencyfmt').value;
+        const dateFmt = document.getElementById('settings-trading-datefmt').value;
+
+        localStorage.setItem('ravora_trading_timeframe', timeframe);
+        localStorage.setItem('ravora_trading_charttype', chartType);
+        localStorage.setItem('ravora_trading_size', size);
+        localStorage.setItem('ravora_trading_riskpct', riskPct);
+        localStorage.setItem('ravora_trading_currencyfmt', currencyFmt);
+        localStorage.setItem('ravora_trading_datefmt', dateFmt);
+
+        if (window.chartStateManager) {
+          window.chartStateManager.timeframe = timeframe;
+          window.chartStateManager.chartType = chartType;
+          if (state.currentScreen === 'dashboard') {
+            updateTerminalView(state.selectedAsset || 'BTC', timeframe);
+          }
+        }
+
+        showToast('Trading preferences updated.');
+      });
+    }
+
+    const btnDisconnectBinance = document.getElementById('btn-exchange-disconnect-binance');
+    if (btnDisconnectBinance) {
+      btnDisconnectBinance.addEventListener('click', () => {
+        const disVal = localStorage.getItem('ravora_exchange_disconnected_binance') === 'true';
+        localStorage.setItem('ravora_exchange_disconnected_binance', disVal ? 'false' : 'true');
+        loadSettingsCenter();
+        showToast(disVal ? 'Binance US Connected.' : 'Binance US Disconnected.');
+      });
+    }
+
+    const btnDisconnectCoinbase = document.getElementById('btn-exchange-disconnect-coinbase');
+    if (btnDisconnectCoinbase) {
+      btnDisconnectCoinbase.addEventListener('click', () => {
+        const disVal = localStorage.getItem('ravora_exchange_disconnected_coinbase') === 'true';
+        localStorage.setItem('ravora_exchange_disconnected_coinbase', disVal ? 'false' : 'true');
+        loadSettingsCenter();
+        showToast(disVal ? 'Coinbase Pro Connected.' : 'Coinbase Pro Disconnected.');
+      });
+    }
+
+    const formAppearance = document.getElementById('form-settings-appearance');
+    if (formAppearance) {
+      formAppearance.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const isCompact = document.getElementById('settings-ui-compact').checked;
+        const hasAnimations = document.getElementById('settings-ui-animations').checked;
+
+        localStorage.setItem('ravora_ui_compact', isCompact ? 'true' : 'false');
+        localStorage.setItem('ravora_ui_animations', hasAnimations ? 'true' : 'false');
+
+        if (isCompact) {
+          document.body.classList.add('compact-mode');
+        } else {
+          document.body.classList.remove('compact-mode');
+        }
+
+        if (hasAnimations) {
+          document.body.classList.remove('no-transitions');
+        } else {
+          document.body.classList.add('no-transitions');
+        }
+
+        showToast('Appearance preferences updated.');
+      });
+    }
+
+    const btnDownloadData = document.getElementById('btn-settings-download-data');
+    if (btnDownloadData) {
+      btnDownloadData.addEventListener('click', async () => {
+        try {
+          const profile = await apiCall('/user/profile');
+          const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(profile, null, 2));
+          const downloadAnchor = document.createElement('a');
+          downloadAnchor.setAttribute("href", dataStr);
+          downloadAnchor.setAttribute("download", "ravora_account_data.json");
+          document.body.appendChild(downloadAnchor);
+          downloadAnchor.click();
+          downloadAnchor.remove();
+          showToast('Data archive downloaded successfully.');
+        } catch (e) {
+          showToast('Failed to download data.');
+        }
+      });
+    }
+
+    const btnDeleteAccount = document.getElementById('btn-settings-delete-account');
+    if (btnDeleteAccount) {
+      btnDeleteAccount.addEventListener('click', async () => {
+        const pass1 = confirm('WARNING: Are you absolutely sure you want to permanently delete your Ravora account? This will erase all trades, data, and configurations.');
+        if (!pass1) return;
+        const pass2 = prompt('Type "DELETE" to confirm account erasure:');
+        if (pass2 !== 'DELETE') {
+          showToast('Erasing cancelled.');
+          return;
+        }
+
+        try {
+          const res = await apiCall('/user/profile/account', { method: 'DELETE' });
+          if (res && res.success) {
+            showToast('Account successfully deleted. Logging out...');
+            setTimeout(() => {
+              localStorage.clear();
+              window.location.href = '/';
+            }, 1500);
+          } else {
+            showToast('Error deleting account.');
+          }
+        } catch (e) {
+          showToast('Failed to delete account.');
+        }
+      });
+    }
+  }
+
+  // ==========================================================================
   // Header Actions Binds
+  // ==========================================================================
   // ==========================================================================
   if (btnHeaderManualScan) {
     btnHeaderManualScan.addEventListener('click', async () => {
@@ -7382,6 +7854,7 @@ document.addEventListener('DOMContentLoaded', () => {
       initializeJournalFilterEvents();
       initializeWatchlistCenterEvents();
       initializeNotificationsCenterEvents();
+      initializeSettingsCenterEvents();
       state.terminalEventsInitialized = true;
     }
   }

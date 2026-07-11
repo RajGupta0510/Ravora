@@ -12,14 +12,23 @@ export const getProfile = async (req, res) => {
       return res.json({ email: req.user.email, onboardingCompleted: false });
     }
 
+    const user = await dbGet('SELECT email, mobile_number, full_name, verified_email, verified_mobile FROM users WHERE id = ?', [userId]);
     const risk = await dbGet('SELECT * FROM risk_profiles WHERE user_id = ?', [userId]);
     const settings = await dbGet('SELECT * FROM user_settings WHERE user_id = ?', [userId]);
     const portfolio = await dbGet('SELECT * FROM portfolios WHERE user_id = ?', [userId]);
 
     return res.json({
-      email: req.user.email,
+      email: user ? user.email : req.user.email,
       onboardingCompleted: true,
       profile: {
+        full_name: user ? user.full_name : '',
+        mobile_number: user ? user.mobile_number : '',
+        verified_email: user ? (user.verified_email === 1) : false,
+        verified_mobile: user ? (user.verified_mobile === 1) : false,
+        username: profile.username || '',
+        country: profile.country || '',
+        timezone: profile.timezone || '',
+        preferred_currency: profile.preferred_currency || '',
         experience_level: profile.experience_level,
         primary_goal: profile.primary_goal,
         risk_stance: risk ? risk.risk_stance : 'balanced',
@@ -257,5 +266,67 @@ export const removeFromWatchlist = async (req, res) => {
   } catch (err) {
     console.error('Error removing from watchlist:', err);
     return res.status(500).json({ error: 'Failed to remove from watchlist.' });
+  }
+};
+
+export const updateUserProfile = async (req, res) => {
+  const userId = req.user.id;
+  const { fullName, mobileNumber, username, country, timezone, preferredCurrency } = req.body;
+
+  try {
+    await dbRun(
+      'UPDATE users SET full_name = ?, mobile_number = ? WHERE id = ?',
+      [fullName, mobileNumber, userId]
+    );
+
+    await dbRun(
+      `UPDATE user_profiles SET 
+         username = ?, 
+         country = ?, 
+         timezone = ?, 
+         preferred_currency = ?, 
+         updated_at = CURRENT_TIMESTAMP 
+       WHERE user_id = ?`,
+      [username, country, timezone, preferredCurrency, userId]
+    );
+
+    return res.json({ success: true, message: 'Profile updated successfully.' });
+  } catch (err) {
+    console.error('Error updating profile settings:', err);
+    return res.status(500).json({ error: 'Failed to update profile settings.' });
+  }
+};
+
+export const getActiveDevices = async (req, res) => {
+  const userId = req.user.id;
+  try {
+    const list = await dbQuery('SELECT * FROM user_devices WHERE user_id = ? ORDER BY last_login_at DESC', [userId]);
+    return res.json(list);
+  } catch (err) {
+    console.error('Error getting active devices:', err);
+    return res.status(500).json({ error: 'Failed to retrieve active sessions.' });
+  }
+};
+
+export const signOutOtherDevices = async (req, res) => {
+  const userId = req.user.id;
+  const fingerprint = req.headers['device-fingerprint'] || 'current-session';
+  try {
+    await dbRun('DELETE FROM user_devices WHERE user_id = ? AND device_fingerprint != ?', [userId, fingerprint]);
+    return res.json({ success: true, message: 'Signed out from other sessions successfully.' });
+  } catch (err) {
+    console.error('Error signing out other sessions:', err);
+    return res.status(500).json({ error: 'Failed to sign out other sessions.' });
+  }
+};
+
+export const deleteUserAccount = async (req, res) => {
+  const userId = req.user.id;
+  try {
+    await dbRun('DELETE FROM users WHERE id = ?', [userId]);
+    return res.json({ success: true, message: 'Account deleted successfully.' });
+  } catch (err) {
+    console.error('Error deleting account:', err);
+    return res.status(500).json({ error: 'Failed to delete account.' });
   }
 };

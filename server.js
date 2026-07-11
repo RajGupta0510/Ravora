@@ -4,8 +4,8 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { initializeDatabase, dbQuery } from './src/database.js';
 import { verifyToken } from './src/middleware/auth.js';
-import { register, login, verifyOtp, resendOtp, requestPasswordRecovery, resetPassword, socialLogin, checkAccount } from './src/controllers/authController.js';
-import { getProfile, onboard, updateSettings, getWatchlist, addToWatchlist, removeFromWatchlist } from './src/controllers/userController.js';
+import { register, login, verifyOtp, resendOtp, requestPasswordRecovery, resetPassword, socialLogin, checkAccount, changePassword } from './src/controllers/authController.js';
+import { getProfile, onboard, updateSettings, getWatchlist, addToWatchlist, removeFromWatchlist, updateUserProfile, getActiveDevices, signOutOtherDevices, deleteUserAccount } from './src/controllers/userController.js';
 import { getPortfolio, getPortfolioHistory, getTransactions, closePosition } from './src/controllers/portfolioController.js';
 import { getOpportunities, getRecommendations, executeRecommendation, deployOpportunity, scanMarkets } from './src/controllers/opportunityController.js';
 import { copilotMessage, getNotifications, markNotificationsRead, connectExchange, markSingleNotificationRead, deleteNotification } from './src/controllers/copilotController.js';
@@ -63,6 +63,7 @@ apiRouter.post('/auth/otp/resend', resendOtp);
 apiRouter.post('/auth/forgot-password/request', requestPasswordRecovery);
 apiRouter.post('/auth/forgot-password/reset', resetPassword);
 apiRouter.post('/auth/social', socialLogin);
+apiRouter.post('/auth/change-password', verifyToken, changePassword);
 
 // Market Data Layer v1 Endpoints (Public)
 apiRouter.get('/market/prices', async (req, res) => {
@@ -144,6 +145,10 @@ apiRouter.get('/market/opportunities/top', async (req, res) => {
 
 // User Profile & Onboarding (Protected)
 apiRouter.get('/user/profile', verifyToken, getProfile);
+apiRouter.put('/user/profile', verifyToken, updateUserProfile);
+apiRouter.get('/user/profile/devices', verifyToken, getActiveDevices);
+apiRouter.delete('/user/profile/devices/all-others', verifyToken, signOutOtherDevices);
+apiRouter.delete('/user/profile/account', verifyToken, deleteUserAccount);
 apiRouter.post('/user/onboard', verifyToken, onboard);
 apiRouter.post('/user/settings', verifyToken, updateSettings);
 apiRouter.get('/watchlist', verifyToken, getWatchlist);

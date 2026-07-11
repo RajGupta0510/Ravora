@@ -662,6 +662,22 @@ export const initializeDatabase = async () => {
   } catch (e) {
     // Ignore error if column already exists
   }
+  try {
+    await dbRun('ALTER TABLE user_profiles ADD COLUMN username TEXT;');
+    console.log('[Migration] Added username column to user_profiles');
+  } catch (e) {}
+  try {
+    await dbRun('ALTER TABLE user_profiles ADD COLUMN country TEXT;');
+    console.log('[Migration] Added country column to user_profiles');
+  } catch (e) {}
+  try {
+    await dbRun('ALTER TABLE user_profiles ADD COLUMN timezone TEXT;');
+    console.log('[Migration] Added timezone column to user_profiles');
+  } catch (e) {}
+  try {
+    await dbRun('ALTER TABLE user_profiles ADD COLUMN preferred_currency TEXT;');
+    console.log('[Migration] Added preferred_currency column to user_profiles');
+  } catch (e) {}
 };
 
 export default db;
