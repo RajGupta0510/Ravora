@@ -3298,16 +3298,12 @@ document.addEventListener('DOMContentLoaded', () => {
           trendSymbol = '↓';
         }
 
-        // Icons mapping
-        const icons = {
-          'BTC': '₿',
-          'ETH': 'Ξ',
-          'SOL': '◎',
-          'LINK': '⬡',
-          'SUI': '💧',
-          'BNB': '🔶'
-        };
-        const icon = icons[ad.symbol] || '🪙';
+        const iconHtml = `
+          <div style="position: relative; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+            <img src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/${ad.symbol.toLowerCase()}.png" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" style="width: 18px; height: 18px; border-radius: 50%;" />
+            <span style="display: none; width: 18px; height: 18px; border-radius: 50%; background: rgba(255,255,255,0.08); align-items: center; justify-content: center; font-size: 0.55rem; color: #fff; font-weight: 700; text-transform: uppercase;">${ad.symbol.substring(0, 2)}</span>
+          </div>
+        `;
 
         // Check if watchlisted
         const isWatch = state.watchlistAssets.includes(ad.symbol);
@@ -3316,7 +3312,7 @@ document.addEventListener('DOMContentLoaded', () => {
         tr.innerHTML = `
           <td style="padding: 6px 12px; border-bottom: none;">
             <div style="display: flex; align-items: center; gap: 8px;">
-              <span style="font-size: 1rem; width: 18px; text-align: center; color: var(--accent);">${icon}</span>
+              ${iconHtml}
               <div>
                 <strong style="font-size: 0.78rem; color: #fff; display: block;">${ad.symbol}</strong>
                 <span style="font-size: 0.58rem; color: var(--text-muted); display: block; max-width: 60px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${ad.name}</span>
@@ -3523,7 +3519,14 @@ document.addEventListener('DOMContentLoaded', () => {
         ? livePrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
         : livePrice.toLocaleString(undefined, { minimumFractionDigits: 4, maximumFractionDigits: 4 });
 
-      if (activeIcon) activeIcon.textContent = opp.icon || '₿';
+      if (activeIcon) {
+        activeIcon.innerHTML = `
+          <div style="position: relative; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+            <img src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/${symbol.toLowerCase()}.png" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" style="width: 18px; height: 18px; border-radius: 50%;" />
+            <span style="display: none; width: 18px; height: 18px; border-radius: 50%; background: rgba(255,255,255,0.08); align-items: center; justify-content: center; font-size: 0.55rem; color: #fff; font-weight: 700; text-transform: uppercase;">${symbol.substring(0, 2)}</span>
+          </div>
+        `;
+      }
       if (activeName) activeName.textContent = details.name;
       if (activeSymbol) activeSymbol.textContent = `${symbol} / USD`;
       if (chartPrice) chartPrice.textContent = `$${priceFormatted}`;
@@ -5128,7 +5131,15 @@ document.addEventListener('DOMContentLoaded', () => {
     if (drawerTitle) drawerTitle.textContent = 'Opportunity Reasoning';
     if (drawerAssetName) drawerAssetName.textContent = opp.name;
     if (drawerAssetSymbol) drawerAssetSymbol.textContent = opp.symbol;
-    if (drawerAssetIcon) drawerAssetIcon.textContent = opp.icon;
+    if (drawerAssetIcon) {
+      const cleanSym = (opp.symbol || 'BTC').split('/')[0].trim().toUpperCase();
+      drawerAssetIcon.innerHTML = `
+        <div style="position: relative; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-right: 4px;">
+          <img src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/${cleanSym.toLowerCase()}.png" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" style="width: 26px; height: 26px; border-radius: 50%;" />
+          <span style="display: none; width: 26px; height: 26px; border-radius: 50%; background: rgba(255,255,255,0.08); align-items: center; justify-content: center; font-size: 0.7rem; color: #fff; font-weight: 700; text-transform: uppercase;">${cleanSym.substring(0, 2)}</span>
+        </div>
+      `;
+    }
     if (drawerBadgeConf) drawerBadgeConf.textContent = `${opp.confidenceScore}% Confidence`;
     if (drawerReasoningText) drawerReasoningText.textContent = opp.reasoningText;
     if (drawerStatReturn) drawerStatReturn.textContent = opp.expectedReturn;
