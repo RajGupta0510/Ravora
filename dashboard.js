@@ -1,3 +1,323 @@
+class RavoraToastManager {
+  constructor() {
+    this.container = null;
+    this.toasts = [];
+    this.maxToasts = 5;
+  }
+
+  init() {
+    this.container = document.querySelector('.ravora-toast-container');
+    if (!this.container) {
+      this.container = document.createElement('div');
+      this.container.className = 'ravora-toast-container';
+      document.body.appendChild(this.container);
+    }
+  }
+
+  getIcon(type) {
+    const icons = {
+      success: `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`,
+      error: `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`,
+      warning: `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`,
+      info: `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#3b82f6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>`,
+      loading: `<div class="ravora-toast-spinner"></div>`
+    };
+    return icons[type] || '';
+  }
+
+  show({ type = 'info', title = '', description = '', action = null, duration = null }) {
+    this.init();
+
+    const isDuplicate = this.toasts.some(t => t.title === title && t.description === description && t.active);
+    if (isDuplicate) return null;
+
+    const activeToasts = this.toasts.filter(t => t.active);
+    if (activeToasts.length >= this.maxToasts) {
+      const oldest = activeToasts[0];
+      this.dismiss(oldest.id);
+    }
+
+    const id = 'toast_' + Math.random().toString(36).substring(2, 9);
+    const toastEl = document.createElement('div');
+    toastEl.className = `ravora-toast toast-${type} entering`;
+    toastEl.id = id;
+    toastEl.setAttribute('role', type === 'error' || type === 'warning' ? 'alert' : 'status');
+    toastEl.setAttribute('aria-live', type === 'error' || type === 'warning' ? 'assertive' : 'polite');
+
+    const iconHtml = this.getIcon(type);
+    
+    let actionBtnHtml = '';
+    if (action && action.text && action.callback) {
+      actionBtnHtml = `
+        <div class="ravora-toast-actions">
+          <button class="ravora-toast-btn-action">${action.text}</button>
+        </div>
+      `;
+    }
+
+    let finalDuration = duration;
+    if (finalDuration === null) {
+      if (type === 'success') finalDuration = 4000;
+      else if (type === 'info') finalDuration = 5000;
+      else if (type === 'warning') finalDuration = 6000;
+      else finalDuration = 0;
+    }
+
+    let progressHtml = '';
+    if (finalDuration > 0) {
+      progressHtml = `<div class="ravora-toast-progress" style="animation: ravoraToastProgress ${finalDuration}ms linear forwards;"></div>`;
+    }
+
+    toastEl.innerHTML = `
+      <div class="ravora-toast-icon">${iconHtml}</div>
+      <div class="ravora-toast-content">
+        <span class="ravora-toast-title">${title}</span>
+        ${description ? `<span class="ravora-toast-desc">${description}</span>` : ''}
+        ${actionBtnHtml}
+      </div>
+      <button class="ravora-toast-close" aria-label="Close notification">×</button>
+      ${progressHtml}
+    `;
+
+    if (finalDuration > 0 && !document.getElementById('toast-progress-keyframes')) {
+      const style = document.createElement('style');
+      style.id = 'toast-progress-keyframes';
+      style.innerHTML = `
+        @keyframes ravoraToastProgress {
+          from { transform: scaleX(1); }
+          to { transform: scaleX(0); }
+        }
+      `;
+      document.head.appendChild(style);
+    }
+
+    this.container.appendChild(toastEl);
+
+    setTimeout(() => {
+      toastEl.classList.remove('entering');
+      toastEl.classList.add('active');
+    }, 10);
+
+    const toastState = {
+      id,
+      el: toastEl,
+      type,
+      title,
+      description,
+      active: true,
+      duration: finalDuration,
+      timer: null,
+      timeLeft: finalDuration,
+      startTime: Date.now()
+    };
+
+    toastEl.querySelector('.ravora-toast-close').addEventListener('click', () => {
+      this.dismiss(id);
+    });
+
+    if (action && action.callback) {
+      const actBtn = toastEl.querySelector('.ravora-toast-btn-action');
+      if (actBtn) {
+        actBtn.addEventListener('click', (e) => {
+          action.callback(e);
+          this.dismiss(id);
+        });
+      }
+    }
+
+    const startTimer = () => {
+      if (finalDuration > 0) {
+        toastState.startTime = Date.now();
+        toastState.timer = setTimeout(() => {
+          this.dismiss(id);
+        }, toastState.timeLeft);
+      }
+    };
+
+    const pauseTimer = () => {
+      if (finalDuration > 0 && toastState.timer) {
+        clearTimeout(toastState.timer);
+        toastState.timeLeft -= Date.now() - toastState.startTime;
+        if (toastState.timeLeft < 0) toastState.timeLeft = 0;
+        
+        const progress = toastEl.querySelector('.ravora-toast-progress');
+        if (progress) {
+          progress.style.animationPlayState = 'paused';
+        }
+      }
+    };
+
+    const resumeTimer = () => {
+      if (finalDuration > 0) {
+        toastState.startTime = Date.now();
+        toastState.timer = setTimeout(() => {
+          this.dismiss(id);
+        }, toastState.timeLeft);
+        
+        const progress = toastEl.querySelector('.ravora-toast-progress');
+        if (progress) {
+          progress.style.animationPlayState = 'running';
+        }
+      }
+    };
+
+    toastEl.addEventListener('mouseenter', pauseTimer);
+    toastEl.addEventListener('mouseleave', resumeTimer);
+
+    toastEl.tabIndex = 0;
+    toastEl.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        this.dismiss(id);
+      }
+    });
+
+    let touchStartX = 0;
+    let touchEndX = 0;
+    toastEl.addEventListener('touchstart', (e) => {
+      touchStartX = e.changedTouches[0].screenX;
+    }, { passive: true });
+
+    toastEl.addEventListener('touchend', (e) => {
+      touchEndX = e.changedTouches[0].screenX;
+      if (touchStartX - touchEndX > 100 || touchEndX - touchStartX > 100) {
+        this.dismiss(id);
+      }
+    }, { passive: true });
+
+    startTimer();
+
+    this.toasts.push(toastState);
+    return id;
+  }
+
+  dismiss(id) {
+    const toastState = this.toasts.find(t => t.id === id);
+    if (!toastState || !toastState.active) return;
+
+    toastState.active = false;
+    if (toastState.timer) clearTimeout(toastState.timer);
+
+    const el = toastState.el;
+    el.classList.remove('active');
+    el.classList.add('exiting');
+
+    const handleRemove = () => {
+      el.remove();
+    };
+
+    el.addEventListener('transitionend', handleRemove);
+    setTimeout(handleRemove, 400);
+  }
+
+  update(id, options) {
+    const toastState = this.toasts.find(t => t.id === id);
+    if (!toastState || !toastState.active) return;
+
+    const el = toastState.el;
+    const type = options.type || toastState.type;
+    const title = options.title || toastState.title;
+    const description = options.description !== undefined ? options.description : toastState.description;
+    const action = options.action || null;
+    
+    if (toastState.timer) clearTimeout(toastState.timer);
+
+    el.className = `ravora-toast toast-${type} active`;
+    
+    const iconHtml = this.getIcon(type);
+    const iconEl = el.querySelector('.ravora-toast-icon');
+    if (iconEl) iconEl.innerHTML = iconHtml;
+
+    const titleEl = el.querySelector('.ravora-toast-title');
+    if (titleEl) titleEl.textContent = title;
+
+    const descEl = el.querySelector('.ravora-toast-desc');
+    if (description) {
+      if (descEl) {
+        descEl.textContent = description;
+      } else {
+        const newDesc = document.createElement('span');
+        newDesc.className = 'ravora-toast-desc';
+        newDesc.textContent = description;
+        el.querySelector('.ravora-toast-content').appendChild(newDesc);
+      }
+    } else if (descEl) {
+      descEl.remove();
+    }
+
+    const actionsEl = el.querySelector('.ravora-toast-actions');
+    if (actionsEl) actionsEl.remove();
+    if (action && action.text && action.callback) {
+      const newActions = document.createElement('div');
+      newActions.className = 'ravora-toast-actions';
+      newActions.innerHTML = `<button class="ravora-toast-btn-action">${action.text}</button>`;
+      el.querySelector('.ravora-toast-content').appendChild(newActions);
+
+      newActions.querySelector('.ravora-toast-btn-action').addEventListener('click', (e) => {
+        action.callback(e);
+        this.dismiss(id);
+      });
+    }
+
+    let newDuration = options.duration;
+    if (newDuration === undefined) {
+      if (type === 'success') newDuration = 4000;
+      else if (type === 'info') newDuration = 5000;
+      else if (type === 'warning') newDuration = 6000;
+      else newDuration = 0;
+    }
+
+    const progressEl = el.querySelector('.ravora-toast-progress');
+    if (progressEl) progressEl.remove();
+
+    if (newDuration > 0) {
+      const newProgress = document.createElement('div');
+      newProgress.className = 'ravora-toast-progress';
+      newProgress.style.animation = `ravoraToastProgress ${newDuration}ms linear forwards`;
+      el.appendChild(newProgress);
+
+      toastState.timeLeft = newDuration;
+      toastState.duration = newDuration;
+      toastState.startTime = Date.now();
+      toastState.timer = setTimeout(() => {
+        this.dismiss(id);
+      }, newDuration);
+    } else {
+      toastState.timer = null;
+      toastState.duration = 0;
+      toastState.timeLeft = 0;
+    }
+
+    toastState.type = type;
+    toastState.title = title;
+    toastState.description = description;
+  }
+
+  promise(promiseInstance, { loading = '', success = '', error = '' }) {
+    const id = this.show({
+      type: 'loading',
+      title: loading
+    });
+
+    promiseInstance.then((res) => {
+      const successText = typeof success === 'function' ? success(res) : success;
+      this.update(id, {
+        type: 'success',
+        title: successText
+      });
+    }).catch((err) => {
+      const errorText = typeof error === 'function' ? error(err) : error;
+      this.update(id, {
+        type: 'error',
+        title: errorText || 'An error occurred'
+      });
+    });
+
+    return promiseInstance;
+  }
+}
+
+window.ravoraToast = new RavoraToastManager();
+
 document.addEventListener('DOMContentLoaded', () => {
 
   // Initialize Supabase Client dynamically
@@ -90,40 +410,16 @@ document.addEventListener('DOMContentLoaded', () => {
     window.requestAnimationFrame(step);
   }
 
-  function showToast(message) {
-    const toast = document.createElement('div');
-    toast.textContent = message;
-    toast.style.position = 'fixed';
-    toast.style.bottom = '20px';
-    toast.style.right = '20px';
-    toast.style.background = 'rgba(8, 12, 28, 0.95)';
-    toast.style.border = '1px solid rgba(255, 255, 255, 0.1)';
-    toast.style.color = '#fff';
-    toast.style.padding = '10px 16px';
-    toast.style.borderRadius = '8px';
-    toast.style.fontSize = '0.78rem';
-    toast.style.fontWeight = '600';
-    toast.style.zIndex = '9999';
-    toast.style.boxShadow = '0 4px 12px rgba(0,0,0,0.5)';
-    toast.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
-    toast.style.transform = 'translateY(10px)';
-    toast.style.opacity = '0';
-    document.body.appendChild(toast);
-    
-    // Animate in
-    setTimeout(() => {
-      toast.style.opacity = '1';
-      toast.style.transform = 'translateY(0)';
-    }, 10);
-    
-    // Animate out
-    setTimeout(() => {
-      toast.style.opacity = '0';
-      toast.style.transform = 'translateY(10px)';
-      setTimeout(() => {
-        toast.remove();
-      }, 200);
-    }, 2500);
+  function showToast(message, type = 'success') {
+    const msg = String(message || '').toLowerCase();
+    const isError = msg.includes('error') || msg.includes('fail') || msg.includes('unable');
+    const isWarning = msg.includes('warn') || msg.includes('expiring') || msg.includes('missing');
+    const finalType = isError ? 'error' : (isWarning ? 'warning' : type);
+
+    window.ravoraToast.show({
+      type: finalType,
+      title: message
+    });
   }
 
   let lastScannerRefreshTime = new Date();
@@ -1791,10 +2087,18 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 1000);
           } else {
             const data = await res.json();
-            alert('OAuth failed: ' + (data.error || 'Unknown error'));
+            window.ravoraToast.show({
+              type: 'error',
+              title: 'OAuth Authentication Failed',
+              description: data.error || 'Unknown error'
+            });
           }
         } catch (err) {
-          alert('OAuth error: ' + err.message);
+          window.ravoraToast.show({
+            type: 'error',
+            title: 'OAuth Error',
+            description: err.message
+          });
         }
       }
     });
@@ -4478,22 +4782,28 @@ document.addEventListener('DOMContentLoaded', () => {
         };
         const opportunityId = opportunityMapping[symbol];
 
-        try {
-          const res = await apiCall('/opportunities/deploy', {
-            method: 'POST',
-            body: JSON.stringify({
-              opportunityId,
-              amount,
-              type: direction,
-              leverage
-            })
-          });
+        const deployPromise = apiCall('/opportunities/deploy', {
+          method: 'POST',
+          body: JSON.stringify({
+            opportunityId,
+            amount,
+            type: direction,
+            leverage
+          })
+        });
 
-          alert(`Simulated trade successfully executed!\nTransaction ID: ${res.transactionId}\nCleared Price: $${res.clearedPrice.toLocaleString()}`);
+        window.ravoraToast.promise(deployPromise, {
+          loading: 'Deploying trade simulation...',
+          success: (res) => `Simulated trade successfully executed! Cleared Price: $${res.clearedPrice.toLocaleString()}`,
+          error: (err) => `Trade deployment failed: ${err.message}`
+        });
+
+        try {
+          await deployPromise;
           modal.style.display = 'none';
           await initializeDashboardUI();
         } catch (err) {
-          alert(err.message);
+          console.error(err);
         } finally {
           deployBtn.disabled = false;
           deployBtn.textContent = 'Deploy Trade';
@@ -4600,19 +4910,25 @@ document.addEventListener('DOMContentLoaded', () => {
           updateTerminalView(pos.symbol, window.chartStateManager.timeframe).catch(console.error);
         });
 
-        card.querySelector('.btn-close-pos-action').addEventListener('click', async (e) => {
+        card.querySelector('.btn-close-pos-action').addEventListener('click', (e) => {
           const btn = e.target;
           btn.disabled = true;
           btn.textContent = '...';
-          try {
-            const res = await apiCall(`/paper/positions/${pos.id}`, { method: 'DELETE' });
-            alert(`Position closed successfully. Realized PnL: $${res.profitLoss.toLocaleString(undefined, { minimumFractionDigits: 2 })}`);
+
+          const closePromise = apiCall(`/paper/positions/${pos.id}`, { method: 'DELETE' });
+
+          window.ravoraToast.promise(closePromise, {
+            loading: `Closing ${pos.symbol} position...`,
+            success: (res) => `Position closed. PnL: $${res.profitLoss.toLocaleString(undefined, { minimumFractionDigits: 2 })}`,
+            error: (err) => `Failed to close position: ${err.message}`
+          });
+
+          closePromise.then(async () => {
             await initializeDashboardUI();
-          } catch (err) {
+          }).catch(() => {
             btn.disabled = false;
             btn.textContent = 'Close';
-            alert(err.message);
-          }
+          });
         });
 
         positionsContainer.appendChild(card);
@@ -4702,20 +5018,37 @@ document.addEventListener('DOMContentLoaded', () => {
   function initializeTerminalEvents() {
     const btnCloseAll = document.getElementById('btn-close-all-trades');
     if (btnCloseAll) {
-      btnCloseAll.addEventListener('click', async () => {
-        if (!confirm('Are you sure you want to close all active simulated positions?')) return;
-        btnCloseAll.disabled = true;
-        btnCloseAll.textContent = 'Closing All...';
-        try {
-          await apiCall('/paper/positions', { method: 'DELETE' });
-          alert('All simulated positions closed successfully.');
-          await initializeDashboardUI();
-        } catch (err) {
-          alert(err.message);
-        } finally {
-          btnCloseAll.disabled = false;
-          btnCloseAll.textContent = 'Close All Trades';
-        }
+      btnCloseAll.addEventListener('click', () => {
+        window.ravoraToast.show({
+          type: 'warning',
+          title: 'Close All Positions?',
+          description: 'Are you sure you want to close all active simulated positions? This cannot be undone.',
+          action: {
+            text: 'Yes, Close All',
+            callback: async () => {
+              btnCloseAll.disabled = true;
+              btnCloseAll.textContent = 'Closing All...';
+              try {
+                await apiCall('/paper/positions', { method: 'DELETE' });
+                window.ravoraToast.show({
+                  type: 'success',
+                  title: 'Positions Closed',
+                  description: 'All simulated positions closed successfully.'
+                });
+                await initializeDashboardUI();
+              } catch (err) {
+                window.ravoraToast.show({
+                  type: 'error',
+                  title: 'Closure Failed',
+                  description: err.message
+                });
+              } finally {
+                btnCloseAll.disabled = false;
+                btnCloseAll.textContent = 'Close All Trades';
+              }
+            }
+          }
+        });
       });
     }
 
@@ -5015,18 +5348,29 @@ document.addEventListener('DOMContentLoaded', () => {
   if (btnCopilotRebalanceExecute) {
     btnCopilotRebalanceExecute.addEventListener('click', async () => {
       if (!activeRecommendationId) {
-        alert('No pending directive rebalance is active to execute.');
+        window.ravoraToast.show({
+          type: 'warning',
+          title: 'Rebalance Execution',
+          description: 'No pending directive rebalance is active to execute.'
+        });
         return;
       }
 
       btnCopilotRebalanceExecute.disabled = true;
       btnCopilotRebalanceExecute.textContent = 'Clearing Swap...';
 
-      try {
-        const res = await apiCall(`/opportunities/recommendations/${activeRecommendationId}/execute`, {
-          method: 'POST'
-        });
+      const execPromise = apiCall(`/opportunities/recommendations/${activeRecommendationId}/execute`, {
+        method: 'POST'
+      });
 
+      window.ravoraToast.promise(execPromise, {
+        loading: 'Clearing rebalance swap...',
+        success: 'Rebalance swap execution confirmed.',
+        error: (err) => `Rebalance failed: ${err.message}`
+      });
+
+      try {
+        const res = await execPromise;
         btnCopilotRebalanceExecute.textContent = 'Swap Executed';
         btnCopilotRebalanceExecute.className = 'btn btn-secondary block-btn';
 
@@ -5040,7 +5384,7 @@ document.addEventListener('DOMContentLoaded', () => {
       } catch (err) {
         btnCopilotRebalanceExecute.disabled = false;
         btnCopilotRebalanceExecute.textContent = 'Execute Rebalance';
-        alert(err.message);
+        console.error(err);
       }
     });
   }
@@ -5172,15 +5516,22 @@ document.addEventListener('DOMContentLoaded', () => {
       btnDrawerDeploy.disabled = true;
       btnDrawerDeploy.textContent = 'Deploying capital...';
 
-      try {
-        await apiCall('/opportunities/deploy', {
-          method: 'POST',
-          body: JSON.stringify({
-            opportunityId: activeOpportunity.opportunityId,
-            amount: amountUSD
-          })
-        });
+      const deployPromise = apiCall('/opportunities/deploy', {
+        method: 'POST',
+        body: JSON.stringify({
+          opportunityId: activeOpportunity.opportunityId,
+          amount: amountUSD
+        })
+      });
 
+      window.ravoraToast.promise(deployPromise, {
+        loading: `Deploying allocation to ${activeOpportunity.name}...`,
+        success: 'Allocation successfully deployed!',
+        error: (err) => `Failed to deploy allocation: ${err.message}`
+      });
+
+      try {
+        await deployPromise;
         btnDrawerDeploy.textContent = 'Allocation Deployed';
         btnDrawerDeploy.className = 'btn btn-secondary btn-lg block-btn';
 
@@ -5192,7 +5543,7 @@ document.addEventListener('DOMContentLoaded', () => {
       } catch (err) {
         btnDrawerDeploy.disabled = false;
         btnDrawerDeploy.textContent = 'Confirm & Deploy Allocation';
-        alert(err.message);
+        console.error(err);
       }
     });
   }
@@ -5431,6 +5782,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if (localTradeIndex !== -1) {
               state.trades[localTradeIndex].notes = notesText;
             }
+            window.ravoraToast.show({
+              type: 'success',
+              title: 'Notes Saved',
+              description: 'Trade notes updated successfully.'
+            });
             saveBtn.textContent = 'Saved!';
             saveBtn.className = 'btn btn-primary btn-sm btn-save-trade-notes';
             setTimeout(() => {
@@ -5441,7 +5797,11 @@ document.addEventListener('DOMContentLoaded', () => {
           } catch (err) {
             saveBtn.disabled = false;
             saveBtn.textContent = 'Save';
-            alert('Failed to save trade notes: ' + err.message);
+            window.ravoraToast.show({
+              type: 'error',
+              title: 'Failed to Save Notes',
+              description: err.message
+            });
           }
         });
 
@@ -7431,21 +7791,29 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
-    const btnSignoutOthers = document.getElementById('btn-settings-signout-others');
     if (btnSignoutOthers) {
-      btnSignoutOthers.addEventListener('click', async () => {
-        if (!confirm('Are you sure you want to sign out other devices?')) return;
-        try {
-          const res = await apiCall('/user/profile/devices/all-others', { method: 'DELETE' });
-          if (res && res.success) {
-            showToast('Signed out of other devices.');
-            refreshActiveSessionsList();
-          } else {
-            showToast('Error signing out of other devices.');
+      btnSignoutOthers.addEventListener('click', () => {
+        window.ravoraToast.show({
+          type: 'warning',
+          title: 'Sign Out Other Devices?',
+          description: 'Are you sure you want to sign out all other devices logged into this account?',
+          action: {
+            text: 'Yes, Sign Out',
+            callback: async () => {
+              try {
+                const res = await apiCall('/user/profile/devices/all-others', { method: 'DELETE' });
+                if (res && res.success) {
+                  showToast('Signed out of other devices.');
+                  refreshActiveSessionsList();
+                } else {
+                  showToast('Error signing out of other devices.');
+                }
+              } catch (e) {
+                showToast('Failed to sign out other devices.');
+              }
+            }
           }
-        } catch (e) {
-          showToast('Failed to sign out other devices.');
-        }
+        });
       });
     }
 
@@ -7596,31 +7964,38 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
-    const btnDeleteAccount = document.getElementById('btn-settings-delete-account');
     if (btnDeleteAccount) {
-      btnDeleteAccount.addEventListener('click', async () => {
-        const pass1 = confirm('WARNING: Are you absolutely sure you want to permanently delete your Ravora account? This will erase all trades, data, and configurations.');
-        if (!pass1) return;
-        const pass2 = prompt('Type "DELETE" to confirm account erasure:');
-        if (pass2 !== 'DELETE') {
-          showToast('Erasing cancelled.');
-          return;
-        }
+      btnDeleteAccount.addEventListener('click', () => {
+        window.ravoraToast.show({
+          type: 'warning',
+          title: 'PERMANENTLY DELETE ACCOUNT?',
+          description: 'WARNING: Are you absolutely sure you want to permanently delete your Ravora account? This will erase all trades, data, and configurations.',
+          action: {
+            text: 'I am sure, continue',
+            callback: async () => {
+              const pass2 = prompt('Type "DELETE" to confirm account erasure:');
+              if (pass2 !== 'DELETE') {
+                showToast('Erasing cancelled.');
+                return;
+              }
 
-        try {
-          const res = await apiCall('/user/profile/account', { method: 'DELETE' });
-          if (res && res.success) {
-            showToast('Account successfully deleted. Logging out...');
-            setTimeout(() => {
-              localStorage.clear();
-              window.location.href = '/';
-            }, 1500);
-          } else {
-            showToast('Error deleting account.');
+              try {
+                const res = await apiCall('/user/profile/account', { method: 'DELETE' });
+                if (res && res.success) {
+                  showToast('Account successfully deleted. Logging out...');
+                  setTimeout(() => {
+                    localStorage.clear();
+                    window.location.href = '/';
+                  }, 1500);
+                } else {
+                  showToast('Error deleting account.');
+                }
+              } catch (e) {
+                showToast('Failed to delete account.');
+              }
+            }
           }
-        } catch (e) {
-          showToast('Failed to delete account.');
-        }
+        });
       });
     }
   }
@@ -7644,12 +8019,19 @@ document.addEventListener('DOMContentLoaded', () => {
       if (dot) dot.style.background = 'var(--accent-secondary)';
       syncSidebarAiStatus('Analyzing', 'var(--accent-secondary)');
  
+      const scanPromise = apiCall('/market/scan', { method: 'POST' });
+
+      window.ravoraToast.promise(scanPromise, {
+        loading: 'Running Quant Analysis Engine...',
+        success: 'Market scan and quant analysis completed.',
+        error: (err) => `Scanner Error: ${err.message}`
+      });
+
       try {
-        await apiCall('/market/scan', { method: 'POST' });
+        await scanPromise;
         await initializeDashboardUI();
       } catch (err) {
         console.error('Error during manual scan:', err);
-        alert('Scanner Error: ' + err.message);
       } finally {
         btnHeaderManualScan.disabled = false;
         btnHeaderManualScan.textContent = 'Scan Markets';

@@ -8068,3 +8068,204 @@ h2 {
     margin: auto !important;
   }
 }
+
+/* ==========================================================================
+   Ravora Global Toast & Feedback System
+   ========================================================================== */
+.ravora-toast-container {
+  position: fixed;
+  z-index: 99999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+}
+
+/* Desktop positioning */
+@media (min-width: 769px) {
+  .ravora-toast-container {
+    top: 24px;
+    right: 24px;
+    align-items: flex-end;
+  }
+}
+
+/* Mobile positioning */
+@media (max-width: 768px) {
+  .ravora-toast-container {
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    align-items: center;
+    width: 90%;
+    max-width: 400px;
+  }
+}
+
+.ravora-toast {
+  pointer-events: auto;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  width: 360px;
+  max-width: 100%;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: rgba(14, 19, 37, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), inset 0 1px 1px 0 rgba(255, 255, 255, 0.08);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+@media (max-width: 768px) {
+  .ravora-toast {
+    width: 100%;
+  }
+}
+
+.ravora-toast.entering {
+  opacity: 0;
+}
+@media (min-width: 769px) {
+  .ravora-toast.entering {
+    transform: translateX(100px);
+  }
+}
+@media (max-width: 768px) {
+  .ravora-toast.entering {
+    transform: translateY(100px);
+  }
+}
+
+.ravora-toast.active {
+  opacity: 1;
+  transform: none;
+}
+
+.ravora-toast.exiting {
+  opacity: 0;
+  max-height: 0;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  margin-top: -10px;
+  transform: scale(0.9);
+  pointer-events: none;
+}
+
+.ravora-toast.toast-success {
+  border-left: 3px solid #10b981;
+}
+.ravora-toast.toast-error {
+  border-left: 3px solid #ef4444;
+}
+.ravora-toast.toast-warning {
+  border-left: 3px solid #f59e0b;
+}
+.ravora-toast.toast-info {
+  border-left: 3px solid #3b82f6;
+}
+.ravora-toast.toast-loading {
+  border-left: 3px solid #a5b4fc;
+}
+
+.ravora-toast-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.ravora-toast-content {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.ravora-toast-title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.ravora-toast-desc {
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.ravora-toast-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.ravora-toast-btn-action {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.ravora-toast-btn-action:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.ravora-toast-close {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0;
+  margin: 0;
+  flex-shrink: 0;
+  margin-top: -2px;
+  transition: color 0.2s ease;
+}
+.ravora-toast-close:hover {
+  color: #fff;
+}
+
+.ravora-toast-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: ravoraToastSpin 0.8s infinite linear;
+}
+
+@keyframes ravoraToastSpin {
+  to { transform: rotate(360deg); }
+}
+
+.ravora-toast-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.15);
+  width: 100%;
+  transform-origin: left;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ravora-toast {
+    transition: none !important;
+    animation: none !important;
+  }
+}
