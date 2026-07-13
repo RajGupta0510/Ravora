@@ -83,14 +83,24 @@
   --font-display: 'Outfit', sans-serif;
   --font-body: 'Inter', sans-serif;
 
-  /* Animation Timings */
-  --transition-hover: 120ms cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-dialog: 180ms cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-panel: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  /* Ravora Unified Motion Tokens */
+  --motion-duration-fast: 120ms;
+  --motion-duration-medium: 200ms;
+  --motion-duration-slow: 300ms;
+  --motion-duration-extra-slow: 500ms;
 
+  --motion-ease-premium: cubic-bezier(0.16, 1, 0.3, 1);
+  --motion-ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --motion-ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --motion-ease-in: cubic-bezier(0.4, 0, 1, 1);
+
+  /* Legacy variables mapped to prevent breaking existing functions */
+  --transition-hover: var(--motion-duration-fast) var(--motion-ease-in-out);
+  --transition-dialog: var(--motion-duration-medium) var(--motion-ease-premium);
+  --transition-panel: var(--motion-duration-medium) var(--motion-ease-in-out);
   --transition-fast: var(--transition-hover);
   --transition-normal: var(--transition-dialog);
-  --transition-slow: 300ms ease;
+  --transition-slow: var(--motion-duration-slow) var(--motion-ease-in-out);
 }
 
 /* ==========================================================================
@@ -310,11 +320,47 @@ textarea::placeholder {
 .shadow-overlay { box-shadow: var(--shadow-overlay) !important; }
 
 .anim-fade {
-  transition: opacity var(--transition-normal) !important;
+  transition: opacity var(--motion-duration-medium) var(--motion-ease-premium) !important;
 }
 
 .anim-scale {
-  transition: transform var(--transition-normal), opacity var(--transition-normal) !important;
+  transition: transform var(--motion-duration-medium) var(--motion-ease-premium), 
+              opacity var(--motion-duration-medium) var(--motion-ease-premium) !important;
+}
+
+/* Unified component transitions */
+.btn {
+  transition: background var(--motion-duration-fast) var(--motion-ease-premium), 
+              border-color var(--motion-duration-fast) var(--motion-ease-premium), 
+              color var(--motion-duration-fast) var(--motion-ease-premium), 
+              box-shadow var(--motion-duration-fast) var(--motion-ease-premium), 
+              transform var(--motion-duration-fast) var(--motion-ease-premium) !important;
+}
+
+.card-glass {
+  transition: border-color var(--motion-duration-medium) var(--motion-ease-premium), 
+              background var(--motion-duration-medium) var(--motion-ease-premium), 
+              box-shadow var(--motion-duration-medium) var(--motion-ease-premium) !important;
+}
+
+.form-input,
+.form-select,
+textarea {
+  transition: border-color var(--motion-duration-fast) var(--motion-ease-premium), 
+              box-shadow var(--motion-duration-fast) var(--motion-ease-premium), 
+              background var(--motion-duration-fast) var(--motion-ease-premium) !important;
+}
+
+/* Accessibility preferences for OS Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 /* Form switch toggle */
