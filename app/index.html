@@ -1492,7 +1492,7 @@
                       style="font-size: 0.6rem; color: var(--text-muted); text-transform: uppercase; display: block; letter-spacing: 0.02em;">Opp
                       Score</span>
                     <strong id="terminal-opp-score"
-                      style="font-size: 1.2rem; font-weight: 800; color: #fff; background: linear-gradient(135deg, #a5b4fc 0%, #6366f1 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">89</strong>
+                      style="font-size: 1.2rem; font-weight: 800; color: #fff; background: linear-gradient(135deg, #a5b4fc 0%, #6366f1 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">89</strong>
                   </div>
                 </div>
 
@@ -4000,6 +4000,30 @@
   <script src="chart/chartComponent.js"></script>
 
   <script src="/dashboard.js?v=12.0"></script>
+
+  <!-- NEW: MOBILE BOTTOM NAVIGATION BAR -->
+  <div id="mobile-bottom-nav" style="display: none;">
+    <button class="mobile-nav-btn active" data-screen="dashboard" title="Workspace">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+      <span>Workspace</span>
+    </button>
+    <button class="mobile-nav-btn" data-screen="opportunities" title="Opportunities">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+      <span>Opps</span>
+    </button>
+    <button class="mobile-nav-btn" data-screen="watchlist" title="Watchlist">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
+      <span>Watchlist</span>
+    </button>
+    <button class="mobile-nav-btn" data-screen="portfolio" title="Portfolio">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+      <span>Portfolio</span>
+    </button>
+    <button class="mobile-nav-btn" data-screen="settings" title="Settings">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+      <span>Settings</span>
+    </button>
+  </div>
 
   <!-- NEW: GLOBAL ERROR STATE OVERLAY -->
   <div id="global-error-overlay" class="ravora-error-overlay" style="display: none;"></div>

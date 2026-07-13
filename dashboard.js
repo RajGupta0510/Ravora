@@ -3807,6 +3807,23 @@ document.addEventListener('DOMContentLoaded', () => {
     btnTriggerProductTour.addEventListener('click', startProductTour);
   }
 
+  function autoInjectTableLabels() {
+    const tables = document.querySelectorAll('.table-ds, .scanner-table, .holdings-table, .scanner-table table');
+    tables.forEach(table => {
+      const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.textContent.trim());
+      if (headers.length === 0) return;
+      const rows = table.querySelectorAll('tbody tr');
+      rows.forEach(row => {
+        const cells = row.querySelectorAll('td');
+        cells.forEach((cell, index) => {
+          if (headers[index] && !cell.getAttribute('data-label')) {
+            cell.setAttribute('data-label', headers[index]);
+          }
+        });
+      });
+    });
+  }
+
   // ==========================================================================
   // SPA Screen Router Navigation
   // ==========================================================================
@@ -3896,6 +3913,20 @@ document.addEventListener('DOMContentLoaded', () => {
     if (pushState) {
       history.pushState({ screen: screenId }, '', '/app/' + screenId);
     }
+
+    // Sync active class on mobile bottom navigation buttons
+    const mobileNavBtns = document.querySelectorAll('.mobile-nav-btn');
+    mobileNavBtns.forEach(btn => {
+      const btnScreen = btn.getAttribute('data-screen');
+      if (btnScreen === screenId) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+
+    // Auto-inject table responsive labels on render
+    setTimeout(autoInjectTableLabels, 50);
   }
 
   menuTabBtns.forEach(btn => {
@@ -9472,6 +9503,18 @@ document.addEventListener('DOMContentLoaded', () => {
       initializeWatchlistCenterEvents();
       initializeNotificationsCenterEvents();
       initializeSettingsCenterEvents();
+
+      // Bind mobile bottom nav buttons
+      const mobileNavBtns = document.querySelectorAll('.mobile-nav-btn');
+      mobileNavBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const targetScreen = btn.getAttribute('data-screen');
+          if (targetScreen) {
+            navigateTo(targetScreen, true);
+          }
+        });
+      });
+
       state.terminalEventsInitialized = true;
     }
     window.showRavoraSuccess = showRavoraSuccess;
