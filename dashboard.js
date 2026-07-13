@@ -1,3 +1,281 @@
+// ==========================================================================
+// Global Loading Skeleton System Helpers
+// ==========================================================================
+
+function getScannerSkeletonHtml() {
+  let html = '';
+  for (let i = 0; i < 7; i++) {
+    html += `
+      <tr class="skeleton-pulse">
+        <td style="padding: 10px 8px;"><span class="skeleton-box" style="width: 60px; height: 12px;"></span></td>
+        <td style="padding: 10px 8px;"><span class="skeleton-box" style="width: 45px; height: 12px;"></span></td>
+        <td style="padding: 10px 8px;"><span class="skeleton-box" style="width: 35px; height: 12px;"></span></td>
+        <td style="padding: 10px 8px; text-align: right;"><span class="skeleton-box" style="width: 50px; height: 12px;"></span></td>
+      </tr>
+    `;
+  }
+  return html;
+}
+
+function getPositionsSkeletonHtml() {
+  let html = '';
+  for (let i = 0; i < 2; i++) {
+    html += `
+      <div class="skeleton-card">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span class="skeleton-box" style="width: 80px; height: 14px;"></span>
+          <span class="skeleton-box" style="width: 50px; height: 14px;"></span>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px; margin: 8px 0;">
+          <span class="skeleton-box skeleton-text" style="width: 100%;"></span>
+          <span class="skeleton-box skeleton-text skeleton-short" style="width: 60%;"></span>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px;">
+          <span class="skeleton-box" style="width: 70px; height: 12px;"></span>
+          <span class="skeleton-box" style="width: 60px; height: 24px; border-radius: 4px;"></span>
+        </div>
+      </div>
+    `;
+  }
+  return html;
+}
+
+function getHistorySkeletonHtml() {
+  let html = '';
+  for (let i = 0; i < 3; i++) {
+    html += `
+      <div class="skeleton-card" style="gap: 8px;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span class="skeleton-box" style="width: 70px; height: 12px;"></span>
+          <span class="skeleton-box" style="width: 80px; height: 12px;"></span>
+        </div>
+        <span class="skeleton-box skeleton-text" style="width: 100%;"></span>
+        <span class="skeleton-box skeleton-text skeleton-short" style="width: 40%;"></span>
+      </div>
+    `;
+  }
+  return html;
+}
+
+function getNotificationsSkeletonHtml() {
+  let html = '';
+  for (let i = 0; i < 4; i++) {
+    html += `
+      <div style="display: flex; gap: 12px; padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.04); align-items: center;">
+        <span class="skeleton-box skeleton-avatar"></span>
+        <div style="flex: 1; display: flex; flex-direction: column; gap: 6px;">
+          <span class="skeleton-box skeleton-text" style="width: 80%; height: 10px; margin: 0;"></span>
+          <span class="skeleton-box skeleton-text skeleton-short" style="width: 40%; height: 8px; margin: 0;"></span>
+        </div>
+      </div>
+    `;
+  }
+  return html;
+}
+
+function showTradingWorkspaceSkeletons() {
+  const scannerRows = document.getElementById('terminal-scanner-rows');
+  if (scannerRows) scannerRows.innerHTML = getScannerSkeletonHtml();
+
+  const positionsContainer = document.getElementById('terminal-positions-cards-list');
+  if (positionsContainer) positionsContainer.innerHTML = getPositionsSkeletonHtml();
+
+  const historyContainer = document.getElementById('terminal-history-cards-list');
+  if (historyContainer) historyContainer.innerHTML = getHistorySkeletonHtml();
+
+  const headerStats = [
+    'terminal-chart-price', 'terminal-chart-change', 
+    'header-volume-val', 'header-volatility-val',
+    'header-atr-val', 'header-spread-val', 'header-oi-val'
+  ];
+  headerStats.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.innerHTML = `<span class="skeleton-box" style="width: 60px; height: 1.1rem; margin: 0;"></span>`;
+    }
+  });
+
+  const aiStats = [
+    'terminal-opp-score', 'terminal-risk-score', 'terminal-trend-val',
+    'terminal-suggested-entry', 'terminal-suggested-tp', 'terminal-suggested-sl',
+    'terminal-rr-ratio', 'terminal-duration', 'terminal-reasoning-text'
+  ];
+  aiStats.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.innerHTML = `<span class="skeleton-box" style="width: 80px; height: 0.9rem; margin: 0;"></span>`;
+    }
+  });
+}
+
+function showPortfolioSkeletons() {
+  const portfolioStats = [
+    'port-summary-value', 'port-summary-today-return', 
+    'port-summary-net-return', 'port-summary-cash'
+  ];
+  portfolioStats.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.innerHTML = `<span class="skeleton-box" style="width: 90px; height: 1.5rem; margin: 0;"></span>`;
+    }
+  });
+
+  const holdingsTable = document.getElementById('portfolio-holdings-rows');
+  if (holdingsTable) {
+    let html = '';
+    for (let i = 0; i < 4; i++) {
+      html += `
+        <tr>
+          <td><span class="skeleton-box" style="width: 50px; height: 12px;"></span></td>
+          <td><span class="skeleton-box" style="width: 35px; height: 12px;"></span></td>
+          <td><span class="skeleton-box" style="width: 60px; height: 12px;"></span></td>
+        </tr>
+      `;
+    }
+    holdingsTable.innerHTML = html;
+  }
+
+  const openPositionsTable = document.getElementById('perf-open-positions-tbody');
+  if (openPositionsTable) {
+    let html = '';
+    for (let i = 0; i < 2; i++) {
+      html += `
+        <tr>
+          <td><span class="skeleton-box" style="width: 45px; height: 12px;"></span></td>
+          <td><span class="skeleton-box" style="width: 35px; height: 12px;"></span></td>
+          <td><span class="skeleton-box" style="width: 50px; height: 12px;"></span></td>
+          <td><span class="skeleton-box" style="width: 50px; height: 12px;"></span></td>
+          <td><span class="skeleton-box" style="width: 40px; height: 12px;"></span></td>
+          <td><span class="skeleton-box" style="width: 40px; height: 12px;"></span></td>
+        </tr>
+      `;
+    }
+    openPositionsTable.innerHTML = html;
+  }
+
+  const insightsList = document.getElementById('perf-ai-insights-list');
+  if (insightsList) {
+    let html = '';
+    for (let i = 0; i < 3; i++) {
+      html += `
+        <li style="list-style: none; margin-bottom: 6px; display: flex; align-items: center; gap: 8px;">
+          <span class="skeleton-box" style="width: 6px; height: 6px; border-radius: 50%;"></span>
+          <span class="skeleton-box skeleton-text" style="width: 80%; height: 10px; margin: 0;"></span>
+        </li>
+      `;
+    }
+    insightsList.innerHTML = html;
+  }
+}
+
+function showWatchlistSkeletons() {
+  const oppsList = document.getElementById('watch-today-opps-list');
+  if (oppsList) {
+    let html = '';
+    for (let i = 0; i < 3; i++) {
+      html += `
+        <div class="skeleton-card" style="flex: 1; min-width: 140px;">
+          <span class="skeleton-box" style="width: 60px; height: 12px;"></span>
+          <span class="skeleton-box" style="width: 80px; height: 16px;"></span>
+          <span class="skeleton-box" style="width: 40px; height: 10px;"></span>
+        </div>
+      `;
+    }
+    oppsList.innerHTML = html;
+  }
+
+  const watchlistRows = document.getElementById('watch-watchlist-rows');
+  if (watchlistRows) {
+    let html = '';
+    for (let i = 0; i < 5; i++) {
+      html += `
+        <tr>
+          <td><span class="skeleton-box" style="width: 55px; height: 12px;"></span></td>
+          <td><span class="skeleton-box" style="width: 45px; height: 12px;"></span></td>
+          <td><span class="skeleton-box" style="width: 35px; height: 12px;"></span></td>
+          <td><span class="skeleton-box" style="width: 45px; height: 12px;"></span></td>
+          <td><span class="skeleton-box" style="width: 55px; height: 12px;"></span></td>
+          <td><span class="skeleton-box" style="width: 60px; height: 12px;"></span></td>
+          <td><span class="skeleton-box" style="width: 40px; height: 12px;"></span></td>
+        </tr>
+      `;
+    }
+    watchlistRows.innerHTML = html;
+  }
+
+  const heatmap = document.getElementById('watch-heatmap-grid');
+  if (heatmap) {
+    let html = '';
+    for (let i = 0; i < 6; i++) {
+      html += `<div class="skeleton-box" style="width: 100%; height: 45px; border-radius: 8px;"></div>`;
+    }
+    heatmap.innerHTML = html;
+  }
+
+  const alertsList = document.getElementById('watch-alerts-list');
+  if (alertsList) {
+    let html = '';
+    for (let i = 0; i < 3; i++) {
+      html += `
+        <div class="skeleton-card" style="padding: 10px; gap: 6px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span class="skeleton-box" style="width: 40px; height: 10px;"></span>
+            <span class="skeleton-box" style="width: 30px; height: 10px;"></span>
+          </div>
+          <span class="skeleton-box skeleton-text" style="width: 90%; height: 9px; margin: 0;"></span>
+        </div>
+      `;
+    }
+    alertsList.innerHTML = html;
+  }
+}
+
+function showJournalSkeletons() {
+  const journalStats = [
+    'journal-stat-total-trades', 'journal-stat-win-rate', 
+    'journal-stat-pnl', 'journal-stat-profit-factor',
+    'journal-stat-avg-win', 'journal-stat-avg-loss', 'journal-stat-avg-duration'
+  ];
+  journalStats.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.innerHTML = `<span class="skeleton-box" style="width: 60px; height: 1.1rem; margin: 0;"></span>`;
+    }
+  });
+
+  const timeline = document.getElementById('journal-timeline-container');
+  if (timeline) timeline.innerHTML = getHistorySkeletonHtml();
+}
+
+function showSettingsSkeletons() {
+  const settingsFields = [
+    'settings-profile-fullname', 'settings-profile-username',
+    'settings-profile-phone', 'settings-profile-country'
+  ];
+  settingsFields.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.placeholder = 'Loading profile parameter...';
+    }
+  });
+
+  const sessionsTable = document.getElementById('settings-sessions-tbody');
+  if (sessionsTable) {
+    let html = '';
+    for (let i = 0; i < 2; i++) {
+      html += `
+        <tr>
+          <td><span class="skeleton-box" style="width: 70px; height: 12px;"></span></td>
+          <td><span class="skeleton-box" style="width: 50px; height: 12px;"></span></td>
+          <td><span class="skeleton-box" style="width: 80px; height: 12px;"></span></td>
+          <td><span class="skeleton-box" style="width: 50px; height: 12px;"></span></td>
+        </tr>
+      `;
+    }
+    sessionsTable.innerHTML = html;
+  }
+}
+
 class RavoraToastManager {
   constructor() {
     this.container = null;
@@ -45,7 +323,7 @@ class RavoraToastManager {
     toastEl.setAttribute('aria-live', type === 'error' || type === 'warning' ? 'assertive' : 'polite');
 
     const iconHtml = this.getIcon(type);
-    
+
     let actionBtnHtml = '';
     if (action && action.text && action.callback) {
       actionBtnHtml = `
@@ -139,7 +417,7 @@ class RavoraToastManager {
         clearTimeout(toastState.timer);
         toastState.timeLeft -= Date.now() - toastState.startTime;
         if (toastState.timeLeft < 0) toastState.timeLeft = 0;
-        
+
         const progress = toastEl.querySelector('.ravora-toast-progress');
         if (progress) {
           progress.style.animationPlayState = 'paused';
@@ -153,7 +431,7 @@ class RavoraToastManager {
         toastState.timer = setTimeout(() => {
           this.dismiss(id);
         }, toastState.timeLeft);
-        
+
         const progress = toastEl.querySelector('.ravora-toast-progress');
         if (progress) {
           progress.style.animationPlayState = 'running';
@@ -218,11 +496,11 @@ class RavoraToastManager {
     const title = options.title || toastState.title;
     const description = options.description !== undefined ? options.description : toastState.description;
     const action = options.action || null;
-    
+
     if (toastState.timer) clearTimeout(toastState.timer);
 
     el.className = `ravora-toast toast-${type} active`;
-    
+
     const iconHtml = this.getIcon(type);
     const iconEl = el.querySelector('.ravora-toast-icon');
     if (iconEl) iconEl.innerHTML = iconHtml;
@@ -354,10 +632,10 @@ document.addEventListener('DOMContentLoaded', () => {
     btn.addEventListener('click', () => {
       tfButtons.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      
+
       const tf = btn.getAttribute('data-tf') || '1D';
       window.chartStateManager.timeframe = tf;
-      
+
       if (state.selectedAsset) {
         updateTerminalView(state.selectedAsset, tf).catch(console.error);
       }
@@ -471,7 +749,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const urlPath = endpoint.split('?')[0];
     const token = localStorage.getItem('ravora_token');
-    
+
     // Attempt real API call if logged in or hitting auth routes
     const useRealAPI = token || urlPath === '/auth/login' || urlPath === '/auth/register';
 
@@ -1324,7 +1602,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const dashRisk = document.getElementById('dash-risk');
   const dashHealth = document.getElementById('dash-health');
   const dashHealthSub = document.getElementById('dash-health-sub');
-  
+
   // Charts
   const chartPeriodButtons = document.querySelectorAll('.chart-toggles button');
   const largeChartLine = document.getElementById('large-chart-line');
@@ -1514,7 +1792,7 @@ document.addEventListener('DOMContentLoaded', () => {
       localStorage.setItem('ravora_profile_goal', 'preservation');
       localStorage.setItem('ravora_profile_horizon', 'medium');
     }
-    
+
     if (!localStorage.getItem('ravora_holdings')) {
       const capital = 132000;
       const initialHoldings = [
@@ -1550,7 +1828,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const token = localStorage.getItem('ravora_token');
     const sevenDays = 7 * 24 * 60 * 60 * 1000;
     const timeDiff = loginTime ? (Date.now() - parseInt(loginTime)) : null;
-    
+
     // Remember Me vs Session Storage verification
     const rememberMe = localStorage.getItem('ravora_remember_me') === 'true';
     const sessionActive = sessionStorage.getItem('ravora_session_active') === 'true';
@@ -1571,7 +1849,7 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.removeItem('ravora_remember_me');
         sessionStorage.removeItem('ravora_session_active');
       }
-      
+
       showAuthOverlay();
       return;
     }
@@ -1589,7 +1867,7 @@ document.addEventListener('DOMContentLoaded', () => {
         state.profile.riskLevel = riskLevels[riskStance] ?? 1;
         state.profile.goal = localStorage.getItem('ravora_profile_goal') || 'preservation';
         state.profile.horizon = localStorage.getItem('ravora_profile_horizon') || 'short';
-        
+
         try {
           const marketsStr = localStorage.getItem('ravora_preferred_markets');
           if (marketsStr) {
@@ -1941,7 +2219,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (val.length === 1 && idx < otpInputs.length - 1) {
         otpInputs[idx + 1].focus();
       }
-      
+
       // Auto submit on final 6th digit
       const allFilled = Array.from(otpInputs).every(i => i.value.length === 1);
       if (allFilled) {
@@ -1960,7 +2238,7 @@ document.addEventListener('DOMContentLoaded', () => {
       e.preventDefault();
       const clipboardData = (e.clipboardData || window.clipboardData).getData('text');
       const digits = clipboardData.replace(/\D/g, '').substring(0, 6);
-      
+
       digits.split('').forEach((char, dIdx) => {
         if (otpInputs[dIdx]) {
           otpInputs[dIdx].value = char;
@@ -2248,7 +2526,7 @@ document.addEventListener('DOMContentLoaded', () => {
               localStorage.setItem('ravora_onboarding_completed', (data.user && data.user.onboardingCompleted) ? 'true' : 'false');
               localStorage.setItem('ravora_remember_me', remember ? 'true' : 'false');
               sessionStorage.setItem('ravora_session_active', 'true');
-              
+
               switchAuthView('success');
               setTimeout(() => {
                 checkAuthState();
@@ -2417,7 +2695,7 @@ document.addEventListener('DOMContentLoaded', () => {
           const remember = document.getElementById('login-remember-me') ? document.getElementById('login-remember-me').checked : false;
           localStorage.setItem('ravora_remember_me', remember ? 'true' : 'false');
           sessionStorage.setItem('ravora_session_active', 'true');
-          
+
           switchAuthView('success');
           setTimeout(() => {
             checkAuthState();
@@ -2614,7 +2892,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const height = 600;
       const left = (window.screen.width / 2) - (width / 2);
       const top = (window.screen.height / 2) - (height / 2);
-      
+
       window.open(
         `/app/oauth-consent.html?provider=${provider}`,
         `Ravora-${provider}-OAuth`,
@@ -2624,12 +2902,12 @@ document.addEventListener('DOMContentLoaded', () => {
       // Listen for message from popup
       const handleOauthMessage = async (event) => {
         if (event.origin !== window.location.origin) return;
-        
+
         const data = event.data;
         if (data && data.provider === provider && data.code) {
           window.removeEventListener('message', handleOauthMessage);
           console.log(`[Ravora Social auth] Verified oauth payload:`, data);
-          
+
           try {
             const mockOAuthPayload = {
               provider: data.provider,
@@ -2682,7 +2960,7 @@ document.addEventListener('DOMContentLoaded', () => {
       step.classList.remove('active');
       step.style.display = 'none';
     });
-    
+
     if (state.currentStep <= 6) {
       const stepEl = document.getElementById(`onboarding-step-${state.currentStep}`);
       if (stepEl) {
@@ -2690,7 +2968,7 @@ document.addEventListener('DOMContentLoaded', () => {
         stepEl.style.display = 'flex';
       }
     }
-    
+
     stepDots.forEach((dot, idx) => {
       if (idx + 1 === state.currentStep) {
         dot.classList.add('active');
@@ -2760,7 +3038,7 @@ document.addEventListener('DOMContentLoaded', () => {
     localStorage.setItem('ravora_onboarding_completed', 'true');
     localStorage.setItem('ravora_profile_experience', state.profile.experience || 'intermediate');
     localStorage.setItem('ravora_profile_goal', state.profile.goal || 'swing');
-    
+
     try {
       await apiCall('/user/onboard', {
         method: 'POST',
@@ -2771,7 +3049,7 @@ document.addEventListener('DOMContentLoaded', () => {
           goal: state.profile.goal || 'swing'
         })
       });
-    } catch(e) {
+    } catch (e) {
       console.warn('Backend save skipped (local fallback):', e.message);
     }
 
@@ -2807,7 +3085,7 @@ document.addEventListener('DOMContentLoaded', () => {
           btnOnboardingNext.textContent = 'Compiling Profile...';
         }
         if (btnOnboardingBack) btnOnboardingBack.style.display = 'none';
-        
+
         onboardingSteps.forEach(step => {
           step.classList.remove('active');
           step.style.display = 'none';
@@ -2816,7 +3094,7 @@ document.addEventListener('DOMContentLoaded', () => {
           onboardingLoader.classList.add('active');
           onboardingLoader.style.display = 'flex';
         }
-        
+
         runOnboardingScanningSimulation();
       } else if (state.currentStep === 5) {
         state.currentStep = 6;
@@ -2827,7 +3105,7 @@ document.addEventListener('DOMContentLoaded', () => {
           btnOnboardingNext.disabled = true;
           btnOnboardingNext.textContent = 'Entering Workspace...';
         }
-        
+
         try {
           await apiCall('/user/onboard', {
             method: 'POST',
@@ -2838,12 +3116,12 @@ document.addEventListener('DOMContentLoaded', () => {
               goal: state.profile.goal || 'swing'
             })
           });
-          
+
           state.onboardingCompleted = true;
           localStorage.setItem('ravora_onboarding_completed', 'true');
           localStorage.setItem('ravora_profile_experience', state.profile.experience);
           localStorage.setItem('ravora_profile_goal', state.profile.goal || 'swing');
-          
+
           onboardingOverlay.classList.add('fade-out-onboarding');
           setTimeout(() => {
             onboardingOverlay.style.display = 'none';
@@ -2857,7 +3135,7 @@ document.addEventListener('DOMContentLoaded', () => {
           localStorage.setItem('ravora_onboarding_completed', 'true');
           localStorage.setItem('ravora_profile_experience', state.profile.experience);
           localStorage.setItem('ravora_profile_goal', state.profile.goal || 'swing');
-          
+
           onboardingOverlay.classList.add('fade-out-onboarding');
           setTimeout(() => {
             onboardingOverlay.style.display = 'none';
@@ -2892,20 +3170,20 @@ document.addEventListener('DOMContentLoaded', () => {
       if (progress >= 100) {
         progress = 100;
         clearInterval(interval);
-        
+
         onboardingProgressBar.style.width = '100%';
         onboardingStatusLogs.textContent = 'Copilot Workspace Ready!';
-        
+
         setTimeout(() => {
           if (onboardingLoader) {
             onboardingLoader.classList.remove('active');
             onboardingLoader.style.display = 'none';
           }
-          
+
           // Move to Step 5: Workspace Intro
           state.currentStep = 5;
           updateOnboardingStepsVisibility();
-          
+
           if (btnOnboardingNext) {
             btnOnboardingNext.disabled = false;
           }
@@ -2928,7 +3206,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function startProductTour() {
     state.isProductTour = true;
     state.currentStep = 1;
-    
+
     // Reset option cards active states to match state values
     const optCards = document.querySelectorAll('.option-card');
     optCards.forEach(card => {
@@ -2936,7 +3214,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!parentStep) return;
       const stepId = parentStep.id;
       const val = card.getAttribute('data-value');
-      
+
       if (stepId.includes('onboarding-step-2')) {
         if (val === state.profile.experience) card.classList.add('active');
         else card.classList.remove('active');
@@ -2948,14 +3226,14 @@ document.addEventListener('DOMContentLoaded', () => {
         else card.classList.remove('active');
       }
     });
-    
+
     onboardingOverlay.classList.remove('fade-out-onboarding');
     showOnboardingOverlay();
     if (onboardingLoader) {
       onboardingLoader.classList.remove('active');
       onboardingLoader.style.display = 'none';
     }
-    
+
     updateOnboardingStepsVisibility();
     if (btnOnboardingBack) btnOnboardingBack.style.display = 'none';
     if (btnOnboardingNext) {
@@ -3024,24 +3302,32 @@ document.addEventListener('DOMContentLoaded', () => {
     updateHeaderTitle(screenId);
 
     if (screenId === 'dashboard') {
+      showTradingWorkspaceSkeletons();
       updateTerminalView(state.selectedAsset || 'BTC', window.chartStateManager.timeframe);
       loadTerminalPositions();
       loadTerminalHistory();
     } else if (screenId === 'portfolio') {
+      showPortfolioSkeletons();
       const pRiskMeter = document.getElementById('portfolio-risk-meter-fill');
       if (pRiskMeter) {
         pRiskMeter.style.width = state.profile.riskLevel === 0 ? '18%' : (state.profile.riskLevel === 1 ? '42%' : '78%');
       }
       refreshPortfolioSubViews();
     } else if (screenId === 'watchlist') {
+      showWatchlistSkeletons();
       renderWatchlistCenter();
     } else if (screenId === 'history') {
+      showJournalSkeletons();
       renderTradeHistoryRowsLocal();
     } else if (screenId === 'notifications') {
+      if (typeof notifAlertsList !== 'undefined' && notifAlertsList) {
+        notifAlertsList.innerHTML = getNotificationsSkeletonHtml();
+      }
       apiCall('/notifications/read', { method: 'POST' }).then(() => {
         loadNotifications();
       });
     } else if (screenId === 'settings') {
+      showSettingsSkeletons();
       loadSettingsCenter();
     }
 
@@ -3237,7 +3523,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Dynamic scale limits
     let minPrice = Math.min(...lows);
     let maxPrice = Math.max(...highs);
-    
+
     // Add extra padding to the price boundaries for line visibility
     const paddingVal = (maxPrice - minPrice) * 0.08 || 1;
     minPrice -= paddingVal;
@@ -3262,7 +3548,7 @@ document.addEventListener('DOMContentLoaded', () => {
     for (let i = 0; i < gridLines; i++) {
       const gridPrice = minPrice + (priceRange / (gridLines - 1)) * i;
       const y = scaleY(gridPrice);
-      
+
       const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
       line.setAttribute('x1', paddingLeft);
       line.setAttribute('y1', y);
@@ -3342,7 +3628,7 @@ document.addEventListener('DOMContentLoaded', () => {
       txt.setAttribute('y', y - 4);
       txt.setAttribute('fill', 'rgba(165, 180, 252, 0.5)');
       txt.setAttribute('font-size', '8');
-      txt.textContent = `Support S${sIdx+1}: $${sVal.toLocaleString(undefined, { maximumFractionDigits: sVal >= 100 ? 2 : 4 })}`;
+      txt.textContent = `Support S${sIdx + 1}: $${sVal.toLocaleString(undefined, { maximumFractionDigits: sVal >= 100 ? 2 : 4 })}`;
       chartSvg.appendChild(txt);
     });
 
@@ -3365,14 +3651,14 @@ document.addEventListener('DOMContentLoaded', () => {
       txt.setAttribute('y', y - 4);
       txt.setAttribute('fill', 'rgba(244, 63, 94, 0.5)');
       txt.setAttribute('font-size', '8');
-      txt.textContent = `Resistance R${rIdx+1}: $${rVal.toLocaleString(undefined, { maximumFractionDigits: rVal >= 100 ? 2 : 4 })}`;
+      txt.textContent = `Resistance R${rIdx + 1}: $${rVal.toLocaleString(undefined, { maximumFractionDigits: rVal >= 100 ? 2 : 4 })}`;
       chartSvg.appendChild(txt);
     });
 
     // 4. Draw Suggested Targets (Entry, TP, SL)
     if (opp.suggestedEntry && opp.suggestedEntry >= minPrice && opp.suggestedEntry <= maxPrice) {
       const y = scaleY(opp.suggestedEntry);
-      
+
       const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
       line.setAttribute('x1', paddingLeft);
       line.setAttribute('y1', y);
@@ -3395,7 +3681,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (opp.suggestedTakeProfit && opp.suggestedTakeProfit >= minPrice && opp.suggestedTakeProfit <= maxPrice) {
       const y = scaleY(opp.suggestedTakeProfit);
-      
+
       const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
       line.setAttribute('x1', paddingLeft);
       line.setAttribute('y1', y);
@@ -3418,7 +3704,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (opp.suggestedStopLoss && opp.suggestedStopLoss >= minPrice && opp.suggestedStopLoss <= maxPrice) {
       const y = scaleY(opp.suggestedStopLoss);
-      
+
       const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
       line.setAttribute('x1', paddingLeft);
       line.setAttribute('y1', y);
@@ -3475,7 +3761,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const overview = await apiCall('/market/overview');
       const opps = await apiCall('/opportunities');
       scannerRows.innerHTML = '';
-      
+
       const supported = overview.length > 0 ? overview.map(o => o.symbol) : ['BTC', 'ETH', 'SOL', 'BNB', 'SUI'];
       const assetsData = supported.map(sym => {
         const live = overview.find(o => o.symbol === sym) || { name: sym, price: 0, change24h: 0 };
@@ -3517,13 +3803,13 @@ document.addEventListener('DOMContentLoaded', () => {
       // 2. Filter assets dynamically based on search and active tab filter
       const activeFilter = state.activeScannerFilter || 'all';
       const searchQuery = (document.getElementById('scanner-search-input')?.value || '').toLowerCase().trim();
-      
+
       const filteredData = assetsData.filter(ad => {
         // Search filter
         const symbolMatch = ad.symbol.toLowerCase().includes(searchQuery);
         const nameMatch = ad.name.toLowerCase().includes(searchQuery);
         if (searchQuery && !symbolMatch && !nameMatch) return false;
-        
+
         // Segmented filter
         if (activeFilter === 'high') {
           return ad.oppScore >= 75;
@@ -3567,14 +3853,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const changeClass = ad.change24h >= 0 ? 'text-green' : 'text-error';
         const changeSign = ad.change24h >= 0 ? '+' : '';
-        const priceFormatted = ad.price >= 100 
+        const priceFormatted = ad.price >= 100
           ? ad.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
           : ad.price.toLocaleString(undefined, { minimumFractionDigits: 4, maximumFractionDigits: 4 });
 
         // Map recommendation badge to HIGH / WATCH / WAIT / AVOID
         let badgeText = 'WAIT';
         let badgeClass = 'badge-wait';
-        
+
         if (ad.recommendation === 'LONG' || ad.recommendation === 'SHORT') {
           if (ad.oppScore >= 75) {
             badgeText = 'HIGH';
@@ -3718,7 +4004,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function bindLadderRowEvents(elementId, title, getPriceFn) {
     const el = recreateElement(elementId);
     if (!el) return;
-    
+
     el.addEventListener('mouseenter', () => {
       if (window.chartOverlayService && window.chartOverlayService.priceLines) {
         window.chartOverlayService.priceLines.forEach(line => {
@@ -3754,11 +4040,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   async function updateTerminalView(symbol, timeframe = null) {
     if (!symbol) return;
-    
+
     if (!timeframe) {
       timeframe = window.chartStateManager.timeframe || '1D';
     }
-    
+
     try {
       const details = await apiCall(`/market/assets/${symbol}?timeframe=${timeframe}`);
       const opps = await apiCall('/opportunities');
@@ -3818,7 +4104,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const livePrice = details.price;
       const liveChange = details.change24h;
-      
+
       const priceFormatted = livePrice >= 100
         ? livePrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
         : livePrice.toLocaleString(undefined, { minimumFractionDigits: 4, maximumFractionDigits: 4 });
@@ -3844,31 +4130,31 @@ document.addEventListener('DOMContentLoaded', () => {
       const atrs = { 'BTC': '1,424.50', 'ETH': '74.20', 'SOL': '4.15', 'LINK': '0.38', 'SUI': '0.045', 'BNB': '12.40' };
       const ois = { 'BTC': '$1.84B', 'ETH': '$452.1M', 'SOL': '$112.5M', 'LINK': '$24.5M', 'SUI': '$38.2M', 'BNB': '$92.4M' };
       const spreads = { 'BTC': '$4.50 (0.01%)', 'ETH': '$0.35 (0.01%)', 'SOL': '$0.02 (0.01%)', 'LINK': '$0.005 (0.02%)', 'SUI': '$0.0003 (0.02%)', 'BNB': '$0.08 (0.01%)' };
-      
+
       const volText = volumes[symbol] || '$120.0M';
       const atrText = atrs[symbol] || '1.50';
       const oiText = ois[symbol] || '$15.4M';
       const spreadText = spreads[symbol] || '0.01%';
       const volatilityText = opp.volatility || 'Moderate';
-      
+
       // Top header updates
       const headerVolume = document.getElementById('header-volume-val');
       if (headerVolume) headerVolume.textContent = volText;
-      
+
       const headerVolatility = document.getElementById('header-volatility-val');
       if (headerVolatility) headerVolatility.textContent = volatilityText;
-      
+
       const headerAiRefresh = document.getElementById('header-ai-refresh');
       if (headerAiRefresh) {
         headerAiRefresh.textContent = opp.recommendation === 'HOLD' ? 'Monitoring' : (opp.recommendation === 'WAIT' ? 'Confirming' : 'Signal Active');
         headerAiRefresh.style.color = opp.recommendation === 'HOLD' ? '#60a5fa' : (opp.recommendation === 'WAIT' ? '#f59e0b' : '#10b981');
       }
-      
+
       const headerLastUpdate = document.getElementById('header-last-update');
       if (headerLastUpdate) {
         headerLastUpdate.textContent = new Date().toISOString().replace('T', ' ').substring(11, 19) + ' UTC';
       }
-      
+
       // Top-right indicator badges updates
       const bTrend = document.getElementById('chart-badge-trend');
       if (bTrend) {
@@ -3878,7 +4164,7 @@ document.addEventListener('DOMContentLoaded', () => {
         bTrend.style.background = trVal === 'Bearish' ? 'rgba(239,68,68,0.08)' : (trVal === 'Bullish' ? 'rgba(16,185,129,0.08)' : 'rgba(245,158,11,0.08)');
         bTrend.style.color = trVal === 'Bearish' ? '#ef4444' : (trVal === 'Bullish' ? '#10b981' : '#f59e0b');
       }
-      
+
       const bMom = document.getElementById('chart-badge-momentum');
       if (bMom) {
         const momVal = opp.momentumDirection || 'Strong';
@@ -3887,7 +4173,7 @@ document.addEventListener('DOMContentLoaded', () => {
         bMom.style.background = momVal === 'Bearish' || momVal === 'Weak' ? 'rgba(239,68,68,0.08)' : (momVal === 'Bullish' || momVal === 'Strong' ? 'rgba(16,185,129,0.08)' : 'rgba(245,158,11,0.08)');
         bMom.style.color = momVal === 'Bearish' || momVal === 'Weak' ? '#ef4444' : (momVal === 'Bullish' || momVal === 'Strong' ? '#10b981' : '#f59e0b');
       }
-      
+
       const bVol = document.getElementById('chart-badge-volatility');
       if (bVol) {
         bVol.textContent = `Vol: ${volatilityText}`;
@@ -3895,19 +4181,19 @@ document.addEventListener('DOMContentLoaded', () => {
         bVol.style.background = volatilityText === 'High' ? 'rgba(239,68,68,0.08)' : (volatilityText === 'Low' ? 'rgba(59,130,246,0.08)' : 'rgba(255,255,255,0.03)');
         bVol.style.color = volatilityText === 'High' ? '#ef4444' : (volatilityText === 'Low' ? '#60a5fa' : '#fff');
       }
-      
+
       const bConf = document.getElementById('chart-badge-confidence');
       if (bConf) {
         bConf.textContent = `AI: ${opp.confidenceScore || 50}%`;
       }
-      
+
       // Bottom chart bar updates
       const barSpread = document.getElementById('chart-bar-spread');
       if (barSpread) barSpread.textContent = spreadText;
-      
+
       const barAtr = document.getElementById('chart-bar-atr');
       if (barAtr) barAtr.textContent = atrText;
-      
+
       const barRsi = document.getElementById('chart-bar-rsi');
       if (barRsi) {
         const trend = opp.trendDirection || 'Bullish';
@@ -3915,10 +4201,10 @@ document.addEventListener('DOMContentLoaded', () => {
         barRsi.textContent = rsiVal.toFixed(2);
         barRsi.className = rsiVal >= 60 ? 'text-green' : (rsiVal <= 40 ? 'text-error' : 'text-warning');
       }
-      
+
       const barVolume = document.getElementById('chart-bar-volume');
       if (barVolume) barVolume.textContent = volText;
-      
+
       const barFunding = document.getElementById('chart-bar-funding');
       if (barFunding) {
         const isLong = opp.recommendation === 'LONG';
@@ -3926,7 +4212,7 @@ document.addEventListener('DOMContentLoaded', () => {
         barFunding.textContent = fundVal;
         barFunding.className = isLong ? 'text-green' : '#ef4444';
       }
-      
+
       const barOi = document.getElementById('chart-bar-oi');
       if (barOi) barOi.textContent = oiText;
       if (confidenceBadge) confidenceBadge.textContent = `${opp.confidenceScore}% Confidence`;
@@ -4226,7 +4512,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Fill Risk Analysis indicators
         const riskRrText = document.getElementById('risk-rr-val');
         if (riskRrText) riskRrText.textContent = opp.riskRewardRatio || '2.0:1';
-        
+
         const riskRrProgress = document.getElementById('risk-rr-progress');
         if (riskRrProgress) {
           const ratioVal = parseFloat(opp.riskRewardRatio || 2.0);
@@ -4325,110 +4611,110 @@ document.addEventListener('DOMContentLoaded', () => {
             trigText.textContent = `Generate a LONG signal after a confirmed breakout above $${(opp.nearestResistance || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}.`;
           } else {
             trigText.textContent = `Awaiting structural shift. Monitor support at $${(opp.nearestSupport || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })} and resistance at $${(opp.nearestResistance || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}.`;
+          }
         }
-      }
 
-      // Update Decision Timeline Elements
-      const analysisUpdated = document.getElementById('timeline-analysis-updated');
-      const signalGenerated = document.getElementById('timeline-signal-generated');
-      const statusDot = document.getElementById('timeline-status-dot');
-      const statusText = document.getElementById('timeline-status-text');
+        // Update Decision Timeline Elements
+        const analysisUpdated = document.getElementById('timeline-analysis-updated');
+        const signalGenerated = document.getElementById('timeline-signal-generated');
+        const statusDot = document.getElementById('timeline-status-dot');
+        const statusText = document.getElementById('timeline-status-text');
 
-      const now = new Date();
-      const formatUTC = (date) => {
-        return date.toISOString().replace('T', ' ').substring(11, 19) + ' UTC';
-      };
+        const now = new Date();
+        const formatUTC = (date) => {
+          return date.toISOString().replace('T', ' ').substring(11, 19) + ' UTC';
+        };
 
-      if (analysisUpdated) {
-        analysisUpdated.textContent = formatUTC(now);
-      }
-      if (signalGenerated) {
-        // Signal generated is slightly before analysis update
-        const sigTime = new Date(now.getTime() - 24000); // 24 seconds ago
-        signalGenerated.textContent = formatUTC(sigTime);
-      }
-
-      if (statusDot && statusText) {
-        const rec = opp ? opp.recommendation : 'HOLD';
-        if (rec === 'LONG' || rec === 'SHORT') {
-          statusDot.style.backgroundColor = '#10b981'; // Green
-          statusText.style.color = '#10b981';
-          statusText.textContent = 'High Confidence Setup';
-        } else if (rec === 'WAIT') {
-          statusDot.style.backgroundColor = '#f59e0b'; // Yellow
-          statusText.style.color = '#f59e0b';
-          statusText.textContent = 'Waiting for Confirmation';
-        } else if (rec === 'HOLD') {
-          statusDot.style.backgroundColor = '#9ca3af'; // Gray
-          statusText.style.color = '#9ca3af';
-          statusText.textContent = 'Monitoring Markets';
-        } else {
-          statusDot.style.backgroundColor = '#ef4444'; // Red
-          statusText.style.color = '#ef4444';
+        if (analysisUpdated) {
+          analysisUpdated.textContent = formatUTC(now);
         }
-      }
-
-      // Helper function to update the AI Status Pill
-      const updateStatusPill = (pillId, rec, riskScore, confidenceScore) => {
-        const pill = document.getElementById(pillId);
-        if (!pill) return;
-        
-        const dot = pill.querySelector('.ai-status-dot');
-        const text = pill.querySelector('.ai-status-text');
-        if (!dot || !text) return;
-        
-        let status = 'Scanning Markets';
-        let color = '#60a5fa'; // Blue
-        let dotColor = '#3b82f6';
-        let bg = 'rgba(59, 130, 246, 0.08)';
-        let border = 'rgba(59, 130, 246, 0.15)';
-        
-        if (riskScore >= 70) {
-          status = 'High-Risk Conditions';
-          color = '#f87171'; // Red
-          dotColor = '#ef4444';
-          bg = 'rgba(239, 68, 68, 0.08)';
-          border = 'rgba(239, 68, 68, 0.15)';
-        } else if ((rec === 'LONG' || rec === 'SHORT') && confidenceScore >= 75) {
-          status = 'High-Confidence Setup';
-          color = '#a5b4fc'; // Purple
-          dotColor = '#8b5cf6';
-          bg = 'rgba(139, 92, 246, 0.08)';
-          border = 'rgba(139, 92, 246, 0.15)';
-        } else if (rec === 'LONG' || rec === 'SHORT') {
-          status = 'Live Analysis';
-          color = '#34d399'; // Green
-          dotColor = '#10b981';
-          bg = 'rgba(16, 185, 129, 0.08)';
-          border = 'rgba(16, 185, 129, 0.15)';
-        } else if (rec === 'WAIT') {
-          status = 'Waiting for Confirmation';
-          color = '#fbbf24'; // Yellow
-          dotColor = '#f59e0b';
-          bg = 'rgba(245, 158, 11, 0.08)';
-          border = 'rgba(245, 158, 11, 0.15)';
-        } else if (rec === 'HOLD') {
-          status = 'Market Consolidating';
-          color = '#60a5fa'; // Blue
-          dotColor = '#3b82f6';
-          bg = 'rgba(59, 130, 246, 0.08)';
-          border = 'rgba(59, 130, 246, 0.15)';
+        if (signalGenerated) {
+          // Signal generated is slightly before analysis update
+          const sigTime = new Date(now.getTime() - 24000); // 24 seconds ago
+          signalGenerated.textContent = formatUTC(sigTime);
         }
-        
-        text.textContent = status;
-        pill.style.color = color;
-        pill.style.background = bg;
-        pill.style.borderColor = border;
-        dot.style.backgroundColor = dotColor;
-      };
 
-      const recVal = opp ? opp.recommendation : 'HOLD';
-      const riskVal = opp ? opp.riskScore : 35;
-      const confVal = opp ? opp.confidenceScore : 50;
+        if (statusDot && statusText) {
+          const rec = opp ? opp.recommendation : 'HOLD';
+          if (rec === 'LONG' || rec === 'SHORT') {
+            statusDot.style.backgroundColor = '#10b981'; // Green
+            statusText.style.color = '#10b981';
+            statusText.textContent = 'High Confidence Setup';
+          } else if (rec === 'WAIT') {
+            statusDot.style.backgroundColor = '#f59e0b'; // Yellow
+            statusText.style.color = '#f59e0b';
+            statusText.textContent = 'Waiting for Confirmation';
+          } else if (rec === 'HOLD') {
+            statusDot.style.backgroundColor = '#9ca3af'; // Gray
+            statusText.style.color = '#9ca3af';
+            statusText.textContent = 'Monitoring Markets';
+          } else {
+            statusDot.style.backgroundColor = '#ef4444'; // Red
+            statusText.style.color = '#ef4444';
+          }
+        }
 
-      updateStatusPill('state1-ai-status-pill', recVal, riskVal, confVal);
-      updateStatusPill('state2-ai-status-pill', recVal, riskVal, confVal);
-    }
+        // Helper function to update the AI Status Pill
+        const updateStatusPill = (pillId, rec, riskScore, confidenceScore) => {
+          const pill = document.getElementById(pillId);
+          if (!pill) return;
+
+          const dot = pill.querySelector('.ai-status-dot');
+          const text = pill.querySelector('.ai-status-text');
+          if (!dot || !text) return;
+
+          let status = 'Scanning Markets';
+          let color = '#60a5fa'; // Blue
+          let dotColor = '#3b82f6';
+          let bg = 'rgba(59, 130, 246, 0.08)';
+          let border = 'rgba(59, 130, 246, 0.15)';
+
+          if (riskScore >= 70) {
+            status = 'High-Risk Conditions';
+            color = '#f87171'; // Red
+            dotColor = '#ef4444';
+            bg = 'rgba(239, 68, 68, 0.08)';
+            border = 'rgba(239, 68, 68, 0.15)';
+          } else if ((rec === 'LONG' || rec === 'SHORT') && confidenceScore >= 75) {
+            status = 'High-Confidence Setup';
+            color = '#a5b4fc'; // Purple
+            dotColor = '#8b5cf6';
+            bg = 'rgba(139, 92, 246, 0.08)';
+            border = 'rgba(139, 92, 246, 0.15)';
+          } else if (rec === 'LONG' || rec === 'SHORT') {
+            status = 'Live Analysis';
+            color = '#34d399'; // Green
+            dotColor = '#10b981';
+            bg = 'rgba(16, 185, 129, 0.08)';
+            border = 'rgba(16, 185, 129, 0.15)';
+          } else if (rec === 'WAIT') {
+            status = 'Waiting for Confirmation';
+            color = '#fbbf24'; // Yellow
+            dotColor = '#f59e0b';
+            bg = 'rgba(245, 158, 11, 0.08)';
+            border = 'rgba(245, 158, 11, 0.15)';
+          } else if (rec === 'HOLD') {
+            status = 'Market Consolidating';
+            color = '#60a5fa'; // Blue
+            dotColor = '#3b82f6';
+            bg = 'rgba(59, 130, 246, 0.08)';
+            border = 'rgba(59, 130, 246, 0.15)';
+          }
+
+          text.textContent = status;
+          pill.style.color = color;
+          pill.style.background = bg;
+          pill.style.borderColor = border;
+          dot.style.backgroundColor = dotColor;
+        };
+
+        const recVal = opp ? opp.recommendation : 'HOLD';
+        const riskVal = opp ? opp.riskScore : 35;
+        const confVal = opp ? opp.confidenceScore : 50;
+
+        updateStatusPill('state1-ai-status-pill', recVal, riskVal, confVal);
+        updateStatusPill('state2-ai-status-pill', recVal, riskVal, confVal);
+      }
       // Premium AI Decision Workspace data population
       let reasoningData = null;
       if (opp && opp.reasoningText) {
@@ -4593,7 +4879,7 @@ document.addEventListener('DOMContentLoaded', () => {
               </div>
             </div>
           `;
-          
+
           const btnDeploy = document.getElementById('btn-deploy-trade');
           if (btnDeploy) {
             btnDeploy.addEventListener('click', () => {
@@ -4650,8 +4936,13 @@ document.addEventListener('DOMContentLoaded', () => {
       } else {
         renderTerminalChart(details, opp);
       }
+      
+      const overlay = document.getElementById('chart-skeleton-overlay');
+      if (overlay) overlay.remove();
     } catch (e) {
       console.error('Error updating terminal view:', e);
+      const overlay = document.getElementById('chart-skeleton-overlay');
+      if (overlay) overlay.remove();
     }
   }
 
@@ -4761,7 +5052,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (modalForm) {
       modalForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        
+
         const deployBtn = document.getElementById('btn-modal-deploy');
         if (!deployBtn || !modal) return;
 
@@ -4842,7 +5133,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const pnlClass = pos.unrealizedPnL >= 0 ? 'text-green' : 'text-error';
         const pnlSign = pos.unrealizedPnL >= 0 ? '+' : '';
-        
+
         // Progress toward TP/SL
         const tp = isShort ? pos.entryPrice * 0.95 : pos.entryPrice * 1.05;
         const sl = isShort ? pos.entryPrice * 1.02 : pos.entryPrice * 0.98;
@@ -4857,7 +5148,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const entryFormatted = pos.entryPrice >= 100
           ? pos.entryPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
           : pos.entryPrice.toLocaleString(undefined, { minimumFractionDigits: 4, maximumFractionDigits: 4 });
-        
+
         const currentFormatted = pos.currentPrice >= 100
           ? pos.currentPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
           : pos.currentPrice.toLocaleString(undefined, { minimumFractionDigits: 4, maximumFractionDigits: 4 });
@@ -4970,7 +5261,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const entryFormatted = t.entryPrice >= 100
           ? t.entryPrice.toLocaleString(undefined, { minimumFractionDigits: 2 })
           : t.entryPrice.toLocaleString(undefined, { minimumFractionDigits: 4 });
-        
+
         const exitFormatted = t.exitPrice >= 100
           ? t.exitPrice.toLocaleString(undefined, { minimumFractionDigits: 2 })
           : t.exitPrice.toLocaleString(undefined, { minimumFractionDigits: 4 });
@@ -5059,7 +5350,7 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.classList.add('active');
 
         const tab = btn.getAttribute('data-tab');
-        
+
         // Hide all tab content elements
         const contents = [
           'tab-active-positions',
@@ -5077,7 +5368,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (tab === 'simulated-orders') targetId = 'tab-simulated-orders';
         else if (tab === 'closed-history') targetId = 'tab-closed-history';
         else if (tab === 'copilot-performance') targetId = 'tab-copilot-performance';
-        
+
         const targetEl = document.getElementById(targetId);
         if (targetEl) targetEl.style.display = 'block';
 
@@ -5102,8 +5393,8 @@ document.addEventListener('DOMContentLoaded', () => {
         e.stopPropagation();
         const isCollapsed = bottomPanel.classList.toggle('collapsed');
         if (toggleIcon) {
-          toggleIcon.innerHTML = isCollapsed 
-            ? '<polyline points="6 9 12 15 18 9"/>' 
+          toggleIcon.innerHTML = isCollapsed
+            ? '<polyline points="6 9 12 15 18 9"/>'
             : '<polyline points="18 15 12 9 6 15"/>';
         }
       });
@@ -5192,10 +5483,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     largeChartSvg.addEventListener('mousemove', (e) => {
       if (!largeChartSvg.chartCoords || !largeChartSvg.chartCoords.length || !largeChartSvg.chartPoints) return;
-      
+
       const rect = largeChartSvg.getBoundingClientRect();
       const mouseX = ((e.clientX - rect.left) / rect.width) * 800;
-      
+
       let closestIdx = 0;
       let minDiff = Infinity;
       largeChartSvg.chartCoords.forEach((coord, idx) => {
@@ -5205,28 +5496,28 @@ document.addEventListener('DOMContentLoaded', () => {
           closestIdx = idx;
         }
       });
-      
+
       const closestCoord = largeChartSvg.chartCoords[closestIdx];
       const closestValue = largeChartSvg.chartPoints[closestIdx];
-      
+
       const pointer = document.getElementById('large-chart-pointer');
       if (pointer) {
         pointer.setAttribute('cx', closestCoord.x);
         pointer.setAttribute('cy', closestCoord.y);
         pointer.style.display = 'block';
       }
-      
+
       if (trackingLine) {
         trackingLine.setAttribute('x1', closestCoord.x);
         trackingLine.setAttribute('x2', closestCoord.x);
         trackingLine.style.display = 'block';
       }
-      
+
       if (dashBalance) {
         dashBalance.textContent = `$${closestValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
       }
     });
-    
+
     largeChartSvg.addEventListener('mouseleave', () => {
       const pointer = document.getElementById('large-chart-pointer');
       if (pointer) {
@@ -5238,11 +5529,11 @@ document.addEventListener('DOMContentLoaded', () => {
           pointer.style.display = 'none';
         }
       }
-      
+
       if (trackingLine) {
         trackingLine.style.display = 'none';
       }
-      
+
       if (dashBalance) {
         // Restore actual dynamic capital balance
         dashBalance.textContent = `$${state.profile.capital.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -5403,8 +5694,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (filter === 'momentum' && opp.type !== 'momentum') return false;
       }
       if (searchQuery) {
-        return opp.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-               opp.symbol.toLowerCase().includes(searchQuery.toLowerCase());
+        return opp.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          opp.symbol.toLowerCase().includes(searchQuery.toLowerCase());
       }
       return true;
     });
@@ -5418,7 +5709,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const card = document.createElement('div');
       card.className = 'card-glass opportunity-card';
       card.setAttribute('data-id', opp.opportunityId);
-      
+
       card.innerHTML = `
         <div class="opp-badge-row">
           <span class="opp-type-tag">${opp.type === 'yield' ? 'Yield Premium' : 'Momentum Flow'}</span>
@@ -5658,20 +5949,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const filtered = state.trades.filter(t => {
       const notesText = (t.notes || '').toLowerCase();
-      const matchesSearch = !searchVal || 
-                            t.symbol.toLowerCase().includes(searchVal) || 
-                            notesText.includes(searchVal);
+      const matchesSearch = !searchVal ||
+        t.symbol.toLowerCase().includes(searchVal) ||
+        notesText.includes(searchVal);
       const matchesAsset = assetVal === 'all' || t.symbol === assetVal;
       const matchesDirection = directionVal === 'all' || t.direction.toLowerCase() === directionVal;
-      const matchesResult = resultVal === 'all' || 
-                            (resultVal === 'win' && (t.winLoss === 'WIN' || t.profitLoss >= 0)) ||
-                            (resultVal === 'loss' && (t.winLoss === 'LOSS' || t.profitLoss < 0));
+      const matchesResult = resultVal === 'all' ||
+        (resultVal === 'win' && (t.winLoss === 'WIN' || t.profitLoss >= 0)) ||
+        (resultVal === 'loss' && (t.winLoss === 'LOSS' || t.profitLoss < 0));
       return matchesSearch && matchesAsset && matchesDirection && matchesResult;
     });
 
     // 4. Render Timeline
     timelineContainer.innerHTML = '';
-    
+
     if (filtered.length === 0) {
       timelineContainer.innerHTML = `<div class="card-glass" style="padding:40px; text-align:center; color:var(--text-muted); font-size:0.8rem;">No completed trades match your filter criteria.</div>`;
     } else {
@@ -5684,7 +5975,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const timelineCard = document.createElement('div');
         timelineCard.className = 'card-glass timeline-card';
         timelineCard.style.cssText = 'padding: 16px 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); background: rgba(14,19,37,0.3); display: flex; flex-direction: column; gap: 0; cursor: pointer; transition: all 0.2s ease; margin-bottom: 8px;';
-        
+
         timelineCard.innerHTML = `
           <div style="display:flex; justify-content:space-between; align-items:center; width:100%;" class="timeline-header">
             <div style="display:flex; align-items:center; gap: 12px;">
@@ -5694,10 +5985,10 @@ document.addEventListener('DOMContentLoaded', () => {
               </div>
               <strong style="color:#fff; font-size: 0.95rem; font-family: var(--font-display);">${t.symbol}</strong>
               <span class="badge-ds" style="background: ${t.direction.toLowerCase() === 'short' ? 'rgba(239,68,68,0.08)' : 'rgba(16,185,129,0.08)'} !important; color: ${t.direction.toLowerCase() === 'short' ? '#f87171' : '#10b981'} !important; font-size: 0.65rem; padding: 2px 6px;">${t.direction.toUpperCase()}</span>
-              <span style="font-size:0.7rem; color:var(--text-muted);">${new Date(t.closeTime).toLocaleDateString()} ${new Date(t.closeTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+              <span style="font-size:0.7rem; color:var(--text-muted);">${new Date(t.closeTime).toLocaleDateString()} ${new Date(t.closeTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
             </div>
             <div style="display:flex; align-items:center; gap: 16px;">
-              <span class="${colorClass}" style="font-weight:700; font-size: 0.9rem;">${sign}$${t.profitLoss.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})} (${sign}${yieldPct.toFixed(2)}%)</span>
+              <span class="${colorClass}" style="font-weight:700; font-size: 0.9rem;">${sign}$${t.profitLoss.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (${sign}${yieldPct.toFixed(2)}%)</span>
               <span style="color: var(--text-muted); font-size: 0.72rem; transition: transform 0.2s;" class="expander-arrow">▼</span>
             </div>
           </div>
@@ -5769,10 +6060,10 @@ document.addEventListener('DOMContentLoaded', () => {
           e.stopPropagation();
           const tradeId = saveBtn.getAttribute('data-id');
           const notesText = timelineCard.querySelector('.journal-trade-notes-input').value;
-          
+
           saveBtn.disabled = true;
           saveBtn.textContent = 'Saving...';
-          
+
           try {
             await apiCall(`/paper/history/${tradeId}/notes`, {
               method: 'PUT',
@@ -5809,10 +6100,10 @@ document.addEventListener('DOMContentLoaded', () => {
           const details = timelineCard.querySelector('.timeline-details');
           const arrow = timelineCard.querySelector('.expander-arrow');
           const isOpen = details.style.display === 'flex';
-          
+
           document.querySelectorAll('.timeline-details').forEach(el => el.style.display = 'none');
           document.querySelectorAll('.expander-arrow').forEach(el => el.style.transform = 'rotate(0deg)');
-          
+
           if (!isOpen) {
             details.style.display = 'flex';
             arrow.style.transform = 'rotate(180deg)';
@@ -5856,7 +6147,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function renderJournalBreakdowns(tradesList) {
     const wins = tradesList.filter(t => t.winLoss === 'WIN' || t.profitLoss >= 0).length;
     const losses = tradesList.length - wins;
-    
+
     const wlRatioEl = document.getElementById('journal-breakdown-wl-ratio');
     if (wlRatioEl) {
       wlRatioEl.textContent = `${wins}W - ${losses}L`;
@@ -5871,7 +6162,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const assetRows = document.getElementById('journal-breakdown-asset-rows');
     if (assetRows) {
       assetRows.innerHTML = '';
-      
+
       const assetMap = {};
       tradesList.forEach(t => {
         if (!assetMap[t.symbol]) {
@@ -5884,8 +6175,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
 
-      const sortedAssets = Object.keys(assetMap).sort((a,b) => assetMap[b].totalProfit - assetMap[a].totalProfit);
-      
+      const sortedAssets = Object.keys(assetMap).sort((a, b) => assetMap[b].totalProfit - assetMap[a].totalProfit);
+
       if (sortedAssets.length === 0) {
         assetRows.innerHTML = `<tr><td colspan="3" style="text-align:center; padding:12px; color:var(--text-muted);">No assets logged.</td></tr>`;
       } else {
@@ -5893,7 +6184,7 @@ document.addEventListener('DOMContentLoaded', () => {
           const stats = assetMap[symbol];
           const tr = document.createElement('tr');
           tr.style.cssText = 'border-bottom: 1px solid rgba(255,255,255,0.02);';
-          
+
           const pnlClass = stats.totalProfit >= 0 ? 'text-green' : 'text-error';
           const pnlSign = stats.totalProfit >= 0 ? '+' : '';
           const wr = (stats.wins / stats.count) * 100;
@@ -5979,7 +6270,7 @@ document.addEventListener('DOMContentLoaded', () => {
     await syncWatchlistFromServer();
 
     const isWatchlistOnly = document.getElementById('watch-filter-watchlist-only')?.checked;
-    
+
     if (state.watchlistAssets.length === 0) {
       if (emptyStateEl) emptyStateEl.style.display = 'block';
       if (mainContentEl) mainContentEl.style.display = 'none';
@@ -6066,15 +6357,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const filteredAssets = renderedAssets.filter(item => {
       if (isWatchlistOnly && !state.watchlistAssets.includes(item.symbol)) return false;
-      
-      const matchesSearch = !searchVal || 
-                            item.symbol.toLowerCase().includes(searchVal) ||
-                            (sectorNames[item.sector] || '').toLowerCase().includes(searchVal);
+
+      const matchesSearch = !searchVal ||
+        item.symbol.toLowerCase().includes(searchVal) ||
+        (sectorNames[item.sector] || '').toLowerCase().includes(searchVal);
       const matchesSector = sectorVal === 'all' || item.sector === sectorVal;
       const matchesRisk = riskVal === 'all' || item.risk === riskVal;
-      const matchesScore = scoreVal === 'all' || 
-                           (scoreVal === '80' && item.oppScore >= 80) ||
-                           (scoreVal === '90' && item.oppScore >= 90);
+      const matchesScore = scoreVal === 'all' ||
+        (scoreVal === '80' && item.oppScore >= 80) ||
+        (scoreVal === '90' && item.oppScore >= 90);
 
       return matchesSearch && matchesSector && matchesRisk && matchesScore;
     });
@@ -6090,7 +6381,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const card = document.createElement('div');
         card.className = 'card-glass metric-card-glow';
         card.style.cssText = 'padding: 20px; border-radius: 14px; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid rgba(255,255,255,0.05); background: rgba(14,19,37,0.4); text-align: left;';
-        
+
         const sign = to.change24h >= 0 ? '+' : '';
         const colorClass = to.change24h >= 0 ? 'text-green' : 'text-error';
         const trendBg = to.trend === 'BULLISH' ? 'rgba(16,185,129,0.08)' : 'rgba(239,68,68,0.08)';
@@ -6109,7 +6400,7 @@ document.addEventListener('DOMContentLoaded', () => {
               <span class="badge-ds" style="background: rgba(99, 102, 241, 0.08) !important; color: #a5b4fc !important; font-size: 0.68rem; padding: 2px 6px;">Score ${to.oppScore}</span>
             </div>
             <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 14px;">
-              <span style="font-size: 1.25rem; font-weight: 700; color: #fff; font-family: monospace;">$${to.price.toLocaleString(undefined, {minimumFractionDigits:2})}</span>
+              <span style="font-size: 1.25rem; font-weight: 700; color: #fff; font-family: monospace;">$${to.price.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
               <span class="${colorClass}" style="font-weight: 600;">${sign}${to.change24h.toFixed(2)}%</span>
             </div>
             <div style="display: flex; gap: 8px; margin-bottom: 12px; font-size: 0.68rem;">
@@ -6133,9 +6424,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const tbody = document.getElementById('watch-watchlist-rows');
     if (tbody) {
       tbody.innerHTML = '';
-      
+
       const watchedRendered = filteredAssets.filter(item => state.watchlistAssets.includes(item.symbol));
-      
+
       watchedRendered.sort((a, b) => {
         const aPinned = pinnedWatchlistAssets.includes(a.symbol) ? 1 : 0;
         const bPinned = pinnedWatchlistAssets.includes(b.symbol) ? 1 : 0;
@@ -6172,7 +6463,7 @@ document.addEventListener('DOMContentLoaded', () => {
               <span>${item.symbol}</span>
               <span style="font-weight:400; font-size:0.65rem; color:var(--text-muted); text-transform:uppercase; margin-left: 6px;">${sectorNames[item.sector] || item.sector}</span>
             </td>
-            <td style="padding: 10px 12px; text-align: right; font-family: monospace;">$${item.price.toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
+            <td style="padding: 10px 12px; text-align: right; font-family: monospace;">$${item.price.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
             <td style="padding: 10px 12px; text-align: right; font-family: monospace;" class="${pnlColor}">${sign}${item.change24h.toFixed(2)}%</td>
             <td style="padding: 10px 12px; text-align: center;"><span class="badge-ds" style="background: ${trendBg} !important; color: ${trendColor} !important; padding: 2px 6px; border-radius: 4px; font-size: 0.65rem;">${item.trend}</span></td>
             <td style="padding: 10px 12px; text-align: center; font-weight: 700; color: #fff;">${item.oppScore}</td>
@@ -6228,7 +6519,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (gainersList && losersList && risersList && fallersList) {
       const sortedMovers = [...renderedAssets].sort((a, b) => b.change24h - a.change24h);
-      
+
       gainersList.innerHTML = '';
       sortedMovers.slice(0, 3).forEach(m => {
         const div = document.createElement('div');
@@ -6246,7 +6537,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       risersList.innerHTML = '';
-      [...renderedAssets].sort((a,b) => b.oppScore - a.oppScore).slice(0, 3).forEach(m => {
+      [...renderedAssets].sort((a, b) => b.oppScore - a.oppScore).slice(0, 3).forEach(m => {
         const div = document.createElement('div');
         div.style.cssText = 'display:flex; justify-content:space-between; font-size:0.72rem; padding: 2px 0;';
         div.innerHTML = `<span style="color:#fff; font-weight:600;">${m.symbol}</span> <span style="color: var(--accent); font-weight:700;">Score ${m.oppScore}</span>`;
@@ -6254,7 +6545,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       fallersList.innerHTML = '';
-      [...renderedAssets].sort((a,b) => a.oppScore - b.oppScore).slice(0, 3).forEach(m => {
+      [...renderedAssets].sort((a, b) => a.oppScore - b.oppScore).slice(0, 3).forEach(m => {
         const div = document.createElement('div');
         div.style.cssText = 'display:flex; justify-content:space-between; font-size:0.72rem; padding: 2px 0;';
         div.innerHTML = `<span style="color:#fff; font-weight:600;">${m.symbol}</span> <span style="color: var(--text-muted);">Score ${m.oppScore}</span>`;
@@ -6275,12 +6566,12 @@ document.addEventListener('DOMContentLoaded', () => {
       const breakouts = renderedAssets.filter(a => a.oppScore >= 90 && a.change24h > 1);
 
       if (radarStCount) radarStCount.textContent = `${strengthening.length} Assets`;
-      radarStText.textContent = strengthening.length > 0 
+      radarStText.textContent = strengthening.length > 0
         ? `${strengthening.map(s => s.symbol).join(', ')} displaying bullish momentum patterns.`
         : 'No strengthening indicators detected.';
 
       if (radarWkCount) radarWkCount.textContent = `${weakening.length} Assets`;
-      radarWkText.textContent = weakening.length > 0 
+      radarWkText.textContent = weakening.length > 0
         ? `${weakening.map(s => s.symbol).join(', ')} fading below key moving averages.`
         : 'No weakening trend indicators.';
 
@@ -6293,7 +6584,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const heatmapGrid = document.getElementById('watch-heatmap-grid');
     if (heatmapGrid) {
       heatmapGrid.innerHTML = '';
-      
+
       const sectorMap = {};
       Object.keys(sectorNames).forEach(sec => {
         sectorMap[sec] = { changeSum: 0, count: 0 };
@@ -6311,7 +6602,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const avg = stats.count > 0 ? (stats.changeSum / stats.count) : 0;
         const div = document.createElement('div');
         div.className = 'card-glass';
-        
+
         let bgStyle = 'rgba(255,255,255,0.03)';
         let borderStyle = 'rgba(255,255,255,0.04)';
         let textColor = '#fff';
@@ -6338,7 +6629,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const alertsList = document.getElementById('watch-alerts-list');
     if (alertsList) {
       alertsList.innerHTML = '';
-      
+
       const defaultAlerts = [
         { id: 'a1', title: 'BTC Accumulation Wave', body: 'Bitcoin entered high-confidence accumulation bands based on ETF inflows.', type: 'info' },
         { id: 'a2', title: 'ETH Momentum Fading', body: 'Ethereum lost support at $3,500; monitoring consolidation range.', type: 'warning' },
@@ -6349,7 +6640,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const item = document.createElement('div');
         item.className = 'notif-alert-item';
         item.style.cssText = 'display:flex; justify-content:space-between; align-items:center; padding: 12px 16px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.15); margin-bottom: 8px;';
-        
+
         item.innerHTML = `
           <div>
             <strong style="font-size: 0.78rem; color:#fff; display:block; margin-bottom:2px;">${alert.title}</strong>
@@ -6412,7 +6703,7 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.classList.add('active');
 
         const tab = btn.getAttribute('data-tab');
-        
+
         const subViews = [
           'port-view-active-positions',
           'port-view-closed-trades',
@@ -6507,7 +6798,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // Toggle Empty State vs Content
       const emptyStateEl = document.getElementById('portfolio-empty-state');
       const mainContentEl = document.getElementById('portfolio-performance-content');
-      
+
       if (openCount === 0 && totalTrades === 0) {
         if (emptyStateEl) emptyStateEl.style.display = 'block';
         if (mainContentEl) mainContentEl.style.display = 'none';
@@ -6570,7 +6861,7 @@ document.addEventListener('DOMContentLoaded', () => {
         todayPnlEl.textContent = `${sign}$${todayPnl.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
         todayPnlEl.className = todayPnl >= 0 ? 'text-green' : 'text-error';
       }
-      
+
       const todayChangeIndicator = document.getElementById('perf-today-change-indicator');
       if (todayChangeIndicator) {
         const icon = todayPnlPct >= 0 ? '↑' : '↓';
@@ -6723,14 +7014,14 @@ document.addEventListener('DOMContentLoaded', () => {
       // 5. Render SECTION 3: ASSET ALLOCATION
       const holdingsRows = document.getElementById('portfolio-holdings-rows');
       const donutTotalValEl = document.getElementById('perf-donut-total-value');
-      
+
       if (donutTotalValEl) {
         donutTotalValEl.textContent = `$${Math.round(currentBalance / 1000)}k`;
       }
 
       if (holdingsRows && Array.isArray(data.holdings)) {
         holdingsRows.innerHTML = '';
-        
+
         // Donut calculations
         // Circumference of circle with radius 70 is 439.8
         const circ = 439.8;
@@ -6753,7 +7044,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
           const tr = document.createElement('tr');
           tr.style.cssText = 'border-bottom: 1px solid rgba(255,255,255,0.02);';
-          
+
           let dotColor = '#475569'; // default Cash
           if (h.symbol === 'ETH') dotColor = '#2563eb';
           else if (h.symbol === 'USDC') dotColor = '#10b981';
@@ -6847,7 +7138,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const insightsList = document.getElementById('perf-ai-insights-list');
       if (insightsList) {
         insightsList.innerHTML = '';
-        
+
         const bulletPoints = [];
         if (state.profile.riskLevel === 0) {
           bulletPoints.push('Your portfolio shield is active, maintaining 70%+ cash/stable reserves to defend against drawdown volatility.');
@@ -7010,7 +7301,7 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       const res = await apiCall(`/portfolio/history?period=${period}`);
       if (!res || !Array.isArray(res.points)) return;
-      
+
       if (!perfTimelineChart) {
         initPerfTimelineChart();
       }
@@ -7055,19 +7346,19 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!rowsContainer) return;
 
     rowsContainer.innerHTML = '';
-    
+
     const searchInput = document.getElementById('ledger-search');
     const searchVal = searchInput ? searchInput.value.toLowerCase() : '';
-    
+
     const typeFilter = document.getElementById('ledger-type-filter');
     const typeVal = typeFilter ? typeFilter.value.toLowerCase() : 'all';
 
     const filtered = (state.trades || []).filter(t => {
-      const matchesSearch = !searchVal || 
-                            t.type.toLowerCase().includes(searchVal) || 
-                            t.asset.toLowerCase().includes(searchVal) || 
-                            t.status.toLowerCase().includes(searchVal);
-      
+      const matchesSearch = !searchVal ||
+        t.type.toLowerCase().includes(searchVal) ||
+        t.asset.toLowerCase().includes(searchVal) ||
+        t.status.toLowerCase().includes(searchVal);
+
       const matchesType = typeVal === 'all' || t.type.toLowerCase() === typeVal;
       return matchesSearch && matchesType;
     });
@@ -7080,7 +7371,7 @@ document.addEventListener('DOMContentLoaded', () => {
     filtered.forEach(t => {
       const tr = document.createElement('tr');
       const badgeClass = t.status.toLowerCase();
-      
+
       tr.innerHTML = `
         <td style="font-family:monospace; font-size:0.75rem; color: var(--text-muted);">${t.timestamp}</td>
         <td style="font-weight:600; color:#fff;">${t.type}</td>
@@ -7227,10 +7518,10 @@ document.addEventListener('DOMContentLoaded', () => {
       if (priorityVal !== 'all' && n.priority !== priorityVal) return false;
 
       const matchesSearch = !searchVal ||
-                            n.title.toLowerCase().includes(searchVal) ||
-                            n.body.toLowerCase().includes(searchVal) ||
-                            n.channel.toLowerCase().includes(searchVal) ||
-                            (n.symbol && n.symbol.toLowerCase().includes(searchVal));
+        n.title.toLowerCase().includes(searchVal) ||
+        n.body.toLowerCase().includes(searchVal) ||
+        n.channel.toLowerCase().includes(searchVal) ||
+        (n.symbol && n.symbol.toLowerCase().includes(searchVal));
 
       return matchesSearch;
     });
@@ -7260,7 +7551,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (insightsContainer) {
       insightsContainer.innerHTML = '';
       const aiInsights = mergedList.filter(n => n.channel === 'ai' || n.channel === 'intelligence');
-      
+
       if (aiInsights.length === 0) {
         insightsContainer.innerHTML = `<div style="font-size:0.72rem; color:var(--text-muted); padding: 8px;">No AI observations compiled today.</div>`;
       } else {
@@ -7274,12 +7565,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     pageNotifList.innerHTML = '';
-    
+
     filtered.sort((a, b) => {
       const aPriority = (a.priority === 'critical' || a.priority === 'high') ? 1 : 0;
       const bPriority = (b.priority === 'critical' || b.priority === 'high') ? 1 : 0;
       if (aPriority !== bPriority) return bPriority - aPriority;
-      
+
       const aUnread = a.isRead ? 0 : 1;
       const bUnread = b.isRead ? 0 : 1;
       return bUnread - aUnread;
@@ -7657,7 +7948,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const compactChk = document.getElementById('settings-ui-compact');
       const animationsChk = document.getElementById('settings-ui-animations');
-      
+
       if (compactChk) compactChk.checked = localStorage.getItem('ravora_ui_compact') === 'true';
       if (animationsChk) animationsChk.checked = localStorage.getItem('ravora_ui_animations') !== 'false';
 
@@ -8008,17 +8299,17 @@ document.addEventListener('DOMContentLoaded', () => {
     btnHeaderManualScan.addEventListener('click', async () => {
       btnHeaderManualScan.disabled = true;
       btnHeaderManualScan.textContent = 'Scanning...';
-      
+
       const statusTxt = document.querySelector('.scanner-status-badge .status-txt');
       const dot = document.querySelector('.scanner-status-badge .status-pulse-dot');
-      
+
       if (statusTxt) {
         statusTxt.textContent = 'RUNNING QUANT ANALYSIS ENGINE';
         statusTxt.style.color = 'var(--accent-secondary)';
       }
       if (dot) dot.style.background = 'var(--accent-secondary)';
       syncSidebarAiStatus('Analyzing', 'var(--accent-secondary)');
- 
+
       const scanPromise = apiCall('/market/scan', { method: 'POST' });
 
       window.ravoraToast.promise(scanPromise, {
@@ -8035,7 +8326,7 @@ document.addEventListener('DOMContentLoaded', () => {
       } finally {
         btnHeaderManualScan.disabled = false;
         btnHeaderManualScan.textContent = 'Scan Markets';
-        
+
         if (statusTxt) {
           statusTxt.textContent = 'ARAIVEN SCANNING ACTIVE';
           statusTxt.style.color = 'var(--success)';
@@ -8053,7 +8344,7 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       const data = await apiCall('/portfolio');
       state.profile.capital = data.currentBalance;
-      
+
       if (dashBalance) {
         const start = state.previousBalance || (data.currentBalance * 0.95);
         animateValue(dashBalance, start, data.currentBalance, 800, '$', '', 2);
@@ -8063,7 +8354,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (dashRisk) {
         dashRisk.textContent = `${100 - data.safetyScore} / 100`;
       }
-      
+
       if (portfolioHoldingsRows) {
         portfolioHoldingsRows.innerHTML = '';
         data.holdings.forEach(h => {
@@ -8222,9 +8513,25 @@ document.addEventListener('DOMContentLoaded', () => {
   // Dashboard UI Initializer
   // ==========================================================================
   async function initializeDashboardUI() {
+    if (state.currentScreen === 'dashboard') {
+      showTradingWorkspaceSkeletons();
+    } else if (state.currentScreen === 'portfolio') {
+      showPortfolioSkeletons();
+    } else if (state.currentScreen === 'watchlist') {
+      showWatchlistSkeletons();
+    } else if (state.currentScreen === 'history') {
+      showJournalSkeletons();
+    } else if (state.currentScreen === 'notifications') {
+      if (typeof notifAlertsList !== 'undefined' && notifAlertsList) {
+        notifAlertsList.innerHTML = getNotificationsSkeletonHtml();
+      }
+    } else if (state.currentScreen === 'settings') {
+      showSettingsSkeletons();
+    }
+
     syncMainAppRiskStateDOMOnly(state.profile.riskLevel);
     await loadPortfolioData();
-    
+
     if (!state.selectedAsset) {
       state.selectedAsset = 'BTC';
     }
@@ -8299,7 +8606,7 @@ document.addEventListener('DOMContentLoaded', () => {
   async function backgroundScanRefresh() {
     const statusTxt = document.querySelector('.scanner-status-badge .status-txt');
     const dot = document.querySelector('.scanner-status-badge .status-pulse-dot');
-    
+
     // Show active scan status in scanner badge
     if (statusTxt) {
       statusTxt.textContent = 'ARAIVEN STREAMING ACTIVE';
@@ -8332,7 +8639,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // Small timeout for visual confirmation of "active scanning"
       setTimeout(() => {
         elementsToSkeleton.forEach(el => el.classList.remove('skeleton-pulse'));
-        
+
         if (statusTxt) {
           statusTxt.textContent = 'ARAIVEN SCANNING ACTIVE';
           statusTxt.style.color = 'var(--success)';
@@ -8390,7 +8697,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (secondsToNextAnalysis <= 0) {
         secondsToNextAnalysis = 30;
         secondsSinceRefresh = 0;
-        
+
         // Silent background refresh
         if (state.selectedAsset) {
           loadScannerAssets().catch(console.error);
@@ -8415,7 +8722,7 @@ document.addEventListener('DOMContentLoaded', () => {
           console.error('[Supabase SignOut Error]', err);
         }
       }
-      
+
       // Clear Supabase client keys directly to bypass third-party CDN storage blocking
       const keysToRemove = [];
       for (let i = 0; i < localStorage.length; i++) {
@@ -8425,7 +8732,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
       keysToRemove.forEach(key => localStorage.removeItem(key));
-      
+
       localStorage.removeItem('ravora_token');
       localStorage.removeItem('ravora_logged_in');
       localStorage.removeItem('ravora_login_time');
@@ -8433,7 +8740,7 @@ document.addEventListener('DOMContentLoaded', () => {
       localStorage.removeItem('ravora_onboarding_completed');
       localStorage.removeItem('ravora_remember_me');
       sessionStorage.removeItem('ravora_session_active');
-      
+
       // Redirect back to landing page
       window.location.href = '/';
     });
