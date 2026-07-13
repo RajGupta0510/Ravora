@@ -1392,6 +1392,9 @@
                 <!-- Price Chart container -->
                 <div id="terminal-candlestick-chart" style="width: 100%; height: 100%;"></div>
 
+                <!-- NEW: CHART ERROR STATE CONTAINER -->
+                <div id="terminal-chart-error-state" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 100; flex-direction: column; justify-content: center; align-items: center; background: rgba(6, 9, 19, 0.85); backdrop-filter: blur(8px);"></div>
+
                 <!-- Live Market Indicators (Top-right of chart) -->
                 <div
                   style="position: absolute; top: 12px; right: 12px; display: flex; gap: 6px; z-index: 10; pointer-events: none;">
@@ -1457,6 +1460,9 @@
 
               <!-- NEW: EMPTY STATE CONTAINER FOR ANALYSIS -->
               <div id="analysis-empty-state" style="display: none; flex-direction: column; justify-content: center; height: 100%; flex: 1;"></div>
+
+              <!-- NEW: ERROR STATE CONTAINER FOR ANALYSIS -->
+              <div id="analysis-error-state" style="display: none; flex-direction: column; justify-content: center; height: 100%; flex: 1;"></div>
 
               <!-- SCROLLABLE CONTENT (Sections 1, 2, 3, 4, 5, 6 are nested here) -->
               <div class="analysis-scroll-content">
@@ -3252,75 +3258,80 @@
 
                 <!-- PANE 1: PROFILE -->
                 <div class="settings-pane active" id="pane-profile" style="display: block;">
-                  <h4 style="color:#fff; font-size:1.15rem; font-family:var(--font-display); margin:0 0 16px 0;">Profile
-                    Settings</h4>
-                  <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 24px;">
-                    <div
-                      style="width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, var(--accent) 0%, #a5b4fc 100%); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: #fff; font-weight: 700; border: 2px solid rgba(255,255,255,0.1);"
-                      id="profile-avatar-placeholder">R</div>
-                    <div>
-                      <strong style="color: #fff; font-size: 0.95rem; display: block;" id="profile-meta-fullname">Raj
-                        Gupta</strong>
-                      <span style="font-size: 0.76rem; color: var(--text-muted);"
-                        id="profile-meta-email">raj@ravora.ai</span>
-                    </div>
-                  </div>
+                  <!-- NEW: PROFILE SUCCESS STATE CONTAINER -->
+                  <div id="profile-success-state" style="display: none; margin-bottom: 20px;"></div>
 
-                  <form id="form-settings-profile" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-                    <div style="display:flex; flex-direction:column; gap:6px;">
-                      <label style="font-size:0.75rem; color:var(--text-secondary); font-weight:600;">Full Name</label>
-                      <input type="text" id="settings-profile-fullname"
-                        style="padding:8px 12px; background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.08); border-radius:8px; color:#fff; font-size:0.8rem; outline:none;" />
+                  <div id="profile-settings-main-content">
+                    <h4 style="color:#fff; font-size:1.15rem; font-family:var(--font-display); margin:0 0 16px 0;">Profile
+                      Settings</h4>
+                    <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 24px;">
+                      <div
+                        style="width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, var(--accent) 0%, #a5b4fc 100%); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: #fff; font-weight: 700; border: 2px solid rgba(255,255,255,0.1);"
+                        id="profile-avatar-placeholder">R</div>
+                      <div>
+                        <strong style="color: #fff; font-size: 0.95rem; display: block;" id="profile-meta-fullname">Raj
+                          Gupta</strong>
+                        <span style="font-size: 0.76rem; color: var(--text-muted);"
+                          id="profile-meta-email">raj@ravora.ai</span>
+                      </div>
                     </div>
-                    <div style="display:flex; flex-direction:column; gap:6px;">
-                      <label style="font-size:0.75rem; color:var(--text-secondary); font-weight:600;">Username</label>
-                      <input type="text" id="settings-profile-username"
-                        style="padding:8px 12px; background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.08); border-radius:8px; color:#fff; font-size:0.8rem; outline:none;" />
-                    </div>
-                    <div style="display:flex; flex-direction:column; gap:6px;">
-                      <label style="font-size:0.75rem; color:var(--text-secondary); font-weight:600;">Email
-                        Address</label>
-                      <input type="email" id="settings-profile-email" disabled
-                        style="padding:8px 12px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.04); border-radius:8px; color:var(--text-muted); font-size:0.8rem; outline:none;" />
-                    </div>
-                    <div style="display:flex; flex-direction:column; gap:6px;">
-                      <label style="font-size:0.75rem; color:var(--text-secondary); font-weight:600;">Phone
-                        Number</label>
-                      <input type="text" id="settings-profile-phone"
-                        style="padding:8px 12px; background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.08); border-radius:8px; color:#fff; font-size:0.8rem; outline:none;" />
-                    </div>
-                    <div style="display:flex; flex-direction:column; gap:6px;">
-                      <label style="font-size:0.75rem; color:var(--text-secondary); font-weight:600;">Country</label>
-                      <input type="text" id="settings-profile-country"
-                        style="padding:8px 12px; background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.08); border-radius:8px; color:#fff; font-size:0.8rem; outline:none;" />
-                    </div>
-                    <div style="display:flex; flex-direction:column; gap:6px;">
-                      <label style="font-size:0.75rem; color:var(--text-secondary); font-weight:600;">Timezone</label>
-                      <select id="settings-profile-timezone"
-                        style="padding:8px 12px; background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.08); border-radius:8px; color:#fff; font-size:0.8rem; outline:none; cursor:pointer;">
-                        <option value="UTC">UTC (GMT+0)</option>
-                        <option value="EST">EST (GMT-5)</option>
-                        <option value="PST">PST (GMT-8)</option>
-                        <option value="IST">IST (GMT+5:30)</option>
-                        <option value="GMT">GMT (GMT+0)</option>
-                      </select>
-                    </div>
-                    <div style="display:flex; flex-direction:column; gap:6px;">
-                      <label style="font-size:0.75rem; color:var(--text-secondary); font-weight:600;">Preferred
-                        Currency</label>
-                      <select id="settings-profile-currency"
-                        style="padding:8px 12px; background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.08); border-radius:8px; color:#fff; font-size:0.8rem; outline:none; cursor:pointer;">
-                        <option value="USD">USD ($)</option>
-                        <option value="EUR">EUR (€)</option>
-                        <option value="GBP">GBP (£)</option>
-                        <option value="INR">INR (₹)</option>
-                      </select>
-                    </div>
-                    <div style="grid-column: span 2; display: flex; justify-content: flex-end; margin-top: 12px;">
-                      <button type="submit" class="btn btn-primary"
-                        style="font-size:0.8rem; font-weight:600; padding:10px 24px;">Save Profile Changes</button>
-                    </div>
-                  </form>
+
+                    <form id="form-settings-profile" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                      <div style="display:flex; flex-direction:column; gap:6px;">
+                        <label style="font-size:0.75rem; color:var(--text-secondary); font-weight:600;">Full Name</label>
+                        <input type="text" id="settings-profile-fullname"
+                          style="padding:8px 12px; background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.08); border-radius:8px; color:#fff; font-size:0.8rem; outline:none;" />
+                      </div>
+                      <div style="display:flex; flex-direction:column; gap:6px;">
+                        <label style="font-size:0.75rem; color:var(--text-secondary); font-weight:600;">Username</label>
+                        <input type="text" id="settings-profile-username"
+                          style="padding:8px 12px; background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.08); border-radius:8px; color:#fff; font-size:0.8rem; outline:none;" />
+                      </div>
+                      <div style="display:flex; flex-direction:column; gap:6px;">
+                        <label style="font-size:0.75rem; color:var(--text-secondary); font-weight:600;">Email
+                          Address</label>
+                        <input type="email" id="settings-profile-email" disabled
+                          style="padding:8px 12px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.04); border-radius:8px; color:var(--text-muted); font-size:0.8rem; outline:none;" />
+                      </div>
+                      <div style="display:flex; flex-direction:column; gap:6px;">
+                        <label style="font-size:0.75rem; color:var(--text-secondary); font-weight:600;">Phone
+                          Number</label>
+                        <input type="text" id="settings-profile-phone"
+                          style="padding:8px 12px; background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.08); border-radius:8px; color:#fff; font-size:0.8rem; outline:none;" />
+                      </div>
+                      <div style="display:flex; flex-direction:column; gap:6px;">
+                        <label style="font-size:0.75rem; color:var(--text-secondary); font-weight:600;">Country</label>
+                        <input type="text" id="settings-profile-country"
+                          style="padding:8px 12px; background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.08); border-radius:8px; color:#fff; font-size:0.8rem; outline:none;" />
+                      </div>
+                      <div style="display:flex; flex-direction:column; gap:6px;">
+                        <label style="font-size:0.75rem; color:var(--text-secondary); font-weight:600;">Timezone</label>
+                        <select id="settings-profile-timezone"
+                          style="padding:8px 12px; background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.08); border-radius:8px; color:#fff; font-size:0.8rem; outline:none; cursor:pointer;">
+                          <option value="UTC">UTC (GMT+0)</option>
+                          <option value="EST">EST (GMT-5)</option>
+                          <option value="PST">PST (GMT-8)</option>
+                          <option value="IST">IST (GMT+5:30)</option>
+                          <option value="GMT">GMT (GMT+0)</option>
+                        </select>
+                      </div>
+                      <div style="display:flex; flex-direction:column; gap:6px;">
+                        <label style="font-size:0.75rem; color:var(--text-secondary); font-weight:600;">Preferred
+                          Currency</label>
+                        <select id="settings-profile-currency"
+                          style="padding:8px 12px; background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.08); border-radius:8px; color:#fff; font-size:0.8rem; outline:none; cursor:pointer;">
+                          <option value="USD">USD ($)</option>
+                          <option value="EUR">EUR (€)</option>
+                          <option value="GBP">GBP (£)</option>
+                          <option value="INR">INR (₹)</option>
+                        </select>
+                      </div>
+                      <div style="grid-column: span 2; display: flex; justify-content: flex-end; margin-top: 12px;">
+                        <button type="submit" class="btn btn-primary"
+                          style="font-size:0.8rem; font-weight:600; padding:10px 24px;">Save Profile Changes</button>
+                      </div>
+                    </form>
+                  </div>
                 </div>
 
                 <!-- PANE 2: SECURITY -->
@@ -3577,66 +3588,71 @@
 
                 <!-- PANE 5: TRADING PREFERENCES -->
                 <div class="settings-pane" id="pane-trading" style="display: none;">
-                  <h4 style="color:#fff; font-size:1.15rem; font-family:var(--font-display); margin:0 0 16px 0;">Trading
-                    Configuration</h4>
+                  <!-- NEW: SETTINGS SUCCESS STATE CONTAINER -->
+                  <div id="settings-success-state" style="display: none; margin-bottom: 20px;"></div>
 
-                  <form id="form-settings-trading" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-                    <div style="display:flex; flex-direction:column; gap:4px;">
-                      <label style="font-size:0.75rem; color:var(--text-secondary); font-weight:600;">Default Chart
-                        Timeframe</label>
-                      <select id="settings-trading-timeframe"
-                        style="padding:8px 12px; background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.08); border-radius:8px; color:#fff; font-size:0.8rem; outline:none; cursor:pointer;">
-                        <option value="1h">1 Hour (1H)</option>
-                        <option value="4h" selected>4 Hours (4H)</option>
-                        <option value="1d">1 Day (1D)</option>
-                        <option value="15m">15 Minutes (15M)</option>
-                      </select>
-                    </div>
-                    <div style="display:flex; flex-direction:column; gap:4px;">
-                      <label style="font-size:0.75rem; color:var(--text-secondary); font-weight:600;">Preferred Chart
-                        Style</label>
-                      <select id="settings-trading-charttype"
-                        style="padding:8px 12px; background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.08); border-radius:8px; color:#fff; font-size:0.8rem; outline:none; cursor:pointer;">
-                        <option value="candlestick" selected>Candles</option>
-                        <option value="line">Line Graph</option>
-                      </select>
-                    </div>
-                    <div style="display:flex; flex-direction:column; gap:4px;">
-                      <label style="font-size:0.75rem; color:var(--text-secondary); font-weight:600;">Default Position
-                        Size ($ USD)</label>
-                      <input type="number" id="settings-trading-size" value="10000"
-                        style="padding:8px 12px; background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.08); border-radius:8px; color:#fff; font-size:0.8rem; outline:none;" />
-                    </div>
-                    <div style="display:flex; flex-direction:column; gap:4px;">
-                      <label style="font-size:0.75rem; color:var(--text-secondary); font-weight:600;">Default Risk limit
-                        per trade (% of Balance)</label>
-                      <input type="number" id="settings-trading-riskpct" value="2" max="100" min="1"
-                        style="padding:8px 12px; background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.08); border-radius:8px; color:#fff; font-size:0.8rem; outline:none;" />
-                    </div>
-                    <div style="display:flex; flex-direction:column; gap:4px;">
-                      <label style="font-size:0.75rem; color:var(--text-secondary); font-weight:600;">Currency Display
-                        Format</label>
-                      <select id="settings-trading-currencyfmt"
-                        style="padding:8px 12px; background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.08); border-radius:8px; color:#fff; font-size:0.8rem; outline:none; cursor:pointer;">
-                        <option value="prefix" selected>Prefix (e.g. $100)</option>
-                        <option value="suffix">Suffix (e.g. 100 USD)</option>
-                      </select>
-                    </div>
-                    <div style="display:flex; flex-direction:column; gap:4px;">
-                      <label style="font-size:0.75rem; color:var(--text-secondary); font-weight:600;">Preferred Date
-                        Format</label>
-                      <select id="settings-trading-datefmt"
-                        style="padding:8px 12px; background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.08); border-radius:8px; color:#fff; font-size:0.8rem; outline:none; cursor:pointer;">
-                        <option value="us" selected>MM/DD/YYYY</option>
-                        <option value="eu">DD/MM/YYYY</option>
-                        <option value="iso">YYYY-MM-DD</option>
-                      </select>
-                    </div>
-                    <div style="grid-column: span 2; display: flex; justify-content: flex-end; margin-top: 12px;">
-                      <button type="submit" class="btn btn-primary" style="font-size:0.8rem; font-weight:600;">Save
-                        Trading Configuration</button>
-                    </div>
-                  </form>
+                  <div id="trading-settings-main-content">
+                    <h4 style="color:#fff; font-size:1.15rem; font-family:var(--font-display); margin:0 0 16px 0;">Trading
+                      Configuration</h4>
+
+                    <form id="form-settings-trading" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                      <div style="display:flex; flex-direction:column; gap:4px;">
+                        <label style="font-size:0.75rem; color:var(--text-secondary); font-weight:600;">Default Chart
+                          Timeframe</label>
+                        <select id="settings-trading-timeframe"
+                          style="padding:8px 12px; background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.08); border-radius:8px; color:#fff; font-size:0.8rem; outline:none; cursor:pointer;">
+                          <option value="1h">1 Hour (1H)</option>
+                          <option value="4h" selected>4 Hours (4H)</option>
+                          <option value="1d">1 Day (1D)</option>
+                          <option value="15m">15 Minutes (15M)</option>
+                        </select>
+                      </div>
+                      <div style="display:flex; flex-direction:column; gap:4px;">
+                        <label style="font-size:0.75rem; color:var(--text-secondary); font-weight:600;">Preferred Chart
+                          Style</label>
+                        <select id="settings-trading-charttype"
+                          style="padding:8px 12px; background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.08); border-radius:8px; color:#fff; font-size:0.8rem; outline:none; cursor:pointer;">
+                          <option value="candlestick" selected>Candles</option>
+                          <option value="line">Line Graph</option>
+                        </select>
+                      </div>
+                      <div style="display:flex; flex-direction:column; gap:4px;">
+                        <label style="font-size:0.75rem; color:var(--text-secondary); font-weight:600;">Default Position
+                          Size ($ USD)</label>
+                        <input type="number" id="settings-trading-size" value="10000"
+                          style="padding:8px 12px; background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.08); border-radius:8px; color:#fff; font-size:0.8rem; outline:none;" />
+                      </div>
+                      <div style="display:flex; flex-direction:column; gap:4px;">
+                        <label style="font-size:0.75rem; color:var(--text-secondary); font-weight:600;">Default Risk limit
+                          per trade (% of Balance)</label>
+                        <input type="number" id="settings-trading-riskpct" value="2" max="100" min="1"
+                          style="padding:8px 12px; background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.08); border-radius:8px; color:#fff; font-size:0.8rem; outline:none;" />
+                      </div>
+                      <div style="display:flex; flex-direction:column; gap:4px;">
+                        <label style="font-size:0.75rem; color:var(--text-secondary); font-weight:600;">Currency Display
+                          Format</label>
+                        <select id="settings-trading-currencyfmt"
+                          style="padding:8px 12px; background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.08); border-radius:8px; color:#fff; font-size:0.8rem; outline:none; cursor:pointer;">
+                          <option value="prefix" selected>Prefix (e.g. $100)</option>
+                          <option value="suffix">Suffix (e.g. 100 USD)</option>
+                        </select>
+                      </div>
+                      <div style="display:flex; flex-direction:column; gap:4px;">
+                        <label style="font-size:0.75rem; color:var(--text-secondary); font-weight:600;">Preferred Date
+                          Format</label>
+                        <select id="settings-trading-datefmt"
+                          style="padding:8px 12px; background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.08); border-radius:8px; color:#fff; font-size:0.8rem; outline:none; cursor:pointer;">
+                          <option value="us" selected>MM/DD/YYYY</option>
+                          <option value="eu">DD/MM/YYYY</option>
+                          <option value="iso">YYYY-MM-DD</option>
+                        </select>
+                      </div>
+                      <div style="grid-column: span 2; display: flex; justify-content: flex-end; margin-top: 12px;">
+                        <button type="submit" class="btn btn-primary" style="font-size:0.8rem; font-weight:600;">Save
+                          Trading Configuration</button>
+                      </div>
+                    </form>
+                  </div>
                 </div>
 
                 <!-- PANE 6: CONNECTED EXCHANGES -->
@@ -3650,6 +3666,9 @@
 
                   <!-- NEW: EMPTY STATE CONTAINER FOR CONNECTED EXCHANGES -->
                   <div id="exchanges-empty-state" style="display: none; margin-bottom: 14px;"></div>
+
+                  <!-- NEW: ERROR STATE CONTAINER FOR CONNECTED EXCHANGES -->
+                  <div id="settings-exchanges-error-state" style="display: none; margin-bottom: 14px;"></div>
 
                   <div style="display: flex; flex-direction: column; gap: 14px;" id="settings-exchanges-list">
                     <!-- Binance US -->
@@ -3981,6 +4000,12 @@
   <script src="chart/chartComponent.js"></script>
 
   <script src="/dashboard.js?v=12.0"></script>
+
+  <!-- NEW: GLOBAL ERROR STATE OVERLAY -->
+  <div id="global-error-overlay" class="ravora-error-overlay" style="display: none;"></div>
+
+  <!-- NEW: GLOBAL SUCCESS STATE OVERLAY -->
+  <div id="global-success-overlay" class="ravora-success-overlay" style="display: none;"></div>
 </body>
 
 </html>

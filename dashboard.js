@@ -149,6 +149,403 @@ function renderRavoraEmptyState(container, options) {
   }
 }
 
+function renderRavoraErrorState(container, options) {
+  if (!container) return;
+  const target = typeof container === 'string' ? document.getElementById(container) : container;
+  if (!target) return;
+
+  // Clean legacy inline styles on target
+  target.style.background = 'none';
+  target.style.border = 'none';
+  target.style.padding = '0';
+  target.style.boxShadow = 'none';
+
+  const {
+    type = 'api', // network, api, auth, exchanges, market, ai, 404, permission
+    headline = '',
+    description = '',
+    primaryText = '',
+    primaryCallback = null,
+    secondaryText = '',
+    secondaryCallback = null
+  } = options;
+
+  let svgIcon = '';
+  const gradDef = `
+    <svg width="0" height="0" style="position: absolute;">
+      <defs>
+        <linearGradient id="ravora-err-grad-${type}" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#EF4444" />
+          <stop offset="100%" stop-color="#7C3AED" />
+        </linearGradient>
+      </defs>
+    </svg>
+  `;
+
+  if (type === 'network') {
+    svgIcon = `
+      <svg viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="url(#ravora-err-grad-${type})" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M1 1l22 22M16.72 11.06A10.94 10.94 0 0 1 19 12.5M5 12.5a10.94 10.94 0 0 1 5.83-2.84M8.5 16a5.46 5.46 0 0 1 3.5-1.5M12 20h.01"></path>
+      </svg>
+    `;
+  } else if (type === 'api') {
+    svgIcon = `
+      <svg viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="url(#ravora-err-grad-${type})" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
+        <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
+        <line x1="6" y1="6" x2="6.01" y2="6"></line>
+        <line x1="6" y1="18" x2="6.01" y2="18"></line>
+        <path d="M12 2v20M12 12h.01"></path>
+      </svg>
+    `;
+  } else if (type === 'auth') {
+    svgIcon = `
+      <svg viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="url(#ravora-err-grad-${type})" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20z"></path>
+        <polyline points="12 6 12 12 16 14"></polyline>
+      </svg>
+    `;
+  } else if (type === 'exchanges') {
+    svgIcon = `
+      <svg viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="url(#ravora-err-grad-${type})" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+        <line x1="1" y1="1" x2="23" y2="23"></line>
+      </svg>
+    `;
+  } else if (type === 'market') {
+    svgIcon = `
+      <svg viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="url(#ravora-err-grad-${type})" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="20" x2="18" y2="10"></line>
+        <line x1="12" y1="20" x2="12" y2="4"></line>
+        <line x1="6" y1="20" x2="6" y2="14"></line>
+        <line x1="1" y1="1" x2="23" y2="23"></line>
+      </svg>
+    `;
+  } else if (type === 'ai') {
+    svgIcon = `
+      <svg viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="url(#ravora-err-grad-${type})" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path>
+        <line x1="1" y1="1" x2="23" y2="23"></line>
+      </svg>
+    `;
+  } else if (type === '404') {
+    svgIcon = `
+      <svg viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="url(#ravora-err-grad-${type})" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3M12 17h.01"></path>
+      </svg>
+    `;
+  } else if (type === 'permission') {
+    svgIcon = `
+      <svg viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="url(#ravora-err-grad-${type})" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+      </svg>
+    `;
+  } else {
+    svgIcon = `
+      <svg viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="url(#ravora-err-grad-${type})" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+    `;
+  }
+
+  let actionsHtml = '';
+  if (primaryText) {
+    actionsHtml += `<button class="ravora-error-btn-primary" id="${target.id}-btn-primary" tabindex="0">${primaryText}</button>`;
+  }
+  if (secondaryText) {
+    actionsHtml += `<button class="ravora-error-btn-secondary" id="${target.id}-btn-secondary" tabindex="0">${secondaryText}</button>`;
+  }
+
+  target.innerHTML = `
+    ${gradDef}
+    <div class="ravora-error-state" role="alert" aria-label="${headline}">
+      <div class="ravora-error-icon" aria-hidden="true">
+        ${svgIcon}
+      </div>
+      <h4 class="ravora-error-title">${headline}</h4>
+      <p class="ravora-error-description">${description}</p>
+      ${actionsHtml ? `<div class="ravora-error-actions">${actionsHtml}</div>` : ''}
+    </div>
+  `;
+
+  if (primaryText && primaryCallback) {
+    const btn = document.getElementById(`${target.id}-btn-primary`);
+    if (btn) {
+      const handler = (e) => {
+        if (e.type === 'keydown' && e.key !== 'Enter' && e.key !== ' ') return;
+        e.preventDefault();
+        primaryCallback();
+      };
+      btn.addEventListener('click', handler);
+      btn.addEventListener('keydown', handler);
+    }
+  }
+  if (secondaryText && secondaryCallback) {
+    const btn = document.getElementById(`${target.id}-btn-secondary`);
+    if (btn) {
+      const handler = (e) => {
+        if (e.type === 'keydown' && e.key !== 'Enter' && e.key !== ' ') return;
+        e.preventDefault();
+        secondaryCallback();
+      };
+      btn.addEventListener('click', handler);
+      btn.addEventListener('keydown', handler);
+    }
+  }
+}
+
+function showRavoraGlobalError(type, callback) {
+  const overlay = document.getElementById('global-error-overlay');
+  if (!overlay) return;
+
+  let headline = '';
+  let description = '';
+  let primaryText = '';
+  let primaryCallback = null;
+
+  if (type === 'network') {
+    headline = 'Unable to connect.';
+    description = 'Check your internet connection and try again.';
+    primaryText = 'Retry';
+    primaryCallback = () => {
+      overlay.style.display = 'none';
+      if (callback) callback();
+    };
+  } else if (type === 'api') {
+    headline = 'Service temporarily unavailable.';
+    description = "We're unable to retrieve data right now.";
+    primaryText = 'Refresh';
+    primaryCallback = () => {
+      overlay.style.display = 'none';
+      window.location.reload();
+    };
+  } else if (type === 'auth') {
+    headline = 'Your session has expired.';
+    description = 'Please sign in again to continue.';
+    primaryText = 'Sign In';
+    primaryCallback = () => {
+      overlay.style.display = 'none';
+      const btnLogout = document.getElementById('btn-logout');
+      if (btnLogout) btnLogout.click();
+      else window.location.href = '/';
+    };
+  } else if (type === '404') {
+    headline = 'Page not found.';
+    description = "The page you're looking for doesn't exist.";
+    primaryText = 'Go to Dashboard';
+    primaryCallback = () => {
+      overlay.style.display = 'none';
+      navigateTo('dashboard', true);
+      history.pushState({ screen: 'dashboard' }, '', '/app/dashboard');
+    };
+  } else if (type === 'permission') {
+    headline = 'Access denied.';
+    description = "You don't have permission to access this page.";
+    primaryText = 'Go Back';
+    primaryCallback = () => {
+      overlay.style.display = 'none';
+      if (window.history.length > 1) {
+        window.history.back();
+      } else {
+        navigateTo('dashboard', true);
+      }
+    };
+  } else {
+    headline = 'An error occurred.';
+    description = 'A temporary error has occurred. Please try again.';
+    primaryText = 'Retry';
+    primaryCallback = () => {
+      overlay.style.display = 'none';
+      if (callback) callback();
+    };
+  }
+
+  overlay.style.display = 'flex';
+  renderRavoraErrorState(overlay, {
+    type,
+    headline,
+    description,
+    primaryText,
+    primaryCallback
+  });
+}
+
+function renderRavoraSuccessState(container, options) {
+  if (!container) return;
+  const target = typeof container === 'string' ? document.getElementById(container) : container;
+  if (!target) return;
+
+  // Clean legacy inline styles on target to avoid layout conflicts
+  target.style.background = 'none';
+  target.style.border = 'none';
+  target.style.padding = '0';
+  target.style.boxShadow = 'none';
+
+  const {
+    type = 'sync', // auth, account, email, exchanges, trade, sync, settings, profile
+    headline = '',
+    description = '',
+    primaryText = '',
+    primaryCallback = null,
+    secondaryText = '',
+    secondaryCallback = null
+  } = options;
+
+  const gradDef = `
+    <svg width="0" height="0" style="position: absolute;">
+      <defs>
+        <linearGradient id="ravora-success-grad-${type}" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#10B981" />
+          <stop offset="100%" stop-color="#059669" />
+        </linearGradient>
+      </defs>
+    </svg>
+  `;
+
+  const svgIcon = `
+    <svg viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="url(#ravora-success-grad-${type})" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+      <polyline points="22 4 12 14.01 9 11.01"></polyline>
+    </svg>
+  `;
+
+  let actionsHtml = '';
+  if (primaryText) {
+    actionsHtml += `<button class="ravora-success-btn-primary" id="${target.id}-btn-primary" tabindex="0">${primaryText}</button>`;
+  }
+  if (secondaryText) {
+    actionsHtml += `<button class="ravora-success-btn-secondary" id="${target.id}-btn-secondary" tabindex="0">${secondaryText}</button>`;
+  }
+
+  target.innerHTML = `
+    ${gradDef}
+    <div class="ravora-success-state" role="status" aria-label="${headline}">
+      <div class="ravora-success-icon" aria-hidden="true">
+        ${svgIcon}
+      </div>
+      <h4 class="ravora-success-title">${headline}</h4>
+      <p class="ravora-success-description">${description}</p>
+      ${actionsHtml ? `<div class="ravora-success-actions">${actionsHtml}</div>` : ''}
+    </div>
+  `;
+
+  if (primaryText && primaryCallback) {
+    const btn = document.getElementById(`${target.id}-btn-primary`);
+    if (btn) {
+      const handler = (e) => {
+        if (e.type === 'keydown' && e.key !== 'Enter' && e.key !== ' ') return;
+        e.preventDefault();
+        primaryCallback();
+      };
+      btn.addEventListener('click', handler);
+      btn.addEventListener('keydown', handler);
+    }
+  }
+  if (secondaryText && secondaryCallback) {
+    const btn = document.getElementById(`${target.id}-btn-secondary`);
+    if (btn) {
+      const handler = (e) => {
+        if (e.type === 'keydown' && e.key !== 'Enter' && e.key !== ' ') return;
+        e.preventDefault();
+        secondaryCallback();
+      };
+      btn.addEventListener('click', handler);
+      btn.addEventListener('keydown', handler);
+    }
+  }
+}
+
+function showRavoraSuccess(type, callback) {
+  const overlay = document.getElementById('global-success-overlay');
+  if (!overlay) return;
+
+  let headline = '';
+  let description = '';
+  let primaryText = '';
+  let primaryCallback = null;
+
+  if (type === 'auth') {
+    headline = 'Welcome back.';
+    description = "You're now signed in to Ravora.";
+    primaryText = 'Open Dashboard';
+    primaryCallback = () => {
+      overlay.style.display = 'none';
+      navigateTo('dashboard', true);
+      if (callback) callback();
+    };
+  } else if (type === 'account') {
+    headline = 'Your account is ready.';
+    description = "Let's personalize your trading workspace.";
+    primaryText = 'Start Onboarding';
+    primaryCallback = () => {
+      overlay.style.display = 'none';
+      const btnOnboarding = document.getElementById('btn-start-onboarding');
+      if (btnOnboarding) btnOnboarding.click();
+      if (callback) callback();
+    };
+  } else if (type === 'email') {
+    headline = 'Email verified successfully.';
+    description = 'Your account is now fully verified.';
+    primaryText = 'Continue';
+    primaryCallback = () => {
+      overlay.style.display = 'none';
+      if (callback) callback();
+    };
+  } else if (type === 'exchanges') {
+    headline = 'Exchange connected.';
+    description = 'Your portfolio will begin syncing shortly.';
+    primaryText = 'View Portfolio';
+    primaryCallback = () => {
+      overlay.style.display = 'none';
+      navigateTo('portfolio', true);
+      if (callback) callback();
+    };
+  } else if (type === 'trade') {
+    headline = 'Trade submitted successfully.';
+    description = 'Your position is now being monitored by Araiven.';
+    primaryText = 'View Position';
+    primaryCallback = () => {
+      overlay.style.display = 'none';
+      navigateTo('portfolio', true);
+      setTimeout(() => {
+        const positionsTab = document.querySelector('.portfolio-sub-tab[data-tab="positions"]');
+        if (positionsTab) positionsTab.click();
+      }, 50);
+      if (callback) callback();
+    };
+  } else if (type === 'sync') {
+    headline = 'Portfolio synchronized.';
+    description = 'Your assets have been updated.';
+    primaryText = 'Open Portfolio';
+    primaryCallback = () => {
+      overlay.style.display = 'none';
+      navigateTo('portfolio', true);
+      if (callback) callback();
+    };
+  } else {
+    headline = 'Action completed.';
+    description = 'Your request has been processed successfully.';
+    primaryText = 'Continue';
+    primaryCallback = () => {
+      overlay.style.display = 'none';
+      if (callback) callback();
+    };
+  }
+
+  overlay.style.display = 'flex';
+  renderRavoraSuccessState(overlay, {
+    type,
+    headline,
+    description,
+    primaryText,
+    primaryCallback
+  });
+}
+
 function getScannerSkeletonHtml() {
   let html = '';
   for (let i = 0; i < 7; i++) {
@@ -919,10 +1316,22 @@ document.addEventListener('DOMContentLoaded', () => {
           return await response.json();
         } else if (response.status === 401) {
           localStorage.removeItem('ravora_token');
+          showRavoraGlobalError('auth');
+          throw new Error('Authentication Error');
+        } else if (response.status >= 500) {
+          showRavoraGlobalError('api');
+          throw new Error('API Error');
         } else {
           console.warn(`Real API returned status ${response.status} for ${endpoint}. Falling back to mock...`);
         }
       } catch (err) {
+        if (err.message === 'Authentication Error' || err.message === 'API Error') {
+          throw err;
+        }
+        if (err.name === 'TypeError' || err.message.includes('Failed to fetch') || err.message.includes('NetworkError')) {
+          showRavoraGlobalError('network', () => apiCall(endpoint, options));
+          throw err;
+        }
         console.warn(`Real API fetch failed for ${endpoint}. Falling back to mock...`, err.message);
       }
     }
@@ -3405,7 +3814,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function navigateTo(screenId, pushState = true) {
     if (!validScreens.includes(screenId)) {
-      screenId = 'dashboard';
+      showRavoraGlobalError('404');
+      return;
+    }
+
+    if (localStorage.getItem('ravora_restricted_access') === 'true' && (screenId === 'settings' || screenId === 'portfolio')) {
+      showRavoraGlobalError('permission');
+      return;
     }
 
     const allNavBtns = [...menuTabBtns, btnTriggerNotif].filter(Boolean);
@@ -4231,9 +4646,66 @@ document.addEventListener('DOMContentLoaded', () => {
       timeframe = window.chartStateManager.timeframe || '1D';
     }
 
+    const chartErrorEl = document.getElementById('terminal-chart-error-state');
+    if (chartErrorEl) chartErrorEl.style.display = 'none';
+
+    const analysisErrorEl = document.getElementById('analysis-error-state');
+    const analysisScrollContent = document.querySelector('.analysis-scroll-content');
+    const terminalActionContainer = document.getElementById('terminal-action-container');
+    if (analysisErrorEl) {
+      analysisErrorEl.style.display = 'none';
+      if (analysisScrollContent) analysisScrollContent.style.display = 'block';
+      if (terminalActionContainer) terminalActionContainer.style.display = 'block';
+    }
+
+    let details = null;
     try {
-      const details = await apiCall(`/market/assets/${symbol}?timeframe=${timeframe}`);
-      const opps = await apiCall('/opportunities');
+      details = await apiCall(`/market/assets/${symbol}?timeframe=${timeframe}`);
+    } catch (err) {
+      console.error('Failed to load market data:', err);
+      if (chartErrorEl) {
+        chartErrorEl.style.display = 'flex';
+        renderRavoraErrorState(chartErrorEl, {
+          type: 'market',
+          headline: 'Market data unavailable.',
+          description: 'Live market data is temporarily unavailable.',
+          primaryText: 'Retry',
+          primaryCallback: () => {
+            chartErrorEl.style.display = 'none';
+            updateTerminalView(symbol, timeframe);
+          }
+        });
+      }
+      const overlay = document.getElementById('chart-skeleton-overlay');
+      if (overlay) overlay.remove();
+      return;
+    }
+
+    let opps = [];
+    try {
+      opps = await apiCall('/opportunities');
+    } catch (err) {
+      console.error('Failed to load Araiven AI insights:', err);
+      if (analysisErrorEl) {
+        analysisErrorEl.style.display = 'flex';
+        if (analysisScrollContent) analysisScrollContent.style.display = 'none';
+        if (terminalActionContainer) terminalActionContainer.style.display = 'none';
+        renderRavoraErrorState(analysisErrorEl, {
+          type: 'ai',
+          headline: 'Araiven is temporarily unavailable.',
+          description: 'AI insights will return once the service is restored.',
+          primaryText: 'Retry Analysis',
+          primaryCallback: () => {
+            analysisErrorEl.style.display = 'none';
+            if (analysisScrollContent) analysisScrollContent.style.display = 'block';
+            if (terminalActionContainer) terminalActionContainer.style.display = 'block';
+            updateTerminalView(symbol, timeframe);
+          }
+        });
+      }
+    }
+
+    try {
       const opp = opps.find(o => o.symbol.startsWith(symbol)) || {
         opportunityScore: 0,
         confidenceScore: 0,
@@ -5307,6 +5779,7 @@ document.addEventListener('DOMContentLoaded', () => {
           await deployPromise;
           modal.style.display = 'none';
           await initializeDashboardUI();
+          showRavoraSuccess('trade');
         } catch (err) {
           console.error(err);
         } finally {
@@ -8299,31 +8772,53 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const exchangesListEl = document.getElementById('settings-exchanges-list');
       const exchangesEmptyStateEl = document.getElementById('exchanges-empty-state');
+      const exchangesErrorStateEl = document.getElementById('settings-exchanges-error-state');
 
-      if (binanceDisconnected && coinbaseDisconnected) {
-        if (state.showExchangesList) {
-          if (exchangesListEl) exchangesListEl.style.display = 'flex';
-          if (exchangesEmptyStateEl) exchangesEmptyStateEl.style.display = 'none';
-        } else {
-          if (exchangesListEl) exchangesListEl.style.display = 'none';
-          if (exchangesEmptyStateEl) {
-            exchangesEmptyStateEl.style.display = 'block';
-            renderRavoraEmptyState(exchangesEmptyStateEl, {
-              type: 'exchanges',
-              headline: 'Connect your first exchange.',
-              description: 'Securely connect an exchange to synchronize your portfolio and trading activity.',
-              primaryText: 'Connect Exchange',
-              primaryCallback: () => {
-                state.showExchangesList = true;
-                loadSettingsCenter();
-              }
-            });
-          }
+      if (localStorage.getItem('ravora_exchange_connection_error') === 'true') {
+        if (exchangesListEl) exchangesListEl.style.display = 'none';
+        if (exchangesEmptyStateEl) exchangesEmptyStateEl.style.display = 'none';
+        if (exchangesErrorStateEl) {
+          exchangesErrorStateEl.style.display = 'block';
+          renderRavoraErrorState(exchangesErrorStateEl, {
+            type: 'exchanges',
+            headline: 'Exchange connection lost.',
+            description: 'Reconnect your exchange to resume synchronization.',
+            primaryText: 'Reconnect',
+            primaryCallback: () => {
+              localStorage.removeItem('ravora_exchange_connection_error');
+              localStorage.removeItem('ravora_exchange_disconnected_binance');
+              loadSettingsCenter();
+            }
+          });
         }
       } else {
-        state.showExchangesList = false;
-        if (exchangesListEl) exchangesListEl.style.display = 'flex';
-        if (exchangesEmptyStateEl) exchangesEmptyStateEl.style.display = 'none';
+        if (exchangesErrorStateEl) exchangesErrorStateEl.style.display = 'none';
+
+        if (binanceDisconnected && coinbaseDisconnected) {
+          if (state.showExchangesList) {
+            if (exchangesListEl) exchangesListEl.style.display = 'flex';
+            if (exchangesEmptyStateEl) exchangesEmptyStateEl.style.display = 'none';
+          } else {
+            if (exchangesListEl) exchangesListEl.style.display = 'none';
+            if (exchangesEmptyStateEl) {
+              exchangesEmptyStateEl.style.display = 'block';
+              renderRavoraEmptyState(exchangesEmptyStateEl, {
+                type: 'exchanges',
+                headline: 'Connect your first exchange.',
+                description: 'Securely connect an exchange to synchronize your portfolio and trading activity.',
+                primaryText: 'Connect Exchange',
+                primaryCallback: () => {
+                  state.showExchangesList = true;
+                  loadSettingsCenter();
+                }
+              });
+            }
+          }
+        } else {
+          state.showExchangesList = false;
+          if (exchangesListEl) exchangesListEl.style.display = 'flex';
+          if (exchangesEmptyStateEl) exchangesEmptyStateEl.style.display = 'none';
+        }
       }
 
       const compactChk = document.getElementById('settings-ui-compact');
@@ -8417,12 +8912,28 @@ document.addEventListener('DOMContentLoaded', () => {
             }
           });
           if (res && res.success) {
-            showToast('Profile updated successfully.');
             const headerUserNameEl = document.getElementById('header-user-display-name');
             if (headerUserNameEl) {
               headerUserNameEl.textContent = fullName;
             }
             loadSettingsCenter();
+
+            const contentEl = document.getElementById('profile-settings-main-content');
+            const successEl = document.getElementById('profile-success-state');
+            if (contentEl && successEl) {
+              contentEl.style.display = 'none';
+              successEl.style.display = 'block';
+              renderRavoraSuccessState(successEl, {
+                type: 'profile',
+                headline: 'Profile updated.',
+                description: 'Your information has been saved.',
+                primaryText: 'Continue',
+                primaryCallback: () => {
+                  successEl.style.display = 'none';
+                  contentEl.style.display = 'block';
+                }
+              });
+            }
           } else {
             showToast('Error updating profile.');
           }
@@ -8566,7 +9077,22 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         }
 
-        showToast('Trading preferences updated.');
+        const contentEl = document.getElementById('trading-settings-main-content');
+        const successEl = document.getElementById('settings-success-state');
+        if (contentEl && successEl) {
+          contentEl.style.display = 'none';
+          successEl.style.display = 'block';
+          renderRavoraSuccessState(successEl, {
+            type: 'settings',
+            headline: 'Changes saved.',
+            description: 'Your preferences have been updated successfully.',
+            primaryText: 'Return',
+            primaryCallback: () => {
+              successEl.style.display = 'none';
+              contentEl.style.display = 'block';
+            }
+          });
+        }
       });
     }
 
@@ -8576,7 +9102,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const disVal = localStorage.getItem('ravora_exchange_disconnected_binance') === 'true';
         localStorage.setItem('ravora_exchange_disconnected_binance', disVal ? 'false' : 'true');
         loadSettingsCenter();
-        showToast(disVal ? 'Binance US Connected.' : 'Binance US Disconnected.');
+        if (disVal) {
+          showRavoraSuccess('exchanges');
+        } else {
+          showToast('Binance US Disconnected.');
+        }
       });
     }
 
@@ -8586,7 +9116,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const disVal = localStorage.getItem('ravora_exchange_disconnected_coinbase') === 'true';
         localStorage.setItem('ravora_exchange_disconnected_coinbase', disVal ? 'false' : 'true');
         loadSettingsCenter();
-        showToast(disVal ? 'Coinbase Pro Connected.' : 'Coinbase Pro Disconnected.');
+        if (disVal) {
+          showRavoraSuccess('exchanges');
+        } else {
+          showToast('Coinbase Pro Disconnected.');
+        }
       });
     }
 
@@ -8940,6 +9474,7 @@ document.addEventListener('DOMContentLoaded', () => {
       initializeSettingsCenterEvents();
       state.terminalEventsInitialized = true;
     }
+    window.showRavoraSuccess = showRavoraSuccess;
   }
 
   async function updateDashboardTopOpportunity() {
