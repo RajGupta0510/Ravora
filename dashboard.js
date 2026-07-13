@@ -2,6 +2,153 @@
 // Global Loading Skeleton System Helpers
 // ==========================================================================
 
+
+function renderRavoraEmptyState(container, options) {
+  if (!container) return;
+  const target = typeof container === 'string' ? document.getElementById(container) : container;
+  if (!target) return;
+
+  // Clean legacy inline styles on empty state container to prevent conflicts
+  target.style.background = 'none';
+  target.style.border = 'none';
+  target.style.padding = '0';
+  target.style.boxShadow = 'none';
+
+  const {
+    type = 'portfolio', // portfolio, journal, watchlist, notifications, search, exchanges, analysis, scanner
+    headline = '',
+    description = '',
+    primaryText = '',
+    primaryCallback = null,
+    secondaryText = '',
+    secondaryCallback = null
+  } = options;
+
+  let svgIcon = '';
+  const gradDef = `
+    <svg width="0" height="0" style="position: absolute;">
+      <defs>
+        <linearGradient id="ravora-grad-${type}" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#2563EB" />
+          <stop offset="100%" stop-color="#7C3AED" />
+        </linearGradient>
+      </defs>
+    </svg>
+  `;
+
+  if (type === 'portfolio') {
+    svgIcon = `
+      <svg viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="url(#ravora-grad-${type})" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+        <polygon points="12 11 12 17 17 14"></polygon>
+      </svg>
+    `;
+  } else if (type === 'journal') {
+    svgIcon = `
+      <svg viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="url(#ravora-grad-${type})" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+      </svg>
+    `;
+  } else if (type === 'watchlist') {
+    svgIcon = `
+      <svg viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="url(#ravora-grad-${type})" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <circle cx="12" cy="12" r="6"></circle>
+        <circle cx="12" cy="12" r="2"></circle>
+      </svg>
+    `;
+  } else if (type === 'notifications') {
+    svgIcon = `
+      <svg viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="url(#ravora-grad-${type})" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+      </svg>
+    `;
+  } else if (type === 'search') {
+    svgIcon = `
+      <svg viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="url(#ravora-grad-${type})" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+    `;
+  } else if (type === 'exchanges') {
+    svgIcon = `
+      <svg viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="url(#ravora-grad-${type})" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="11" width="18" height="10" rx="2" ry="2"></rect>
+        <path d="M12 2v9M8 5h8"></path>
+        <path d="M7 11V9a5 5 0 0 1 10 0v2"></path>
+      </svg>
+    `;
+  } else if (type === 'analysis') {
+    svgIcon = `
+      <svg viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="url(#ravora-grad-${type})" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path>
+        <circle cx="12" cy="12" r="4"></circle>
+      </svg>
+    `;
+  } else if (type === 'scanner') {
+    svgIcon = `
+      <svg viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="url(#ravora-grad-${type})" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"></path>
+      </svg>
+    `;
+  } else {
+    svgIcon = `
+      <svg viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="url(#ravora-grad-${type})" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+    `;
+  }
+
+  let actionsHtml = '';
+  if (primaryText) {
+    actionsHtml += `<button class="ravora-empty-btn-primary" id="${target.id}-btn-primary" tabindex="0">${primaryText}</button>`;
+  }
+  if (secondaryText) {
+    actionsHtml += `<button class="ravora-empty-btn-secondary" id="${target.id}-btn-secondary" tabindex="0">${secondaryText}</button>`;
+  }
+
+  target.innerHTML = `
+    ${gradDef}
+    <div class="ravora-empty-state" role="region" aria-label="${headline}">
+      <div class="ravora-empty-state-icon" aria-hidden="true">
+        ${svgIcon}
+      </div>
+      <h4 class="ravora-empty-state-title">${headline}</h4>
+      <p class="ravora-empty-state-description">${description}</p>
+      ${actionsHtml ? `<div class="ravora-empty-state-actions">${actionsHtml}</div>` : ''}
+    </div>
+  `;
+
+  if (primaryText && primaryCallback) {
+    const btn = document.getElementById(`${target.id}-btn-primary`);
+    if (btn) {
+      const handler = (e) => {
+        if (e.type === 'keydown' && e.key !== 'Enter' && e.key !== ' ') return;
+        e.preventDefault();
+        primaryCallback();
+      };
+      btn.addEventListener('click', handler);
+      btn.addEventListener('keydown', handler);
+    }
+  }
+  if (secondaryText && secondaryCallback) {
+    const btn = document.getElementById(`${target.id}-btn-secondary`);
+    if (btn) {
+      const handler = (e) => {
+        if (e.type === 'keydown' && e.key !== 'Enter' && e.key !== ' ') return;
+        e.preventDefault();
+        secondaryCallback();
+      };
+      btn.addEventListener('click', handler);
+      btn.addEventListener('keydown', handler);
+    }
+  }
+}
+
 function getScannerSkeletonHtml() {
   let html = '';
   for (let i = 0; i < 7; i++) {
@@ -3826,10 +3973,49 @@ document.addEventListener('DOMContentLoaded', () => {
       if (filteredData.length === 0) {
         if (emptyStateEl) {
           emptyStateEl.style.display = 'block';
-          if (activeFilter === 'watchlist') {
-            emptyStateEl.textContent = 'No assets in your watchlist.';
+          if (searchQuery) {
+            renderRavoraEmptyState(emptyStateEl, {
+              type: 'search',
+              headline: 'No matching assets found.',
+              description: 'Try another asset name, ticker or keyword.',
+              primaryText: 'Clear Search',
+              primaryCallback: () => {
+                const searchInput = document.getElementById('scanner-search-input');
+                if (searchInput) {
+                  searchInput.value = '';
+                  searchInput.dispatchEvent(new Event('input'));
+                }
+              }
+            });
+          } else if (activeFilter === 'watchlist') {
+            renderRavoraEmptyState(emptyStateEl, {
+              type: 'watchlist',
+              headline: 'Build your AI Watchlist.',
+              description: 'Add assets to let Araiven monitor opportunities and market changes.',
+              primaryText: 'Browse Markets',
+              primaryCallback: () => {
+                const allTabBtn = document.querySelector('.scanner-tab-btn[data-filter="all"]');
+                if (allTabBtn) {
+                  allTabBtn.click();
+                } else {
+                  state.activeScannerFilter = 'all';
+                  loadScannerAssets();
+                }
+              }
+            });
           } else {
-            emptyStateEl.textContent = 'No matching assets found.';
+            renderRavoraEmptyState(emptyStateEl, {
+              type: 'scanner',
+              headline: 'No assets found.',
+              description: 'No assets are currently active in this category.',
+              primaryText: 'Reset Filters',
+              primaryCallback: () => {
+                const allTabBtn = document.querySelector('.scanner-tab-btn[data-filter="all"]');
+                if (allTabBtn) {
+                  allTabBtn.click();
+                }
+              }
+            });
           }
         }
       } else {
@@ -4361,6 +4547,34 @@ document.addEventListener('DOMContentLoaded', () => {
       if (state1Active) state1Active.style.display = activeState === 1 ? 'block' : 'none';
       if (state2NoTrade) state2NoTrade.style.display = activeState === 2 ? 'block' : 'none';
       if (state3Insufficient) state3Insufficient.style.display = activeState === 3 ? 'block' : 'none';
+
+      const analysisEmptyState = document.getElementById('analysis-empty-state');
+      const analysisScrollContent = document.querySelector('.analysis-scroll-content');
+      const terminalActionContainer = document.getElementById('terminal-action-container');
+
+      if (activeState === 3) {
+        if (analysisScrollContent) analysisScrollContent.style.display = 'none';
+        if (terminalActionContainer) terminalActionContainer.style.display = 'none';
+        if (analysisEmptyState) {
+          analysisEmptyState.style.display = 'flex';
+          renderRavoraEmptyState(analysisEmptyState, {
+            type: 'analysis',
+            headline: 'Araiven is preparing your analysis.',
+            description: 'Once sufficient market data is available, AI insights will appear here.',
+            primaryText: 'Refresh',
+            primaryCallback: () => {
+              const btnHeaderScan = document.getElementById('btn-header-manual-scan');
+              if (btnHeaderScan) {
+                btnHeaderScan.click();
+              }
+            }
+          });
+        }
+      } else {
+        if (analysisScrollContent) analysisScrollContent.style.display = 'block';
+        if (terminalActionContainer) terminalActionContainer.style.display = 'block';
+        if (analysisEmptyState) analysisEmptyState.style.display = 'none';
+      }
 
       const isSetupActive = activeState === 1;
       const executionPlanActive = document.getElementById('execution-plan-active');
@@ -5701,7 +5915,26 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     if (cards.length === 0) {
-      opportunitiesCardsContainer.innerHTML = '<div class="card-glass" style="grid-column: 1/-1; padding: 40px; text-align: center; color: var(--text-secondary);">No opportunities match current criteria.</div>';
+      const emptyDiv = document.createElement('div');
+      emptyDiv.style.gridColumn = '1/-1';
+      emptyDiv.id = 'opportunities-empty-state-wrapper';
+      opportunitiesCardsContainer.appendChild(emptyDiv);
+      renderRavoraEmptyState(emptyDiv, {
+        type: 'scanner',
+        headline: 'No opportunities match your filters.',
+        description: 'Try adjusting filters or broadening your search.',
+        primaryText: 'Reset Filters',
+        primaryCallback: () => {
+          if (explorerSearchInput) explorerSearchInput.value = '';
+          const allBtn = document.querySelector('#explorer-filter-tabs button[data-filter="all"]');
+          if (allBtn) {
+            const filterBtns = document.querySelectorAll('#explorer-filter-tabs button');
+            filterBtns.forEach(btn => btn.classList.remove('active'));
+            allBtn.classList.add('active');
+          }
+          renderOpportunitiesCardsLocal('all', '');
+        }
+      });
       return;
     }
 
@@ -5846,20 +6079,50 @@ document.addEventListener('DOMContentLoaded', () => {
     const timelineContainer = document.getElementById('journal-timeline-container');
     if (!timelineContainer) return;
 
+    let journalError = false;
     try {
       const trades = await apiCall('/paper/history');
       state.trades = trades;
     } catch (e) {
       console.error('Error fetching trade history:', e);
       state.trades = [];
+      journalError = true;
     }
 
     const totalTrades = state.trades.length;
     const emptyStateEl = document.getElementById('journal-empty-state');
     const mainContentEl = document.getElementById('journal-main-content');
 
+    if (journalError) {
+      if (emptyStateEl) {
+        emptyStateEl.style.display = 'block';
+        renderRavoraEmptyState(emptyStateEl, {
+          type: 'error',
+          headline: 'Unable to load trading journal.',
+          description: 'A temporary issue prevented loading your trade history.',
+          primaryText: 'Retry',
+          primaryCallback: () => {
+            renderTradeHistoryRowsLocal();
+          }
+        });
+      }
+      if (mainContentEl) mainContentEl.style.display = 'none';
+      return;
+    }
+
     if (totalTrades === 0) {
-      if (emptyStateEl) emptyStateEl.style.display = 'block';
+      if (emptyStateEl) {
+        emptyStateEl.style.display = 'block';
+        renderRavoraEmptyState(emptyStateEl, {
+          type: 'journal',
+          headline: 'No trades to review yet.',
+          description: "Completed trades will appear here along with Araiven's performance analysis.",
+          primaryText: 'Open Trading Workspace',
+          primaryCallback: () => {
+            navigateTo('dashboard');
+          }
+        });
+      }
       if (mainContentEl) mainContentEl.style.display = 'none';
       return;
     } else {
@@ -6257,8 +6520,10 @@ document.addEventListener('DOMContentLoaded', () => {
       if (Array.isArray(list)) {
         state.watchlistAssets = list;
       }
+      state.watchlistError = false;
     } catch (e) {
       console.error('Error syncing watchlist from server:', e);
+      state.watchlistError = true;
     }
   }
 
@@ -6271,8 +6536,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const isWatchlistOnly = document.getElementById('watch-filter-watchlist-only')?.checked;
 
+    if (state.watchlistError) {
+      if (emptyStateEl) {
+        emptyStateEl.style.display = 'block';
+        renderRavoraEmptyState(emptyStateEl, {
+          type: 'error',
+          headline: 'Unable to load watchlist.',
+          description: 'A connection error occurred while syncing your watchlist.',
+          primaryText: 'Retry',
+          primaryCallback: () => {
+            renderWatchlistCenter();
+          }
+        });
+      }
+      if (mainContentEl) mainContentEl.style.display = 'none';
+      return;
+    }
+
     if (state.watchlistAssets.length === 0) {
-      if (emptyStateEl) emptyStateEl.style.display = 'block';
+      if (emptyStateEl) {
+        emptyStateEl.style.display = 'block';
+        renderRavoraEmptyState(emptyStateEl, {
+          type: 'watchlist',
+          headline: 'Build your AI Watchlist.',
+          description: 'Add assets to let Araiven monitor opportunities and market changes.',
+          primaryText: 'Browse Markets',
+          primaryCallback: () => {
+            navigateTo('dashboard');
+          }
+        });
+      }
       if (mainContentEl) mainContentEl.style.display = 'none';
       return;
     } else {
@@ -6800,7 +7093,24 @@ document.addEventListener('DOMContentLoaded', () => {
       const mainContentEl = document.getElementById('portfolio-performance-content');
 
       if (openCount === 0 && totalTrades === 0) {
-        if (emptyStateEl) emptyStateEl.style.display = 'block';
+        if (emptyStateEl) {
+          emptyStateEl.style.display = 'block';
+          renderRavoraEmptyState(emptyStateEl, {
+            type: 'portfolio',
+            headline: 'Your portfolio starts here.',
+            description: 'Connect an exchange or begin paper trading to start tracking your performance.',
+            primaryText: 'Connect Exchange',
+            primaryCallback: () => {
+              navigateTo('settings');
+              const btn = document.querySelector('#settings-nav-menu .settings-menu-btn[data-pane="exchanges"]');
+              if (btn) btn.click();
+            },
+            secondaryText: 'Start Paper Trading',
+            secondaryCallback: () => {
+              navigateTo('dashboard');
+            }
+          });
+        }
         if (mainContentEl) mainContentEl.style.display = 'none';
         return; // Skip rendering details
       } else {
@@ -7217,6 +7527,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     } catch (e) {
       console.error('Error refreshing portfolio Performance Center:', e);
+      const emptyStateEl = document.getElementById('portfolio-empty-state');
+      const mainContentEl = document.getElementById('portfolio-performance-content');
+      if (emptyStateEl) {
+        emptyStateEl.style.display = 'block';
+        renderRavoraEmptyState(emptyStateEl, {
+          type: 'error',
+          headline: 'Unable to load portfolio.',
+          description: 'A temporary connection issue occurred. Please check your connection and try again.',
+          primaryText: 'Retry',
+          primaryCallback: () => {
+            refreshPortfolioSubViews();
+          }
+        });
+      }
+      if (mainContentEl) mainContentEl.style.display = 'none';
     }
   }
 
@@ -7576,8 +7901,34 @@ document.addEventListener('DOMContentLoaded', () => {
       return bUnread - aUnread;
     });
 
-    if (filtered.length === 0) {
-      if (emptyStateEl) emptyStateEl.style.display = 'block';
+    if (state.notificationError) {
+      if (emptyStateEl) {
+        emptyStateEl.style.display = 'block';
+        renderRavoraEmptyState(emptyStateEl, {
+          type: 'error',
+          headline: 'Unable to load notifications.',
+          description: 'A temporary connection issue occurred. Please check your connection and try again.',
+          primaryText: 'Retry',
+          primaryCallback: () => {
+            loadNotifications();
+          }
+        });
+      }
+    } else if (filtered.length === 0) {
+      if (emptyStateEl) {
+        emptyStateEl.style.display = 'block';
+        renderRavoraEmptyState(emptyStateEl, {
+          type: 'notifications',
+          headline: "You're all caught up.",
+          description: 'Araiven will notify you when meaningful events require your attention.',
+          primaryText: 'Notification Settings',
+          primaryCallback: () => {
+            navigateTo('settings');
+            const btn = document.querySelector('#settings-nav-menu .settings-menu-btn[data-pane="notifications"]');
+            if (btn) btn.click();
+          }
+        });
+      }
     } else {
       if (emptyStateEl) emptyStateEl.style.display = 'none';
 
@@ -7944,6 +8295,35 @@ document.addEventListener('DOMContentLoaded', () => {
           document.getElementById('btn-exchange-disconnect-coinbase').textContent = 'Disconnect';
           document.getElementById('btn-exchange-disconnect-coinbase').style.color = '#ef4444';
         }
+      }
+
+      const exchangesListEl = document.getElementById('settings-exchanges-list');
+      const exchangesEmptyStateEl = document.getElementById('exchanges-empty-state');
+
+      if (binanceDisconnected && coinbaseDisconnected) {
+        if (state.showExchangesList) {
+          if (exchangesListEl) exchangesListEl.style.display = 'flex';
+          if (exchangesEmptyStateEl) exchangesEmptyStateEl.style.display = 'none';
+        } else {
+          if (exchangesListEl) exchangesListEl.style.display = 'none';
+          if (exchangesEmptyStateEl) {
+            exchangesEmptyStateEl.style.display = 'block';
+            renderRavoraEmptyState(exchangesEmptyStateEl, {
+              type: 'exchanges',
+              headline: 'Connect your first exchange.',
+              description: 'Securely connect an exchange to synchronize your portfolio and trading activity.',
+              primaryText: 'Connect Exchange',
+              primaryCallback: () => {
+                state.showExchangesList = true;
+                loadSettingsCenter();
+              }
+            });
+          }
+        }
+      } else {
+        state.showExchangesList = false;
+        if (exchangesListEl) exchangesListEl.style.display = 'flex';
+        if (exchangesEmptyStateEl) exchangesEmptyStateEl.style.display = 'none';
       }
 
       const compactChk = document.getElementById('settings-ui-compact');
@@ -8503,9 +8883,12 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       const data = await apiCall('/notifications');
       state.notifications = data;
-      renderNotificationsFeedLocal();
+      state.notificationError = false;
+      renderPageNotificationsFeed();
     } catch (e) {
       console.error('Error loading notifications:', e);
+      state.notificationError = true;
+      renderPageNotificationsFeed();
     }
   }
 
