@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { useApp, Opportunity } from '../../context/AppContext';
 import { Sparkles, Play } from 'lucide-react';
 
@@ -36,7 +36,7 @@ export const OpportunitiesPanel: React.FC = () => {
     };
   }, [selectedOpp]);
 
-  const handleScan = async () => {
+  const handleScan = useCallback(async () => {
     try {
       setScanning(true);
       await scanMarkets();
@@ -45,7 +45,7 @@ export const OpportunitiesPanel: React.FC = () => {
     } finally {
       setScanning(false);
     }
-  };
+  }, [scanMarkets]);
 
   const handleDeploy = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -72,12 +72,12 @@ export const OpportunitiesPanel: React.FC = () => {
     } finally {
       setDeploying(false);
     }
-  };
+  }, [selectedOpp, deployAmount, deployLeverage, deployOpportunity]);
 
-  const filteredOpps = opportunities.filter(opp => {
+  const filteredOpps = useMemo(() => opportunities.filter(opp => {
     if (filterType === 'ALL') return true;
     return opp.type === filterType;
-  });
+  }), [opportunities, filterType]);
 
   const formatCurrency = (val: number) => {
     return '$' + val.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });

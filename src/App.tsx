@@ -1,11 +1,46 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useSearchParams } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { AppProvider } from './context/AppContext';
 import { Toaster } from 'sonner';
-import LandingPage from './components/landing/LandingPage';
-import { OnboardingWizard } from './components/dashboard/OnboardingWizard';
-import { AuthCardPage } from 'components/ui/auth-card';
+
+// Lazy-loaded page components — only downloaded when their route is visited
+const LandingPage = React.lazy(() => import('./components/landing/LandingPage'));
+const OnboardingWizard = React.lazy(() => import('./components/dashboard/OnboardingWizard').then(m => ({ default: m.OnboardingWizard })));
+const AuthCardPage = React.lazy(() => import('components/ui/auth-card').then(m => ({ default: m.AuthCardPage })));
+
+// Lightweight loading skeleton shown while lazy chunks download
+const PageSkeleton: React.FC = () => (
+  <div style={{
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100vw',
+    height: '100vh',
+    background: '#060B17',
+    color: '#fff',
+    fontFamily: 'sans-serif'
+  }}>
+    <div style={{
+      width: '36px',
+      height: '36px',
+      border: '3px solid rgba(255,255,255,0.1)',
+      borderRadius: '50%',
+      borderTopColor: '#4F7CFF',
+      animation: 'spin-loader 0.8s linear infinite',
+      marginBottom: '16px'
+    }}></div>
+    <div style={{ fontSize: '0.78rem', letterSpacing: '0.08em', color: '#94a3b8', fontWeight: 600 }}>
+      LOADING...
+    </div>
+    <style>{`
+      @keyframes spin-loader {
+        to { transform: rotate(360deg); }
+      }
+    `}</style>
+  </div>
+);
 
 // Protected Route Wrapper - redirects unauthenticated users to login, and forces onboarding if not completed
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -131,30 +166,32 @@ const DashboardRedirect: React.FC = () => {
 
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<LandingPage />} />
-        
-        <Route path="/auth" element={<AuthRedirect />} />
-        <Route path="/auth/:mode" element={
-          <GuestRoute>
-            <AuthCardPage />
-          </GuestRoute>
-        } />
-        
-        <Route path="/onboarding" element={
-          <OnboardingRoute>
-            <OnboardingWizard />
-          </OnboardingRoute>
-        } />
-        
-        <Route path="/dashboard" element={
-          <ProtectedRoute>
-            <DashboardRedirect />
-          </ProtectedRoute>
-        } />
-        
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+      <Suspense fallback={<PageSkeleton />}>
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          
+          <Route path="/auth" element={<AuthRedirect />} />
+          <Route path="/auth/:mode" element={
+            <GuestRoute>
+              <AuthCardPage />
+            </GuestRoute>
+          } />
+          
+          <Route path="/onboarding" element={
+            <OnboardingRoute>
+              <OnboardingWizard />
+            </OnboardingRoute>
+          } />
+          
+          <Route path="/dashboard" element={
+            <ProtectedRoute>
+              <DashboardRedirect />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </Suspense>
       <Toaster theme="dark" position="top-right" richColors />
     </BrowserRouter>
   );

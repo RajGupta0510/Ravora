@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useApp } from '../../context/AppContext';
 import PortfolioPanel from './PortfolioPanel';
@@ -30,7 +30,7 @@ export const AppDashboard: React.FC = () => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [executingRecId, setExecutingRecId] = useState<string | null>(null);
 
-  const unreadNotifsCount = notifications.filter(n => n.is_read === 0).length;
+  const unreadNotifsCount = useMemo(() => notifications.filter(n => n.is_read === 0).length, [notifications]);
 
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -46,7 +46,7 @@ export const AppDashboard: React.FC = () => {
     };
   }, [showNotifications]);
 
-  const handleExecuteRec = async (id: string) => {
+  const handleExecuteRec = useCallback(async (id: string) => {
     try {
       setExecutingRecId(id);
       const success = await executeRecommendation(id);
@@ -60,21 +60,21 @@ export const AppDashboard: React.FC = () => {
     } finally {
       setExecutingRecId(null);
     }
-  };
+  }, [executeRecommendation]);
 
-  const getRiskStanceLabel = () => {
+  const getRiskStanceLabel = useCallback(() => {
     if (!profile) return 'Balanced Shield';
     const stance = profile.risk_stance;
     return stance.charAt(0).toUpperCase() + stance.slice(1) + (stance === 'balanced' ? ' Shield' : ' Buffer');
-  };
+  }, [profile]);
 
-  const getRiskStanceColor = () => {
+  const getRiskStanceColor = useCallback(() => {
     if (!profile) return '#10b981';
     const stance = profile.risk_stance;
     if (stance === 'conservative') return '#3b82f6';
     if (stance === 'aggressive') return '#f59e0b';
     return '#10b981';
-  };
+  }, [profile]);
 
   return (
     <div style={{

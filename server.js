@@ -20,11 +20,39 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 import fs from 'fs';
+import zlib from 'zlib';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
+
+// Gzip compression middleware for all text-based responses
+app.use((req, res, next) => {
+  const acceptEncoding = req.headers['accept-encoding'] || '';
+  if (!acceptEncoding.includes('gzip')) return next();
+
+  const originalSend = res.send.bind(res);
+  res.send = function (body) {
+    const contentType = res.getHeader('content-type') || '';
+    const isCompressible = typeof body === 'string' || Buffer.isBuffer(body);
+    const isTextType = /text|json|javascript|css|svg|xml/.test(String(contentType));
+
+    if (isCompressible && isTextType && body.length > 1024) {
+      const buf = typeof body === 'string' ? Buffer.from(body) : body;
+      zlib.gzip(buf, (err, compressed) => {
+        if (err) return originalSend(body);
+        res.setHeader('Content-Encoding', 'gzip');
+        res.setHeader('Vary', 'Accept-Encoding');
+        res.removeHeader('Content-Length');
+        originalSend(compressed);
+      });
+    } else {
+      originalSend(body);
+    }
+  };
+  next();
+});
 
 // CORS middleware to support external static servers (Live Server at 5500, etc.)
 app.use((req, res, next) => {

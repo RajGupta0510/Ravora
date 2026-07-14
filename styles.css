@@ -4999,6 +4999,7 @@ h2 {
   padding: 32px 24px;
   height: 100%;
   overflow-y: auto;
+  will-change: width;
 }
 
 .sidebar-header {

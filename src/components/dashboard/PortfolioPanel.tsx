@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { useApp } from '../../context/AppContext';
 import { Shield, TrendingUp, Activity, FileText, Trash2, ArrowUpRight, ArrowDownRight } from 'lucide-react';
 
@@ -17,7 +17,7 @@ export const PortfolioPanel: React.FC = () => {
   const [closingAll, setClosingAll] = useState(false);
   const [closingPosId, setClosingPosId] = useState<string | null>(null);
 
-  const handleClosePos = async (id: string) => {
+  const handleClosePos = useCallback(async (id: string) => {
     try {
       setClosingPosId(id);
       await closePaperPosition(id);
@@ -26,9 +26,9 @@ export const PortfolioPanel: React.FC = () => {
     } finally {
       setClosingPosId(null);
     }
-  };
+  }, [closePaperPosition]);
 
-  const handleCloseAll = async () => {
+  const handleCloseAll = useCallback(async () => {
     if (!window.confirm('Are you sure you want to close all open paper positions?')) return;
     try {
       setClosingAll(true);
@@ -38,7 +38,7 @@ export const PortfolioPanel: React.FC = () => {
     } finally {
       setClosingAll(false);
     }
-  };
+  }, [closeAllPaperPositions]);
 
   // Get color for PnL values
   const getPnlStyle = (pnl: number) => {
@@ -59,8 +59,8 @@ export const PortfolioPanel: React.FC = () => {
     return '#ef4444'; // Red
   };
 
-  // Generate SVG path coordinate strings for the historical portfolio balance line chart
-  const getSvgPathCoordinates = () => {
+  // Memoized SVG path coordinate strings — only recalculated when portfolioHistory changes
+  const chartPaths = useMemo(() => {
     if (portfolioHistory.length < 2) return { line: 'M 10 25 L 190 25', grad: 'M 10 25 L 190 25 L 190 50 L 10 50 Z' };
     
     const maxVal = Math.max(...portfolioHistory.map(h => h.balance));
@@ -73,9 +73,8 @@ export const PortfolioPanel: React.FC = () => {
     const paddingRight = 10;
     const chartWidth = width - paddingLeft - paddingRight;
 
-    let points = portfolioHistory.map((h, idx) => {
+    const points = portfolioHistory.map((h, idx) => {
       const x = paddingLeft + (idx / (portfolioHistory.length - 1)) * chartWidth;
-      // Invert Y so higher balance values map to lower pixel heights (top of chart)
       const y = height - 10 - ((h.balance - minVal) / range) * (height - 20);
       return { x, y };
     });
@@ -84,9 +83,7 @@ export const PortfolioPanel: React.FC = () => {
     const gradPath = `${linePath} L ${points[points.length - 1].x} ${height} L ${points[0].x} ${height} Z`;
 
     return { line: linePath, grad: gradPath };
-  };
-
-  const chartPaths = getSvgPathCoordinates();
+  }, [portfolioHistory]);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>

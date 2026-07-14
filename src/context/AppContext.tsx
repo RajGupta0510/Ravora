@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
 import { useAuth } from './AuthContext';
 
 export interface PortfolioAsset {
@@ -471,35 +471,44 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
+  const contextValue = useMemo(() => ({
+    profile,
+    settings,
+    portfolioBalance,
+    safetyScore,
+    portfolioAssets,
+    portfolioHistory,
+    opportunities,
+    recommendations,
+    notifications,
+    paperPositions,
+    paperHistory,
+    copilotHistory,
+    marketOverview,
+    marketSummary,
+    loading,
+    onboardUser,
+    updateSettings,
+    fetchDashboardData,
+    scanMarkets,
+    executeRecommendation,
+    deployOpportunity,
+    closePaperPosition,
+    closeAllPaperPositions,
+    sendCopilotMessage,
+    markNotificationsAsRead,
+    connectExchangeKey
+  }), [
+    profile, settings, portfolioBalance, safetyScore, portfolioAssets,
+    portfolioHistory, opportunities, recommendations, notifications,
+    paperPositions, paperHistory, copilotHistory, marketOverview,
+    marketSummary, loading, onboardUser, updateSettings, fetchDashboardData,
+    scanMarkets, executeRecommendation, deployOpportunity, closePaperPosition,
+    closeAllPaperPositions, sendCopilotMessage, markNotificationsAsRead, connectExchangeKey
+  ]);
+
   return (
-    <AppContext.Provider value={{
-      profile,
-      settings,
-      portfolioBalance,
-      safetyScore,
-      portfolioAssets,
-      portfolioHistory,
-      opportunities,
-      recommendations,
-      notifications,
-      paperPositions,
-      paperHistory,
-      copilotHistory,
-      marketOverview,
-      marketSummary,
-      loading,
-      onboardUser,
-      updateSettings,
-      fetchDashboardData,
-      scanMarkets,
-      executeRecommendation,
-      deployOpportunity,
-      closePaperPosition,
-      closeAllPaperPositions,
-      sendCopilotMessage,
-      markNotificationsAsRead,
-      connectExchangeKey
-    }}>
+    <AppContext.Provider value={contextValue}>
       {children}
     </AppContext.Provider>
   );
