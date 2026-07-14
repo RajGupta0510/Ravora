@@ -223,6 +223,10 @@ export const OnboardingWizard: React.FC = () => {
                 <div 
                   key={opt.key}
                   onClick={() => setExperience(opt.key as any)}
+                  role="radio"
+                  aria-checked={experience === opt.key}
+                  tabIndex={0}
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setExperience(opt.key as any); } }}
                   style={{
                     padding: '16px 20px',
                     borderRadius: '10px',
@@ -260,6 +264,10 @@ export const OnboardingWizard: React.FC = () => {
                   <div 
                     key={m}
                     onClick={() => toggleMarket(m)}
+                    role="checkbox"
+                    aria-checked={isSelected}
+                    tabIndex={0}
+                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleMarket(m); } }}
                     style={{
                       padding: '18px 16px',
                       borderRadius: '10px',
@@ -300,6 +308,10 @@ export const OnboardingWizard: React.FC = () => {
                 <div 
                   key={opt.key}
                   onClick={() => setGoal(opt.key)}
+                  role="radio"
+                  aria-checked={goal === opt.key}
+                  tabIndex={0}
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setGoal(opt.key); } }}
                   style={{
                     padding: '18px 16px',
                     borderRadius: '10px',
@@ -336,6 +348,10 @@ export const OnboardingWizard: React.FC = () => {
                 <div 
                   key={opt.key}
                   onClick={() => setWorkspace(opt.key as any)}
+                  role="radio"
+                  aria-checked={workspace === opt.key}
+                  tabIndex={0}
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setWorkspace(opt.key as any); } }}
                   style={{
                     padding: '16px 20px',
                     borderRadius: '10px',
@@ -380,6 +396,10 @@ export const OnboardingWizard: React.FC = () => {
                   <div 
                     key={opt.key}
                     onClick={() => toggleAraiven(opt.key)}
+                    role="checkbox"
+                    aria-checked={isSelected}
+                    tabIndex={0}
+                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleAraiven(opt.key); } }}
                     style={{
                       padding: '18px 16px',
                       borderRadius: '10px',

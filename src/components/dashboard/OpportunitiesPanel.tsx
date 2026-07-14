@@ -22,6 +22,20 @@ export const OpportunitiesPanel: React.FC = () => {
   // Filter states
   const [filterType, setFilterType] = useState<'ALL' | 'LONG' | 'SHORT' | 'HOLD'>('ALL');
 
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setSelectedOpp(null);
+      }
+    };
+    if (selectedOpp) {
+      window.addEventListener('keydown', handleKeyDown);
+    }
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [selectedOpp]);
+
   const handleScan = async () => {
     try {
       setScanning(true);
@@ -210,6 +224,7 @@ export const OpportunitiesPanel: React.FC = () => {
             </div>
             <button 
               onClick={() => setSelectedOpp(null)}
+              aria-label="Close Details Dialog"
               style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: '1.2rem' }}
             >
               ✕

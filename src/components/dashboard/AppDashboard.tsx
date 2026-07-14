@@ -32,6 +32,20 @@ export const AppDashboard: React.FC = () => {
 
   const unreadNotifsCount = notifications.filter(n => n.is_read === 0).length;
 
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setShowNotifications(false);
+      }
+    };
+    if (showNotifications) {
+      window.addEventListener('keydown', handleKeyDown);
+    }
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [showNotifications]);
+
   const handleExecuteRec = async (id: string) => {
     try {
       setExecutingRecId(id);
@@ -214,6 +228,8 @@ export const AppDashboard: React.FC = () => {
             {/* Notification trigger button */}
             <button 
               onClick={() => { setShowNotifications(!showNotifications); markNotificationsAsRead(); }}
+              aria-label="Notifications Log Drawer"
+              aria-expanded={showNotifications}
               style={{
                 background: 'none',
                 border: 'none',
@@ -225,7 +241,7 @@ export const AppDashboard: React.FC = () => {
                 padding: '4px'
               }}
             >
-              <Bell size={20} />
+              <Bell size={20} aria-hidden="true" />
               {unreadNotifsCount > 0 && (
                 <span style={{
                   position: 'absolute',
@@ -302,7 +318,13 @@ export const AppDashboard: React.FC = () => {
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-3)', borderBottom: 'var(--border-thickness) solid var(--color-border-divider)', paddingBottom: 'var(--space-2)' }}>
               <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-secondary)' }}>NOTIFICATIONS LOG</span>
-              <span onClick={() => setShowNotifications(false)} style={{ fontSize: '0.72rem', cursor: 'pointer', color: 'var(--text-muted)' }}>Close</span>
+              <button 
+                onClick={() => setShowNotifications(false)} 
+                aria-label="Close Notifications Log"
+                style={{ background: 'none', border: 'none', fontSize: '0.72rem', cursor: 'pointer', color: 'var(--text-muted)', padding: 0 }}
+              >
+                Close
+              </button>
             </div>
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
@@ -313,7 +335,7 @@ export const AppDashboard: React.FC = () => {
               ) : (
                 notifications.map((notif) => (
                   <div key={notif.id} style={{ display: 'flex', gap: 'var(--space-2)', fontSize: '0.76rem' }}>
-                    <ShieldAlert size={14} style={{ color: notif.priority === 'high' ? 'var(--color-danger)' : 'var(--color-ai-accent)', flexShrink: 0, marginTop: '2px' }} />
+                    <ShieldAlert size={14} aria-hidden="true" style={{ color: notif.priority === 'high' ? 'var(--color-danger)' : 'var(--color-ai-accent)', flexShrink: 0, marginTop: '2px' }} />
                     <div>
                       <div style={{ fontWeight: 600, color: '#fff' }}>{notif.title}</div>
                       <div style={{ color: 'var(--text-secondary)', marginTop: '2px', lineHeight: 1.35 }}>{notif.body}</div>

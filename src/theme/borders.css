@@ -5,3 +5,9 @@
   --border-color-hover: rgba(255, 255, 255, 0.16);
   --border-color-divider: rgba(255, 255, 255, 0.04);
 }
+
+/* Accessibility Focus System */
+:focus-visible {
+  outline: 2px solid var(--color-primary) !important;
+  outline-offset: 2px !important;
+}
