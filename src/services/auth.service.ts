@@ -82,11 +82,18 @@ export const authService = {
 
   // Resend OTP
   async resendOtp({ email, phone, type }: { email?: string; phone?: string; type: any }) {
-    return await supabase.auth.resend({
-      type,
-      email,
-      phone
-    });
+    if (email) {
+      return await supabase.auth.resend({
+        type,
+        email
+      });
+    } else if (phone) {
+      return await supabase.auth.resend({
+        type,
+        phone
+      });
+    }
+    return { data: null, error: new Error('Email or Phone required to resend OTP.') as any };
   },
 
   // Social Logins (OAuth)

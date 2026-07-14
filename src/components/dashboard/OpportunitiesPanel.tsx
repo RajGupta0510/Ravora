@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useApp, Opportunity } from '../../context/AppContext';
-import { Sparkles, Play, Shield, Navigation, Percent, Activity, SlidersHorizontal } from 'lucide-react';
+import { Sparkles, Play } from 'lucide-react';
 
 export const OpportunitiesPanel: React.FC = () => {
   const { 
@@ -149,7 +149,7 @@ export const OpportunitiesPanel: React.FC = () => {
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'rgba(255,255,255,0.03)', display: 'flex', alignItems: 'center', justify: 'center', fontWeight: 'bold' }}>
+                  <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'rgba(255,255,255,0.03)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>
                     {opp.icon}
                   </div>
                   <div>

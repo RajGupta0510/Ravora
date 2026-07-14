@@ -15,8 +15,8 @@ interface AuthContextType {
   loading: boolean;
   deviceFingerprint: string;
   supabaseClient: SupabaseClient;
-  login: (emailOrPhone: string, isPhone: boolean, isOtp: boolean, passwordOrOtp: string, rememberMe: boolean) => Promise<{ success: boolean; otpRequired?: boolean; error?: string }>;
-  register: (fullName: string, emailOrPhone: string, isPhone: boolean, password: string, confirmPassword: string) => Promise<{ success: boolean; otpRequired?: boolean; error?: string }>;
+  login: (emailOrPhone: string, isPhone: boolean, isOtp: boolean, passwordOrOtp: string, rememberMe: boolean) => Promise<{ success: boolean; otpRequired?: boolean; userId?: string; otpCode?: string; error?: string }>;
+  register: (fullName: string, emailOrPhone: string, isPhone: boolean, password: string, confirmPassword: string) => Promise<{ success: boolean; otpRequired?: boolean; userId?: string; otpCode?: string; error?: string }>;
   verifyOtpCode: (emailOrPhone: string, isPhone: boolean, otpCode: string, userId: string, rememberMe?: boolean) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
   checkAuth: () => Promise<void>;
@@ -174,20 +174,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     rememberMe: boolean
   ) => {
     try {
+      localStorage.setItem('ravora_remember_me', rememberMe ? 'true' : 'false');
       if (isOtp) {
-        const { error } = await supabase.auth.signInWithOtp(
+        const { data, error } = await supabase.auth.signInWithOtp(
           isPhone ? { phone: emailOrPhone } : { email: emailOrPhone }
         );
         if (error) throw error;
-        return { success: true, otpRequired: true };
+        return {
+          success: true,
+          otpRequired: true,
+          userId: (data as any)?.user?.id,
+          otpCode: (data as any)?.otpCode
+        };
       } else {
         const credentials = isPhone
           ? { phone: emailOrPhone, password: passwordOrOtp }
           : { email: emailOrPhone, password: passwordOrOtp };
 
-        const { error } = await supabase.auth.signInWithPassword(credentials);
+        const { data, error } = await supabase.auth.signInWithPassword(credentials);
         if (error) throw error;
-        return { success: true };
+        return {
+          success: true,
+          otpRequired: (data as any)?.otpRequired || false,
+          userId: data.user?.id,
+          otpCode: (data as any)?.otpCode
+        };
       }
     } catch (err: any) {
       console.error('[AuthContext] Login error:', err);
@@ -228,7 +239,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const isConfirmed = !!data.user?.email_confirmed_at || !!data.user?.phone_confirmed_at;
       return {
         success: true,
-        otpRequired: !isConfirmed
+        otpRequired: !isConfirmed,
+        userId: data.user?.id,
+        otpCode: (data as any)?.otpCode
       };
     } catch (err: any) {
       console.error('[AuthContext] Registration error:', err);
@@ -251,10 +264,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     emailOrPhone: string,
     isPhone: boolean,
     otpCode: string,
-    userId: string,
+    _userId: string,
     rememberMe = false
   ) => {
     try {
+      localStorage.setItem('ravora_remember_me', rememberMe ? 'true' : 'false');
       const { error } = await supabase.auth.verifyOtp(
         isPhone
           ? { phone: emailOrPhone, token: otpCode, type: 'sms' }

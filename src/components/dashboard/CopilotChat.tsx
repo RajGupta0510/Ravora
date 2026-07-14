@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
-import { MessageSquareCode, Send, Sparkles } from 'lucide-react';
+import { MessageSquareCode, Send } from 'lucide-react';
 
 export const CopilotChat: React.FC = () => {
-  const { copilotHistory, sendCopilotMessage, loading } = useApp();
+  const { copilotHistory, sendCopilotMessage } = useApp();
   const [inputText, setInputText] = useState('');
   const [sending, setSending] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);

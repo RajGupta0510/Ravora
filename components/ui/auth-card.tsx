@@ -11,13 +11,9 @@ import {
   Eye,
   EyeOff,
   User,
-  ShieldCheck,
   LoaderCircle,
-  TrendingUp,
   BrainCircuit,
   LockKeyhole,
-  CheckCircle,
-  HelpCircle,
 } from 'lucide-react';
 import AuthSwitch from './auth-switch';
 
@@ -87,7 +83,7 @@ const getErrorMessage = (err: any): string => {
 };
 
 export const AuthCardPage: React.FC = () => {
-  const { login, register, forgotPassword, resetPassword, signInWithOAuth, verifyOtpCode, supabaseClient } = useAuth();
+  const { login, register, forgotPassword, resetPassword, signInWithOAuth, verifyOtpCode } = useAuth();
   const navigate = useNavigate();
   const { mode: pathMode } = useParams<{ mode: string }>();
   const mode = (pathMode as 'login' | 'register' | 'forgot' | 'reset' | 'otp') || 'login';
@@ -316,22 +312,6 @@ export const AuthCardPage: React.FC = () => {
       setServerError(getErrorMessage(err) || 'An unexpected error occurred.');
     } finally {
       setIsSubmitting(false);
-    }
-  };
-
-  // Developer Quick Access Autofill
-  const handleAutofillDemo = (email: string, pass: string) => {
-    if (mode === 'login') {
-      loginForm.setValue('email', email);
-      loginForm.setValue('password', pass);
-      toast.info('Demo Credentials Loaded');
-    } else {
-      changeMode('login');
-      setTimeout(() => {
-        loginForm.setValue('email', email);
-        loginForm.setValue('password', pass);
-        toast.info('Demo Credentials Loaded');
-      }, 100);
     }
   };
 
@@ -756,7 +736,7 @@ export const AuthCardPage: React.FC = () => {
 
               <button
                 type="button"
-                onClick={() => { setMode('login'); setServerError(null); }}
+                onClick={() => { changeMode('login'); setServerError(null); }}
                 className="w-full text-center text-xs font-bold text-slate-400 hover:text-white transition-colors duration-200 mt-2 block"
               >
                 Back to Sign In

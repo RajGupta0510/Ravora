@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
-import { Shield, TrendingUp, DollarSign, Activity, FileText, Trash2, ArrowUpRight, ArrowDownRight } from 'lucide-react';
+import { Shield, TrendingUp, Activity, FileText, Trash2, ArrowUpRight, ArrowDownRight } from 'lucide-react';
 
 export const PortfolioPanel: React.FC = () => {
   const { 
@@ -11,8 +11,7 @@ export const PortfolioPanel: React.FC = () => {
     paperPositions,
     paperHistory,
     closePaperPosition,
-    closeAllPaperPositions,
-    loading 
+    closeAllPaperPositions
   } = useApp();
 
   const [closingAll, setClosingAll] = useState(false);
@@ -326,11 +325,11 @@ export const PortfolioPanel: React.FC = () => {
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                   {hist.realizedPnl >= 0 ? (
-                    <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'rgba(16, 185, 129, 0.08)', color: '#10b981', display: 'flex', alignItems: 'center', justify: 'center' }}>
+                    <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'rgba(16, 185, 129, 0.08)', color: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                       <ArrowUpRight size={14} />
                     </div>
                   ) : (
-                    <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'rgba(239, 68, 68, 0.08)', color: '#ef4444', display: 'flex', alignItems: 'center', justify: 'center' }}>
+                    <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'rgba(239, 68, 68, 0.08)', color: '#ef4444', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                       <ArrowDownRight size={14} />
                     </div>
                   )}

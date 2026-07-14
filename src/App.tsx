@@ -5,7 +5,6 @@ import { AppProvider } from './context/AppContext';
 import { Toaster } from 'sonner';
 import LandingPage from './components/landing/LandingPage';
 import { OnboardingWizard } from './components/dashboard/OnboardingWizard';
-import { AppDashboard } from './components/dashboard/AppDashboard';
 import { AuthCardPage } from 'components/ui/auth-card';
 
 // Protected Route Wrapper - redirects unauthenticated users to login, and forces onboarding if not completed

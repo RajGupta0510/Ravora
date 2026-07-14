@@ -13,8 +13,7 @@ import {
   Bell, 
   LogOut, 
   ShieldAlert, 
-  Sparkles,
-  CheckCircle2
+  Sparkles
 } from 'lucide-react';
 
 export const AppDashboard: React.FC = () => {
@@ -90,7 +89,7 @@ export const AppDashboard: React.FC = () => {
         {/* Brand Logo */}
         <div style={{ padding: '24px', borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontFamily: 'var(--font-display)', fontWeight: 700 }}>
-            <div style={{ width: '32px', height: '32px', borderRadius: '6px', background: 'var(--gradient-interactive)', display: 'flex', alignItems: 'center', justify: 'center', color: '#fff' }}>R</div>
+            <div style={{ width: '32px', height: '32px', borderRadius: '6px', background: 'var(--gradient-interactive)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>R</div>
             <span>Ravora OS</span>
           </div>
         </div>

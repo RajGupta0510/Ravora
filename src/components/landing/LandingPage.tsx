@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { Shield, TrendingUp, Cpu, Volume2, Key, Info, HelpCircle } from 'lucide-react';
+import { HelpCircle } from 'lucide-react';
 
 interface RiskConfig {
   label: string;
@@ -23,23 +22,12 @@ interface RiskConfig {
 }
 
 export const LandingPage: React.FC = () => {
-  const { login, register, verifyOtpCode, socialLoginSuccess } = useAuth();
   const navigate = useNavigate();
 
   // UI states
   const [activeNav, setActiveNav] = useState('problem-section');
   const [navbarScrolled, setNavbarScrolled] = useState(false);
-  const [isYearly, setIsYearly] = useState(false);
   const [selectedRisk, setSelectedRisk] = useState<0 | 1 | 2>(1); // 0=Cons, 1=Mod, 2=Agg
-  const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
-
-  useEffect(() => {
-    const handleResize = () => setWindowWidth(window.innerWidth);
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  const isDesktop = windowWidth >= 1024;
 
   // 3D Parallax Mouse States
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
@@ -140,12 +128,6 @@ export const LandingPage: React.FC = () => {
       }
     };
   }, []);
-
-  const pricingPeriods = {
-    free: isYearly ? '$0' : '$0',
-    pro: isYearly ? '$19' : '$29',
-    premium: isYearly ? '$69' : '$99'
-  };
 
   const riskProfiles: Record<0 | 1 | 2, RiskConfig> = {
     0: {

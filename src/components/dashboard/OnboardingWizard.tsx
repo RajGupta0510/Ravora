@@ -2,18 +2,7 @@ import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
   Sparkles, 
-  BookOpen, 
-  Compass, 
-  TrendingUp, 
-  Layers, 
-  Cpu, 
-  CheckCircle2, 
-  ChevronRight,
-  Shield,
-  Activity,
-  FileText,
-  AlertTriangle,
-  Globe
+  CheckCircle2
 } from 'lucide-react';
 
 export const OnboardingWizard: React.FC = () => {
@@ -107,19 +96,6 @@ export const OnboardingWizard: React.FC = () => {
       alert(err.message || 'An unexpected error occurred.');
     } finally {
       setLoading(false);
-    }
-  };
-
-  const getStepTitle = () => {
-    switch (step) {
-      case 1: return 'Welcome to Ravora';
-      case 2: return 'Trading Experience';
-      case 3: return 'Markets of Interest';
-      case 4: return 'Investment Objective';
-      case 5: return 'Workspace Layout';
-      case 6: return 'Araiven AI Integration';
-      case 7: return 'Workspace Review';
-      default: return '';
     }
   };
 
