@@ -116,7 +116,7 @@ export const OpportunitiesPanel: React.FC = () => {
       </div>
 
       {/* Grid List */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '20px' }}>
+      <div className="opportunities-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '20px' }}>
         {filteredOpps.length === 0 ? (
           <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: '48px 0', color: 'var(--text-muted)', fontSize: '0.8rem' }}>
             No opportunities matching that criteria were ingested in this epoch.

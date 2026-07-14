@@ -73,7 +73,7 @@ export const AppDashboard: React.FC = () => {
     }}>
       
       {/* Side Navigation */}
-      <aside style={{
+      <aside className="app-sidebar" style={{
         width: '240px',
         borderRight: 'var(--border-thickness) solid var(--color-border)',
         background: 'rgba(14, 19, 37, 0.6)',
@@ -87,15 +87,15 @@ export const AppDashboard: React.FC = () => {
         zIndex: 100
       }}>
         {/* Brand Logo */}
-        <div style={{ padding: 'var(--space-6)', borderBottom: 'var(--border-thickness) solid var(--color-border-divider)' }}>
+        <div className="logo" style={{ padding: 'var(--space-6)', borderBottom: 'var(--border-thickness) solid var(--color-border-divider)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2.5)', fontFamily: 'var(--font-display)', fontWeight: 700 }}>
-            <div style={{ width: '32px', height: '32px', borderRadius: 'var(--radius-sm)', background: 'var(--gradient-interactive)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>R</div>
-            <span>Ravora OS</span>
+            <div style={{ width: '32px', height: '32px', borderRadius: 'var(--radius-sm)', background: 'var(--gradient-interactive)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', flexShrink: 0 }}>R</div>
+            <span className="sidebar-logo-text">Ravora OS</span>
           </div>
         </div>
 
         {/* Navigation list */}
-        <nav style={{ flex: 1, padding: 'var(--space-5) var(--space-3.5)', display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+        <nav className="sidebar-menu" style={{ flex: 1, padding: 'var(--space-5) var(--space-3.5)', display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
           {[
             { id: 'portfolio', label: 'Portfolio', icon: Briefcase },
             { id: 'opportunities', label: 'Opportunities', icon: TrendingUp },
@@ -108,6 +108,7 @@ export const AppDashboard: React.FC = () => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
+                className={`menu-tab-btn ${isActive ? 'active' : ''}`}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -125,8 +126,8 @@ export const AppDashboard: React.FC = () => {
                   transition: 'all var(--motion-duration-fast) var(--motion-ease-in-out)'
                 }}
               >
-                <Icon size={16} />
-                {tab.label}
+                <Icon size={16} style={{ flexShrink: 0 }} />
+                <span className="sidebar-nav-label">{tab.label}</span>
               </button>
             );
           })}
@@ -134,42 +135,44 @@ export const AppDashboard: React.FC = () => {
 
         {/* User profile details & Logout */}
         <div style={{ padding: 'var(--space-5)', borderTop: 'var(--border-thickness) solid var(--color-border-divider)', display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <div className="user-meta" style={{ display: 'flex', flexDirection: 'column' }}>
             <span style={{ fontSize: '0.8rem', fontWeight: 600, color: '#fff' }}>{user?.fullName}</span>
             <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.email}</span>
           </div>
-          <button 
-            onClick={logout}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 'var(--space-2)',
-              width: '100%',
-              padding: 'var(--space-2.5)',
-              borderRadius: 'var(--radius-sm)',
-              border: 'var(--border-thickness) solid rgba(255,255,255,0.06)',
-              background: 'rgba(255,255,255,0.01)',
-              color: 'var(--text-secondary)',
-              cursor: 'pointer',
-              fontSize: '0.78rem',
-              fontWeight: 600,
-              justifyContent: 'center',
-              transition: 'background var(--motion-duration-fast) var(--motion-ease-in-out)'
-            }}
-            onMouseOver={(e) => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.08)'}
-            onMouseOut={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.01)'}
-          >
-            <LogOut size={14} />
-            Log Out
-          </button>
+          <div id="btn-logout-wrapper">
+            <button 
+              onClick={logout}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 'var(--space-2)',
+                width: '100%',
+                padding: 'var(--space-2.5)',
+                borderRadius: 'var(--radius-sm)',
+                border: 'var(--border-thickness) solid rgba(255,255,255,0.06)',
+                background: 'rgba(255,255,255,0.01)',
+                color: 'var(--text-secondary)',
+                cursor: 'pointer',
+                fontSize: '0.78rem',
+                fontWeight: 600,
+                justifyContent: 'center',
+                transition: 'background var(--motion-duration-fast) var(--motion-ease-in-out)'
+              }}
+              onMouseOver={(e) => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.08)'}
+              onMouseOut={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.01)'}
+            >
+              <LogOut size={14} style={{ flexShrink: 0 }} />
+              <span className="sidebar-nav-label" style={{ marginLeft: '4px' }}>Log Out</span>
+            </button>
+          </div>
         </div>
       </aside>
 
       {/* Main Content Area */}
-      <div style={{ flex: 1, paddingLeft: '240px', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+      <div className="app-main-window" style={{ flex: 1, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
         
         {/* Header Bar */}
-        <header style={{
+        <header className="app-header-bar" style={{
           height: '76px',
           borderBottom: 'var(--border-thickness) solid var(--color-border)',
           padding: '0 var(--space-8)',
@@ -331,6 +334,30 @@ export const AppDashboard: React.FC = () => {
         </main>
 
       </div>
+
+      {/* Mobile Bottom Navigation */}
+      <div id="mobile-bottom-nav">
+        {[
+          { id: 'portfolio', label: 'Portfolio', icon: Briefcase },
+          { id: 'opportunities', label: 'Opportunities', icon: TrendingUp },
+          { id: 'copilot', label: 'Copilot', icon: MessageSquareCode },
+          { id: 'settings', label: 'Settings', icon: Settings }
+        ].map((tab) => {
+          const Icon = tab.icon;
+          const isActive = activeTab === tab.id;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id as any)}
+              className={`mobile-nav-btn ${isActive ? 'active' : ''}`}
+            >
+              <Icon size={20} />
+              <span>{tab.label}</span>
+            </button>
+          );
+        })}
+      </div>
+
     </div>
   );
 };

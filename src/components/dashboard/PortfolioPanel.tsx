@@ -92,7 +92,7 @@ export const PortfolioPanel: React.FC = () => {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       
       {/* Overview Cards Row */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr 1fr', gap: '20px' }}>
+      <div className="terminal-layout-grid" style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr 1fr', gap: '20px' }}>
         
         {/* Card 1: Balance & SVG Trend */}
         <div className="card-glass" style={{ padding: '24px', borderRadius: '12px', border: '1px solid var(--border)', background: 'rgba(14, 19, 37, 0.4)' }}>

@@ -2,15 +2,11 @@ On branch main
 Your branch is up to date with 'origin/main'.
 
 Changes not staged for commit:
-  (use "git add/rm <file>..." to update what will be committed)
+  (use "git add <file>..." to update what will be committed)
   (use "git restore <file>..." to discard changes in working directory)
-	deleted:    dist/assets/index-C5YvmGQh.js
-	deleted:    dist/assets/index-jkwKTNUD.css
-	modified:   dist/index.html
-
-Untracked files:
-  (use "git add <file>..." to include in what will be committed)
-	dist/assets/index-CrtGX5hZ.css
-	dist/assets/index-U77cRvNS.js
+	modified:   src/components/dashboard/AppDashboard.tsx
+	modified:   src/components/dashboard/OpportunitiesPanel.tsx
+	modified:   src/components/dashboard/PortfolioPanel.tsx
+	modified:   src/components/dashboard/SettingsPanel.tsx
 
 no changes added to commit (use "git add" and/or "git commit -a")

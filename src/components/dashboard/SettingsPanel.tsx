@@ -68,7 +68,7 @@ export const SettingsPanel: React.FC = () => {
   };
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '1.1fr 0.9fr', gap: 'var(--space-8)', alignItems: 'start' }}>
+    <div className="settings-grid" style={{ display: 'grid', gridTemplateColumns: '1.1fr 0.9fr', gap: 'var(--space-8)', alignItems: 'start' }}>
       
       {/* Col 1: System settings */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
