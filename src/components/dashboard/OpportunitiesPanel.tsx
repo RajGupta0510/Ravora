@@ -134,22 +134,22 @@ export const OpportunitiesPanel: React.FC = () => {
               }}
               className="card-glass"
               style={{
-                padding: '20px',
-                borderRadius: '12px',
-                border: '1px solid var(--border)',
+                padding: 'var(--space-5)',
+                borderRadius: 'var(--radius-md)',
+                border: 'var(--border-thickness) solid var(--color-border)',
                 cursor: 'pointer',
-                transition: 'all 0.2s',
+                transition: 'all var(--transition-hover)',
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '14px',
+                gap: 'var(--space-3.5)',
                 background: 'rgba(14, 19, 37, 0.3)'
               }}
-              onMouseOver={(e) => e.currentTarget.style.borderColor = 'var(--border-hover)'}
-              onMouseOut={(e) => e.currentTarget.style.borderColor = 'var(--border)'}
+              onMouseOver={(e) => e.currentTarget.style.borderColor = 'var(--color-border-hover)'}
+              onMouseOut={(e) => e.currentTarget.style.borderColor = 'var(--color-border)'}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'rgba(255,255,255,0.03)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+                  <div style={{ width: '28px', height: '28px', borderRadius: 'var(--radius-pill)', background: 'rgba(255,255,255,0.03)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>
                     {opp.icon}
                   </div>
                   <div>
@@ -167,7 +167,7 @@ export const OpportunitiesPanel: React.FC = () => {
                 {opp.reasoningText}
               </p>
 
-              <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px dashed rgba(255,255,255,0.04)', paddingTop: '12px', fontSize: '0.75rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: 'var(--border-thickness) dashed var(--color-border-divider)', paddingTop: 'var(--space-3)', fontSize: '0.75rem' }}>
                 <div>
                   <span style={{ color: 'var(--text-muted)' }}>Confidence:</span>
                   <span style={{ fontWeight: 700, marginLeft: '4px', color: 'var(--success)' }}>{opp.confidenceScore}%</span>
@@ -190,11 +190,11 @@ export const OpportunitiesPanel: React.FC = () => {
           right: 0,
           bottom: 0,
           width: '460px',
-          background: 'rgba(8, 12, 28, 0.96)',
+          background: 'rgba(14, 19, 37, 0.96)',
           backdropFilter: 'blur(16px)',
-          borderLeft: '1px solid var(--border)',
+          borderLeft: 'var(--border-thickness) solid var(--color-border)',
           zIndex: 999,
-          padding: '32px',
+          padding: 'var(--space-8)',
           boxSizing: 'border-box',
           display: 'flex',
           flexDirection: 'column',

@@ -329,7 +329,7 @@ export const AuthCardPage: React.FC = () => {
         
         {/* Branding header */}
         <div className="flex items-center gap-3 relative z-10">
-          <div className="w-9 h-9 rounded-lg bg-gradient-to-r from-[#4F7CFF] to-[#7A5AF8] flex items-center justify-center font-display font-bold text-lg shadow-[0_4px_20px_rgba(79,124,255,0.35)]">
+          <div className="w-9 h-9 rounded-lg bg-gradient-to-r from-primary to-accent flex items-center justify-center font-display font-bold text-lg shadow-[0_4px_20px_rgba(79,124,255,0.35)]">
             R
           </div>
           <span className="font-display font-bold text-xl tracking-wide bg-gradient-to-r from-white via-white to-slate-400 bg-clip-text text-transparent">
@@ -346,7 +346,7 @@ export const AuthCardPage: React.FC = () => {
           
           <h2 className="text-4xl font-display font-bold leading-tight tracking-tight">
             Trade Smarter. <br />
-            <span className="bg-gradient-to-r from-[#4F7CFF] via-[#7A5AF8] to-[#06B6D4] bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-primary via-accent to-accent-cyan bg-clip-text text-transparent">
               Let AI Do The Rest.
             </span>
           </h2>
@@ -403,7 +403,7 @@ export const AuthCardPage: React.FC = () => {
         
         {/* Mobile Header Logo */}
         <div className="lg:hidden flex items-center gap-2.5 mb-8">
-          <div className="w-8.5 h-8.5 rounded-lg bg-gradient-to-r from-[#4F7CFF] to-[#7A5AF8] flex items-center justify-center font-display font-bold text-base shadow-[0_4px_16px_rgba(79,124,255,0.25)]">
+          <div className="w-8.5 h-8.5 rounded-lg bg-gradient-to-r from-primary to-accent flex items-center justify-center font-display font-bold text-base shadow-[0_4px_16px_rgba(79,124,255,0.25)]">
             R
           </div>
           <span className="font-display font-bold text-lg tracking-wide">Ravora OS</span>
@@ -531,7 +531,7 @@ export const AuthCardPage: React.FC = () => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full h-10 bg-gradient-to-r from-[#4F7CFF] to-[#7A5AF8] hover:opacity-95 transition-all text-white font-bold rounded-xl text-sm flex items-center justify-center gap-2.5 shadow-[0_4px_20px_rgba(79,124,255,0.2)] disabled:opacity-50"
+                className="w-full h-10 bg-gradient-to-r from-primary to-accent hover:opacity-95 transition-all text-white font-bold rounded-xl text-sm flex items-center justify-center gap-2.5 shadow-[0_4px_20px_rgba(79,124,255,0.2)] disabled:opacity-50"
               >
                 {isSubmitting ? (
                   <LoaderCircle className="w-4.5 h-4.5 animate-spin" />
@@ -680,7 +680,7 @@ export const AuthCardPage: React.FC = () => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full h-10 bg-gradient-to-r from-[#4F7CFF] to-[#7A5AF8] hover:opacity-95 transition-all text-white font-bold rounded-xl text-sm flex items-center justify-center gap-2.5 shadow-[0_4px_20px_rgba(79,124,255,0.2)] disabled:opacity-50 mt-1.5"
+                className="w-full h-10 bg-gradient-to-r from-primary to-accent hover:opacity-95 transition-all text-white font-bold rounded-xl text-sm flex items-center justify-center gap-2.5 shadow-[0_4px_20px_rgba(79,124,255,0.2)] disabled:opacity-50 mt-1.5"
               >
                 {isSubmitting ? (
                   <LoaderCircle className="w-4.5 h-4.5 animate-spin" />
@@ -725,7 +725,7 @@ export const AuthCardPage: React.FC = () => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full h-10 bg-gradient-to-r from-[#4F7CFF] to-[#7A5AF8] hover:opacity-95 transition-all text-white font-bold rounded-xl text-sm flex items-center justify-center gap-2.5 shadow-[0_4px_20px_rgba(79,124,255,0.2)] disabled:opacity-50"
+                className="w-full h-10 bg-gradient-to-r from-primary to-accent hover:opacity-95 transition-all text-white font-bold rounded-xl text-sm flex items-center justify-center gap-2.5 shadow-[0_4px_20px_rgba(79,124,255,0.2)] disabled:opacity-50"
               >
                 {isSubmitting ? (
                   <LoaderCircle className="w-4.5 h-4.5 animate-spin" />
@@ -798,7 +798,7 @@ export const AuthCardPage: React.FC = () => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full h-10 bg-gradient-to-r from-[#4F7CFF] to-[#7A5AF8] hover:opacity-95 transition-all text-white font-bold rounded-xl text-sm flex items-center justify-center gap-2.5 shadow-[0_4px_20px_rgba(79,124,255,0.2)] disabled:opacity-50"
+                className="w-full h-10 bg-gradient-to-r from-primary to-accent hover:opacity-95 transition-all text-white font-bold rounded-xl text-sm flex items-center justify-center gap-2.5 shadow-[0_4px_20px_rgba(79,124,255,0.2)] disabled:opacity-50"
               >
                 {isSubmitting ? (
                   <LoaderCircle className="w-4.5 h-4.5 animate-spin" />
@@ -839,7 +839,7 @@ export const AuthCardPage: React.FC = () => {
               <button
                 type="submit"
                 disabled={isSubmitting || otpCodeValue.length !== 8}
-                className="w-full h-10 bg-gradient-to-r from-[#4F7CFF] to-[#7A5AF8] hover:opacity-95 transition-all text-white font-bold rounded-xl text-sm flex items-center justify-center gap-2.5 shadow-[0_4px_20px_rgba(79,124,255,0.2)] disabled:opacity-50"
+                className="w-full h-10 bg-gradient-to-r from-primary to-accent hover:opacity-95 transition-all text-white font-bold rounded-xl text-sm flex items-center justify-center gap-2.5 shadow-[0_4px_20px_rgba(79,124,255,0.2)] disabled:opacity-50"
               >
                 {isSubmitting ? (
                   <LoaderCircle className="w-4.5 h-4.5 animate-spin" />

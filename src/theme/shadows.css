@@ -1,0 +1,6 @@
+:root {
+  /* Shadows (Three Standard Levels) */
+  --shadow-subtle: 0 2px 8px rgba(0, 0, 0, 0.15);
+  --shadow-medium: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+  --shadow-overlay: 0 16px 48px rgba(0, 0, 0, 0.45);
+}

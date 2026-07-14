@@ -1,0 +1,7 @@
+:root {
+  /* Borders */
+  --border-thickness: 1px;
+  --border-color: rgba(255, 255, 255, 0.08);
+  --border-color-hover: rgba(255, 255, 255, 0.16);
+  --border-color-divider: rgba(255, 255, 255, 0.04);
+}

@@ -626,10 +626,10 @@ export const LandingPage: React.FC = () => {
                 <span style={{ fontSize: '0.62rem', fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.05em' }}>DIVERSIFICATION SCALING</span>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   {[
-                    { label: 'ETH Staking', pct: currentRisk.divETH, color: '#4f46e5' },
-                    { label: 'Stable Yield', pct: currentRisk.divUSDC, color: '#10b981' },
-                    { label: 'BTC Inflow', pct: currentRisk.divBTC, color: '#f59e0b' },
-                    { label: 'Cash Reserves', pct: currentRisk.divCash, color: '#64748b' }
+                    { label: 'ETH Staking', pct: currentRisk.divETH, color: 'var(--color-primary)' },
+                    { label: 'Stable Yield', pct: currentRisk.divUSDC, color: 'var(--color-success)' },
+                    { label: 'BTC Inflow', pct: currentRisk.divBTC, color: 'var(--color-warning)' },
+                    { label: 'Cash Reserves', pct: currentRisk.divCash, color: 'var(--color-text-muted)' }
                   ].map((bar) => (
                     <div key={bar.label} style={{ fontSize: '0.75rem' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '3px' }}>

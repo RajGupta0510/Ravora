@@ -8,27 +8,27 @@ export default {
   theme: {
     extend: {
       colors: {
-        background: "#060B17",
-        card: "#0F172A",
+        background: "var(--color-background)",
+        card: "var(--color-surface)",
         primary: {
-          DEFAULT: "#4F7CFF",
-          foreground: "#ffffff"
+          DEFAULT: "var(--color-primary)",
+          foreground: "var(--color-text-primary)"
         },
         secondary: {
-          DEFAULT: "#6C63FF",
-          foreground: "#ffffff"
+          DEFAULT: "var(--color-secondary)",
+          foreground: "var(--color-text-primary)"
         },
         accent: {
-          DEFAULT: "#7A5AF8",
-          cyan: "#06B6D4"
+          DEFAULT: "var(--color-ai-accent)",
+          cyan: "var(--color-info)"
         },
         slate: {
-          400: "#94a3b8"
+          400: "var(--color-text-secondary)"
         }
       },
       fontFamily: {
-        display: ["Outfit", "sans-serif"],
-        body: ["Inter", "sans-serif"]
+        display: ["var(--font-display)"],
+        body: ["var(--font-body)"]
       }
     },
   },

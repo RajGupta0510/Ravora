@@ -68,19 +68,19 @@ export const SettingsPanel: React.FC = () => {
   };
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '1.1fr 0.9fr', gap: '32px', alignItems: 'start' }}>
+    <div style={{ display: 'grid', gridTemplateColumns: '1.1fr 0.9fr', gap: 'var(--space-8)', alignItems: 'start' }}>
       
       {/* Col 1: System settings */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
         
         {/* Execution Mode */}
-        <div className="card-glass" style={{ padding: '24px', borderRadius: '12px', border: '1px solid var(--border)' }}>
-          <h3 style={{ fontSize: '0.9rem', fontWeight: 700, margin: '0 0 16px 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Radio size={16} style={{ color: 'var(--ai-accent)' }} />
+        <div className="card-glass" style={{ padding: 'var(--space-6)', borderRadius: 'var(--radius-md)', border: 'var(--border-thickness) solid var(--color-border)' }}>
+          <h3 style={{ fontSize: '0.9rem', fontWeight: 700, margin: '0 0 var(--space-4) 0', display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+            <Radio size={16} style={{ color: 'var(--color-ai-accent)' }} />
             SYSTEM EXECUTION MODE
           </h3>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
             {[
               { key: 'advisory', label: '1-Click Advisory Approval (Default V1)', desc: 'Araiven scans markets and drafts recommended rebalances. You must manually review and confirm each order.' },
               { key: 'autopilot_guard', label: 'Autopilot Guard Protective Shield', desc: 'Allows Araiven to execute protective swaps to stablecoins automatically when drawdown limits are breached.' },
@@ -90,12 +90,12 @@ export const SettingsPanel: React.FC = () => {
                 key={mode.key}
                 onClick={() => handleChangeExecutionMode(mode.key)}
                 style={{
-                  padding: '16px',
-                  borderRadius: '8px',
-                  border: settings?.execution_mode === mode.key ? '1px solid var(--ai-accent)' : '1px solid rgba(255,255,255,0.03)',
+                  padding: 'var(--space-4)',
+                  borderRadius: 'var(--radius-sm)',
+                  border: settings?.execution_mode === mode.key ? 'var(--border-thickness) solid var(--color-ai-accent)' : 'var(--border-thickness) solid var(--color-border-divider)',
                   background: settings?.execution_mode === mode.key ? 'rgba(124, 58, 237, 0.05)' : 'rgba(255,255,255,0.005)',
                   cursor: 'pointer',
-                  transition: 'all 0.15s'
+                  transition: 'all var(--motion-duration-fast) var(--motion-ease-in-out)'
                 }}
               >
                 <div style={{ fontWeight: 600, fontSize: '0.85rem', color: settings?.execution_mode === mode.key ? '#fff' : 'var(--text-secondary)' }}>{mode.label}</div>

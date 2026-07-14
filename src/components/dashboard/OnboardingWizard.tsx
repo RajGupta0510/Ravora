@@ -127,24 +127,24 @@ export const OnboardingWizard: React.FC = () => {
       <div className="auth-form-card" style={{
         width: '100%',
         maxWidth: step === 1 ? '480px' : (step === 7 ? '640px' : '580px'),
-        padding: '36px',
+        padding: 'var(--space-9)',
         background: 'rgba(14, 19, 37, 0.85)',
-        border: '1px solid rgba(255, 255, 255, 0.06)',
-        borderRadius: '16px',
-        boxShadow: '0 24px 50px rgba(0, 0, 0, 0.5)',
+        border: 'var(--border-thickness) solid var(--color-border)',
+        borderRadius: 'var(--radius-lg)',
+        boxShadow: 'var(--shadow-overlay)',
         boxSizing: 'border-box',
         display: 'flex',
         flexDirection: 'column',
-        gap: '24px',
-        transition: 'max-width 0.3s ease'
+        gap: 'var(--space-6)',
+        transition: 'max-width var(--motion-duration-slow) var(--motion-ease-in-out)'
       }}>
         
         {/* Progress Tracker (Only shown after Step 1) */}
         {step > 1 && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <Sparkles size={14} style={{ color: 'var(--ai-accent)' }} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1.5)' }}>
+                <Sparkles size={14} style={{ color: 'var(--color-ai-accent)' }} />
                 <span style={{ fontFamily: 'monospace', fontSize: '0.68rem', fontWeight: 700, letterSpacing: '0.1em', color: 'var(--text-secondary)' }}>
                   Tailoring Araiven Workspace
                 </span>
@@ -154,8 +154,8 @@ export const OnboardingWizard: React.FC = () => {
               </span>
             </div>
             {/* Progress Bar */}
-            <div style={{ height: '3px', background: 'rgba(255, 255, 255, 0.04)', borderRadius: '99px', overflow: 'hidden' }}>
-              <div style={{ width: `${(step / 7) * 100}%`, height: '100%', background: 'var(--gradient-primary)', transition: 'width 0.3s ease' }}></div>
+            <div style={{ height: '3px', background: 'rgba(255, 255, 255, 0.04)', borderRadius: 'var(--radius-pill)', overflow: 'hidden' }}>
+              <div style={{ width: `${(step / 7) * 100}%`, height: '100%', background: 'var(--gradient-primary)', transition: 'width var(--motion-duration-slow) var(--motion-ease-in-out)' }}></div>
             </div>
           </div>
         )}

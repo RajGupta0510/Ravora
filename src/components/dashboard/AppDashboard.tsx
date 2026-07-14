@@ -75,8 +75,8 @@ export const AppDashboard: React.FC = () => {
       {/* Side Navigation */}
       <aside style={{
         width: '240px',
-        borderRight: '1px solid var(--border)',
-        background: 'rgba(8, 12, 28, 0.6)',
+        borderRight: 'var(--border-thickness) solid var(--color-border)',
+        background: 'rgba(14, 19, 37, 0.6)',
         backdropFilter: 'blur(16px)',
         display: 'flex',
         flexDirection: 'column',
@@ -87,15 +87,15 @@ export const AppDashboard: React.FC = () => {
         zIndex: 100
       }}>
         {/* Brand Logo */}
-        <div style={{ padding: '24px', borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontFamily: 'var(--font-display)', fontWeight: 700 }}>
-            <div style={{ width: '32px', height: '32px', borderRadius: '6px', background: 'var(--gradient-interactive)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>R</div>
+        <div style={{ padding: 'var(--space-6)', borderBottom: 'var(--border-thickness) solid var(--color-border-divider)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2.5)', fontFamily: 'var(--font-display)', fontWeight: 700 }}>
+            <div style={{ width: '32px', height: '32px', borderRadius: 'var(--radius-sm)', background: 'var(--gradient-interactive)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>R</div>
             <span>Ravora OS</span>
           </div>
         </div>
 
         {/* Navigation list */}
-        <nav style={{ flex: 1, padding: '20px 14px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        <nav style={{ flex: 1, padding: 'var(--space-5) var(--space-3.5)', display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
           {[
             { id: 'portfolio', label: 'Portfolio', icon: Briefcase },
             { id: 'opportunities', label: 'Opportunities', icon: TrendingUp },
@@ -111,10 +111,10 @@ export const AppDashboard: React.FC = () => {
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '12px',
+                  gap: 'var(--space-3)',
                   width: '100%',
-                  padding: '12px 16px',
-                  borderRadius: '8px',
+                  padding: 'var(--space-3) var(--space-4)',
+                  borderRadius: 'var(--radius-md)',
                   border: 'none',
                   background: isActive ? 'var(--gradient-primary)' : 'transparent',
                   color: isActive ? '#fff' : 'var(--text-secondary)',
@@ -122,7 +122,7 @@ export const AppDashboard: React.FC = () => {
                   textAlign: 'left',
                   fontSize: '0.85rem',
                   fontWeight: 600,
-                  transition: 'all 0.15s'
+                  transition: 'all var(--motion-duration-fast) var(--motion-ease-in-out)'
                 }}
               >
                 <Icon size={16} />
@@ -133,7 +133,7 @@ export const AppDashboard: React.FC = () => {
         </nav>
 
         {/* User profile details & Logout */}
-        <div style={{ padding: '20px', borderTop: '1px solid rgba(255,255,255,0.03)', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        <div style={{ padding: 'var(--space-5)', borderTop: 'var(--border-thickness) solid var(--color-border-divider)', display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <span style={{ fontSize: '0.8rem', fontWeight: 600, color: '#fff' }}>{user?.fullName}</span>
             <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.email}</span>
@@ -143,18 +143,18 @@ export const AppDashboard: React.FC = () => {
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '8px',
+              gap: 'var(--space-2)',
               width: '100%',
-              padding: '10px',
-              borderRadius: '6px',
-              border: '1px solid rgba(255,255,255,0.06)',
+              padding: 'var(--space-2.5)',
+              borderRadius: 'var(--radius-sm)',
+              border: 'var(--border-thickness) solid rgba(255,255,255,0.06)',
               background: 'rgba(255,255,255,0.01)',
               color: 'var(--text-secondary)',
               cursor: 'pointer',
               fontSize: '0.78rem',
               fontWeight: 600,
               justifyContent: 'center',
-              transition: 'background 0.2s'
+              transition: 'background var(--motion-duration-fast) var(--motion-ease-in-out)'
             }}
             onMouseOver={(e) => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.08)'}
             onMouseOut={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.01)'}
@@ -171,8 +171,8 @@ export const AppDashboard: React.FC = () => {
         {/* Header Bar */}
         <header style={{
           height: '76px',
-          borderBottom: '1px solid var(--border)',
-          padding: '0 32px',
+          borderBottom: 'var(--border-thickness) solid var(--color-border)',
+          padding: '0 var(--space-8)',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
@@ -183,7 +183,7 @@ export const AppDashboard: React.FC = () => {
           zIndex: 90
         }}>
           <div>
-            <h1 style={{ fontFamily: 'var(--font-display)', fontSize: '1.25rem', fontWeight: 700, margin: 0 }}>
+            <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--font-size-card)', fontWeight: 700, margin: 0 }}>
               {activeTab === 'portfolio' && 'Wealth Workspace'}
               {activeTab === 'opportunities' && 'Araiven Scan Matrix'}
               {activeTab === 'copilot' && 'AI Portfolio Audit'}
@@ -191,18 +191,18 @@ export const AppDashboard: React.FC = () => {
             </h1>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-5)' }}>
             {/* Active Risk Guard tag */}
             <div style={{
               background: 'rgba(255,255,255,0.02)',
-              border: '1px solid var(--border)',
-              padding: '6px 12px',
-              borderRadius: '99px',
+              border: 'var(--border-thickness) solid var(--color-border)',
+              padding: 'var(--space-1.5) var(--space-3)',
+              borderRadius: 'var(--radius-pill)',
               fontSize: '0.7rem',
               fontWeight: 600,
               display: 'flex',
               alignItems: 'center',
-              gap: '6px'
+              gap: 'var(--space-1.5)'
             }}>
               <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: getRiskStanceColor() }}></span>
               <span>Guard: {getRiskStanceLabel()}</span>
@@ -242,21 +242,21 @@ export const AppDashboard: React.FC = () => {
         {recommendations.length > 0 && (
           <div style={{
             background: 'linear-gradient(90deg, rgba(124, 58, 237, 0.15) 0%, rgba(37, 99, 235, 0.05) 100%)',
-            borderBottom: '1px solid rgba(124, 58, 237, 0.2)',
-            padding: '12px 32px',
+            borderBottom: 'var(--border-thickness) solid rgba(124, 58, 237, 0.2)',
+            padding: 'var(--space-3) var(--space-8)',
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
             fontSize: '0.78rem',
-            animation: 'fadeIn 0.3s ease'
+            animation: 'fadeIn var(--motion-duration-slow) var(--motion-ease-out)'
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <Sparkles size={14} style={{ color: 'var(--ai-accent)' }} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2.5)' }}>
+              <Sparkles size={14} style={{ color: 'var(--color-ai-accent)' }} />
               <span>
                 <strong>Araiven Directive Alert:</strong> Optimization plan drafted. Rebalance USDC reserves into confident market opportunity vectors.
               </span>
             </div>
-            <div style={{ display: 'flex', gap: '12px' }}>
+            <div style={{ display: 'flex', gap: 'var(--space-3)' }}>
               <button 
                 onClick={() => setActiveTab('opportunities')}
                 style={{ background: 'none', border: 'none', color: '#fff', textDecoration: 'underline', cursor: 'pointer', fontWeight: 600 }}
@@ -269,8 +269,8 @@ export const AppDashboard: React.FC = () => {
                 className="btn btn-primary"
                 style={{
                   height: '28px',
-                  padding: '0 12px',
-                  borderRadius: '4px',
+                  padding: '0 var(--space-3)',
+                  borderRadius: 'var(--radius-sm)',
                   fontSize: '0.7rem',
                   fontWeight: 700
                 }}
@@ -289,28 +289,28 @@ export const AppDashboard: React.FC = () => {
             right: '32px',
             width: '340px',
             background: 'rgba(14, 19, 37, 0.95)',
-            border: '1px solid var(--border)',
-            borderRadius: '12px',
-            boxShadow: '0 20px 40px rgba(0,0,0,0.5)',
+            border: 'var(--border-thickness) solid var(--color-border)',
+            borderRadius: 'var(--radius-md)',
+            boxShadow: 'var(--shadow-overlay)',
             zIndex: 999,
             maxHeight: '400px',
             overflowY: 'auto',
-            padding: '16px'
+            padding: 'var(--space-4)'
           }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', borderBottom: '1px solid rgba(255,255,255,0.03)', paddingBottom: '8px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-3)', borderBottom: 'var(--border-thickness) solid var(--color-border-divider)', paddingBottom: 'var(--space-2)' }}>
               <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-secondary)' }}>NOTIFICATIONS LOG</span>
               <span onClick={() => setShowNotifications(false)} style={{ fontSize: '0.72rem', cursor: 'pointer', color: 'var(--text-muted)' }}>Close</span>
             </div>
             
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
               {notifications.length === 0 ? (
-                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textAlign: 'center', padding: '12px 0' }}>
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textAlign: 'center', padding: 'var(--space-3) 0' }}>
                   No notifications recorded.
                 </div>
               ) : (
                 notifications.map((notif) => (
-                  <div key={notif.id} style={{ display: 'flex', gap: '8px', fontSize: '0.76rem' }}>
-                    <ShieldAlert size={14} style={{ color: notif.priority === 'high' ? 'var(--danger)' : 'var(--ai-accent)', flexShrink: 0, marginTop: '2px' }} />
+                  <div key={notif.id} style={{ display: 'flex', gap: 'var(--space-2)', fontSize: '0.76rem' }}>
+                    <ShieldAlert size={14} style={{ color: notif.priority === 'high' ? 'var(--color-danger)' : 'var(--color-ai-accent)', flexShrink: 0, marginTop: '2px' }} />
                     <div>
                       <div style={{ fontWeight: 600, color: '#fff' }}>{notif.title}</div>
                       <div style={{ color: 'var(--text-secondary)', marginTop: '2px', lineHeight: 1.35 }}>{notif.body}</div>
@@ -323,7 +323,7 @@ export const AppDashboard: React.FC = () => {
         )}
 
         {/* Content view routing router */}
-        <main style={{ flex: 1, padding: '32px' }}>
+        <main style={{ flex: 1, padding: 'var(--space-8)' }}>
           {activeTab === 'portfolio' && <PortfolioPanel />}
           {activeTab === 'opportunities' && <OpportunitiesPanel />}
           {activeTab === 'copilot' && <CopilotChat />}

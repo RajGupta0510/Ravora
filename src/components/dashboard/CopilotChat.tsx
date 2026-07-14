@@ -39,35 +39,35 @@ export const CopilotChat: React.FC = () => {
       display: 'flex',
       flexDirection: 'column',
       height: 'calc(100vh - 140px)',
-      borderRadius: '12px',
-      border: '1px solid var(--border)',
+      borderRadius: 'var(--radius-md)',
+      border: 'var(--border-thickness) solid var(--color-border)',
       background: 'rgba(14, 19, 37, 0.45)',
       overflow: 'hidden'
     }}>
       
       {/* Header */}
       <div style={{
-        padding: '16px 24px',
-        borderBottom: '1px solid rgba(255,255,255,0.03)',
+        padding: 'var(--space-4) var(--space-6)',
+        borderBottom: 'var(--border-thickness) solid var(--color-border-divider)',
         display: 'flex',
         alignItems: 'center',
-        gap: '10px'
+        gap: 'var(--space-2.5)'
       }}>
-        <MessageSquareCode size={18} style={{ color: 'var(--ai-accent)' }} />
+        <MessageSquareCode size={18} style={{ color: 'var(--color-ai-accent)' }} />
         <div>
           <h2 style={{ fontSize: '0.9rem', fontWeight: 700, margin: 0 }}>Araiven Advisor Sandbox</h2>
           <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>Continuous Audit & Reasoning System</span>
         </div>
       </div>
-
+ 
       {/* Messages Scroll Area */}
       <div style={{
         flex: 1,
-        padding: '24px',
+        padding: 'var(--space-6)',
         overflowY: 'auto',
         display: 'flex',
         flexDirection: 'column',
-        gap: '16px'
+        gap: 'var(--space-4)'
       }}>
         {copilotHistory.map((msg, idx) => (
           <div 
@@ -76,12 +76,12 @@ export const CopilotChat: React.FC = () => {
             style={{
               maxWidth: '80%',
               alignSelf: msg.sender === 'user' ? 'flex-end' : 'flex-start',
-              padding: '12px 16px',
-              borderRadius: '10px',
+              padding: 'var(--space-3) var(--space-4)',
+              borderRadius: 'var(--radius-md)',
               fontSize: '0.8rem',
               lineHeight: 1.45,
               background: msg.sender === 'user' ? 'rgba(37, 99, 235, 0.15)' : 'rgba(255, 255, 255, 0.02)',
-              border: msg.sender === 'user' ? '1px solid rgba(37,99,235,0.2)' : '1px solid rgba(255,255,255,0.04)',
+              border: msg.sender === 'user' ? 'var(--border-thickness) solid rgba(37,99,235,0.2)' : 'var(--border-thickness) solid var(--color-border-divider)',
               color: '#fff',
               boxSizing: 'border-box'
             }}
@@ -89,7 +89,7 @@ export const CopilotChat: React.FC = () => {
             <p style={{ margin: 0 }}>{msg.text}</p>
             {msg.actionHtml && (
               <div 
-                style={{ marginTop: '10px' }}
+                style={{ marginTop: 'var(--space-2.5)' }}
                 dangerouslySetInnerHTML={{ __html: msg.actionHtml }}
               />
             )}
@@ -97,17 +97,17 @@ export const CopilotChat: React.FC = () => {
         ))}
         <div ref={messagesEndRef} />
       </div>
-
+ 
       {/* Preset prompts & Input section */}
       <div style={{
-        padding: '16px 24px',
-        borderTop: '1px solid rgba(255,255,255,0.03)',
+        padding: 'var(--space-4) var(--space-6)',
+        borderTop: 'var(--border-thickness) solid var(--color-border-divider)',
         display: 'flex',
         flexDirection: 'column',
-        gap: '12px'
+        gap: 'var(--space-3)'
       }}>
         {/* Preset prompts badges */}
-        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
           {presetPrompts.map((p) => (
             <button
               key={p.key}
@@ -116,23 +116,23 @@ export const CopilotChat: React.FC = () => {
               className="chat-suggest-btn"
               style={{
                 background: 'rgba(255,255,255,0.02)',
-                border: '1px solid rgba(255,255,255,0.06)',
-                borderRadius: '6px',
-                padding: '6px 12px',
+                border: 'var(--border-thickness) solid rgba(255,255,255,0.06)',
+                borderRadius: 'var(--radius-sm)',
+                padding: 'var(--space-1.5) var(--space-3)',
                 fontSize: '0.72rem',
                 color: 'var(--text-secondary)',
                 cursor: 'pointer',
                 fontWeight: 600,
-                transition: 'all 0.15s'
+                transition: 'all var(--transition-hover)'
               }}
             >
               {p.text}
             </button>
           ))}
         </div>
-
+ 
         {/* Input box */}
-        <form onSubmit={handleSubmit} style={{ display: 'flex', gap: '10px', width: '100%', position: 'relative' }}>
+        <form onSubmit={handleSubmit} style={{ display: 'flex', gap: 'var(--space-2.5)', width: '100%', position: 'relative' }}>
           <input
             type="text"
             value={inputText}
@@ -140,9 +140,9 @@ export const CopilotChat: React.FC = () => {
             placeholder="Query Araiven strategy details or ask for rebalance audits..."
             style={{
               flex: 1,
-              padding: '12px 48px 12px 16px',
-              borderRadius: '8px',
-              border: '1px solid rgba(255,255,255,0.08)',
+              padding: 'var(--space-3) var(--space-12) var(--space-3) var(--space-4)',
+              borderRadius: 'var(--radius-md)',
+              border: 'var(--border-thickness) solid var(--color-border)',
               background: 'rgba(255,255,255,0.03)',
               color: '#fff',
               fontSize: '0.82rem',
@@ -155,16 +155,16 @@ export const CopilotChat: React.FC = () => {
             disabled={sending || !inputText.trim()}
             style={{
               position: 'absolute',
-              right: '8px',
+              right: 'var(--space-2)',
               top: '50%',
               transform: 'translateY(-50%)',
               background: 'none',
               border: 'none',
-              color: 'var(--primary)',
+              color: 'var(--color-primary)',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
-              padding: '6px'
+              padding: 'var(--space-1.5)'
             }}
           >
             <Send size={16} />

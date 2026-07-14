@@ -311,25 +311,25 @@ export const PortfolioPanel: React.FC = () => {
             No transaction records found.
           </div>
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2.5)' }}>
             {paperHistory.slice(0, 10).map((hist) => (
               <div key={hist.id} style={{
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
-                padding: '12px 16px',
-                borderRadius: '8px',
+                padding: 'var(--space-3) var(--space-4)',
+                borderRadius: 'var(--radius-sm)',
                 background: 'rgba(255,255,255,0.005)',
-                border: '1px solid rgba(255,255,255,0.02)',
+                border: 'var(--border-thickness) solid var(--color-border-divider)',
                 fontSize: '0.78rem'
               }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
                   {hist.realizedPnl >= 0 ? (
-                    <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'rgba(16, 185, 129, 0.08)', color: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <div style={{ width: '28px', height: '28px', borderRadius: 'var(--radius-pill)', background: 'rgba(16, 185, 129, 0.08)', color: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                       <ArrowUpRight size={14} />
                     </div>
                   ) : (
-                    <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'rgba(239, 68, 68, 0.08)', color: '#ef4444', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <div style={{ width: '28px', height: '28px', borderRadius: 'var(--radius-pill)', background: 'rgba(239, 68, 68, 0.08)', color: '#ef4444', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                       <ArrowDownRight size={14} />
                     </div>
                   )}
