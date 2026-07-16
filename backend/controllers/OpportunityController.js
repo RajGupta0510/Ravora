@@ -28,7 +28,10 @@ export const OpportunityController = {
       }
 
       return res.json(opps.map(o => OpportunityController._formatOpportunity(o)));
-    } catch (err) { next(err); }
+    } catch (err) {
+      console.error('[Opportunities Controller Error]:', err);
+      next(err);
+    }
   },
 
   async getRecommendations(req, res, next) {
@@ -72,7 +75,10 @@ export const OpportunityController = {
       });
 
       return res.json(formatted);
-    } catch (err) { next(err); }
+    } catch (err) {
+      console.error('[Recommendations Controller Error]:', err);
+      next(err);
+    }
   },
 
   async executeRecommendation(req, res, next) {
@@ -182,25 +188,31 @@ export const OpportunityController = {
   },
 
   _formatOpportunity(o) {
+    if (!o) return null;
+    const entry = parseFloat(o.suggested_entry || 0);
+    const tp = parseFloat(o.suggested_take_profit || 0);
+    const tp1 = parseFloat(o.suggested_take_profit_1 || 0) || (entry && tp ? entry + (tp - entry) * 0.33 : 0);
+    const tp2 = parseFloat(o.suggested_take_profit_2 || 0) || (entry && tp ? entry + (tp - entry) * 0.66 : 0);
+    const tp3 = parseFloat(o.suggested_take_profit_3 || 0) || tp;
+
     return {
       opportunityId: o.id,
-      type: o.opportunity_type,
-      recommendation: o.opportunity_type,
       name: o.name,
       symbol: o.symbol,
       icon: o.icon_symbol,
+      opportunityType: o.opportunity_type,
       opportunityScore: parseFloat(o.opportunity_score || 0),
       confidenceScore: parseFloat(o.confidence_score || 0),
       riskScore: parseFloat(o.risk_score || 0),
       riskLevel: o.risk_level,
       expectedReturn: parseFloat(o.expected_return || 0),
       reasoningText: o.reasoning_text,
-      suggestedEntry: parseFloat(o.suggested_entry || 0),
+      suggestedEntry: entry,
       suggestedStopLoss: parseFloat(o.suggested_stop_loss || 0),
-      suggestedTakeProfit: parseFloat(o.suggested_take_profit || 0),
-      suggestedTakeProfit1: parseFloat(o.suggested_take_profit_1 || 0),
-      suggestedTakeProfit2: parseFloat(o.suggested_take_profit_2 || 0),
-      suggestedTakeProfit3: parseFloat(o.suggested_take_profit_3 || 0),
+      suggestedTakeProfit: tp,
+      suggestedTakeProfit1: tp1,
+      suggestedTakeProfit2: tp2,
+      suggestedTakeProfit3: tp3,
       expectedDuration: o.expected_duration,
       riskRewardRatio: parseFloat(o.risk_reward_ratio || 0),
       trendDirection: o.trend_direction,

@@ -537,6 +537,71 @@ CREATE POLICY "Users can view own audit logs" ON audit_logs FOR SELECT USING (au
 
 
 -- ═══════════════════════════════════════════════════════════
+-- OPPORTUNITIES & ARAIVEN RECOMMENDATIONS
+-- ═══════════════════════════════════════════════════════════
+
+DROP TABLE IF EXISTS araiven_recommendations CASCADE;
+DROP TABLE IF EXISTS opportunities CASCADE;
+
+CREATE TABLE IF NOT EXISTS opportunities (
+  id              TEXT PRIMARY KEY,
+  name            TEXT NOT NULL,
+  symbol          TEXT NOT NULL,
+  icon_symbol     TEXT,
+  opportunity_type TEXT,
+  opportunity_score NUMERIC DEFAULT 0,
+  confidence_score NUMERIC DEFAULT 0,
+  risk_score      NUMERIC DEFAULT 0,
+  risk_level      TEXT,
+  expected_return NUMERIC DEFAULT 0,
+  reasoning_text  TEXT,
+  suggested_entry NUMERIC DEFAULT 0,
+  suggested_stop_loss NUMERIC DEFAULT 0,
+  suggested_take_profit NUMERIC DEFAULT 0,
+  suggested_take_profit_1 NUMERIC DEFAULT 0,
+  suggested_take_profit_2 NUMERIC DEFAULT 0,
+  suggested_take_profit_3 NUMERIC DEFAULT 0,
+  expected_duration TEXT,
+  risk_reward_ratio NUMERIC DEFAULT 0,
+  trend_direction TEXT,
+  trend_strength  NUMERIC DEFAULT 0,
+  support_levels  TEXT,
+  resistance_levels TEXT,
+  trade_probability NUMERIC DEFAULT 0,
+  strategy_used   TEXT,
+  trade_quality   TEXT,
+  nearest_support NUMERIC DEFAULT 0,
+  nearest_resistance NUMERIC DEFAULT 0,
+  distance_to_support NUMERIC DEFAULT 0,
+  distance_to_resistance NUMERIC DEFAULT 0,
+  market_bias     TEXT,
+  created_at      TIMESTAMPTZ DEFAULT NOW(),
+  updated_at      TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS araiven_recommendations (
+  id              UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id         UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  opportunity_id  TEXT NOT NULL REFERENCES opportunities(id) ON DELETE CASCADE,
+  suggested_allocation_pct NUMERIC DEFAULT 0,
+  status          TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'executed', 'dismissed')),
+  reasoning_text  TEXT,
+  created_at      TIMESTAMPTZ DEFAULT NOW(),
+  updated_at      TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- RLS policies for opportunities (anyone can read)
+ALTER TABLE opportunities ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Anyone can view opportunities" ON opportunities FOR SELECT USING (TRUE);
+
+-- RLS policies for araiven_recommendations (users can view/manage own)
+ALTER TABLE araiven_recommendations ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Users can view own recommendations" ON araiven_recommendations FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "Users can manage own recommendations" ON araiven_recommendations FOR ALL USING (auth.uid() = user_id);
+
+
+
+-- ═══════════════════════════════════════════════════════════
 -- DONE
 -- ═══════════════════════════════════════════════════════════
 -- Schema version: 1.0.0

@@ -97,14 +97,22 @@ export const MarketDataService = {
       const maxPrice = prices.length > 0 ? Math.max(...prices) : 0;
       const volume24h = history.length > 0 ? history[history.length - 1].volume : 0;
 
+      // Fetch dynamic ticker info from DB cache
+      const ticker = await this.getTicker(symbol).catch(() => null);
+      const name = ticker ? ticker.name : (symbol.toUpperCase() === 'BTC' ? 'Bitcoin' : (symbol.toUpperCase() === 'ETH' ? 'Ethereum' : (symbol.toUpperCase() === 'SOL' ? 'Solana' : symbol.toUpperCase())));
+      const currentPrice = prices.length > 0 ? prices[prices.length - 1] : (ticker ? parseFloat(ticker.price) : 0);
+      const change24h = ticker ? parseFloat(ticker.change_24h || 0) : 0;
+
       return {
         symbol: symbol.toUpperCase(),
-        currentPrice: prices.length > 0 ? prices[prices.length - 1] : 0,
+        name: name,
+        price: currentPrice,
+        currentPrice: currentPrice,
         highPrice: maxPrice,
         lowPrice: minPrice,
         volume24h,
-        marketCap: 0, // Fallback
-        change24h: 0, // Fallback
+        marketCap: ticker ? parseFloat(ticker.market_cap || 0) : 0,
+        change24h: change24h,
         sparkline: prices,
         historicalPrices: history.map(h => ({
           time: new Date(h.timestamp).toLocaleDateString(),
