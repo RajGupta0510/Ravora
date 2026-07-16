@@ -164,6 +164,33 @@ const DashboardRedirect: React.FC = () => {
   );
 };
 
+// Catch reloads on /app/* paths and redirect them to /app/ with initialRoute set
+const LegacyDashboardRedirect: React.FC = () => {
+  React.useEffect(() => {
+    const path = window.location.pathname.replace(/^\/app\/?/, '');
+    if (path) {
+      sessionStorage.setItem('initialRoute', path);
+    }
+    window.location.href = '/app/';
+  }, []);
+  return (
+    <div style={{
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      width: '100vw',
+      height: '100vh',
+      background: '#060B17',
+      color: '#fff',
+      fontFamily: 'sans-serif'
+    }}>
+      <div style={{ fontSize: '0.78rem', letterSpacing: '0.08em', color: '#94a3b8', fontWeight: 600 }}>
+        RELOADING WORKSPACE...
+      </div>
+    </div>
+  );
+};
+
   return (
     <BrowserRouter>
       <Suspense fallback={<PageSkeleton />}>
@@ -188,6 +215,8 @@ const DashboardRedirect: React.FC = () => {
               <DashboardRedirect />
             </ProtectedRoute>
           } />
+          
+          <Route path="/app/*" element={<LegacyDashboardRedirect />} />
           
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

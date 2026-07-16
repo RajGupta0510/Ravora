@@ -1141,6 +1141,9 @@ class RavoraToastManager {
 window.ravoraToast = new RavoraToastManager();
 
 document.addEventListener('DOMContentLoaded', () => {
+  const API_BASE = '/v1';
+  const btnSignoutOthers = document.getElementById('btn-signout-others');
+  const btnDeleteAccount = document.getElementById('btn-delete-account');
 
   // Initialize Supabase Client dynamically
   let supabaseClient = null;
@@ -1281,8 +1284,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let activeOpportunity = null;
   let activeRecommendationId = null;
 
-  // Dynamic API Base URL detection (redirects to port 3000 if served via static servers on other ports)
-  const API_BASE = window.location.port !== '3000' ? 'http://localhost:3000/v1' : '/v1';
+  // API Base URL is declared at the top of DOMContentLoaded scope
 
   // ==========================================================================
   // API Call Helper
@@ -2248,26 +2250,11 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function showAuthOverlay() {
-    if (authContainer) authContainer.style.display = 'flex';
-    if (onboardingOverlay) onboardingOverlay.style.display = 'none';
-    if (appLayoutContainer) appLayoutContainer.style.display = 'none';
-
-    // Check URL parameters to decide which form to show by default
-    const urlParams = new URLSearchParams(window.location.search);
-    const authType = urlParams.get('auth');
-    if (authType === 'register') {
-      switchAuthView('register');
-    } else {
-      switchAuthView('login');
-    }
+    window.location.href = '/auth/login';
   }
 
   function showOnboardingOverlay() {
-    if (authContainer) authContainer.style.display = 'none';
-    if (onboardingOverlay) onboardingOverlay.style.display = 'flex';
-    if (appLayoutContainer) appLayoutContainer.style.display = 'none';
-    state.currentStep = 1;
-    updateOnboardingStepsVisibility();
+    window.location.href = '/onboarding';
   }
 
   function showDashboard() {
@@ -5651,7 +5638,14 @@ document.addEventListener('DOMContentLoaded', () => {
         window.activeChartComponent.updateData(details, opp);
         window.realtimeDataService.setActiveAsset(symbol, timeframe);
       } else {
-        renderTerminalChart(details, opp);
+        console.warn('activeChartComponent not initialized yet. Dynamic boot requested...');
+        if (typeof window.initChartIntelligence === 'function') {
+          window.initChartIntelligence('terminal-candlestick-chart');
+          if (window.activeChartComponent) {
+            window.activeChartComponent.updateData(details, opp);
+            window.realtimeDataService.setActiveAsset(symbol, timeframe);
+          }
+        }
       }
       
       const overlay = document.getElementById('chart-skeleton-overlay');

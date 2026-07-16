@@ -14,9 +14,10 @@ export default defineConfig({
     port: 5173,
     proxy: {
       '/v1': {
-        target: 'http://localhost:3000',
+        target: 'http://127.0.0.1:3001',
         changeOrigin: true,
         secure: false,
+        rewrite: (path) => path.replace(/^\/v1/, '/api/v1'),
       },
     },
   },
@@ -25,10 +26,19 @@ export default defineConfig({
     emptyOutDir: true,
     rollupOptions: {
       output: {
-        manualChunks: {
-          'vendor-react': ['react', 'react-dom'],
-          'vendor-router': ['react-router-dom'],
-          'vendor-ui': ['lucide-react', 'sonner', 'clsx', 'tailwind-merge', 'class-variance-authority'],
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('react-router-dom')) {
+              return 'vendor-router';
+            }
+            if (id.includes('react') || id.includes('react-dom')) {
+              return 'vendor-react';
+            }
+            if (id.includes('lucide-react') || id.includes('sonner') || id.includes('clsx') || id.includes('tailwind-merge') || id.includes('class-variance-authority')) {
+              return 'vendor-ui';
+            }
+            return 'vendor';
+          }
         },
       },
     },
