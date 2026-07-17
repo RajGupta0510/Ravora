@@ -23,7 +23,12 @@ export const authenticate = async (req, res, next) => {
   }
 
   try {
-    if (!isConfigured) {
+    const isProduction = process.env.NODE_ENV === 'production';
+    if (isProduction && !isConfigured) {
+      return next(ApiError.internal('Database client is not configured in production mode.'));
+    }
+
+    if (!isConfigured && !isProduction) {
       // Sandbox mode — accept mock tokens
       if (token.startsWith('mock_jwt_token_')) {
         const userId = token.replace('mock_jwt_token_', '');

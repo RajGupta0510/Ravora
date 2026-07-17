@@ -7,6 +7,7 @@ import { RecommendationRepository } from '../repositories/RecommendationReposito
 import { PortfolioRepository } from '../repositories/PortfolioRepository.js';
 import { MarketDataService } from '../services/MarketDataService.js';
 import { NotificationService } from '../services/NotificationService.js';
+import { QuantitativeScannerService } from '../services/QuantitativeScannerService.js';
 import { getSupabaseAdmin } from '../config/database.js';
 import { ApiError } from '../utils/ApiError.js';
 import crypto from 'crypto';
@@ -180,8 +181,8 @@ export const OpportunityController = {
     try {
       const userId = req.user.id;
       
-      // Simulate scan and regenerate recommendations
-      await OpportunityController._seedDefaultRecommendations(userId);
+      // Perform a real quantitative market scan using live market data and technical indicators
+      await QuantitativeScannerService.scanAndGenerate(userId);
 
       return res.json({
         success: true,

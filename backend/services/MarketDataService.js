@@ -137,5 +137,30 @@ export const MarketDataService = {
       logger.error('MarketData', 'Failed to fetch asset details', { symbol, error: err.message });
       return { symbol: symbol.toUpperCase(), sparkline: [], historicalPrices: [] };
     }
+  },
+
+  async getTrending() {
+    const overview = await this.getOverview();
+    return overview.sort((a, b) => b.volume24h - a.volume24h).slice(0, 5);
+  },
+
+  async getTopGainers() {
+    const overview = await this.getOverview();
+    return overview.sort((a, b) => b.change24h - a.change24h).slice(0, 3);
+  },
+
+  async getTopLosers() {
+    const overview = await this.getOverview();
+    return overview.sort((a, b) => a.change24h - b.change24h).slice(0, 3);
+  },
+
+  async searchAssets(query = '') {
+    const overview = await this.getOverview();
+    const cleanQuery = query.toUpperCase().trim();
+    if (!cleanQuery) return overview;
+    return overview.filter(o => 
+      o.symbol.includes(cleanQuery) || 
+      o.name.toUpperCase().includes(cleanQuery)
+    );
   }
 };

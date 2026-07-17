@@ -600,10 +600,106 @@ CREATE POLICY "Users can view own recommendations" ON araiven_recommendations FO
 CREATE POLICY "Users can manage own recommendations" ON araiven_recommendations FOR ALL USING (auth.uid() = user_id);
 
 
+-- ═══════════════════════════════════════════════════════════
+-- ADDITIONAL OPTIONAL SCHEMAS (USER SPECIFIC)
+-- ═══════════════════════════════════════════════════════════
+
+-- 1. USER PREFERENCES
+CREATE TABLE IF NOT EXISTS user_preferences (
+  id              UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id         UUID UNIQUE NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  theme           TEXT DEFAULT 'dark' CHECK (theme IN ('dark', 'light')),
+  dashboard_layout TEXT DEFAULT 'balanced',
+  preferred_language TEXT DEFAULT 'en',
+  created_at      TIMESTAMPTZ DEFAULT NOW(),
+  updated_at      TIMESTAMPTZ DEFAULT NOW()
+);
+
+DROP TRIGGER IF EXISTS user_preferences_updated_at ON user_preferences;
+CREATE TRIGGER user_preferences_updated_at
+  BEFORE UPDATE ON user_preferences
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+CREATE INDEX IF NOT EXISTS idx_user_preferences_user_id ON user_preferences(user_id);
+ALTER TABLE user_preferences ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Users can view own preferences" ON user_preferences FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "Users can manage own preferences" ON user_preferences FOR ALL USING (auth.uid() = user_id);
+
+
+-- 2. WATCHLIST ITEMS
+CREATE TABLE IF NOT EXISTS watchlist_items (
+  id              UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  watchlist_id    UUID REFERENCES watchlist(id) ON DELETE CASCADE,
+  symbol          TEXT NOT NULL,
+  notes           TEXT,
+  created_at      TIMESTAMPTZ DEFAULT NOW(),
+  updated_at      TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE (watchlist_id, symbol)
+);
+
+DROP TRIGGER IF EXISTS watchlist_items_updated_at ON watchlist_items;
+CREATE TRIGGER watchlist_items_updated_at
+  BEFORE UPDATE ON watchlist_items
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+CREATE INDEX IF NOT EXISTS idx_watchlist_items_watchlist_id ON watchlist_items(watchlist_id);
+ALTER TABLE watchlist_items ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Users can view own watchlist items" ON watchlist_items FOR SELECT
+  USING (watchlist_id IN (SELECT id FROM watchlist WHERE user_id = auth.uid()));
+CREATE POLICY "Users can manage own watchlist items" ON watchlist_items FOR ALL
+  USING (watchlist_id IN (SELECT id FROM watchlist WHERE user_id = auth.uid()));
+
+
+-- 3. NOTIFICATION PREFERENCES
+CREATE TABLE IF NOT EXISTS notification_preferences (
+  id              UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id         UUID UNIQUE NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  email_enabled   BOOLEAN DEFAULT TRUE,
+  sms_enabled     BOOLEAN DEFAULT FALSE,
+  whatsapp_enabled BOOLEAN DEFAULT FALSE,
+  security_alerts BOOLEAN DEFAULT TRUE,
+  ai_opportunities BOOLEAN DEFAULT TRUE,
+  market_volatility BOOLEAN DEFAULT TRUE,
+  created_at      TIMESTAMPTZ DEFAULT NOW(),
+  updated_at      TIMESTAMPTZ DEFAULT NOW()
+);
+
+DROP TRIGGER IF EXISTS notification_preferences_updated_at ON notification_preferences;
+CREATE TRIGGER notification_preferences_updated_at
+  BEFORE UPDATE ON notification_preferences
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+CREATE INDEX IF NOT EXISTS idx_notification_preferences_user_id ON notification_preferences(user_id);
+ALTER TABLE notification_preferences ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Users can view own notification preferences" ON notification_preferences FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "Users can manage own notification preferences" ON notification_preferences FOR ALL USING (auth.uid() = user_id);
+
+
+-- 4. AI CONVERSATIONS
+CREATE TABLE IF NOT EXISTS ai_conversations (
+  id              UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id         UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  title           TEXT,
+  summary         TEXT,
+  messages        JSONB DEFAULT '[]'::jsonb,
+  created_at      TIMESTAMPTZ DEFAULT NOW(),
+  updated_at      TIMESTAMPTZ DEFAULT NOW()
+);
+
+DROP TRIGGER IF EXISTS ai_conversations_updated_at ON ai_conversations;
+CREATE TRIGGER ai_conversations_updated_at
+  BEFORE UPDATE ON ai_conversations
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+CREATE INDEX IF NOT EXISTS idx_ai_conversations_user_id ON ai_conversations(user_id);
+ALTER TABLE ai_conversations ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Users can view own AI conversations" ON ai_conversations FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "Users can manage own AI conversations" ON ai_conversations FOR ALL USING (auth.uid() = user_id);
+
 
 -- ═══════════════════════════════════════════════════════════
 -- DONE
 -- ═══════════════════════════════════════════════════════════
--- Schema version: 1.0.0
--- Tables created: 17 (including connected_exchanges)
+-- Schema version: 1.1.0
+-- Tables created: 21 (including connected_exchanges)
 -- RLS policies: All user-facing tables secured

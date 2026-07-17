@@ -5,11 +5,13 @@
 
 import { BinanceMarketProvider } from './providers/BinanceMarketProvider.js';
 import { CoinGeckoMarketProvider } from './providers/CoinGeckoMarketProvider.js';
+import { CoinMarketCapMarketProvider } from './providers/CoinMarketCapMarketProvider.js';
 import { logger } from '../utils/logger.js';
 
 const providers = {
   binance: () => new BinanceMarketProvider(),
   coingecko: () => new CoinGeckoMarketProvider(),
+  coinmarketcap: () => new CoinMarketCapMarketProvider(),
 };
 
 export class MarketProviderFactory {
@@ -23,7 +25,7 @@ export class MarketProviderFactory {
    * Fetch tickers with automatic fallback.
    * Tries providers in order until one succeeds.
    */
-  static async fetchTickersWithFallback(symbols, providerOrder = ['binance', 'coingecko']) {
+  static async fetchTickersWithFallback(symbols, providerOrder = ['binance', 'coingecko', 'coinmarketcap']) {
     for (const name of providerOrder) {
       try {
         const provider = MarketProviderFactory.create(name);

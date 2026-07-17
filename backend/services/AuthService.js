@@ -44,7 +44,8 @@ export const AuthService = {
    * Get user by Supabase token (for middleware).
    */
   async getUserFromToken(token) {
-    if (!isConfigured) {
+    const isProduction = process.env.NODE_ENV === 'production';
+    if (!isConfigured && !isProduction) {
       if (token.startsWith('mock_jwt_token_')) {
         const userId = token.replace('mock_jwt_token_', '');
         return { id: userId, email: `sandbox_${userId}@ravora.dev` };

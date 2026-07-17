@@ -104,46 +104,66 @@ export const PortfolioController = {
 
       if (!portfolio.data) throw ApiError.notFound('Portfolio');
 
-      const { data: profile } = await db
-        .from('profiles')
-        .select('risk_stance')
-        .eq('id', userId)
-        .maybeSingle();
+      const { data: assets, error: assetsErr } = await db
+        .from('portfolio_assets')
+        .select('*')
+        .eq('portfolio_id', portfolio.data.id);
 
-      const riskStance = profile?.risk_stance || 'balanced';
+      if (assetsErr) throw assetsErr;
 
-      // Base static datasets matching legacy dashboard.js
-      const baseDatasets = {
-        conservative: {
-          '24h': [123500, 123800, 123900, 124200, 124100, 124300, 124582],
-          '7d': [121000, 121800, 122400, 122900, 123600, 124000, 124582],
-          '30d': [118000, 119500, 120200, 121900, 122800, 123400, 124582],
-          '1y': [105000, 108000, 111000, 113000, 117000, 120000, 124582]
-        },
-        balanced: {
-          '24h': [128000, 127200, 129500, 128400, 130800, 131500, 132194],
-          '7d': [122000, 124500, 126000, 125100, 129000, 130200, 132194],
-          '30d': [115000, 118000, 122000, 121500, 127000, 129000, 132194],
-          '1y': [98000, 104000, 109000, 112000, 122000, 127000, 132194]
-        },
-        aggressive: {
-          '24h': [141000, 138000, 146000, 142000, 148500, 145000, 149425],
-          '7d': [130000, 138000, 134000, 142000, 145000, 141000, 149425],
-          '30d': [120000, 132000, 127000, 139000, 142000, 136000, 149425],
-          '1y': [88000, 102000, 95000, 118000, 134000, 126000, 149425]
-        }
+      const periodMap = {
+        '24h': { interval: '1H', limit: 24 },
+        '7d': { interval: '1D', limit: 7 },
+        '30d': { interval: '1D', limit: 30 },
+        '1y': { interval: '1W', limit: 52 }
       };
+      const config = periodMap[period] || periodMap['24h'];
 
-      const stanceData = baseDatasets[riskStance] || baseDatasets.balanced;
-      const basePoints = stanceData[period] || stanceData['24h'];
-      const currentBalance = parseFloat(portfolio.data.current_balance || 100000);
-      const lastBaseVal = basePoints[basePoints.length - 1];
-      const scaleFactor = lastBaseVal > 0 ? currentBalance / lastBaseVal : 1;
-      const points = basePoints.map(val => Math.round(val * scaleFactor * 100) / 100);
+      const assetHistories = {};
+      const stablecoins = ['USDC', 'USDS', 'USDT'];
+
+      for (const asset of assets || []) {
+        if (!stablecoins.includes(asset.asset_symbol)) {
+          const historyDetails = await MarketDataService.getAssetDetails(asset.asset_symbol, config.interval);
+          assetHistories[asset.asset_symbol] = (historyDetails.history || []).slice(-config.limit);
+        }
+      }
+
+      const points = [];
+      const numPoints = config.limit;
+
+      for (let i = 0; i < numPoints; i++) {
+        let pointValue = 0;
+        
+        for (const asset of assets || []) {
+          const isStable = stablecoins.includes(asset.asset_symbol);
+          if (isStable) {
+            pointValue += parseFloat(asset.balance_amount);
+          } else {
+            const assetHistory = assetHistories[asset.asset_symbol] || [];
+            const historyPoint = assetHistory[i] || assetHistory[assetHistory.length - 1];
+            const price = historyPoint ? historyPoint.close : parseFloat(asset.average_entry_price);
+            
+            const marginUSD = parseFloat(asset.balance_amount) * parseFloat(asset.average_entry_price);
+            const leverage = parseFloat(asset.leverage || 1.0);
+            const priceRatio = price / parseFloat(asset.average_entry_price);
+            
+            let profitLoss = 0;
+            if (asset.position_type?.toLowerCase() === 'short') {
+              profitLoss = marginUSD * leverage * (1 - priceRatio);
+            } else {
+              profitLoss = marginUSD * leverage * (priceRatio - 1);
+            }
+            
+            pointValue += Math.max(0, marginUSD + profitLoss);
+          }
+        }
+        points.push(Math.round(pointValue * 100) / 100);
+      }
 
       return res.json({
         period,
-        points
+        points: points.filter(p => p > 0)
       });
     } catch (err) { next(err); }
   },

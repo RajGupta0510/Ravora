@@ -8,6 +8,10 @@ const router = Router();
 router.get('/prices', optionalAuth, MarketController.getPrices);
 router.get('/overview', optionalAuth, MarketController.getOverview);
 router.get('/summary', optionalAuth, MarketController.getSummary);
+router.get('/trending', optionalAuth, MarketController.getTrending);
+router.get('/gainers', optionalAuth, MarketController.getTopGainers);
+router.get('/losers', optionalAuth, MarketController.getTopLosers);
+router.get('/search', optionalAuth, MarketController.searchAssets);
 router.get('/assets/:symbol', optionalAuth, MarketController.getAssetDetails);
 
 // Authenticated market scanner trigger
