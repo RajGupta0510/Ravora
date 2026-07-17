@@ -144,7 +144,7 @@ const AuthRedirect: React.FC = () => {
 // Redirect to legacy HTML/JS dashboard
 const DashboardRedirect: React.FC = () => {
   React.useEffect(() => {
-    window.location.href = '/app/';
+    window.location.href = '/app/index.html';
   }, []);
   return (
     <div style={{
@@ -164,14 +164,14 @@ const DashboardRedirect: React.FC = () => {
   );
 };
 
-// Catch reloads on /app/* paths and redirect them to /app/ with initialRoute set
+// Catch reloads on /app/* paths and redirect them to /app/index.html with initialRoute set
 const LegacyDashboardRedirect: React.FC = () => {
   React.useEffect(() => {
     const path = window.location.pathname.replace(/^\/app\/?/, '');
     if (path) {
       sessionStorage.setItem('initialRoute', path);
     }
-    window.location.href = '/app/';
+    window.location.href = '/app/index.html';
   }, []);
   return (
     <div style={{

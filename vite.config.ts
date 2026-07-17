@@ -1,9 +1,53 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
+import fs from 'fs';
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+    {
+      name: 'serve-legacy-dashboard',
+      configureServer(server) {
+        server.middlewares.use((req, res, next) => {
+          const url = req.url || '';
+          const urlPath = url.split('?')[0];
+
+          let filePath = '';
+          if (urlPath === '/app' || urlPath === '/app/') {
+            filePath = path.resolve(__dirname, './app/index.html');
+          } else if (urlPath.startsWith('/app/')) {
+            const relativePath = urlPath.substring(5); // remove '/app/'
+            filePath = path.resolve(__dirname, './app', relativePath);
+          }
+
+          if (filePath && fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
+            const ext = path.extname(filePath).toLowerCase();
+            const contentTypes: Record<string, string> = {
+              '.html': 'text/html',
+              '.js': 'application/javascript',
+              '.css': 'text/css',
+              '.svg': 'image/svg+xml',
+              '.png': 'image/png',
+              '.jpg': 'image/jpeg',
+              '.jpeg': 'image/jpeg',
+              '.gif': 'image/gif',
+              '.json': 'application/json',
+              '.woff': 'font/woff',
+              '.woff2': 'font/woff2',
+              '.ttf': 'font/ttf',
+            };
+            res.setHeader('Content-Type', contentTypes[ext] || 'application/octet-stream');
+            res.writeHead(200);
+            res.end(fs.readFileSync(filePath));
+            return;
+          }
+
+          next();
+        });
+      }
+    }
+  ],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),

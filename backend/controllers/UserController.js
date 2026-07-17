@@ -71,7 +71,7 @@ export const UserController = {
         araiven: req.body.araiven || ['opportunities', 'trends', 'plans']
       };
 
-      await UserService.completeOnboarding(req.user.id, payload);
+      await UserService.completeOnboarding(req.user.id, req.user.email, payload);
       return res.json({ success: true, message: 'Onboarding completed successfully.' });
     } catch (err) { next(err); }
   },

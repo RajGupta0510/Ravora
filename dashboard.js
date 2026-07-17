@@ -9622,7 +9622,7 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
       const pathSegments = window.location.pathname.split('/');
       let screenId = pathSegments[pathSegments.length - 1] || 'dashboard';
-      if (screenId === 'app' || screenId === '') {
+      if (screenId === 'app' || screenId === '' || screenId === 'index.html') {
         screenId = 'dashboard';
       }
       navigateTo(screenId, false);

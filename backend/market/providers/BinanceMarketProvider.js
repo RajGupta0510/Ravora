@@ -31,11 +31,18 @@ export class BinanceMarketProvider extends MarketProviderInterface {
       });
   }
 
-  async fetchHistory(symbol, days = 30) {
+  async fetchHistory(symbol, daysOrInterval = 30, limit = 100) {
     const binanceSymbol = SYMBOL_MAP[symbol] || `${symbol}USDT`;
-    const interval = '1d';
-    const limit = days;
-    const response = await fetch(`${this.baseUrl}/api/v3/klines?symbol=${binanceSymbol}&interval=${interval}&limit=${limit}`);
+    let interval = '1d';
+    let finalLimit = limit;
+
+    if (typeof daysOrInterval === 'string') {
+      interval = daysOrInterval;
+    } else if (typeof daysOrInterval === 'number') {
+      finalLimit = daysOrInterval;
+    }
+
+    const response = await fetch(`${this.baseUrl}/api/v3/klines?symbol=${binanceSymbol}&interval=${interval}&limit=${finalLimit}`);
     if (!response.ok) throw new Error(`Binance history API error: ${response.status}`);
     const data = await response.json();
 

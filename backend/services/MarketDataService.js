@@ -88,9 +88,21 @@ export const MarketDataService = {
 
   async getAssetDetails(symbol, timeframe = '1D') {
     try {
-      const days = timeframe === '1W' ? 7 : (timeframe === '1M' ? 30 : 1);
+      const normSymbol = symbol.toUpperCase();
+      const intervalMap = {
+        '1m': { interval: '1m', limit: 100 },
+        '5m': { interval: '5m', limit: 100 },
+        '15m': { interval: '15m', limit: 100 },
+        '1H': { interval: '1h', limit: 100 },
+        '4H': { interval: '4h', limit: 100 },
+        '1D': { interval: '1d', limit: 100 },
+        '1W': { interval: '1w', limit: 52 },
+        '1M': { interval: '1M', limit: 12 }
+      };
+
+      const config = intervalMap[timeframe] || { interval: '1d', limit: 100 };
       const provider = MarketProviderFactory.create('binance');
-      const history = await provider.fetchHistory(symbol.toUpperCase(), days).catch(() => []);
+      const history = await provider.fetchHistory(normSymbol, config.interval, config.limit).catch(() => []);
       
       const prices = history.map(h => h.close);
       const minPrice = prices.length > 0 ? Math.min(...prices) : 0;

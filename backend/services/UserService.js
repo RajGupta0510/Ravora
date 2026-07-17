@@ -36,7 +36,7 @@ export const UserService = {
     return profile;
   },
 
-  async completeOnboarding(userId, data) {
+  async completeOnboarding(userId, email, data) {
     const { experience_level, capital, riskLevel, primary_goal } = data;
 
     // Map riskLevel and save risk profile
@@ -49,6 +49,7 @@ export const UserService = {
     // Upsert profile
     await userRepo.upsert({
       id: userId,
+      email: email,
       experience_level,
       capital,
       risk_stance: riskStance,
