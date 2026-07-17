@@ -7319,12 +7319,25 @@ h2 {
 
 .analysis-scroll-content {
   flex: 1 !important;
-  overflow-y: visible !important;
-  /* Disables outer scrolling */
+  overflow-y: auto !important;
+  /* Enables inner scrolling */
   display: flex !important;
   flex-direction: column !important;
   gap: 12px !important;
   margin-bottom: 12px !important;
+}
+
+.analysis-scroll-content::-webkit-scrollbar {
+  width: 4px;
+}
+
+.analysis-scroll-content::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 2px;
+}
+
+.analysis-scroll-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.15);
 }
 
 .ai-summary-scroll-box {
