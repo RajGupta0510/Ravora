@@ -15,6 +15,7 @@ import notificationRoutes from './notification.routes.js';
 import paperTradingRoutes from './paperTrading.routes.js';
 import marketRoutes from './market.routes.js';
 import opportunityRoutes from './opportunity.routes.js';
+import exchangeRoutes from './exchange.routes.js';
 import { getSupabaseAdmin, isConfigured } from '../config/database.js';
 import env from '../config/environment.js';
 
@@ -77,6 +78,7 @@ authRouter.use('/watchlist', watchlistRoutes);
 authRouter.use('/notifications', notificationRoutes);
 authRouter.use('/paper', paperTradingRoutes);
 authRouter.use('/opportunities', opportunityRoutes);
+authRouter.use('/exchanges', exchangeRoutes);
 
 router.use(authRouter);
 

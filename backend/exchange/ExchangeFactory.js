@@ -5,12 +5,17 @@
 
 import { BinanceExchange } from './providers/BinanceExchange.js';
 import { BybitExchange } from './providers/BybitExchange.js';
+import { OKXExchange } from './providers/OKXExchange.js';
+import { CoinbaseExchange } from './providers/CoinbaseExchange.js';
+import { KrakenExchange } from './providers/KrakenExchange.js';
 import { ApiError } from '../utils/ApiError.js';
 
 const providers = {
   binance: BinanceExchange,
   bybit: BybitExchange,
-  // Future: okx, coinbase, kraken
+  okx: OKXExchange,
+  coinbase: CoinbaseExchange,
+  kraken: KrakenExchange,
 };
 
 export class ExchangeFactory {
