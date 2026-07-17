@@ -16,12 +16,21 @@ import paperTradingRoutes from './paperTrading.routes.js';
 import marketRoutes from './market.routes.js';
 import opportunityRoutes from './opportunity.routes.js';
 import { getSupabaseAdmin, isConfigured } from '../config/database.js';
+import env from '../config/environment.js';
 
 const router = Router();
 
 // Health check (no auth)
 router.get('/health', (req, res) => {
   res.json({ success: true, data: { status: 'healthy', version: '1.0.0', timestamp: new Date().toISOString() } });
+});
+
+// Public Auth Config route for frontend client initialization
+router.get('/auth/config', (req, res) => {
+  res.json({
+    supabaseUrl: env.SUPABASE_URL || 'http://localhost:3000/mock-supabase',
+    supabaseAnonKey: env.SUPABASE_ANON_KEY || 'mock-anon-key'
+  });
 });
 
 // Admin Helper to confirm test users in local development

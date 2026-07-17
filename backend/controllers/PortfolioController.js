@@ -4,6 +4,7 @@
 
 import { PortfolioService } from '../services/PortfolioService.js';
 import { MarketDataService } from '../services/MarketDataService.js';
+import { PortfolioIntelligenceService } from '../services/PortfolioIntelligenceService.js';
 import { getSupabaseAdmin } from '../config/database.js';
 import { ApiError } from '../utils/ApiError.js';
 import crypto from 'crypto';
@@ -326,6 +327,43 @@ export const PortfolioController = {
     try {
       const asset = await PortfolioService.addAsset(req.user.id, req.body);
       return res.status(201).json(asset);
+    } catch (err) { next(err); }
+  },
+
+  async getPerformance(req, res, next) {
+    try {
+      const summary = await PortfolioIntelligenceService.calculatePerformanceSummary(req.user.id);
+      return res.json(summary);
+    } catch (err) { next(err); }
+  },
+
+  async getAllocation(req, res, next) {
+    try {
+      const allocation = await PortfolioIntelligenceService.calculateAllocationAnalysis(req.user.id);
+      return res.json(allocation);
+    } catch (err) { next(err); }
+  },
+
+  async getRisk(req, res, next) {
+    try {
+      const risk = await PortfolioIntelligenceService.calculateRiskMetrics(req.user.id);
+      return res.json(risk);
+    } catch (err) { next(err); }
+  },
+
+  async getAnalytics(req, res, next) {
+    try {
+      const performance = await PortfolioIntelligenceService.calculatePerformanceSummary(req.user.id);
+      const allocation = await PortfolioIntelligenceService.calculateAllocationAnalysis(req.user.id);
+      const risk = await PortfolioIntelligenceService.calculateRiskMetrics(req.user.id);
+      return res.json({ performance, allocation, risk });
+    } catch (err) { next(err); }
+  },
+
+  async getHealth(req, res, next) {
+    try {
+      const health = await PortfolioIntelligenceService.getPortfolioHealth(req.user.id);
+      return res.json(health);
     } catch (err) { next(err); }
   },
 };
