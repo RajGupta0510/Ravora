@@ -1,8 +1,12 @@
-import React, { Suspense } from 'react';
+import React, { Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useSearchParams } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { AppProvider } from './context/AppContext';
 import { Toaster } from 'sonner';
+
+const Agentation = import.meta.env.DEV
+  ? lazy(() => import('agentation').then(module => ({ default: module.Agentation })))
+  : null;
 
 // Lazy-loaded page components — only downloaded when their route is visited
 const LandingPage = React.lazy(() => import('./components/landing/LandingPage'));
@@ -231,6 +235,11 @@ const App: React.FC = () => {
     <AuthProvider>
       <AppProvider>
         <AppContent />
+        {Agentation && (
+          <Suspense fallback={null}>
+            <Agentation />
+          </Suspense>
+        )}
       </AppProvider>
     </AuthProvider>
   );

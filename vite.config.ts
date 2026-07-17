@@ -39,7 +39,15 @@ export default defineConfig({
             };
             res.setHeader('Content-Type', contentTypes[ext] || 'application/octet-stream');
             res.writeHead(200);
-            res.end(fs.readFileSync(filePath));
+
+            let content = fs.readFileSync(filePath);
+            if (ext === '.html') {
+              let htmlStr = content.toString('utf8');
+              htmlStr = htmlStr.replace('</body>', '<script type="module" src="/src/agentation-loader.tsx"></script></body>');
+              content = Buffer.from(htmlStr, 'utf8');
+            }
+
+            res.end(content);
             return;
           }
 
