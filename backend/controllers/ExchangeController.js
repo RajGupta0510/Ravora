@@ -12,7 +12,7 @@ export const ExchangeController = {
         apiSecret,
         passphrase
       );
-      return res.status(201).json(account);
+      return res.status(201).json({ success: true, data: account });
     } catch (err) { next(err); }
   },
 
@@ -20,14 +20,14 @@ export const ExchangeController = {
     try {
       const { id } = req.params;
       const result = await ExchangeSyncService.disconnectExchange(req.user.id, id);
-      return res.json(result);
+      return res.json({ success: true, data: result });
     } catch (err) { next(err); }
   },
 
   async listExchanges(req, res, next) {
     try {
       const list = await ExchangeSyncService.listConnectedExchanges(req.user.id);
-      return res.json(list);
+      return res.json({ success: true, data: list });
     } catch (err) { next(err); }
   },
 
@@ -35,7 +35,15 @@ export const ExchangeController = {
     try {
       const { id } = req.params;
       const result = await ExchangeSyncService.syncExchangeAccount(req.user.id, id);
-      return res.json(result);
+      return res.json({ success: true, data: result });
+    } catch (err) { next(err); }
+  },
+
+  async getSyncStatus(req, res, next) {
+    try {
+      const { id } = req.params;
+      const status = await ExchangeSyncService.getSyncStatus(req.user.id, id);
+      return res.json({ success: true, data: status });
     } catch (err) { next(err); }
   },
 
@@ -50,7 +58,7 @@ export const ExchangeController = {
         .limit(20);
 
       if (error) throw error;
-      return res.json(data || []);
+      return res.json({ success: true, data: data || [] });
     } catch (err) { next(err); }
   }
 };

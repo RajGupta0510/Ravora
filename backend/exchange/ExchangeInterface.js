@@ -8,29 +8,36 @@ export class ExchangeInterface {
     this.name = name;
   }
 
-  /** Get account balance */
+  /**
+   * Get wallet & spot balance details
+   * @returns {Promise<Array<{ asset: string, free: number, locked: number }>>}
+   */
   async getBalance() {
     throw new Error(`${this.name}: getBalance() not implemented`);
   }
 
-  /** Get open positions */
+  /**
+   * Get active margin & futures positions
+   * @returns {Promise<Array<{ symbol: string, side: string, entryPrice: number, currentPrice: number, quantity: number, leverage: number, marginUsed: number, unrealizedPnl: number, status: string }>>}
+   */
   async getPositions() {
     throw new Error(`${this.name}: getPositions() not implemented`);
   }
 
-  /** Place an order */
-  async placeOrder(order) {
-    throw new Error(`${this.name}: placeOrder() not implemented`);
+  /**
+   * Get active open orders
+   * @returns {Promise<Array<{ exchangeOrderId: string, symbol: string, type: string, side: string, quantity: number, price: number, status: string, createdAt: string }>>}
+   */
+  async getOpenOrders() {
+    throw new Error(`${this.name}: getOpenOrders() not implemented`);
   }
 
-  /** Cancel an order */
-  async cancelOrder(orderId) {
-    throw new Error(`${this.name}: cancelOrder() not implemented`);
-  }
-
-  /** Get order status */
-  async getOrderStatus(orderId) {
-    throw new Error(`${this.name}: getOrderStatus() not implemented`);
+  /**
+   * Get historical completed trades
+   * @returns {Promise<Array<{ exchangeOrderId: string, symbol: string, side: string, entryPrice: number, exitPrice: number, quantity: number, leverage: number, pnl: number, fee: number, openedAt: string, closedAt: string }>>}
+   */
+  async getTradeHistory() {
+    throw new Error(`${this.name}: getTradeHistory() not implemented`);
   }
 
   /** Get current ticker price */
@@ -43,12 +50,7 @@ export class ExchangeInterface {
     throw new Error(`${this.name}: getOrderBook() not implemented`);
   }
 
-  /** Get trade history */
-  async getTradeHistory(symbol, limit = 50) {
-    throw new Error(`${this.name}: getTradeHistory() not implemented`);
-  }
-
-  /** Validate API credentials */
+  /** Validate API credentials & permissions */
   async validateCredentials() {
     throw new Error(`${this.name}: validateCredentials() not implemented`);
   }
