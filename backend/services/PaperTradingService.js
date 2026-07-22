@@ -210,20 +210,40 @@ export const PaperTradingService = {
     const marginUsed = (position.entry_price * position.quantity) / position.leverage;
     const newBalance = account.balance + marginUsed + pnl;
 
-    // Trigger Araiven AI coach reviews
+    // Trigger Araiven AI coach reviews using local rule-based analysis
     let coachReview = null;
     try {
-      coachReview = await AiService.tradeReview(userId, {
+      const { MarketProviderFactory } = await import('../market/MarketProviderFactory.js');
+      const { TechnicalIndicators } = await import('../ai/reasoning/TechnicalIndicators.js');
+      const { RuleBasedReviewEngine } = await import('../ai/reasoning/RuleBasedReviewEngine.js');
+
+      const provider = MarketProviderFactory.create('binance');
+      const candles = await provider.fetchHistory(position.symbol, '1d', 30).catch(() => []);
+      
+      const indicators = {};
+      if (candles && candles.length >= 14) {
+        const closes = candles.map(c => c.close);
+        const rsi14 = TechnicalIndicators.calculateRSI(closes, 14);
+        indicators.rsi = rsi14[rsi14.length - 1];
+        
+        const sma20 = TechnicalIndicators.calculateSMA(closes, 20);
+        const currentPrice = closes[closes.length - 1];
+        indicators.trend = currentPrice >= (sma20[sma20.length - 1] || currentPrice) ? 'bullish' : 'bearish';
+      }
+
+      coachReview = RuleBasedReviewEngine.generateReview({
         symbol: position.symbol,
         side: position.side === 'long' ? 'buy' : 'sell',
         quantity: position.quantity,
         price: position.entry_price,
         exitPrice: finalExitPrice,
         pnl,
-        leverage: position.leverage
-      });
+        leverage: position.leverage,
+        stopLoss: position.stop_loss,
+        takeProfit: position.take_profit
+      }, indicators);
     } catch (err) {
-      logger.warn('PaperTrading', 'Araiven trade coaching review generation failed', { error: err.message });
+      logger.warn('PaperTrading', 'Rule-based trade coaching review generation failed', { error: err.message });
     }
 
     // Persist closed status and the AI review JSON
