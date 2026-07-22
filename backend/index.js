@@ -20,6 +20,7 @@ import { marketSyncWorker } from './jobs/workers/MarketSyncWorker.js';
 import { portfolioSyncWorker } from './jobs/workers/PortfolioSyncWorker.js';
 import { priceAlertWorker } from './jobs/workers/PriceAlertWorker.js';
 import { notificationWorker } from './jobs/workers/NotificationWorker.js';
+import { newsSyncWorker } from './jobs/workers/NewsSyncWorker.js';
 
 async function bootstrap() {
   try {
@@ -70,6 +71,8 @@ async function bootstrap() {
       JobScheduler.register('price-alerts', 30_000, priceAlertWorker);
       // Process notification queue every 10 seconds
       JobScheduler.register('notifications', 10_000, notificationWorker);
+      // News & Sentiment sync every 5 minutes
+      JobScheduler.register('news-sync', 300_000, newsSyncWorker);
 
       // Start all scheduled jobs
       JobScheduler.startAll();

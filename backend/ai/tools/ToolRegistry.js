@@ -113,6 +113,35 @@ export const ToolRegistry = {
   },
 
   /**
+   * Fetches latest news updates and sentiment metrics for the asset.
+   */
+  async getNewsSentimentContext(symbol) {
+    try {
+      const { NewsService } = await import('../../services/NewsService.js');
+      const news = await NewsService.getAssetNews(symbol, 5);
+      const sentiment = await NewsService.getSentiment(symbol);
+      const impact = await NewsService.getMarketImpact(symbol);
+
+      return {
+        symbol: symbol.toUpperCase(),
+        overallSentiment: sentiment.overallSentiment,
+        averageScore: sentiment.averageScore,
+        overallImpact: impact.overallImpact,
+        recentHeadlines: news.map(n => ({
+          title: n.title,
+          source: n.source,
+          sentiment: n.sentiment,
+          impact: n.market_impact,
+          publishedAt: n.published_at
+        }))
+      };
+    } catch (err) {
+      logger.error('ToolRegistry', `Error fetching news sentiment context for ${symbol}`, { error: err.message });
+      return { symbol: symbol.toUpperCase(), overallSentiment: 'Neutral', recentHeadlines: [] };
+    }
+  },
+
+  /**
    * Retrieves connection statuses for linked exchange APIs.
    */
   async getExchangeContext(userId) {

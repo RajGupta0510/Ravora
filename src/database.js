@@ -667,6 +667,58 @@ export const initializeDatabase = async () => {
     );
   `);
 
+  // 27. news_articles table (News & Sentiment Engine V1)
+  await dbRun(`
+    CREATE TABLE IF NOT EXISTS news_articles (
+      id TEXT PRIMARY KEY,
+      title TEXT NOT NULL,
+      content TEXT NOT NULL,
+      url TEXT UNIQUE NOT NULL,
+      source TEXT NOT NULL,
+      category TEXT NOT NULL,
+      published_at TEXT NOT NULL,
+      sentiment TEXT NOT NULL,
+      sentiment_score REAL NOT NULL DEFAULT 0.0,
+      market_impact TEXT NOT NULL,
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+
+  // 28. news_asset_mappings table (News & Sentiment Engine V1 Mappings)
+  await dbRun(`
+    CREATE TABLE IF NOT EXISTS news_asset_mappings (
+      article_id TEXT NOT NULL,
+      asset_symbol TEXT NOT NULL,
+      PRIMARY KEY (article_id, asset_symbol),
+      FOREIGN KEY (article_id) REFERENCES news_articles(id) ON DELETE CASCADE
+    );
+  `);
+
+  // 29. news_bookmarks table (News & Sentiment Engine V1 Bookmarks)
+  await dbRun(`
+    CREATE TABLE IF NOT EXISTS news_bookmarks (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL,
+      article_id TEXT NOT NULL,
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE (user_id, article_id),
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+      FOREIGN KEY (article_id) REFERENCES news_articles(id) ON DELETE CASCADE
+    );
+  `);
+
+  // 30. news_read_status table (News & Sentiment Engine V1 Read States)
+  await dbRun(`
+    CREATE TABLE IF NOT EXISTS news_read_status (
+      user_id TEXT NOT NULL,
+      article_id TEXT NOT NULL,
+      read_at TEXT DEFAULT CURRENT_TIMESTAMP,
+      PRIMARY KEY (user_id, article_id),
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+      FOREIGN KEY (article_id) REFERENCES news_articles(id) ON DELETE CASCADE
+    );
+  `);
+
   // Seed opportunities if empty
   const opps = await dbQuery('SELECT COUNT(*) as count FROM opportunities');
   if (opps[0].count === 0) {
