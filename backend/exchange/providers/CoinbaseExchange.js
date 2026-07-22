@@ -88,4 +88,162 @@ export class CoinbaseExchange extends ExchangeInterface {
       permissions: { read: true, trade: true, withdraw: false }
     };
   }
+
+  async placeOrder(params) {
+    const { symbol, type, side, quantity, price, stopPrice } = params;
+    const isMock = !this.apiKey || this.apiKey.includes('mock') || this.apiKey.includes('test');
+
+    if (isMock) {
+      const orderId = `coinbase-ord-${Math.floor(100000 + Math.random() * 900000)}`;
+      const tickerPrice = price || (stopPrice ? stopPrice : (symbol.toUpperCase() === 'BTCUSDT' ? 64000.00 : 3400.00));
+      const status = (type === 'stop_loss' || type === 'stop_limit') ? 'accepted' : 'filled';
+
+      const mockResponse = {
+        success: true,
+        order_id: orderId,
+        order_configuration: {
+          limit_limit_gtd: {
+            base_size: quantity.toString(),
+            limit_price: tickerPrice.toString(),
+            post_only: false
+          }
+        }
+      };
+
+      return {
+        exchangeOrderId: orderId,
+        status,
+        filledPrice: tickerPrice,
+        fee: status === 'filled' ? (quantity * tickerPrice * 0.001) : 0,
+        response: mockResponse
+      };
+    }
+
+    try {
+      const crypto = await import('crypto');
+      const timestamp = Math.floor(Date.now() / 1000).toString();
+      const method = 'POST';
+      const requestPath = '/api/v3/brokerage/orders';
+
+      // Convert symbol, e.g. BTCUSDT -> BTC-USDT
+      const productId = symbol.toUpperCase().replace('USDT', '-USDT');
+      const clientOrderId = crypto.randomUUID();
+
+      const orderConfig = {};
+      if (type.toLowerCase() === 'market') {
+        orderConfig.market_market_ioc = {
+          base_size: quantity.toString()
+        };
+      } else {
+        orderConfig.limit_limit_gtd = {
+          base_size: quantity.toString(),
+          limit_price: price.toString(),
+          end_time: new Date(Date.now() + 86400000).toISOString() // 24h
+        };
+      }
+
+      const body = {
+        client_order_id: clientOrderId,
+        product_id: productId,
+        side: side.toUpperCase(),
+        order_configuration: orderConfig
+      };
+
+      const bodyStr = JSON.stringify(body);
+      const signString = timestamp + method + requestPath + bodyStr;
+      
+      const signature = crypto
+        .createHmac('sha256', this.apiSecret)
+        .update(signString)
+        .digest('hex');
+
+      const res = await fetch(`https://api.coinbase.com${requestPath}`, {
+        method,
+        headers: {
+          'CB-ACCESS-KEY': this.apiKey,
+          'CB-ACCESS-SIGN': signature,
+          'CB-ACCESS-TIMESTAMP': timestamp,
+          'Content-Type': 'application/json'
+        },
+        body: bodyStr
+      });
+
+      const response = await res.json();
+      if (!res.ok || !response.success) {
+        throw new Error(response.error_response?.message || `Coinbase API error: ${res.status}`);
+      }
+
+      return {
+        exchangeOrderId: response.order_id,
+        status: type.toLowerCase() === 'market' ? 'filled' : 'accepted',
+        filledPrice: price || 0,
+        fee: 0,
+        response
+      };
+    } catch (err) {
+      throw new Error(`Coinbase placeOrder failed: ${err.message}`);
+    }
+  }
+
+  async cancelOrder(symbol, exchangeOrderId) {
+    const isMock = !this.apiKey || this.apiKey.includes('mock') || this.apiKey.includes('test');
+
+    if (isMock) {
+      return {
+        exchangeOrderId,
+        status: 'cancelled',
+        response: {
+          results: [{ order_id: exchangeOrderId, result: 'SUCCESS' }]
+        }
+      };
+    }
+
+    try {
+      const crypto = await import('crypto');
+      const timestamp = Math.floor(Date.now / 1000).toString();
+      const method = 'POST';
+      const requestPath = '/api/v3/brokerage/orders/batch_cancel';
+
+      const body = {
+        order_ids: [exchangeOrderId]
+      };
+
+      const bodyStr = JSON.stringify(body);
+      const signString = timestamp + method + requestPath + bodyStr;
+      
+      const signature = crypto
+        .createHmac('sha256', this.apiSecret)
+        .update(signString)
+        .digest('hex');
+
+      const res = await fetch(`https://api.coinbase.com${requestPath}`, {
+        method,
+        headers: {
+          'CB-ACCESS-KEY': this.apiKey,
+          'CB-ACCESS-SIGN': signature,
+          'CB-ACCESS-TIMESTAMP': timestamp,
+          'Content-Type': 'application/json'
+        },
+        body: bodyStr
+      });
+
+      const response = await res.json();
+      if (!res.ok) {
+        throw new Error(`Coinbase API error: ${res.status}`);
+      }
+
+      const result = response.results?.[0];
+      if (result?.result !== 'SUCCESS') {
+        throw new Error(`Coinbase cancellation failed: ${result?.result}`);
+      }
+
+      return {
+        exchangeOrderId: result.order_id,
+        status: 'cancelled',
+        response
+      };
+    } catch (err) {
+      throw new Error(`Coinbase cancelOrder failed: ${err.message}`);
+    }
+  }
 }

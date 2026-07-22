@@ -116,4 +116,159 @@ export class OKXExchange extends ExchangeInterface {
       permissions: { read: true, trade: true, withdraw: false }
     };
   }
+
+  async placeOrder(params) {
+    const { symbol, type, side, quantity, price, stopPrice } = params;
+    const isMock = !this.apiKey || this.apiKey.includes('mock') || this.apiKey.includes('test');
+
+    if (isMock) {
+      const orderId = `okx-ord-${Math.floor(100000 + Math.random() * 900000)}`;
+      const tickerPrice = price || (stopPrice ? stopPrice : (symbol.toUpperCase() === 'BTCUSDT' ? 64000.00 : 3400.00));
+      const status = (type === 'stop_loss' || type === 'stop_limit') ? 'accepted' : 'filled';
+
+      const mockResponse = {
+        code: '0',
+        msg: '',
+        data: [{
+          ordId: orderId,
+          clOrdId: `mock_okx_${Math.random().toString(36).substr(2, 9)}`,
+          sCode: '0',
+          sMsg: 'OK'
+        }]
+      };
+
+      return {
+        exchangeOrderId: orderId,
+        status,
+        filledPrice: tickerPrice,
+        fee: status === 'filled' ? (quantity * tickerPrice * 0.001) : 0,
+        response: mockResponse
+      };
+    }
+
+    try {
+      const crypto = await import('crypto');
+      const timestamp = new Date().toISOString();
+      const method = 'POST';
+      const requestPath = '/api/v5/trade/order';
+
+      const body = {
+        instId: symbol.toUpperCase().replace('USDT', '-USDT'), // Convert e.g. BTCUSDT -> BTC-USDT
+        tdMode: 'cash',
+        side: side.toLowerCase(),
+        ordType: type.toLowerCase() === 'market' ? 'market' : 'limit',
+        sz: quantity.toString()
+      };
+
+      if (type.toLowerCase() === 'limit' && price) {
+        body.px = price.toString();
+      }
+
+      const bodyStr = JSON.stringify(body);
+      const signString = timestamp + method + requestPath + bodyStr;
+      
+      const signature = crypto
+        .createHmac('sha256', this.apiSecret)
+        .update(signString)
+        .digest('base64');
+
+      const res = await fetch(`${this.baseUrl}${requestPath}`, {
+        method,
+        headers: {
+          'OK-ACCESS-KEY': this.apiKey,
+          'OK-ACCESS-SIGN': signature,
+          'OK-ACCESS-TIMESTAMP': timestamp,
+          'OK-ACCESS-PASSPHRASE': this.passphrase,
+          'Content-Type': 'application/json'
+        },
+        body: bodyStr
+      });
+
+      const response = await res.json();
+      if (response.code !== '0') {
+        throw new Error(response.msg || `OKX API error: ${response.code}`);
+      }
+
+      const orderData = response.data?.[0];
+      if (orderData?.sCode !== '0') {
+        throw new Error(orderData?.sMsg || 'OKX order placement failed');
+      }
+
+      return {
+        exchangeOrderId: orderData.ordId,
+        status: type.toLowerCase() === 'market' ? 'filled' : 'accepted',
+        filledPrice: price || 0,
+        fee: 0,
+        response
+      };
+    } catch (err) {
+      throw new Error(`OKX placeOrder failed: ${err.message}`);
+    }
+  }
+
+  async cancelOrder(symbol, exchangeOrderId) {
+    const isMock = !this.apiKey || this.apiKey.includes('mock') || this.apiKey.includes('test');
+
+    if (isMock) {
+      return {
+        exchangeOrderId,
+        status: 'cancelled',
+        response: {
+          code: '0',
+          msg: '',
+          data: [{ ordId: exchangeOrderId, sCode: '0', sMsg: 'OK' }]
+        }
+      };
+    }
+
+    try {
+      const crypto = await import('crypto');
+      const timestamp = new Date().toISOString();
+      const method = 'POST';
+      const requestPath = '/api/v5/trade/cancel-order';
+
+      const body = {
+        instId: symbol.toUpperCase().replace('USDT', '-USDT'),
+        ordId: exchangeOrderId
+      };
+
+      const bodyStr = JSON.stringify(body);
+      const signString = timestamp + method + requestPath + bodyStr;
+      
+      const signature = crypto
+        .createHmac('sha256', this.apiSecret)
+        .update(signString)
+        .digest('base64');
+
+      const res = await fetch(`${this.baseUrl}${requestPath}`, {
+        method,
+        headers: {
+          'OK-ACCESS-KEY': this.apiKey,
+          'OK-ACCESS-SIGN': signature,
+          'OK-ACCESS-TIMESTAMP': timestamp,
+          'OK-ACCESS-PASSPHRASE': this.passphrase,
+          'Content-Type': 'application/json'
+        },
+        body: bodyStr
+      });
+
+      const response = await res.json();
+      if (response.code !== '0') {
+        throw new Error(response.msg || `OKX API error: ${response.code}`);
+      }
+
+      const orderData = response.data?.[0];
+      if (orderData?.sCode !== '0') {
+        throw new Error(orderData?.sMsg || 'OKX order cancellation failed');
+      }
+
+      return {
+        exchangeOrderId: orderData.ordId,
+        status: 'cancelled',
+        response
+      };
+    } catch (err) {
+      throw new Error(`OKX cancelOrder failed: ${err.message}`);
+    }
+  }
 }

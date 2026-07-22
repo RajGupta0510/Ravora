@@ -116,4 +116,156 @@ export class BybitExchange extends ExchangeInterface {
       permissions: { read: true, trade: true, withdraw: false }
     };
   }
+
+  async placeOrder(params) {
+    const { symbol, type, side, quantity, price, stopPrice } = params;
+    const isMock = !this.apiKey || this.apiKey.includes('mock') || this.apiKey.includes('test');
+
+    if (isMock) {
+      const orderId = `bybit-ord-${Math.floor(100000 + Math.random() * 900000)}`;
+      const tickerPrice = price || (stopPrice ? stopPrice : (symbol.toUpperCase() === 'BTCUSDT' ? 64000.00 : 3400.00));
+      const status = (type === 'stop_loss' || type === 'stop_limit') ? 'accepted' : 'filled';
+
+      const mockResponse = {
+        retCode: 0,
+        retMsg: 'OK',
+        result: {
+          orderId,
+          orderLinkId: `mock_link_id_${Math.random().toString(36).substr(2, 9)}`
+        },
+        retExtInfo: {},
+        time: Date.now()
+      };
+
+      return {
+        exchangeOrderId: orderId,
+        status,
+        filledPrice: tickerPrice,
+        fee: status === 'filled' ? (quantity * tickerPrice * 0.001) : 0,
+        response: mockResponse
+      };
+    }
+
+    try {
+      const crypto = await import('crypto');
+      const timestamp = Date.now().toString();
+      const recvWindow = '5000';
+      const orderLinkId = `bybit_link_${crypto.randomUUID().substring(0, 8)}`;
+
+      const body = {
+        category: 'spot',
+        symbol: symbol.toUpperCase(),
+        side: side.charAt(0).toUpperCase() + side.slice(1).toLowerCase(), // Buy or Sell
+        orderType: type.toLowerCase() === 'market' ? 'Market' : 'Limit',
+        qty: quantity.toString(),
+        orderLinkId
+      };
+
+      if (type.toLowerCase() === 'limit' && price) {
+        body.price = price.toString();
+      }
+      if (stopPrice) {
+        body.triggerPrice = stopPrice.toString();
+        body.triggerDirection = side.toLowerCase() === 'buy' ? 1 : 2; // 1: rise, 2: fall
+      }
+
+      const bodyStr = JSON.stringify(body);
+      const signString = timestamp + this.apiKey + recvWindow + bodyStr;
+      
+      const signature = crypto
+        .createHmac('sha256', this.apiSecret)
+        .update(signString)
+        .digest('hex');
+
+      const res = await fetch(`${this.baseUrl}/v5/order/create`, {
+        method: 'POST',
+        headers: {
+          'X-BAPI-API-KEY': this.apiKey,
+          'X-BAPI-SIGN': signature,
+          'X-BAPI-TIMESTAMP': timestamp,
+          'X-BAPI-RECV-WINDOW': recvWindow,
+          'Content-Type': 'application/json'
+        },
+        body: bodyStr
+      });
+
+      const response = await res.json();
+      if (response.retCode !== 0) {
+        throw new Error(response.retMsg || `Bybit API error: ${response.retCode}`);
+      }
+
+      // V5 spot orders might execute immediately (market) or sit in book (limit)
+      const isMarket = type.toLowerCase() === 'market';
+      return {
+        exchangeOrderId: response.result.orderId,
+        status: isMarket ? 'filled' : 'accepted',
+        filledPrice: price || 0,
+        fee: 0, // Fee calculation usually fetched from another endpoint
+        response
+      };
+    } catch (err) {
+      throw new Error(`Bybit placeOrder failed: ${err.message}`);
+    }
+  }
+
+  async cancelOrder(symbol, exchangeOrderId) {
+    const isMock = !this.apiKey || this.apiKey.includes('mock') || this.apiKey.includes('test');
+
+    if (isMock) {
+      return {
+        exchangeOrderId,
+        status: 'cancelled',
+        response: {
+          retCode: 0,
+          retMsg: 'OK',
+          result: { orderId: exchangeOrderId }
+        }
+      };
+    }
+
+    try {
+      const crypto = await import('crypto');
+      const timestamp = Date.now().toString();
+      const recvWindow = '5000';
+
+      const body = {
+        category: 'spot',
+        symbol: symbol.toUpperCase(),
+        orderId: exchangeOrderId
+      };
+
+      const bodyStr = JSON.stringify(body);
+      const signString = timestamp + this.apiKey + recvWindow + bodyStr;
+      
+      const signature = crypto
+        .createHmac('sha256', this.apiSecret)
+        .update(signString)
+        .digest('hex');
+
+      const res = await fetch(`${this.baseUrl}/v5/order/cancel`, {
+        method: 'POST',
+        headers: {
+          'X-BAPI-API-KEY': this.apiKey,
+          'X-BAPI-SIGN': signature,
+          'X-BAPI-TIMESTAMP': timestamp,
+          'X-BAPI-RECV-WINDOW': recvWindow,
+          'Content-Type': 'application/json'
+        },
+        body: bodyStr
+      });
+
+      const response = await res.json();
+      if (response.retCode !== 0) {
+        throw new Error(response.retMsg || `Bybit API error: ${response.retCode}`);
+      }
+
+      return {
+        exchangeOrderId: response.result.orderId,
+        status: 'cancelled',
+        response
+      };
+    } catch (err) {
+      throw new Error(`Bybit cancelOrder failed: ${err.message}`);
+    }
+  }
 }

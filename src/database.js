@@ -473,6 +473,84 @@ export const initializeDatabase = async () => {
     );
   `);
 
+  // 16. orders table (Trade Execution V1)
+  await dbRun(`
+    CREATE TABLE IF NOT EXISTS orders (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL,
+      exchange TEXT NOT NULL,
+      symbol TEXT NOT NULL,
+      type TEXT NOT NULL,
+      side TEXT NOT NULL,
+      quantity REAL NOT NULL,
+      price REAL,
+      filled_price REAL,
+      fee REAL DEFAULT 0,
+      status TEXT DEFAULT 'pending',
+      exchange_order_id TEXT,
+      client_order_id TEXT,
+      stop_price REAL,
+      leverage REAL DEFAULT 1.0,
+      error_message TEXT,
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+      filled_at TEXT,
+      updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
+      deleted_at TEXT,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    );
+  `);
+
+  // 17. executions table (Trade Execution V1 Fills)
+  await dbRun(`
+    CREATE TABLE IF NOT EXISTS executions (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL,
+      order_id TEXT NOT NULL,
+      exchange_account_id TEXT NOT NULL,
+      exchange_execution_id TEXT,
+      symbol TEXT NOT NULL,
+      side TEXT NOT NULL,
+      price REAL NOT NULL,
+      quantity REAL NOT NULL,
+      fee REAL DEFAULT 0,
+      fee_asset TEXT,
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+      FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE
+    );
+  `);
+
+  // 18. order_events table (Trade Execution V1 Status Transitions)
+  await dbRun(`
+    CREATE TABLE IF NOT EXISTS order_events (
+      id TEXT PRIMARY KEY,
+      order_id TEXT NOT NULL,
+      event_type TEXT NOT NULL,
+      previous_status TEXT,
+      new_status TEXT NOT NULL,
+      message TEXT,
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE
+    );
+  `);
+
+  // 19. exchange_responses table (Trade Execution V1 Raw Request/Response Logs)
+  await dbRun(`
+    CREATE TABLE IF NOT EXISTS exchange_responses (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL,
+      order_id TEXT,
+      exchange TEXT NOT NULL,
+      endpoint TEXT NOT NULL,
+      request_payload TEXT NOT NULL,
+      response_payload TEXT NOT NULL,
+      status_code INTEGER,
+      latency_ms INTEGER,
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    );
+  `);
+
   // Seed opportunities if empty
   const opps = await dbQuery('SELECT COUNT(*) as count FROM opportunities');
   if (opps[0].count === 0) {

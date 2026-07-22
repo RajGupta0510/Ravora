@@ -54,4 +54,30 @@ export class ExchangeInterface {
   async validateCredentials() {
     throw new Error(`${this.name}: validateCredentials() not implemented`);
   }
+
+  /**
+   * Place an order on the exchange
+   * @param {object} params
+   * @param {string} params.symbol - e.g. 'BTCUSDT'
+   * @param {string} params.type - 'market' | 'limit' | 'stop_loss' | 'take_profit' | 'stop_limit' | 'trailing_stop'
+   * @param {string} params.side - 'buy' | 'sell'
+   * @param {number} params.quantity - Number of assets to trade
+   * @param {number} [params.price] - Limit price
+   * @param {number} [params.stopPrice] - Trigger price for stops
+   * @param {number} [params.leverage=1.0] - Leverage multiplier
+   * @returns {Promise<{ exchangeOrderId: string, status: string, filledPrice: number, fee: number, response: object }>}
+   */
+  async placeOrder(params) {
+    throw new Error(`${this.name}: placeOrder() not implemented`);
+  }
+
+  /**
+   * Cancel an open order on the exchange
+   * @param {string} symbol - e.g. 'BTCUSDT'
+   * @param {string} exchangeOrderId - The ID assigned by the exchange
+   * @returns {Promise<{ exchangeOrderId: string, status: string, response: object }>}
+   */
+  async cancelOrder(symbol, exchangeOrderId) {
+    throw new Error(`${this.name}: cancelOrder() not implemented`);
+  }
 }
