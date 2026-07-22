@@ -551,6 +551,68 @@ export const initializeDatabase = async () => {
     );
   `);
 
+  // 20. strategy_definitions table (Backtesting & Strategy V1)
+  await dbRun(`
+    CREATE TABLE IF NOT EXISTS strategy_definitions (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL,
+      name TEXT NOT NULL,
+      description TEXT,
+      indicators_config TEXT NOT NULL,
+      rules_config TEXT NOT NULL,
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+      updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    );
+  `);
+
+  // 21. backtest_results table (Backtesting & Strategy V1 Results)
+  await dbRun(`
+    CREATE TABLE IF NOT EXISTS backtest_results (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL,
+      strategy_id TEXT,
+      symbol TEXT NOT NULL,
+      timeframe TEXT NOT NULL,
+      start_date TEXT NOT NULL,
+      end_date TEXT NOT NULL,
+      initial_capital REAL NOT NULL,
+      final_capital REAL NOT NULL,
+      metrics TEXT NOT NULL,
+      trades TEXT NOT NULL,
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+      FOREIGN KEY (strategy_id) REFERENCES strategy_definitions(id) ON DELETE SET NULL
+    );
+  `);
+
+  // 22. historical_signals table (Backtesting & Strategy V1 Signals)
+  await dbRun(`
+    CREATE TABLE IF NOT EXISTS historical_signals (
+      id TEXT PRIMARY KEY,
+      symbol TEXT NOT NULL,
+      timeframe TEXT NOT NULL,
+      signal_type TEXT NOT NULL,
+      price REAL NOT NULL,
+      indicators_snapshot TEXT NOT NULL,
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+
+  // 23. pattern_statistics table (Backtesting & Strategy V1 Patterns)
+  await dbRun(`
+    CREATE TABLE IF NOT EXISTS pattern_statistics (
+      id TEXT PRIMARY KEY,
+      pattern_name TEXT NOT NULL,
+      symbol TEXT NOT NULL,
+      timeframe TEXT NOT NULL,
+      detected_at TEXT NOT NULL,
+      subsequent_price_change_pct REAL,
+      success INTEGER,
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+
   // Seed opportunities if empty
   const opps = await dbQuery('SELECT COUNT(*) as count FROM opportunities');
   if (opps[0].count === 0) {
