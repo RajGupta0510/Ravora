@@ -17,6 +17,8 @@ import marketRoutes from './market.routes.js';
 import opportunityRoutes from './opportunity.routes.js';
 import exchangeRoutes from './exchange.routes.js';
 import orderRoutes from './order.routes.js';
+import aiRoutes from './ai.routes.js';
+import { AiController } from '../ai/controllers/AiController.js';
 import { getSupabaseAdmin, isConfigured } from '../config/database.js';
 import env from '../config/environment.js';
 
@@ -81,6 +83,8 @@ authRouter.use('/paper', paperTradingRoutes);
 authRouter.use('/opportunities', opportunityRoutes);
 authRouter.use('/exchanges', exchangeRoutes);
 authRouter.use('/orders', orderRoutes);
+authRouter.use('/ai', aiRoutes);
+authRouter.post('/copilot/message', AiController.copilotMessage);
 
 router.use(authRouter);
 
