@@ -3814,7 +3814,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // ==========================================================================
   // SPA Screen Router Navigation
   // ==========================================================================
-  const validScreens = ['dashboard', 'watchlist', 'copilot', 'opportunities', 'portfolio', 'history', 'notifications', 'settings'];
+  const validScreens = ['dashboard', 'watchlist', 'copilot', 'opportunities', 'portfolio', 'history', 'notifications', 'settings', 'markets', 'papertrading'];
 
   function navigateTo(screenId, pushState = true) {
     if (!validScreens.includes(screenId)) {
@@ -3895,6 +3895,12 @@ document.addEventListener('DOMContentLoaded', () => {
     } else if (screenId === 'settings') {
       showSettingsSkeletons();
       loadSettingsCenter();
+    } else if (screenId === 'markets') {
+      loadMarketsData();
+    } else if (screenId === 'papertrading') {
+      loadPaperTradingData();
+    } else if (screenId === 'copilot') {
+      loadCopilotData();
     }
 
     if (pushState) {
@@ -5918,11 +5924,11 @@ document.addEventListener('DOMContentLoaded', () => {
           btn.disabled = true;
           btn.textContent = '...';
 
-          const closePromise = apiCall(`/paper/positions/${pos.id}`, { method: 'DELETE' });
+          const closePromise = apiCall(`/paper/positions/${pos.id}/close`, { method: 'POST' });
 
           window.ravoraToast.promise(closePromise, {
             loading: `Closing ${pos.symbol} position...`,
-            success: (res) => `Position closed. PnL: $${res.profitLoss.toLocaleString(undefined, { minimumFractionDigits: 2 })}`,
+            success: (res) => `Position closed. PnL: $${res.pnl.toLocaleString(undefined, { minimumFractionDigits: 2 })}`,
             error: (err) => `Failed to close position: ${err.message}`
           });
 
@@ -6032,7 +6038,7 @@ document.addEventListener('DOMContentLoaded', () => {
               btnCloseAll.disabled = true;
               btnCloseAll.textContent = 'Closing All...';
               try {
-                await apiCall('/paper/positions', { method: 'DELETE' });
+                await apiCall('/paper/positions/close-all', { method: 'POST' });
                 window.ravoraToast.show({
                   type: 'success',
                   title: 'Positions Closed',
@@ -8764,34 +8770,71 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const statusBinance = document.getElementById('exchange-status-binance');
       const statusCoinbase = document.getElementById('exchange-status-coinbase');
-      const binanceDisconnected = localStorage.getItem('ravora_exchange_disconnected_binance') === 'true';
-      const coinbaseDisconnected = localStorage.getItem('ravora_exchange_disconnected_coinbase') === 'true';
+      
+      let binanceConnected = false;
+      let coinbaseConnected = false;
+      let binanceId = null;
+      let coinbaseId = null;
+      
+      try {
+        const exchRes = await apiCall('/exchanges');
+        if (exchRes && exchRes.success && Array.isArray(exchRes.data)) {
+          const binanceRec = exchRes.data.find(e => e.name.toLowerCase() === 'binance');
+          const coinbaseRec = exchRes.data.find(e => e.name.toLowerCase() === 'coinbase');
+          if (binanceRec) {
+            binanceConnected = true;
+            binanceId = binanceRec.id;
+          }
+          if (coinbaseRec) {
+            coinbaseConnected = true;
+            coinbaseId = coinbaseRec.id;
+          }
+        }
+      } catch (err) {
+        console.error('Failed to fetch exchanges:', err);
+      }
 
       if (statusBinance) {
-        if (binanceDisconnected) {
+        if (!binanceConnected) {
           statusBinance.textContent = 'Unconnected';
           statusBinance.style.color = 'var(--text-muted)';
-          document.getElementById('btn-exchange-disconnect-binance').textContent = 'Connect';
-          document.getElementById('btn-exchange-disconnect-binance').style.color = 'var(--accent)';
+          const btn = document.getElementById('btn-exchange-disconnect-binance');
+          if (btn) {
+            btn.textContent = 'Connect';
+            btn.style.color = 'var(--accent)';
+            btn.removeAttribute('data-id');
+          }
         } else {
           statusBinance.textContent = 'Connected | API: Read/Write | Sync: Just now';
           statusBinance.style.color = '#10b981';
-          document.getElementById('btn-exchange-disconnect-binance').textContent = 'Disconnect';
-          document.getElementById('btn-exchange-disconnect-binance').style.color = '#ef4444';
+          const btn = document.getElementById('btn-exchange-disconnect-binance');
+          if (btn) {
+            btn.textContent = 'Disconnect';
+            btn.style.color = '#ef4444';
+            btn.setAttribute('data-id', binanceId);
+          }
         }
       }
 
       if (statusCoinbase) {
-        if (coinbaseDisconnected) {
+        if (!coinbaseConnected) {
           statusCoinbase.textContent = 'Unconnected';
           statusCoinbase.style.color = 'var(--text-muted)';
-          document.getElementById('btn-exchange-disconnect-coinbase').textContent = 'Connect';
-          document.getElementById('btn-exchange-disconnect-coinbase').style.color = 'var(--accent)';
+          const btn = document.getElementById('btn-exchange-disconnect-coinbase');
+          if (btn) {
+            btn.textContent = 'Connect';
+            btn.style.color = 'var(--accent)';
+            btn.removeAttribute('data-id');
+          }
         } else {
           statusCoinbase.textContent = 'Connected | API: Read/Write | Sync: Just now';
           statusCoinbase.style.color = '#10b981';
-          document.getElementById('btn-exchange-disconnect-coinbase').textContent = 'Disconnect';
-          document.getElementById('btn-exchange-disconnect-coinbase').style.color = '#ef4444';
+          const btn = document.getElementById('btn-exchange-disconnect-coinbase');
+          if (btn) {
+            btn.textContent = 'Disconnect';
+            btn.style.color = '#ef4444';
+            btn.setAttribute('data-id', coinbaseId);
+          }
         }
       }
 
@@ -8799,51 +8842,32 @@ document.addEventListener('DOMContentLoaded', () => {
       const exchangesEmptyStateEl = document.getElementById('exchanges-empty-state');
       const exchangesErrorStateEl = document.getElementById('settings-exchanges-error-state');
 
-      if (localStorage.getItem('ravora_exchange_connection_error') === 'true') {
-        if (exchangesListEl) exchangesListEl.style.display = 'none';
-        if (exchangesEmptyStateEl) exchangesEmptyStateEl.style.display = 'none';
-        if (exchangesErrorStateEl) {
-          exchangesErrorStateEl.style.display = 'block';
-          renderRavoraErrorState(exchangesErrorStateEl, {
-            type: 'exchanges',
-            headline: 'Exchange connection lost.',
-            description: 'Reconnect your exchange to resume synchronization.',
-            primaryText: 'Reconnect',
-            primaryCallback: () => {
-              localStorage.removeItem('ravora_exchange_connection_error');
-              localStorage.removeItem('ravora_exchange_disconnected_binance');
-              loadSettingsCenter();
-            }
-          });
-        }
-      } else {
-        if (exchangesErrorStateEl) exchangesErrorStateEl.style.display = 'none';
+      if (exchangesErrorStateEl) exchangesErrorStateEl.style.display = 'none';
 
-        if (binanceDisconnected && coinbaseDisconnected) {
-          if (state.showExchangesList) {
-            if (exchangesListEl) exchangesListEl.style.display = 'flex';
-            if (exchangesEmptyStateEl) exchangesEmptyStateEl.style.display = 'none';
-          } else {
-            if (exchangesListEl) exchangesListEl.style.display = 'none';
-            if (exchangesEmptyStateEl) {
-              exchangesEmptyStateEl.style.display = 'block';
-              renderRavoraEmptyState(exchangesEmptyStateEl, {
-                type: 'exchanges',
-                headline: 'Connect your first exchange.',
-                description: 'Securely connect an exchange to synchronize your portfolio and trading activity.',
-                primaryText: 'Connect Exchange',
-                primaryCallback: () => {
-                  state.showExchangesList = true;
-                  loadSettingsCenter();
-                }
-              });
-            }
-          }
-        } else {
-          state.showExchangesList = false;
+      if (!binanceConnected && !coinbaseConnected) {
+        if (state.showExchangesList) {
           if (exchangesListEl) exchangesListEl.style.display = 'flex';
           if (exchangesEmptyStateEl) exchangesEmptyStateEl.style.display = 'none';
+        } else {
+          if (exchangesListEl) exchangesListEl.style.display = 'none';
+          if (exchangesEmptyStateEl) {
+            exchangesEmptyStateEl.style.display = 'block';
+            renderRavoraEmptyState(exchangesEmptyStateEl, {
+              type: 'exchanges',
+              headline: 'Connect your first exchange.',
+              description: 'Securely connect an exchange to synchronize your portfolio and trading activity.',
+              primaryText: 'Connect Exchange',
+              primaryCallback: () => {
+                state.showExchangesList = true;
+                loadSettingsCenter();
+              }
+            });
+          }
         }
+      } else {
+        state.showExchangesList = false;
+        if (exchangesListEl) exchangesListEl.style.display = 'flex';
+        if (exchangesEmptyStateEl) exchangesEmptyStateEl.style.display = 'none';
       }
 
       const compactChk = document.getElementById('settings-ui-compact');
@@ -9123,28 +9147,72 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const btnDisconnectBinance = document.getElementById('btn-exchange-disconnect-binance');
     if (btnDisconnectBinance) {
-      btnDisconnectBinance.addEventListener('click', () => {
-        const disVal = localStorage.getItem('ravora_exchange_disconnected_binance') === 'true';
-        localStorage.setItem('ravora_exchange_disconnected_binance', disVal ? 'false' : 'true');
-        loadSettingsCenter();
-        if (disVal) {
-          showRavoraSuccess('exchanges');
+      btnDisconnectBinance.addEventListener('click', async () => {
+        const exchId = btnDisconnectBinance.getAttribute('data-id');
+        if (exchId) {
+          try {
+            await apiCall(`/exchanges/${exchId}`, { method: 'DELETE' });
+            window.ravoraToast.success('Binance US Disconnected.');
+            loadSettingsCenter();
+          } catch (err) {
+            console.error(err);
+          }
         } else {
-          showToast('Binance US Disconnected.');
+          const apiKey = prompt("Enter Binance US API Key:");
+          if (!apiKey) return;
+          const apiSecret = prompt("Enter Binance US Secret Key:");
+          if (!apiSecret) return;
+          
+          try {
+            await apiCall('/exchanges', {
+              method: 'POST',
+              body: JSON.stringify({
+                exchangeName: 'binance',
+                apiKey,
+                apiSecret
+              })
+            });
+            showRavoraSuccess('exchanges');
+            loadSettingsCenter();
+          } catch (err) {
+            console.error(err);
+          }
         }
       });
     }
 
     const btnDisconnectCoinbase = document.getElementById('btn-exchange-disconnect-coinbase');
     if (btnDisconnectCoinbase) {
-      btnDisconnectCoinbase.addEventListener('click', () => {
-        const disVal = localStorage.getItem('ravora_exchange_disconnected_coinbase') === 'true';
-        localStorage.setItem('ravora_exchange_disconnected_coinbase', disVal ? 'false' : 'true');
-        loadSettingsCenter();
-        if (disVal) {
-          showRavoraSuccess('exchanges');
+      btnDisconnectCoinbase.addEventListener('click', async () => {
+        const exchId = btnDisconnectCoinbase.getAttribute('data-id');
+        if (exchId) {
+          try {
+            await apiCall(`/exchanges/${exchId}`, { method: 'DELETE' });
+            window.ravoraToast.success('Coinbase Pro Disconnected.');
+            loadSettingsCenter();
+          } catch (err) {
+            console.error(err);
+          }
         } else {
-          showToast('Coinbase Pro Disconnected.');
+          const apiKey = prompt("Enter Coinbase Pro API Key:");
+          if (!apiKey) return;
+          const apiSecret = prompt("Enter Coinbase Pro Secret Key:");
+          if (!apiSecret) return;
+          
+          try {
+            await apiCall('/exchanges', {
+              method: 'POST',
+              body: JSON.stringify({
+                exchangeName: 'coinbase',
+                apiKey,
+                apiSecret
+              })
+            });
+            showRavoraSuccess('exchanges');
+            loadSettingsCenter();
+          } catch (err) {
+            console.error(err);
+          }
         }
       });
     }
@@ -9698,6 +9766,847 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // Redirect back to landing page
       window.location.href = '/';
+    });
+  }
+
+  // ==========================================================================
+  // Araiven Copilot Page Logic (Step 7)
+  // ==========================================================================
+  let activeCopilotConversationId = null;
+
+  async function loadCopilotData() {
+    const listContainer = document.getElementById('copilot-threads-list');
+    if (!listContainer) return;
+    
+    listContainer.innerHTML = '<span style="font-size: 0.72rem; color: var(--text-secondary); text-align: center; padding: 12px 0;">Loading conversation history...</span>';
+    
+    try {
+      const res = await apiCall('/ai/conversations');
+      if (res && res.success && Array.isArray(res.data)) {
+        listContainer.innerHTML = '';
+        if (res.data.length === 0) {
+          listContainer.innerHTML = '<span style="font-size: 0.72rem; color: var(--text-muted); text-align: center; padding: 12px 0;">No past audits found.</span>';
+          return;
+        }
+        res.data.forEach(conv => {
+          const card = document.createElement('div');
+          card.className = 'card-glass';
+          card.style.cssText = 'padding: 10px; border-radius: 6px; cursor: pointer; transition: all 0.15s ease; border: 1px solid rgba(255,255,255,0.04);';
+          if (activeCopilotConversationId === conv.id) {
+            card.style.borderColor = 'var(--accent)';
+            card.style.background = 'rgba(255,255,255,0.04)';
+          }
+          
+          const time = new Date(conv.created_at).toLocaleDateString();
+          card.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+              <span style="font-weight:700; font-size:0.74rem; color:#fff;">${conv.title || 'Audit Thread'}</span>
+              <span style="font-size:0.62rem; color:var(--text-muted);">${time}</span>
+            </div>
+            <p style="font-size:0.66rem; color:var(--text-secondary); margin:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">ID: ${conv.id.substring(0, 8)}...</p>
+          `;
+          card.addEventListener('click', () => {
+            activeCopilotConversationId = conv.id;
+            loadCopilotConversationDetails(conv.id);
+            const children = listContainer.children;
+            for (let i = 0; i < children.length; i++) {
+              children[i].style.borderColor = 'rgba(255,255,255,0.04)';
+              children[i].style.background = 'none';
+            }
+            card.style.borderColor = 'var(--accent)';
+            card.style.background = 'rgba(255,255,255,0.04)';
+          });
+          listContainer.appendChild(card);
+        });
+      } else {
+        listContainer.innerHTML = '<span style="font-size: 0.72rem; color: var(--text-muted); text-align: center; padding: 12px 0;">No past audits found.</span>';
+      }
+    } catch (err) {
+      console.error(err);
+      listContainer.innerHTML = '<span style="font-size: 0.72rem; color: #ef4444; text-align: center; padding: 12px 0;">Failed to load history.</span>';
+    }
+  }
+
+  async function loadCopilotConversationDetails(id) {
+    const log = document.getElementById('copilot-messages-log');
+    if (!log) return;
+    
+    log.innerHTML = '<div class="copilot-loading-spinner" style="display:flex; align-items:center; justify-content:center; height:100%;"><span style="color:var(--text-secondary); font-size:0.8rem;">Retrieving messages...</span></div>';
+    
+    try {
+      const res = await apiCall(`/ai/conversations/${id}`);
+      if (res && res.success && res.data) {
+        log.innerHTML = '';
+        const messages = res.data.messages || [];
+        messages.forEach(msg => {
+          appendCopilotMessage(msg.role === 'user' ? 'user' : 'agent', msg.content);
+        });
+        log.scrollTop = log.scrollHeight;
+      }
+    } catch (err) {
+      console.error(err);
+      log.innerHTML = '<div style="color:#ef4444; padding:20px; font-size:0.8rem;">Failed to load messages.</div>';
+    }
+  }
+
+  function appendCopilotMessage(role, content) {
+    const log = document.getElementById('copilot-messages-log');
+    if (!log) return;
+    
+    const bubble = document.createElement('div');
+    bubble.className = role === 'user' ? 'chat-message-bubble user' : 'chat-message-bubble agent';
+    
+    if (role === 'agent') {
+      bubble.innerHTML = `
+        <div class="message-meta">Araiven AI</div>
+        <div class="message-body">${formatMarkdown(content)}</div>
+      `;
+    } else {
+      bubble.innerHTML = `
+        <div class="message-meta">You</div>
+        <div class="message-body">${formatMarkdown(content)}</div>
+      `;
+    }
+    log.appendChild(bubble);
+    log.scrollTop = log.scrollHeight;
+    return bubble;
+  }
+
+  function formatMarkdown(text) {
+    if (!text) return '';
+    return text
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.*?)\*/g, '<em>$1</em>')
+      .replace(/`([^`]+)`/g, '<code class="code-inline">$1</code>')
+      .replace(/\n/g, '<br>');
+  }
+
+  function typeAiBubble(role, content, speed = 4) {
+    const log = document.getElementById('copilot-messages-log');
+    if (!log) return;
+    
+    const bubble = document.createElement('div');
+    bubble.className = role === 'user' ? 'chat-message-bubble user' : 'chat-message-bubble agent';
+    
+    const meta = document.createElement('div');
+    meta.className = 'message-meta';
+    meta.textContent = role === 'agent' ? 'Araiven AI' : 'You';
+    bubble.appendChild(meta);
+    
+    const body = document.createElement('div');
+    body.className = 'message-body';
+    bubble.appendChild(body);
+    
+    log.appendChild(bubble);
+    
+    let index = 0;
+    function type() {
+      if (index < content.length) {
+        body.innerHTML = formatMarkdown(content.substring(0, index + 1));
+        index++;
+        log.scrollTop = log.scrollHeight;
+        setTimeout(type, speed);
+      }
+    }
+    type();
+    return bubble;
+  }
+
+  async function streamCopilotMessage(text) {
+    const token = localStorage.getItem('ravora_token');
+    const log = document.getElementById('copilot-messages-log');
+    if (!log) return;
+    
+    const agentBubble = document.createElement('div');
+    agentBubble.className = 'chat-message-bubble agent';
+    agentBubble.innerHTML = `
+      <div class="message-meta">Araiven AI</div>
+      <div class="message-body">
+        <div class="copilot-thinking-dots">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </div>
+    `;
+    log.appendChild(agentBubble);
+    log.scrollTop = log.scrollHeight;
+    
+    const bodyContainer = agentBubble.querySelector('.message-body');
+    let accumulatedText = '';
+    
+    try {
+      const response = await fetch(`${API_BASE}/ai/chat`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          message: text,
+          conversationId: activeCopilotConversationId,
+          stream: true
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error('Streaming failed');
+      }
+      
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder('utf-8');
+      
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        
+        const chunk = decoder.decode(value, { stream: true });
+        const lines = chunk.split('\n');
+        
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            const dataStr = line.slice(6).trim();
+            if (dataStr === '[DONE]') {
+              continue;
+            }
+            try {
+              const dataObj = JSON.parse(dataStr);
+              if (dataObj.text) {
+                accumulatedText += dataObj.text;
+                bodyContainer.innerHTML = formatMarkdown(accumulatedText) + '<span class="copilot-cursor" style="display:inline-block; width:6px; height:12px; background:#fff; animation: blink 0.8s infinite;"></span>';
+                log.scrollTop = log.scrollHeight;
+              }
+            } catch (e) {
+            }
+          }
+        }
+      }
+      
+      const cursor = bodyContainer.querySelector('.copilot-cursor');
+      if (cursor) cursor.remove();
+      
+      loadCopilotData();
+      
+    } catch (err) {
+      console.error(err);
+      bodyContainer.innerHTML = '<span style="color:#ef4444;">Connection lost. Standard fallback response below:</span><br>' + formatMarkdown("I'm sorry, I encountered a temporary connection issue. Please make sure the backend server is active and try again.");
+    }
+  }
+
+  // ==========================================================================
+  // Paper Trading View Logic (Step 8)
+  // ==========================================================================
+  async function loadPaperTradingData() {
+    try {
+      const account = await apiCall('/paper/account');
+      if (account) {
+        document.getElementById('paper-cash-balance').textContent = `$${parseFloat(account.balance).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        document.getElementById('paper-net-equity').textContent = `$${parseFloat(account.equity).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        document.getElementById('paper-buying-power').textContent = `$${parseFloat(account.buyingPower).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      }
+      
+      const statsRes = await apiCall('/paper/statistics');
+      if (statsRes && statsRes.success && statsRes.data) {
+        const stats = statsRes.data;
+        document.getElementById('paper-stat-winrate').textContent = `${parseFloat(stats.winRate || 0).toFixed(1)}%`;
+        const netPnL = parseFloat(stats.netProfit || 0);
+        const netPnLEl = document.getElementById('paper-stat-netpnl');
+        netPnLEl.textContent = (netPnL >= 0 ? '+' : '') + `$${netPnL.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        netPnLEl.style.color = netPnL >= 0 ? '#10b981' : '#ef4444';
+        
+        const avgPnL = parseFloat(stats.averageProfit || 0);
+        document.getElementById('paper-stat-avgpnl').textContent = `$${avgPnL.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        
+        document.getElementById('paper-stat-streak').textContent = `${stats.winStreak || 0} Wins`;
+      }
+      
+      const positions = await apiCall('/paper/positions');
+      const positionsTbody = document.getElementById('paper-positions-tbody');
+      if (positionsTbody) {
+        positionsTbody.innerHTML = '';
+        if (!Array.isArray(positions) || positions.length === 0) {
+          positionsTbody.innerHTML = `<tr><td colspan="9" style="text-align: center; color: var(--text-muted); padding: 24px 8px;">No open positions in sandbox.</td></tr>`;
+        } else {
+          positions.forEach(pos => {
+            const tr = document.createElement('tr');
+            tr.style.borderBottom = '1px solid rgba(255,255,255,0.04)';
+            const pnl = parseFloat(pos.unrealizedPnL || 0);
+            const pnlColor = pnl >= 0 ? '#10b981' : '#ef4444';
+            const returnPct = parseFloat(pos.percentageReturn || 0);
+            
+            tr.innerHTML = `
+              <td style="padding: 10px 8px; font-weight: 700; color: #fff;">${pos.symbol}</td>
+              <td style="padding: 10px 8px;"><span style="padding: 2px 6px; border-radius: 4px; font-size: 0.62rem; font-weight: 700; background: ${pos.direction === 'LONG' ? 'rgba(16,185,129,0.1)' : 'rgba(239,68,68,0.1)'}; color: ${pos.direction === 'LONG' ? '#10b981' : '#ef4444'};">${pos.direction}</span></td>
+              <td style="padding: 10px 8px; text-align: right;">$${parseFloat(pos.positionSize).toLocaleString()}</td>
+              <td style="padding: 10px 8px; text-align: right;">$${parseFloat(pos.entryPrice).toLocaleString()}</td>
+              <td style="padding: 10px 8px; text-align: right;">$${parseFloat(pos.currentPrice).toLocaleString()}</td>
+              <td style="padding: 10px 8px; text-align: right; color: ${pnlColor}; font-weight: 700;">${pnl >= 0 ? '+' : ''}$${pnl.toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
+              <td style="padding: 10px 8px; text-align: right; color: ${pnlColor}; font-weight: 700;">${returnPct >= 0 ? '+' : ''}${returnPct.toFixed(2)}%</td>
+              <td style="padding: 10px 8px; text-align: right;">${pos.duration || '0m'}</td>
+              <td style="padding: 10px 8px; text-align: center;">
+                <button class="btn btn-primary btn-xs btn-close-paper-pos" data-id="${pos.id}" style="padding: 4px 8px; background: rgba(239,68,68,0.1); color: #ef4444; border: 1px solid rgba(239,68,68,0.2); border-radius: 4px; cursor: pointer;">Close</button>
+              </td>
+            `;
+            positionsTbody.appendChild(tr);
+          });
+          
+          positionsTbody.querySelectorAll('.btn-close-paper-pos').forEach(btn => {
+            btn.addEventListener('click', async () => {
+              const id = btn.getAttribute('data-id');
+              btn.disabled = true;
+              btn.textContent = 'Closing...';
+              try {
+                const res = await apiCall(`/paper/positions/${id}/close`, { method: 'POST' });
+                window.ravoraToast.success(`Position closed! Exit: $${parseFloat(res.exitPrice).toLocaleString()}, PnL: $${parseFloat(res.pnl).toLocaleString()}`);
+                loadPaperTradingData();
+              } catch (err) {
+                btn.disabled = false;
+                btn.textContent = 'Close';
+              }
+            });
+          });
+        }
+      }
+
+      const ordersTbody = document.getElementById('paper-orders-tbody');
+      if (ordersTbody) {
+        ordersTbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: var(--text-muted); padding: 24px 8px;">No pending orders in sandbox.</td></tr>';
+      }
+
+      const history = await apiCall('/paper/history');
+      const historyTbody = document.getElementById('paper-history-tbody');
+      if (historyTbody) {
+        historyTbody.innerHTML = '';
+        if (!Array.isArray(history) || history.length === 0) {
+          historyTbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: var(--text-muted); padding: 24px 8px;">No trading history logged.</td></tr>`;
+        } else {
+          history.forEach(trade => {
+            const tr = document.createElement('tr');
+            tr.style.borderBottom = '1px solid rgba(255,255,255,0.04)';
+            const pnl = parseFloat(trade.profitLoss || 0);
+            const pnlColor = pnl >= 0 ? '#10b981' : '#ef4444';
+            
+            tr.innerHTML = `
+              <td style="padding: 10px 8px; font-weight: 700; color: #fff;">${trade.symbol}</td>
+              <td style="padding: 10px 8px;"><span style="padding: 2px 6px; border-radius: 4px; font-size: 0.62rem; font-weight: 700; background: ${trade.direction === 'LONG' ? 'rgba(16,185,129,0.1)' : 'rgba(239,68,68,0.1)'}; color: ${trade.direction === 'LONG' ? '#10b981' : '#ef4444'};">${trade.direction}</span></td>
+              <td style="padding: 10px 8px; text-align: right;">$${parseFloat(trade.positionSize).toLocaleString()}</td>
+              <td style="padding: 10px 8px; text-align: right;">$${parseFloat(trade.entryPrice).toLocaleString()}</td>
+              <td style="padding: 10px 8px; text-align: right;">$${parseFloat(trade.exitPrice).toLocaleString()}</td>
+              <td style="padding: 10px 8px; text-align: right; color: ${pnlColor}; font-weight: 700;">${pnl >= 0 ? '+' : ''}$${pnl.toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
+              <td style="padding: 10px 8px; text-align: right;">${trade.duration || '0m'}</td>
+              <td style="padding: 10px 8px; text-align: right; color: var(--text-secondary);">${new Date(trade.closeTime).toLocaleDateString()}</td>
+            `;
+            historyTbody.appendChild(tr);
+          });
+        }
+      }
+      
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  // ==========================================================================
+  // Global Markets View Logic (Step 9)
+  // ==========================================================================
+  let currentMarketsFilter = 'all';
+
+  async function loadMarketsData() {
+    try {
+      const trending = await apiCall('/market/trending');
+      const gainers = await apiCall('/market/gainers');
+      const losers = await apiCall('/market/losers');
+      
+      const trendingList = document.getElementById('markets-trending-list');
+      if (trendingList && Array.isArray(trending)) {
+        trendingList.innerHTML = '';
+        trending.forEach(item => {
+          const div = document.createElement('div');
+          div.style.cssText = 'display:flex; justify-content:space-between; align-items:center; font-size:0.74rem;';
+          div.innerHTML = `
+            <span style="font-weight:700; color:#fff;">${item.symbol} <span style="font-weight:400; color:var(--text-secondary); font-size:0.65rem;">${item.name}</span></span>
+            <span style="font-weight:600; color:var(--text-muted);">$${item.volume24h.toLocaleString('en-US', { maximumFractionDigits: 0 })}</span>
+          `;
+          trendingList.appendChild(div);
+        });
+      }
+
+      const gainersList = document.getElementById('markets-gainers-list');
+      if (gainersList && Array.isArray(gainers)) {
+        gainersList.innerHTML = '';
+        gainers.forEach(item => {
+          const div = document.createElement('div');
+          div.style.cssText = 'display:flex; justify-content:space-between; align-items:center; font-size:0.74rem;';
+          div.innerHTML = `
+            <span style="font-weight:700; color:#fff;">${item.symbol}</span>
+            <span style="font-weight:700; color:#10b981;">+${parseFloat(item.change24h).toFixed(2)}%</span>
+          `;
+          gainersList.appendChild(div);
+        });
+      }
+
+      const losersList = document.getElementById('markets-losers-list');
+      if (losersList && Array.isArray(losers)) {
+        losersList.innerHTML = '';
+        losers.forEach(item => {
+          const div = document.createElement('div');
+          div.style.cssText = 'display:flex; justify-content:space-between; align-items:center; font-size:0.74rem;';
+          div.innerHTML = `
+            <span style="font-weight:700; color:#fff;">${item.symbol}</span>
+            <span style="font-weight:700; color:#ef4444;">${parseFloat(item.change24h).toFixed(2)}%</span>
+          `;
+          losersList.appendChild(div);
+        });
+      }
+
+      const overview = await apiCall('/market/overview');
+      renderMarketsTable(overview);
+      
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  function renderMarketsTable(assets) {
+    const tbody = document.getElementById('markets-table-tbody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+    
+    if (!Array.isArray(assets) || assets.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 24px;">No markets data found.</td></tr>';
+      return;
+    }
+    
+    let filtered = assets;
+    if (currentMarketsFilter === 'large') {
+      filtered = assets.filter(a => a.symbol === 'BTC' || a.symbol === 'ETH' || a.symbol === 'SOL');
+    } else if (currentMarketsFilter === 'volatile') {
+      filtered = assets.filter(a => Math.abs(a.change24h) > 1.5);
+    } else if (currentMarketsFilter === 'stables') {
+      filtered = assets.filter(a => a.symbol === 'USDC' || a.symbol === 'USDT');
+    }
+    
+    const searchEl = document.getElementById('markets-search-input');
+    const q = searchEl ? searchEl.value.toUpperCase().trim() : '';
+    if (q) {
+      filtered = filtered.filter(a => a.symbol.includes(q) || a.name.toUpperCase().includes(q));
+    }
+    
+    filtered.forEach(asset => {
+      const tr = document.createElement('tr');
+      tr.style.borderBottom = '1px solid rgba(255,255,255,0.04)';
+      const pnlColor = asset.change24h >= 0 ? '#10b981' : '#ef4444';
+      
+      tr.innerHTML = `
+        <td style="padding: 12px; font-weight: 700; color: #fff;">
+          ${asset.symbol} <span style="font-weight:400; color:var(--text-secondary); font-size:0.65rem; margin-left:4px;">${asset.name}</span>
+        </td>
+        <td style="padding: 12px; text-align: right; font-weight: 600; color: #fff;">$${parseFloat(asset.price).toLocaleString()}</td>
+        <td style="padding: 12px; text-align: right; color: ${pnlColor}; font-weight: 700;">${asset.change24h >= 0 ? '+' : ''}${parseFloat(asset.change24h).toFixed(2)}%</td>
+        <td style="padding: 12px; text-align: right; color: var(--text-secondary);">$${parseFloat(asset.volume24h).toLocaleString()}</td>
+        <td style="padding: 12px; text-align: right; color: var(--text-secondary);">$${parseFloat(asset.marketCap).toLocaleString()}</td>
+        <td style="padding: 12px; text-align: center;">
+          <button class="btn btn-secondary btn-xs btn-market-details" data-symbol="${asset.symbol}" style="padding: 4px 10px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 4px; color: #fff; cursor: pointer;">Research Details</button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    tbody.querySelectorAll('.btn-market-details').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const sym = btn.getAttribute('data-symbol');
+        showAssetDrawer(sym);
+      });
+    });
+  }
+
+  async function showAssetDrawer(symbol) {
+    const drawer = document.getElementById('markets-asset-drawer');
+    if (!drawer) return;
+    
+    drawer.style.display = 'flex';
+    
+    document.getElementById('drawer-asset-logo').textContent = symbol === 'BTC' ? '₿' : (symbol === 'ETH' ? 'Ξ' : '◎');
+    document.getElementById('drawer-asset-title').textContent = symbol === 'BTC' ? 'Bitcoin' : (symbol === 'ETH' ? 'Ethereum' : (symbol === 'SOL' ? 'Solana' : symbol));
+    document.getElementById('drawer-asset-symbol').textContent = `${symbol} / USD`;
+    document.getElementById('drawer-kpi-high').textContent = 'Loading...';
+    document.getElementById('drawer-kpi-low').textContent = 'Loading...';
+    document.getElementById('drawer-kpi-vol').textContent = 'Loading...';
+    document.getElementById('drawer-kpi-mcap').textContent = 'Loading...';
+    document.getElementById('drawer-ai-analysis-text').innerHTML = 'Araiven AI is auditing indicators...';
+    
+    try {
+      const data = await apiCall(`/market/assets/${symbol}`);
+      if (data) {
+        document.getElementById('drawer-kpi-high').textContent = `$${parseFloat(data.highPrice || data.price).toLocaleString()}`;
+        document.getElementById('drawer-kpi-low').textContent = `$${parseFloat(data.lowPrice || data.price).toLocaleString()}`;
+        document.getElementById('drawer-kpi-vol').textContent = `$${parseFloat(data.volume24h || 0).toLocaleString()}`;
+        document.getElementById('drawer-kpi-mcap').textContent = `$${parseFloat(data.marketCap || 0).toLocaleString()}`;
+      }
+      
+      const aiRes = await apiCall(`/ai/analyze-asset?symbol=${symbol}`, { method: 'POST' });
+      if (aiRes && aiRes.success && aiRes.data) {
+        document.getElementById('drawer-ai-analysis-text').innerHTML = formatMarkdown(aiRes.data.reply || aiRes.data);
+      } else {
+        document.getElementById('drawer-ai-analysis-text').innerHTML = `No AI analysis available for ${symbol}.`;
+      }
+      
+      const tradeBtn = document.getElementById('btn-markets-drawer-trade');
+      tradeBtn.onclick = () => {
+        drawer.style.display = 'none';
+        state.selectedAsset = symbol;
+        navigateTo('dashboard', true);
+      };
+      
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  // ==========================================================================
+  // DOM Event Handlers Binding (Steps 7, 8, 9)
+  // ==========================================================================
+  
+  // Close Markets Drawer
+  const btnCloseDrawer = document.getElementById('btn-close-markets-drawer');
+  if (btnCloseDrawer) {
+    btnCloseDrawer.addEventListener('click', () => {
+      const drawer = document.getElementById('markets-asset-drawer');
+      if (drawer) drawer.style.display = 'none';
+    });
+  }
+
+  // Markets Segmented Filter clicks
+  const marketsSegmented = document.getElementById('markets-filter-segmented');
+  if (marketsSegmented) {
+    marketsSegmented.querySelectorAll('.segmented-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        marketsSegmented.querySelectorAll('.segmented-tab').forEach(t => {
+          t.classList.remove('active');
+          t.style.color = 'var(--text-secondary)';
+        });
+        tab.classList.add('active');
+        tab.style.color = '#fff';
+        currentMarketsFilter = tab.getAttribute('data-filter');
+        loadMarketsData();
+      });
+    });
+  }
+
+  // Markets Search input keyup
+  const marketsSearchInput = document.getElementById('markets-search-input');
+  if (marketsSearchInput) {
+    marketsSearchInput.addEventListener('keyup', () => {
+      loadMarketsData();
+    });
+  }
+
+  // Copilot Send Button & Keypress Enter
+  const btnCopilotSend = document.getElementById('btn-copilot-send');
+  const copilotChatInput = document.getElementById('copilot-chat-input');
+  if (btnCopilotSend && copilotChatInput) {
+    const handleSend = () => {
+      const val = copilotChatInput.value.trim();
+      if (!val) return;
+      copilotChatInput.value = '';
+      appendCopilotMessage('user', val);
+      streamCopilotMessage(val);
+    };
+    btnCopilotSend.addEventListener('click', handleSend);
+    copilotChatInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') handleSend();
+    });
+  }
+
+  // Copilot New Chat button
+  const btnCopilotNewChat = document.getElementById('btn-copilot-new-chat');
+  if (btnCopilotNewChat) {
+    btnCopilotNewChat.addEventListener('click', () => {
+      activeCopilotConversationId = null;
+      const log = document.getElementById('copilot-messages-log');
+      if (log) {
+        log.innerHTML = '<div style="text-align: center; padding: 24px; color: var(--text-muted); font-size: 0.76rem;">New conversation initialized. Ask Araiven something to start.</div>';
+      }
+      loadCopilotData();
+    });
+  }
+
+  // AI Advisory Toolbox button handlers
+  const btnToolPortfolio = document.getElementById('btn-tool-portfolio-audit');
+  if (btnToolPortfolio) {
+    btnToolPortfolio.addEventListener('click', async () => {
+      appendCopilotMessage('user', 'Please audit my current portfolio allocation.');
+      const agentBubble = appendCopilotMessage('agent', 'Analyzing portfolio allocations and staking distributions...');
+      const body = agentBubble.querySelector('.message-body');
+      try {
+        const res = await apiCall('/ai/portfolio-review');
+        if (res && res.success && res.data) {
+          body.innerHTML = formatMarkdown(res.data.reply || res.data);
+        }
+      } catch (err) {
+        body.textContent = 'Failed to load portfolio review audit.';
+      }
+    });
+  }
+
+  const btnToolRisk = document.getElementById('btn-tool-risk-review');
+  if (btnToolRisk) {
+    btnToolRisk.addEventListener('click', async () => {
+      appendCopilotMessage('user', 'Run a risk check on my current exposures.');
+      const agentBubble = appendCopilotMessage('agent', 'Evaluating risk matrices and exposure factors...');
+      const body = agentBubble.querySelector('.message-body');
+      try {
+        const res = await apiCall('/ai/risk-review');
+        if (res && res.success && res.data) {
+          body.innerHTML = formatMarkdown(res.data.reply || res.data);
+        }
+      } catch (err) {
+        body.textContent = 'Failed to load risk cushions audit.';
+      }
+    });
+  }
+
+  const btnToolMarketSummary = document.getElementById('btn-tool-market-summary');
+  if (btnToolMarketSummary) {
+    btnToolMarketSummary.addEventListener('click', async () => {
+      appendCopilotMessage('user', 'Give me a macro market summary briefing.');
+      const agentBubble = appendCopilotMessage('agent', 'Fetching macro trends and global parameters...');
+      const body = agentBubble.querySelector('.message-body');
+      try {
+        const res = await apiCall('/ai/market-summary');
+        if (res && res.success && res.data) {
+          body.innerHTML = formatMarkdown(res.data.reply || res.data);
+        }
+      } catch (err) {
+        body.textContent = 'Failed to load market summary briefing.';
+      }
+    });
+  }
+
+  const btnToolWatchlistReview = document.getElementById('btn-tool-watchlist-review');
+  if (btnToolWatchlistReview) {
+    btnToolWatchlistReview.addEventListener('click', async () => {
+      appendCopilotMessage('user', 'Please review my current watchlist.');
+      const agentBubble = appendCopilotMessage('agent', 'Calculating sentiment score and target structures on watchlisted tokens...');
+      const body = agentBubble.querySelector('.message-body');
+      try {
+        const res = await apiCall('/ai/watchlist-review', { method: 'POST' });
+        if (res && res.success && res.data) {
+          body.innerHTML = formatMarkdown(res.data.reply || res.data);
+        }
+      } catch (err) {
+        body.textContent = 'Failed to load watchlist sentiment review.';
+      }
+    });
+  }
+
+  // Trade Review form submission
+  const copilotTradeReviewForm = document.getElementById('copilot-trade-review-form');
+  if (copilotTradeReviewForm) {
+    copilotTradeReviewForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const symbol = document.getElementById('review-trade-symbol').value.toUpperCase().trim();
+      const qty = parseFloat(document.getElementById('review-trade-qty').value);
+      if (!symbol || isNaN(qty)) return;
+      
+      appendCopilotMessage('user', `Audit pending trade details: ${qty} ${symbol}`);
+      const agentBubble = appendCopilotMessage('agent', `Running trade safety review on ${qty} ${symbol}...`);
+      const body = agentBubble.querySelector('.message-body');
+      
+      try {
+        const res = await apiCall('/ai/trade-review', {
+          method: 'POST',
+          body: JSON.stringify({ symbol, quantity: qty })
+        });
+        if (res && res.success && res.data) {
+          body.innerHTML = formatMarkdown(res.data.reply || res.data);
+        }
+      } catch (err) {
+        body.textContent = 'Failed to complete pre-trade review.';
+      }
+    });
+  }
+
+  // Reset Sandbox account
+  const btnPaperReset = document.getElementById('btn-paper-reset');
+  if (btnPaperReset) {
+    btnPaperReset.addEventListener('click', async () => {
+      if (!confirm('Are you sure you want to reset your paper account balance to $100k and wipe all history?')) return;
+      btnPaperReset.disabled = true;
+      btnPaperReset.textContent = 'Resetting...';
+      try {
+        await apiCall('/paper/reset', { method: 'POST' });
+        window.ravoraToast.success('Simulated account successfully reset!');
+        loadPaperTradingData();
+      } catch (err) {
+        console.error(err);
+      } finally {
+        btnPaperReset.disabled = false;
+        btnPaperReset.textContent = 'Reset Balance & History';
+      }
+    });
+  }
+
+  // Workspace tab switching logic
+  const btnAnalysisTab = document.getElementById('btn-workspace-tab-analysis');
+  const btnOrderTab = document.getElementById('btn-workspace-tab-order');
+  const paneAnalysis = document.getElementById('workspace-analysis-pane');
+  const paneOrder = document.getElementById('workspace-order-entry-pane');
+  
+  if (btnAnalysisTab && btnOrderTab && paneAnalysis && paneOrder) {
+    btnAnalysisTab.addEventListener('click', () => {
+      btnAnalysisTab.classList.add('active');
+      btnAnalysisTab.style.color = '#fff';
+      btnAnalysisTab.style.borderBottomColor = 'var(--accent)';
+      
+      btnOrderTab.classList.remove('active');
+      btnOrderTab.style.color = 'var(--text-secondary)';
+      btnOrderTab.style.borderBottomColor = 'transparent';
+      
+      paneAnalysis.style.display = 'flex';
+      paneOrder.style.display = 'none';
+    });
+    
+    btnOrderTab.addEventListener('click', () => {
+      btnOrderTab.classList.add('active');
+      btnOrderTab.style.color = '#fff';
+      btnOrderTab.style.borderBottomColor = 'var(--accent)';
+      
+      btnAnalysisTab.classList.remove('active');
+      btnAnalysisTab.style.color = 'var(--text-secondary)';
+      btnAnalysisTab.style.borderBottomColor = 'transparent';
+      
+      paneOrder.style.display = 'flex';
+      paneAnalysis.style.display = 'none';
+    });
+  }
+
+  // Trading mode toggle (Live vs Paper)
+  const btnModeLive = document.getElementById('btn-mode-live');
+  const btnModePaper = document.getElementById('btn-mode-paper');
+  state.tradingMode = 'paper';
+  
+  if (btnModeLive && btnModePaper) {
+    btnModeLive.addEventListener('click', () => {
+      btnModeLive.classList.add('active');
+      btnModeLive.style.color = '#fff';
+      btnModeLive.style.background = 'rgba(255,255,255,0.06)';
+      
+      btnModePaper.classList.remove('active');
+      btnModePaper.style.color = 'var(--text-secondary)';
+      btnModePaper.style.background = 'transparent';
+      
+      state.tradingMode = 'live';
+      window.ravoraToast.success('Switched to LIVE trading mode (Active exchanges required)');
+    });
+    
+    btnModePaper.addEventListener('click', () => {
+      btnModePaper.classList.add('active');
+      btnModePaper.style.color = '#fff';
+      btnModePaper.style.background = 'rgba(255,255,255,0.06)';
+      
+      btnModeLive.classList.remove('active');
+      btnModeLive.style.color = 'var(--text-secondary)';
+      btnModeLive.style.background = 'transparent';
+      
+      state.tradingMode = 'paper';
+      window.ravoraToast.success('Switched to SIMULATED paper trading mode');
+    });
+  }
+
+  // Manual Order Entry form setup
+  const workspaceOrderForm = document.getElementById('workspace-order-form');
+  if (workspaceOrderForm) {
+    const slider = document.getElementById('order-leverage-slider');
+    const display = document.getElementById('order-leverage-display');
+    if (slider && display) {
+      slider.addEventListener('input', () => {
+        display.textContent = `${parseFloat(slider.value).toFixed(1)}x`;
+      });
+    }
+    
+    const typeSelect = document.getElementById('order-type-select');
+    const priceRow = document.getElementById('order-price-row');
+    if (typeSelect && priceRow) {
+      typeSelect.addEventListener('change', () => {
+        if (typeSelect.value === 'market') {
+          priceRow.style.display = 'none';
+        } else {
+          priceRow.style.display = 'flex';
+        }
+      });
+    }
+
+    let orderSide = 'buy';
+    const btnBuy = document.getElementById('btn-order-buy');
+    const btnSell = document.getElementById('btn-order-sell');
+    if (btnBuy && btnSell) {
+      btnBuy.addEventListener('click', () => {
+        btnBuy.classList.add('active');
+        btnBuy.style.color = '#fff';
+        btnSell.classList.remove('active');
+        btnSell.style.color = 'var(--text-secondary)';
+        orderSide = 'buy';
+      });
+      btnSell.addEventListener('click', () => {
+        btnSell.classList.add('active');
+        btnSell.style.color = '#fff';
+        btnBuy.classList.remove('active');
+        btnBuy.style.color = 'var(--text-secondary)';
+        orderSide = 'sell';
+      });
+    }
+    
+    workspaceOrderForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const type = typeSelect.value;
+      const margin = parseFloat(document.getElementById('order-margin-input').value);
+      const leverage = parseFloat(slider ? slider.value : 1.0);
+      const limitPrice = parseFloat(document.getElementById('order-price-input').value || 0);
+      const stopLoss = parseFloat(document.getElementById('order-sl-input').value || 0) || null;
+      const takeProfit = parseFloat(document.getElementById('order-tp-input').value || 0) || null;
+      const symbol = state.selectedAsset || 'BTC';
+      
+      let entryPrice = limitPrice;
+      if (type === 'market') {
+        const headerPriceEl = document.getElementById('terminal-chart-price');
+        entryPrice = headerPriceEl ? parseFloat(headerPriceEl.textContent.replace(/[^0-9.]/g, '')) : 64000;
+      }
+      
+      const quantity = (margin * leverage) / entryPrice;
+      
+      const submitBtn = workspaceOrderForm.querySelector('button[type="submit"]');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Submitting order...';
+      
+      try {
+        const endpoint = state.tradingMode === 'live' ? '/orders' : '/paper/order';
+        const res = await apiCall(endpoint, {
+          method: 'POST',
+          body: JSON.stringify({
+            symbol,
+            type,
+            side: orderSide,
+            quantity,
+            price: entryPrice,
+            leverage,
+            stopLoss,
+            takeProfit
+          })
+        });
+        
+        window.ravoraToast.success(`Order placed! Symbol: ${symbol}, Side: ${orderSide.toUpperCase()}, Status: ${res.status}`);
+        
+        loadTerminalPositions();
+        loadTerminalHistory();
+        
+      } catch (err) {
+        console.error(err);
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Place Simulated Order';
+      }
     });
   }
 
