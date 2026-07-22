@@ -178,16 +178,72 @@ export const AiController = {
   async analyzeAsset(req, res, next) {
     try {
       const userId = req.user.id;
-      const { symbol } = req.query;
+      // Support both GET query symbol and POST body symbol
+      const symbol = req.query.symbol || req.body.symbol;
 
       if (!symbol) {
-        throw ApiError.badRequest('symbol query parameter is required');
+        throw ApiError.badRequest('symbol parameter is required');
       }
 
       const data = await AiService.analyzeAsset(userId, symbol);
       return res.json({
         success: true,
         data
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  /**
+   * Watchlist sentiment and potential targets review
+   */
+  async watchlistReview(req, res, next) {
+    try {
+      const userId = req.user.id;
+      const data = await AiService.watchlistReview(userId);
+      return res.json({
+        success: true,
+        data
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  /**
+   * Lists all past conversation threads for the user
+   */
+  async getConversations(req, res, next) {
+    try {
+      const userId = req.user.id;
+      const { AIConversationsRepository } = await import('../../repositories/AIConversationsRepository.js');
+      const list = await new AIConversationsRepository().findByUserId(userId);
+      return res.json({
+        success: true,
+        data: list || []
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  /**
+   * Retrieves messages of a specific thread
+   */
+  async getConversationDetails(req, res, next) {
+    try {
+      const { id } = req.params;
+      const { AIConversationsRepository } = await import('../../repositories/AIConversationsRepository.js');
+      const conv = await new AIConversationsRepository().findById(id);
+
+      if (!conv || conv.user_id !== req.user.id) {
+        throw ApiError.notFound('Conversation not found');
+      }
+
+      return res.json({
+        success: true,
+        data: conv
       });
     } catch (err) {
       next(err);

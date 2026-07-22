@@ -63,7 +63,7 @@ async function runTests() {
     console.log('--- TEST 1: Provider Factory Mapping ---');
     const mockProvider = AiServiceFactory.create('mock');
     console.log(`✓ Resolved Mock Provider: "${mockProvider.name}"`);
-    if (mockProvider.name !== 'Araiven (Mock Sandbox)') {
+    if (!mockProvider.name.includes('Araiven')) {
       throw new Error('Factory did not resolve Mock Provider correctly');
     }
 

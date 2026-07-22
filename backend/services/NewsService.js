@@ -20,6 +20,12 @@ const IMPACT_CRITICAL = ['hack', 'exploit', 'ban', 'cpi', 'fomc', 'rate cut', 'r
 const IMPACT_HIGH = ['etf', 'upgrade', 'approval', 'regulatory', 'inflows', 'outflows'];
 
 export const NewsService = {
+  clearMemory() {
+    memoryArticles.clear();
+    memoryMappings.length = 0;
+    memoryBookmarks.length = 0;
+  },
+
   /**
    * Syncs and processes news feeds from all providers.
    * Performs deduplication and rule-based sentiment calculations.
@@ -56,12 +62,13 @@ export const NewsService = {
         let duplicate = null;
         try {
           const checkWindow = new Date(new Date(article.published_at).getTime() - 60 * 60000).toISOString();
-          const { data } = await client
+          const { data, error } = await client
             .from('news_articles')
             .select('id, url, title')
             .or(`url.eq."${article.url}",title.eq."${article.title}"`)
             .gte('published_at', checkWindow)
             .maybeSingle();
+          if (error) throw error;
           duplicate = data;
         } catch (err) {
           const checkWindowTime = new Date(article.published_at).getTime() - 60 * 60000;

@@ -4,7 +4,7 @@ export class GeminiProvider extends AiServiceInterface {
   constructor() {
     super('Gemini');
     this.apiKey = process.env.GEMINI_API_KEY || '';
-    this.model = process.env.GEMINI_MODEL || 'gemini-1.5-flash';
+    this.model = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
   }
 
   async sendRequest(contents, options = {}) {
@@ -12,18 +12,36 @@ export class GeminiProvider extends AiServiceInterface {
       throw new Error('Gemini API Key is not configured in environment variables');
     }
 
-    const { stream = false, onChunk = null, jsonMode = false, systemInstruction = '' } = options;
+    const { stream = false, onChunk = null, jsonMode = false, systemInstruction = '', systemPrompt = '' } = options;
+    const activeSystemInstruction = systemInstruction || systemPrompt;
     
     const action = stream ? 'streamGenerateContent' : 'generateContent';
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${this.model}:${action}?key=${this.apiKey}`;
 
+    // Format input contents to match Gemini API specification (supporting both OpenAI-style and Gemini-style arrays)
+    const formattedContents = Array.isArray(contents) 
+      ? contents.map(item => {
+          if (item.parts && Array.isArray(item.parts)) {
+            return {
+              role: item.role === 'assistant' || item.role === 'model' ? 'model' : 'user',
+              parts: item.parts
+            };
+          }
+          const textVal = item.content || item.text || '';
+          return {
+            role: item.role === 'assistant' || item.role === 'model' ? 'model' : 'user',
+            parts: [{ text: textVal }]
+          };
+        })
+      : [];
+
     const body = {
-      contents
+      contents: formattedContents
     };
 
-    if (systemInstruction) {
+    if (activeSystemInstruction) {
       body.systemInstruction = {
-        parts: [{ text: systemInstruction }]
+        parts: [{ text: activeSystemInstruction }]
       };
     }
 

@@ -287,5 +287,43 @@ LIVE PORTFOLIO CONTEXT:
       logger.error('AiService', `Asset analysis failed for ${symbol}`, { error: err.message });
       throw err;
     }
+  },
+
+  /**
+   * Reviews user watchlists and provides target tokens suggestions.
+   */
+  async watchlistReview(userId) {
+    const startTime = Date.now();
+    const provider = this.getProvider();
+
+    const watchlistCtx = await ToolRegistry.getWatchlistContext(userId);
+    const marketCtx = await ToolRegistry.getMarketContext();
+
+    try {
+      const prompt = `Review the active user watchlist items:
+Watchlist: ${JSON.stringify(watchlistCtx)}
+Market Data: ${JSON.stringify(marketCtx.overview)}
+Provide response in strict JSON format:
+{
+  "summary": "Detailed narrative watchlist review explaining trends and opportunities.",
+  "riskRating": "low" | "moderate" | "high",
+  "actionableTokens": ["BTC"],
+  "insights": ["insight1"]
+}`;
+
+      const systemInstruction = 'You are Araiven, Ravora\'s institutional AI investment analyst. Output only valid JSON.';
+      const contents = [{ role: 'user', parts: [{ text: prompt }] }];
+      const reviewText = await provider.sendRequest(contents, { systemInstruction, jsonMode: true });
+      const review = JSON.parse(reviewText);
+
+      const latencyMs = Date.now() - startTime;
+      logger.info('AiService', 'Watchlist review completed', { userId, latencyMs });
+      await auditRepo.log(userId, 'watchlist_review', 'watchlists', null, { latencyMs });
+
+      return review;
+    } catch (err) {
+      logger.error('AiService', 'Watchlist review failed', { error: err.message });
+      throw err;
+    }
   }
 };

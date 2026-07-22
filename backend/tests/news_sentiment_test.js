@@ -32,6 +32,9 @@ async function runTests() {
       console.warn('[Setup] Database cleanup bypassed (news tables not migrated). using in-memory fallbacks.');
     }
 
+    // Isolate fallback memory store
+    NewsService.clearMemory();
+
     // ----------------------------------------------------
     // TEST 1: News Ingestion & Duplicate Detection
     // ----------------------------------------------------
