@@ -10268,9 +10268,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // ==========================================================================
   
   // Close Markets Drawer
-  const btnCloseDrawer = document.getElementById('btn-close-markets-drawer');
-  if (btnCloseDrawer) {
-    btnCloseDrawer.addEventListener('click', () => {
+  const btnCloseMarketsDrawer = document.getElementById('btn-close-markets-drawer');
+  if (btnCloseMarketsDrawer) {
+    btnCloseMarketsDrawer.addEventListener('click', () => {
       const drawer = document.getElementById('markets-asset-drawer');
       if (drawer) drawer.style.display = 'none';
     });
@@ -10302,18 +10302,18 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Copilot Send Button & Keypress Enter
-  const btnCopilotSend = document.getElementById('btn-copilot-send');
-  const copilotChatInput = document.getElementById('copilot-chat-input');
-  if (btnCopilotSend && copilotChatInput) {
+  const btnCopilotSendNew = document.getElementById('btn-copilot-send');
+  const copilotChatInputNew = document.getElementById('copilot-chat-input');
+  if (btnCopilotSendNew && copilotChatInputNew) {
     const handleSend = () => {
-      const val = copilotChatInput.value.trim();
+      const val = copilotChatInputNew.value.trim();
       if (!val) return;
-      copilotChatInput.value = '';
+      copilotChatInputNew.value = '';
       appendCopilotMessage('user', val);
       streamCopilotMessage(val);
     };
-    btnCopilotSend.addEventListener('click', handleSend);
-    copilotChatInput.addEventListener('keypress', (e) => {
+    btnCopilotSendNew.addEventListener('click', handleSend);
+    copilotChatInputNew.addEventListener('keypress', (e) => {
       if (e.key === 'Enter') handleSend();
     });
   }

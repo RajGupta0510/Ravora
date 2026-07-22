@@ -99,7 +99,7 @@ const GuestRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
 const AppContent: React.FC = () => {
   const { loading } = useAuth();
-  
+
   if (loading) {
     return (
       <div style={{
@@ -134,94 +134,94 @@ const AppContent: React.FC = () => {
     );
   }
 
-// Redirect legacy query-parameter based auth to the clean path-based routing
-const AuthRedirect: React.FC = () => {
-  const [searchParams] = useSearchParams();
-  const mode = searchParams.get('mode');
-  if (mode === 'register') return <Navigate to="/auth/register" replace />;
-  if (mode === 'forgot') return <Navigate to="/auth/forgot" replace />;
-  if (mode === 'reset') return <Navigate to="/auth/reset" replace />;
-  if (mode === 'otp') return <Navigate to="/auth/otp" replace />;
-  return <Navigate to="/auth/login" replace />;
-};
+  // Redirect legacy query-parameter based auth to the clean path-based routing
+  const AuthRedirect: React.FC = () => {
+    const [searchParams] = useSearchParams();
+    const mode = searchParams.get('mode');
+    if (mode === 'register') return <Navigate to="/auth/register" replace />;
+    if (mode === 'forgot') return <Navigate to="/auth/forgot" replace />;
+    if (mode === 'reset') return <Navigate to="/auth/reset" replace />;
+    if (mode === 'otp') return <Navigate to="/auth/otp" replace />;
+    return <Navigate to="/auth/login" replace />;
+  };
 
-// Redirect to legacy HTML/JS dashboard
-const DashboardRedirect: React.FC = () => {
-  React.useEffect(() => {
-    window.location.href = '/app/index.html';
-  }, []);
-  return (
-    <div style={{
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      width: '100vw',
-      height: '100vh',
-      background: '#060B17',
-      color: '#fff',
-      fontFamily: 'sans-serif'
-    }}>
-      <div style={{ fontSize: '0.78rem', letterSpacing: '0.08em', color: '#94a3b8', fontWeight: 600 }}>
-        LOADING WORKSPACE...
+  // Redirect to legacy HTML/JS dashboard
+  const DashboardRedirect: React.FC = () => {
+    React.useEffect(() => {
+      window.location.href = '/app/index.html';
+    }, []);
+    return (
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: '100vw',
+        height: '100vh',
+        background: '#060B17',
+        color: '#fff',
+        fontFamily: 'sans-serif'
+      }}>
+        <div style={{ fontSize: '0.78rem', letterSpacing: '0.08em', color: '#94a3b8', fontWeight: 600 }}>
+          LOADING WORKSPACE...
+        </div>
       </div>
-    </div>
-  );
-};
+    );
+  };
 
-// Catch reloads on /app/* paths and redirect them to /app/index.html with initialRoute set
-const LegacyDashboardRedirect: React.FC = () => {
-  React.useEffect(() => {
-    const path = window.location.pathname.replace(/^\/app\/?/, '');
-    if (path) {
-      sessionStorage.setItem('initialRoute', path);
-    }
-    window.location.href = '/app/index.html';
-  }, []);
-  return (
-    <div style={{
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      width: '100vw',
-      height: '100vh',
-      background: '#060B17',
-      color: '#fff',
-      fontFamily: 'sans-serif'
-    }}>
-      <div style={{ fontSize: '0.78rem', letterSpacing: '0.08em', color: '#94a3b8', fontWeight: 600 }}>
-        RELOADING WORKSPACE...
+  // Catch reloads on /app/* paths and redirect them to /app/index.html with initialRoute set
+  const LegacyDashboardRedirect: React.FC = () => {
+    React.useEffect(() => {
+      const path = window.location.pathname.replace(/^\/app\/?/, '');
+      if (path) {
+        sessionStorage.setItem('initialRoute', path);
+      }
+      window.location.href = '/app/index.html';
+    }, []);
+    return (
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: '100vw',
+        height: '100vh',
+        background: '#060B17',
+        color: '#fff',
+        fontFamily: 'sans-serif'
+      }}>
+        <div style={{ fontSize: '0.78rem', letterSpacing: '0.08em', color: '#94a3b8', fontWeight: 600 }}>
+          RELOADING WORKSPACE...
+        </div>
       </div>
-    </div>
-  );
-};
+    );
+  };
 
   return (
     <BrowserRouter>
       <Suspense fallback={<PageSkeleton />}>
         <Routes>
           <Route path="/" element={<LandingPage />} />
-          
+
           <Route path="/auth" element={<AuthRedirect />} />
           <Route path="/auth/:mode" element={
             <GuestRoute>
               <AuthCardPage />
             </GuestRoute>
           } />
-          
+
           <Route path="/onboarding" element={
             <OnboardingRoute>
               <OnboardingWizard />
             </OnboardingRoute>
           } />
-          
+
           <Route path="/dashboard" element={
             <ProtectedRoute>
               <DashboardRedirect />
             </ProtectedRoute>
           } />
-          
+
           <Route path="/app/*" element={<LegacyDashboardRedirect />} />
-          
+
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Suspense>
