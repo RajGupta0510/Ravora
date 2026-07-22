@@ -9,5 +9,6 @@ router.get('/risk-review', AiController.riskReview);
 router.post('/trade-review', AiController.tradeReview);
 router.get('/market-summary', AiController.marketSummary);
 router.get('/opportunity-analysis', AiController.opportunityAnalysis);
+router.get('/analyze-asset', AiController.analyzeAsset);
 
 export default router;

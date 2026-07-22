@@ -46,7 +46,7 @@ export const ToolRegistry = {
       const overview = await MarketDataService.getOverview();
       const gainers = await MarketDataService.getTopGainers();
       const losers = await MarketDataService.getTopLosers();
-      const trending = await MarketDataService.getTrendingMarkets();
+      const trending = await MarketDataService.getTrending();
       
       return {
         overview: overview.map(o => ({
@@ -62,6 +62,53 @@ export const ToolRegistry = {
     } catch (err) {
       logger.error('ToolRegistry', 'Error fetching market context', { error: err.message });
       return { error: 'Market data unavailable.' };
+    }
+  },
+
+  /**
+   * Bridges technical indicators and patterns context for a single asset.
+   */
+  async getAssetContext(symbol) {
+    try {
+      const { MarketProviderFactory } = await import('../../market/MarketProviderFactory.js');
+      const { TechnicalIndicators } = await import('../reasoning/TechnicalIndicators.js');
+      const { PatternDetector } = await import('../reasoning/PatternDetector.js');
+      
+      const provider = MarketProviderFactory.create('binance');
+      const candles = await provider.fetchHistory(symbol.toUpperCase(), '1d', 100);
+      
+      if (!candles || candles.length < 30) {
+        throw new Error('Insufficient candles history for indicators calculations');
+      }
+
+      const closes = candles.map(c => c.close);
+      
+      const sma20 = TechnicalIndicators.calculateSMA(closes, 20);
+      const ema12 = TechnicalIndicators.calculateEMA(closes, 12);
+      const rsi14 = TechnicalIndicators.calculateRSI(closes, 14);
+      const bb = TechnicalIndicators.calculateBollingerBands(closes, 20, 2);
+      const atr = TechnicalIndicators.calculateATR(candles, 14);
+      
+      const patterns = PatternDetector.detectAll(candles);
+      const latestIdx = candles.length - 1;
+
+      return {
+        symbol: symbol.toUpperCase(),
+        currentPrice: closes[latestIdx],
+        sma20: sma20[latestIdx],
+        ema12: ema12[latestIdx],
+        rsi14: rsi14[latestIdx],
+        bollingerBands: {
+          upper: bb.upper[latestIdx],
+          middle: bb.middle[latestIdx],
+          lower: bb.lower[latestIdx]
+        },
+        atr: atr[latestIdx],
+        recentPatternsDetected: patterns.slice(-5)
+      };
+    } catch (err) {
+      logger.error('ToolRegistry', `Error fetching asset context for ${symbol}`, { error: err.message });
+      return { error: `Asset data for ${symbol} is currently unavailable.` };
     }
   },
 

@@ -181,4 +181,15 @@ Provide response in strict JSON format as an array of recommendations:
     const result = await this.sendRequest(messages, { systemPrompt });
     return JSON.parse(result);
   }
+
+  async analyzeAsset(symbol, context) {
+    const prompt = `Perform a technical asset analysis for ${symbol.toUpperCase()}:
+Context: ${JSON.stringify(context)}
+Provide response in strict JSON format matching the single asset analysis schema.`;
+
+    const systemPrompt = 'You are Araiven, Ravora\'s institutional AI investment analyst. Output only valid JSON.';
+    const messages = [{ role: 'user', content: prompt }];
+    const result = await this.sendRequest(messages, { systemPrompt });
+    return JSON.parse(result);
+  }
 }

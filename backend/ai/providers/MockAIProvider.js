@@ -95,6 +95,34 @@ export class MockAIProvider extends AiServiceInterface {
     return `Hello! I am Araiven, your AI wealth copilot. I am actively monitoring market orderbooks, sentiment channels, and yield vaults. You asked: "${message}". How can I assist you with your Ravora portfolio today?`;
   }
 
+  async analyzeAsset(symbol, context) {
+    const price = context?.currentPrice || 64200.00;
+    return {
+      symbol: symbol.toUpperCase(),
+      currentPrice: price,
+      trendOutlook: 'bullish',
+      score: 82,
+      indicatorsAudit: {
+        rsiExplanation: `RSI is currently at ${Math.round(context?.rsi14 || 45)}, which mathematically represents a healthy neutral momentum with room to grow before overbought conditions are reached.`,
+        bollingerBandsExplanation: 'Bollinger Bands are contracting on the daily timeframe, indicating a consolidation phase that historically precedes a high-volatility breakout.',
+        maCrossExplanation: 'The 12 EMA is trading above the 20 SMA, confirming short-term bullish momentum holds.'
+      },
+      patternsDetected: ['bullish_fvg'],
+      supportResistance: {
+        resistance: price * 1.05,
+        support: price * 0.96
+      },
+      actionableAdvice: {
+        action: 'accumulate',
+        stopLoss: price * 0.94,
+        takeProfit: price * 1.12,
+        reasoning: 'Price consolidation above key support levels with volume contraction indicates accumulation before range expansion.',
+        confidenceScore: 85,
+        potentialDownside: 'A break below range support invalidates the bullish thesis and risks a drawdown to local lows.'
+      }
+    };
+  }
+
   async generateRecommendations(userId, portfolio, opportunities) {
     return [
       {

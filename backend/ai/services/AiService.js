@@ -262,5 +262,30 @@ LIVE PORTFOLIO CONTEXT:
       logger.error('AiService', 'Opportunity analysis failed', { error: err.message });
       throw err;
     }
+  },
+
+  /**
+   * Performs technical analysis and indicator breakdown for a single asset.
+   */
+  async analyzeAsset(userId, symbol) {
+    const startTime = Date.now();
+    const provider = this.getProvider();
+
+    // 1. Fetch asset indicators & pattern context
+    const assetCtx = await ToolRegistry.getAssetContext(symbol);
+
+    try {
+      // 2. Query LLM provider
+      const review = await provider.analyzeAsset(symbol.toUpperCase(), assetCtx);
+      
+      const latencyMs = Date.now() - startTime;
+      logger.info('AiService', `Asset analysis completed for ${symbol}`, { userId, latencyMs });
+      await auditRepo.log(userId, 'analyze_asset', 'market', null, { latencyMs, symbol });
+
+      return review;
+    } catch (err) {
+      logger.error('AiService', `Asset analysis failed for ${symbol}`, { error: err.message });
+      throw err;
+    }
   }
 };

@@ -10,6 +10,9 @@ Boundaries & Constraints:
 2. DO NOT HALLUCINATE OR INVENT: Never invent account balances, trades, or market prices. If data is missing or connection fails, state that clearly instead of guessing.
 3. OBJECTIVE TONE: Speak in a professional, quantitative, financial analyst tone. Avoid hype or emoji-heavy speech. Explain WHY you reach every conclusion.
 
+Educational Explanations Rule:
+Do not simply list indicator values. You must explain *what* they mean educationally to help the user learn (e.g. "RSI at 28 is inside the oversold zone, which mathematically indicates selling volume has exhausted and a short-term trend reversal is probable.").
+
 Decision Explanations Rule:
 For every trade recommendation or asset shift, you MUST provide:
 - Reasoning (detailed why)
@@ -38,17 +41,16 @@ Analyze the user's holdings. Address:
 1. Overall Valuation & Asset Weights.
 2. Health score (calculate based on diversification and active risk).
 3. Sector allocation split.
-4. Compliance with user's active risk stance.
+4. Strong vs Weak positions (identify underperforming assets with low yields or high drawdowns as "Weak" and outperforming ones as "Strong").
+5. Compliance with user's active risk stance.
 
 Output MUST be a valid JSON object matching this schema exactly:
 {
   "summary": "Detailed narrative portfolio audit explaining the state and performance.",
   "healthScore": 88,
   "diversificationScore": 92,
-  "analysisDetails": {
-    "volatilityScore": "low" | "moderate" | "high",
-    "exposureRatio": "Ratio of L1 vs DeFi vs stablecoins"
-  },
+  "strongPositions": ["BTC", "USDC"],
+  "weakPositions": ["SOL"],
   "recommendations": [
     {
       "asset": "BTC",
@@ -111,7 +113,7 @@ Output MUST be a valid JSON object matching this schema:
   },
 
   /**
-   * Generates prompt template for reviewing a trade before placement.
+   * Generates prompt template for reviewing a trade before execution.
    */
   tradeReviewSystemPrompt(trade, context) {
     return `
@@ -121,22 +123,27 @@ You are reviewing a proposed Trade before the user executes it.
 Proposed Trade: ${JSON.stringify(trade)}
 User Context & Portfolio Status: ${JSON.stringify(context)}
 
-Evaluate whether this trade is safe and suitable:
-1. Does it exceed risk profile allocation caps?
-2. Does it cause overconcentration in a single asset?
-3. Is it a high-leverage risk?
-4. What is the potential upside and downside of this entry?
+Evaluate whether this trade is safe and suitable. Include:
+1. Entry and exit quality scores (0-100).
+2. Risk, Reward, and Risk/Reward Ratio.
+3. Suggested Stop Loss and Take Profit levels.
+4. Trade confidence score (0-100) and reasoning.
+5. Alternative scenarios (what to do if support breaks, or where to average down).
 
 Output MUST be a valid JSON object matching this schema:
 {
   "verdict": "approve" | "warn" | "reject",
+  "entryQuality": 85,
+  "exitQuality": 80,
+  "riskRewardRatio": "1:2.5",
+  "suggestedStopLoss": 61200.0,
+  "suggestedTakeProfit": 68000.0,
   "reasoning": "Detailed justification based on portfolio balances and current asset price.",
   "confidenceScore": 90,
   "riskLevel": "low" | "medium" | "high",
   "assumptions": "key assumptions behind verdict",
-  "potentialDownside": "downside details",
-  "potentialUpside": "upside details",
-  "suggestedActions": "alternative suggestion if warned/rejected, otherwise proceed instructions"
+  "alternativeScenario": "If support at $62k fails, wait for liquidity sweep at $60.5k before entering.",
+  "educationalExplanation": "RSI shows neutral momentum, but Bollinger Bands are contracting indicating an imminent breakout."
 }
 `;
   },
@@ -174,6 +181,52 @@ Output MUST be a valid JSON object matching this schema:
       "suggestedAction": "look for buy limits near range lows"
     }
   ]
+}
+`;
+  },
+
+  /**
+   * Generates prompt template for analyzing a single asset.
+   */
+  assetAnalysisSystemPrompt(symbol, context) {
+    return `
+${this.SYSTEM_INSTRUCTIONS}
+
+You are performing a Technical Asset Analysis for ${symbol.toUpperCase()}.
+Live Asset Indicators & Patterns Context: ${JSON.stringify(context)}
+
+Analyze using:
+- Trend and Momentum (EMA, SMA crossovers, RSI values)
+- Volume and Volatility (Bollinger Band widths, ATR ranges)
+- Key structures (Fair Value Gaps, Liquidity Sweeps, Order Blocks)
+- Support & Resistance boundaries
+
+Provide an educational explanation of what these indicator levels mathematically indicate. Do not just list numbers.
+
+Output MUST be a valid JSON object matching this schema:
+{
+  "symbol": "${symbol.toUpperCase()}",
+  "currentPrice": 64200.0,
+  "trendOutlook": "bullish" | "bearish" | "neutral",
+  "score": 82,
+  "indicatorsAudit": {
+    "rsiExplanation": "how RSI behaves here",
+    "bollingerBandsExplanation": "bb status",
+    "maCrossExplanation": "moving average status"
+  },
+  "patternsDetected": ["fvg", "double_top"],
+  "supportResistance": {
+    "resistance": 66000.0,
+    "support": 62000.0
+  },
+  "actionableAdvice": {
+    "action": "accumulate" | "hold" | "trim",
+    "stopLoss": 60500.0,
+    "takeProfit": 68500.0,
+    "reasoning": "detailed why with confidence score",
+    "confidenceScore": 85,
+    "potentialDownside": "downside risk description"
+  }
 }
 `;
   }

@@ -23,6 +23,40 @@ async function runTests() {
   const testPortfolioId = '66666666-6666-4666-6666-666666666666';
 
   try {
+    // Seed Profile and Portfolio to prevent "Portfolio not found" errors
+    console.log('[Setup] Seeding test database records...');
+    await db.auth.admin.createUser({
+      id: testUserId,
+      email: 'test_ai_user@ravora.ai',
+      password: 'Password123!',
+      email_confirm: true
+    }).catch(() => null);
+
+    await db.from('profiles').upsert({
+      id: testUserId,
+      full_name: 'Test AI Analyst',
+      email: 'test_ai_user@ravora.ai',
+      risk_stance: 'balanced',
+      max_drawdown_cap: 5.0
+    }, { onConflict: 'id' });
+
+    await db.from('portfolios').upsert({
+      id: testPortfolioId,
+      user_id: testUserId,
+      current_balance: 100000.00,
+      currency: 'USD',
+      safety_score: 95
+    }, { onConflict: 'user_id' });
+
+    await db.from('portfolio_assets').upsert({
+      portfolio_id: testPortfolioId,
+      exchange_account_id: testExchangeId,
+      asset_symbol: 'USDT',
+      balance_amount: 50000.00,
+      average_entry_price: 1.00,
+      allocation_pct: 50.0
+    }, { onConflict: 'portfolio_id,asset_symbol' });
+
     // ----------------------------------------------------
     // TEST 1: Factory Resolution & Provider Switching
     // ----------------------------------------------------
@@ -120,6 +154,13 @@ async function runTests() {
     const marketSummary = await AiService.marketSummary(testUserId);
     console.log(`✓ Market briefing generated. Sentiment: ${marketSummary.sentiment.toUpperCase()}`);
     console.log(`  Summary: "${marketSummary.summary}"`);
+
+    // Asset Analysis
+    const assetAnalysis = await AiService.analyzeAsset(testUserId, 'BTCUSDT');
+    console.log(`✓ Technical Asset Analysis generated for BTCUSDT. Outlook: ${assetAnalysis.trendOutlook}`);
+    console.log(`  RSI Audit Explanation: "${assetAnalysis.indicatorsAudit?.rsiExplanation}"`);
+    console.log(`  Patterns Detected: ${JSON.stringify(assetAnalysis.patternsDetected)}`);
+    console.log(`  Action recommendation: "${assetAnalysis.actionableAdvice?.action.toUpperCase()}" (Confidence: ${assetAnalysis.actionableAdvice?.confidenceScore}%)`);
 
     console.log('✓ TEST 4 PASSED.\n');
 

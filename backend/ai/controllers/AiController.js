@@ -170,5 +170,27 @@ export const AiController = {
     } catch (err) {
       next(err);
     }
+  },
+
+  /**
+   * Performs technical analysis and indicator breakdown for a single asset.
+   */
+  async analyzeAsset(req, res, next) {
+    try {
+      const userId = req.user.id;
+      const { symbol } = req.query;
+
+      if (!symbol) {
+        throw ApiError.badRequest('symbol query parameter is required');
+      }
+
+      const data = await AiService.analyzeAsset(userId, symbol);
+      return res.json({
+        success: true,
+        data
+      });
+    } catch (err) {
+      next(err);
+    }
   }
 };

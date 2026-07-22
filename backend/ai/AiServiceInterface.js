@@ -31,4 +31,8 @@ export class AiServiceInterface {
   async generateRecommendations(userId, portfolio, opportunities) {
     throw new Error(`${this.name}: generateRecommendations() not implemented`);
   }
+
+  async analyzeAsset(symbol, context) {
+    throw new Error(`${this.name}: analyzeAsset() not implemented`);
+  }
 }
