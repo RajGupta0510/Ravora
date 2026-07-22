@@ -17,6 +17,10 @@ export async function marketSyncWorker() {
 
       // Broadcast to WebSocket subscribers
       PriceChannel.broadcast(tickers);
+
+      // Process pending virtual paper orders with the new market prices
+      const { PaperTradingService } = await import('../../services/PaperTradingService.js');
+      await PaperTradingService.processPendingOrders().catch(() => null);
     }
   } catch (err) {
     logger.error('MarketSyncWorker', 'Failed to sync market data', { error: err.message });

@@ -613,6 +613,60 @@ export const initializeDatabase = async () => {
     );
   `);
 
+  // 24. paper_accounts table (Paper Trading Engine V1)
+  await dbRun(`
+    CREATE TABLE IF NOT EXISTS paper_accounts (
+      id TEXT PRIMARY KEY,
+      user_id TEXT UNIQUE NOT NULL,
+      balance REAL DEFAULT 100000.00,
+      initial_balance REAL DEFAULT 100000.00,
+      currency TEXT DEFAULT 'USD',
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+      updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    );
+  `);
+
+  // 25. paper_positions table (Paper Trading Engine V1 Positions)
+  await dbRun(`
+    CREATE TABLE IF NOT EXISTS paper_positions (
+      id TEXT PRIMARY KEY,
+      paper_account_id TEXT NOT NULL,
+      symbol TEXT NOT NULL,
+      side TEXT NOT NULL,
+      entry_price REAL NOT NULL,
+      quantity REAL NOT NULL,
+      leverage REAL DEFAULT 1.0,
+      stop_loss REAL,
+      take_profit REAL,
+      status TEXT DEFAULT 'open',
+      exit_price REAL,
+      pnl REAL,
+      review_json TEXT,
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+      closed_at TEXT,
+      FOREIGN KEY (paper_account_id) REFERENCES paper_accounts(id) ON DELETE CASCADE
+    );
+  `);
+
+  // 26. paper_orders table (Paper Trading Engine V1 Orders)
+  await dbRun(`
+    CREATE TABLE IF NOT EXISTS paper_orders (
+      id TEXT PRIMARY KEY,
+      paper_account_id TEXT NOT NULL,
+      symbol TEXT NOT NULL,
+      type TEXT NOT NULL,
+      side TEXT NOT NULL,
+      quantity REAL NOT NULL,
+      price REAL,
+      filled_price REAL,
+      status TEXT DEFAULT 'pending',
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+      filled_at TEXT,
+      FOREIGN KEY (paper_account_id) REFERENCES paper_accounts(id) ON DELETE CASCADE
+    );
+  `);
+
   // Seed opportunities if empty
   const opps = await dbQuery('SELECT COUNT(*) as count FROM opportunities');
   if (opps[0].count === 0) {
