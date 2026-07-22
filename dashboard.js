@@ -2400,7 +2400,27 @@ document.addEventListener('DOMContentLoaded', () => {
       const email = localStorage.getItem('ravora_email') || 'User';
       updateUserWidget(email);
 
-      const onboardingCompleted = localStorage.getItem('ravora_onboarding_completed') === 'true';
+      let onboardingCompleted = localStorage.getItem('ravora_onboarding_completed') === 'true';
+      if (!onboardingCompleted && token) {
+        console.log('[Auth Debug] Local onboarding status is false, verifying with backend...');
+        try {
+          const res = await apiCall('/user/profile');
+          if (res && res.onboardingCompleted) {
+            console.log('[Auth Debug] Backend confirmed onboarding is complete. Auto-correcting local state.');
+            onboardingCompleted = true;
+            localStorage.setItem('ravora_onboarding_completed', 'true');
+            if (res.profile) {
+              localStorage.setItem('ravora_profile_experience', res.profile.experience_level || 'beginner');
+              localStorage.setItem('ravora_profile_capital', (res.profile.capital || 132000).toString());
+              localStorage.setItem('ravora_profile_risk', res.profile.risk_stance || 'balanced');
+              localStorage.setItem('ravora_profile_goal', res.profile.primary_goal || 'preservation');
+            }
+          }
+        } catch (e) {
+          console.warn('[checkAuthState] On-demand profile verification failed:', e);
+        }
+      }
+
       if (onboardingCompleted) {
         state.onboardingCompleted = true;
         state.profile.experience = localStorage.getItem('ravora_profile_experience') || 'beginner';
