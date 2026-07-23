@@ -7368,7 +7368,7 @@ h2 {
 /* Bottom Tabbed Workspace */
 .terminal-positions-panel {
   grid-column: 1 / span 3 !important;
-  height: 220px !important;
+  height: 320px !important;
   margin-top: 0 !important;
   /* Managed by grid gap */
   transition: height 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
@@ -9231,5 +9231,22 @@ h2 {
     transform: scale(0);
   } 40% { 
     transform: scale(1.0);
+  }
+}
+
+/* Responsiveness overrides for the new top layout */
+@media (max-width: 1200px) {
+  .terminal-layout-grid-top {
+    grid-template-columns: 300px 1fr !important;
+  }
+}
+
+@media (max-width: 900px) {
+  .terminal-layout-grid-top {
+    grid-template-columns: 1fr !important;
+  }
+  .terminal-scanner-panel,
+  .terminal-chart-panel {
+    height: auto !important;
   }
 }

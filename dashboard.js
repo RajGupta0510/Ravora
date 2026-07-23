@@ -3972,7 +3972,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function updateHeaderTitle(screen) {
     const titles = {
-      dashboard: { main: 'Portfolio Dashboard', sub: 'Welcome back. Araiven engine is actively guarding your wealth.' },
+      dashboard: { main: 'Trading Workspace', sub: 'Welcome back. Araiven engine is actively guarding your wealth.' },
       watchlist: { main: 'Market Watchlist', sub: 'High-priority asset tickers flagged by Araiven intelligence.' },
       copilot: { main: 'Araiven Wealth Copilot', sub: 'Ask questions, review strategy logs, and run active rebalance audits.' },
       opportunities: { main: 'Opportunity Explorer', sub: 'Real-time high-probability alpha allocation strategies compiled by Araiven.' },
@@ -6083,7 +6083,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
-    const tabBtns = document.querySelectorAll('.panel-tab-btn');
+    const tabBtns = document.querySelectorAll('.terminal-positions-panel .panel-tab-btn');
     tabBtns.forEach(btn => {
       btn.addEventListener('click', () => {
         tabBtns.forEach(b => b.classList.remove('active'));
@@ -6093,9 +6093,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Hide all tab content elements
         const contents = [
+          'tab-active-analysis',
+          'tab-active-order-entry',
           'tab-active-positions',
           'tab-simulated-orders',
           'tab-closed-history',
+          'tab-paper-trading',
+          'tab-news-sentiment',
+          'tab-alerts-log',
           'tab-copilot-performance'
         ];
         contents.forEach(id => {
@@ -6104,9 +6109,15 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         // Show the target tab content element
-        let targetId = 'tab-active-positions';
-        if (tab === 'simulated-orders') targetId = 'tab-simulated-orders';
+        let targetId = 'tab-active-analysis';
+        if (tab === 'active-analysis') targetId = 'tab-active-analysis';
+        else if (tab === 'active-order-entry') targetId = 'tab-active-order-entry';
+        else if (tab === 'active-positions') targetId = 'tab-active-positions';
+        else if (tab === 'simulated-orders') targetId = 'tab-simulated-orders';
         else if (tab === 'closed-history') targetId = 'tab-closed-history';
+        else if (tab === 'paper-trading') targetId = 'tab-paper-trading';
+        else if (tab === 'news-sentiment') targetId = 'tab-news-sentiment';
+        else if (tab === 'alerts-log') targetId = 'tab-alerts-log';
         else if (tab === 'copilot-performance') targetId = 'tab-copilot-performance';
 
         const targetEl = document.getElementById(targetId);
@@ -10388,32 +10399,48 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       const account = await apiCall('/paper/account');
       if (account) {
-        document.getElementById('paper-cash-balance').textContent = `$${parseFloat(account.balance).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-        document.getElementById('paper-net-equity').textContent = `$${parseFloat(account.equity).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-        document.getElementById('paper-buying-power').textContent = `$${parseFloat(account.buyingPower).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        const cashBal = document.getElementById('paper-cash-balance');
+        const netEq = document.getElementById('paper-net-equity');
+        const buyPow = document.getElementById('paper-buying-power');
+        if (cashBal) cashBal.textContent = `$${parseFloat(account.balance).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        if (netEq) netEq.textContent = `$${parseFloat(account.equity).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        if (buyPow) buyPow.textContent = `$${parseFloat(account.buyingPower).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+        const tabBal = document.getElementById('paper-tab-balance');
+        const tabEq = document.getElementById('paper-tab-equity');
+        const tabBuy = document.getElementById('paper-tab-buying-power');
+        if (tabBal) tabBal.textContent = `$${parseFloat(account.balance).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDC`;
+        if (tabEq) tabEq.textContent = `$${parseFloat(account.equity).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDC`;
+        if (tabBuy) tabBuy.textContent = `$${parseFloat(account.buyingPower).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDC`;
       }
       
       const statsRes = await apiCall('/paper/statistics');
       if (statsRes && statsRes.success && statsRes.data) {
         const stats = statsRes.data;
-        document.getElementById('paper-stat-winrate').textContent = `${parseFloat(stats.winRate || 0).toFixed(1)}%`;
+        const winRateEl = document.getElementById('paper-stat-winrate');
+        if (winRateEl) winRateEl.textContent = `${parseFloat(stats.winRate || 0).toFixed(1)}%`;
         const netPnL = parseFloat(stats.netProfit || 0);
         const netPnLEl = document.getElementById('paper-stat-netpnl');
-        netPnLEl.textContent = (netPnL >= 0 ? '+' : '') + `$${netPnL.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-        netPnLEl.style.color = netPnL >= 0 ? '#10b981' : '#ef4444';
+        if (netPnLEl) {
+          netPnLEl.textContent = (netPnL >= 0 ? '+' : '') + `$${netPnL.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+          netPnLEl.style.color = netPnL >= 0 ? '#10b981' : '#ef4444';
+        }
         
         const avgPnL = parseFloat(stats.averageProfit || 0);
-        document.getElementById('paper-stat-avgpnl').textContent = `$${avgPnL.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        const avgPnLEl = document.getElementById('paper-stat-avgpnl');
+        if (avgPnLEl) avgPnLEl.textContent = `$${avgPnL.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
         
-        document.getElementById('paper-stat-streak').textContent = `${stats.winStreak || 0} Wins`;
+        const streakEl = document.getElementById('paper-stat-streak');
+        if (streakEl) streakEl.textContent = `${stats.winStreak || 0} Wins`;
       }
       
       const positions = await apiCall('/paper/positions');
-      const positionsTbody = document.getElementById('paper-positions-tbody');
-      if (positionsTbody) {
-        positionsTbody.innerHTML = '';
+      
+      const renderRows = (tbodyEl) => {
+        if (!tbodyEl) return;
+        tbodyEl.innerHTML = '';
         if (!Array.isArray(positions) || positions.length === 0) {
-          positionsTbody.innerHTML = `<tr><td colspan="9" style="text-align: center; color: var(--text-muted); padding: 24px 8px;">No open positions in sandbox.</td></tr>`;
+          tbodyEl.innerHTML = `<tr><td colspan="${tbodyEl.id.includes('tab') ? 7 : 9}" style="text-align: center; color: var(--text-muted); padding: 24px 8px;">No open positions in sandbox.</td></tr>`;
         } else {
           positions.forEach(pos => {
             const tr = document.createElement('tr');
@@ -10422,23 +10449,37 @@ document.addEventListener('DOMContentLoaded', () => {
             const pnlColor = pnl >= 0 ? '#10b981' : '#ef4444';
             const returnPct = parseFloat(pos.percentageReturn || 0);
             
-            tr.innerHTML = `
-              <td style="padding: 10px 8px; font-weight: 700; color: #fff;">${pos.symbol}</td>
-              <td style="padding: 10px 8px;"><span style="padding: 2px 6px; border-radius: 4px; font-size: 0.62rem; font-weight: 700; background: ${pos.direction === 'LONG' ? 'rgba(16,185,129,0.1)' : 'rgba(239,68,68,0.1)'}; color: ${pos.direction === 'LONG' ? '#10b981' : '#ef4444'};">${pos.direction}</span></td>
-              <td style="padding: 10px 8px; text-align: right;">$${parseFloat(pos.positionSize).toLocaleString()}</td>
-              <td style="padding: 10px 8px; text-align: right;">$${parseFloat(pos.entryPrice).toLocaleString()}</td>
-              <td style="padding: 10px 8px; text-align: right;">$${parseFloat(pos.currentPrice).toLocaleString()}</td>
-              <td style="padding: 10px 8px; text-align: right; color: ${pnlColor}; font-weight: 700;">${pnl >= 0 ? '+' : ''}$${pnl.toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
-              <td style="padding: 10px 8px; text-align: right; color: ${pnlColor}; font-weight: 700;">${returnPct >= 0 ? '+' : ''}${returnPct.toFixed(2)}%</td>
-              <td style="padding: 10px 8px; text-align: right;">${pos.duration || '0m'}</td>
-              <td style="padding: 10px 8px; text-align: center;">
-                <button class="btn btn-primary btn-xs btn-close-paper-pos" data-id="${pos.id}" style="padding: 4px 8px; background: rgba(239,68,68,0.1); color: #ef4444; border: 1px solid rgba(239,68,68,0.2); border-radius: 4px; cursor: pointer;">Close</button>
-              </td>
-            `;
-            positionsTbody.appendChild(tr);
+            if (tbodyEl.id.includes('tab')) {
+              tr.innerHTML = `
+                <td style="padding: 10px 8px; font-weight: 700; color: #fff;">${pos.symbol}</td>
+                <td style="padding: 10px 8px;"><span style="padding: 2px 6px; border-radius: 4px; font-size: 0.62rem; font-weight: 700; background: ${pos.direction === 'LONG' ? 'rgba(16,185,129,0.1)' : 'rgba(239,68,68,0.1)'}; color: ${pos.direction === 'LONG' ? '#10b981' : '#ef4444'};">${pos.direction}</span></td>
+                <td style="padding: 10px 8px; text-align: right;">$${parseFloat(pos.positionSize).toLocaleString()}</td>
+                <td style="padding: 10px 8px; text-align: right;">$${parseFloat(pos.entryPrice).toLocaleString()}</td>
+                <td style="padding: 10px 8px; text-align: right;">$${parseFloat(pos.currentPrice).toLocaleString()}</td>
+                <td style="padding: 10px 8px; text-align: right; color: ${pnlColor}; font-weight: 700;">${pnl >= 0 ? '+' : ''}$${pnl.toLocaleString('en-US', { minimumFractionDigits: 2 })} (${returnPct >= 0 ? '+' : ''}${returnPct.toFixed(2)}%)</td>
+                <td style="padding: 10px 8px; text-align: center;">
+                  <button class="btn btn-primary btn-xs btn-close-paper-pos" data-id="${pos.id}" style="padding: 4px 8px; background: rgba(239,68,68,0.1); color: #ef4444; border: 1px solid rgba(239,68,68,0.2); border-radius: 4px; cursor: pointer;">Close</button>
+                </td>
+              `;
+            } else {
+              tr.innerHTML = `
+                <td style="padding: 10px 8px; font-weight: 700; color: #fff;">${pos.symbol}</td>
+                <td style="padding: 10px 8px;"><span style="padding: 2px 6px; border-radius: 4px; font-size: 0.62rem; font-weight: 700; background: ${pos.direction === 'LONG' ? 'rgba(16,185,129,0.1)' : 'rgba(239,68,68,0.1)'}; color: ${pos.direction === 'LONG' ? '#10b981' : '#ef4444'};">${pos.direction}</span></td>
+                <td style="padding: 10px 8px; text-align: right;">$${parseFloat(pos.positionSize).toLocaleString()}</td>
+                <td style="padding: 10px 8px; text-align: right;">$${parseFloat(pos.entryPrice).toLocaleString()}</td>
+                <td style="padding: 10px 8px; text-align: right;">$${parseFloat(pos.currentPrice).toLocaleString()}</td>
+                <td style="padding: 10px 8px; text-align: right; color: ${pnlColor}; font-weight: 700;">${pnl >= 0 ? '+' : ''}$${pnl.toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
+                <td style="padding: 10px 8px; text-align: right; color: ${pnlColor}; font-weight: 700;">${returnPct >= 0 ? '+' : ''}${returnPct.toFixed(2)}%</td>
+                <td style="padding: 10px 8px; text-align: right;">${pos.duration || '0m'}</td>
+                <td style="padding: 10px 8px; text-align: center;">
+                  <button class="btn btn-primary btn-xs btn-close-paper-pos" data-id="${pos.id}" style="padding: 4px 8px; background: rgba(239,68,68,0.1); color: #ef4444; border: 1px solid rgba(239,68,68,0.2); border-radius: 4px; cursor: pointer;">Close</button>
+                </td>
+              `;
+            }
+            tbodyEl.appendChild(tr);
           });
           
-          positionsTbody.querySelectorAll('.btn-close-paper-pos').forEach(btn => {
+          tbodyEl.querySelectorAll('.btn-close-paper-pos').forEach(btn => {
             btn.addEventListener('click', async () => {
               const id = btn.getAttribute('data-id');
               btn.disabled = true;
@@ -10454,7 +10495,12 @@ document.addEventListener('DOMContentLoaded', () => {
             });
           });
         }
-      }
+      };
+
+      const positionsTbody = document.getElementById('paper-positions-tbody');
+      const positionsTabTbody = document.getElementById('paper-positions-tab-tbody');
+      renderRows(positionsTbody);
+      renderRows(positionsTabTbody);
 
       const ordersTbody = document.getElementById('paper-orders-tbody');
       if (ordersTbody) {
@@ -10829,6 +10875,25 @@ document.addEventListener('DOMContentLoaded', () => {
       } finally {
         btnPaperReset.disabled = false;
         btnPaperReset.textContent = 'Reset Balance & History';
+      }
+    });
+  }
+
+  const btnPaperTabReset = document.getElementById('btn-paper-tab-reset');
+  if (btnPaperTabReset) {
+    btnPaperTabReset.addEventListener('click', async () => {
+      if (!confirm('Are you sure you want to reset your paper account balance to $100k and wipe all history?')) return;
+      btnPaperTabReset.disabled = true;
+      btnPaperTabReset.textContent = 'Resetting...';
+      try {
+        await apiCall('/paper/reset', { method: 'POST' });
+        window.ravoraToast.success('Simulated account successfully reset!');
+        loadPaperTradingData();
+      } catch (err) {
+        console.error(err);
+      } finally {
+        btnPaperTabReset.disabled = false;
+        btnPaperTabReset.textContent = 'Reset Sandbox';
       }
     });
   }
