@@ -82,4 +82,19 @@ export const UserController = {
       return res.json(summary);
     } catch (err) { next(err); }
   },
+
+  async submitFeedback(req, res, next) {
+    try {
+      const { rating, feedbackText, category } = req.body;
+      const { logger } = await import('../utils/logger.js');
+      logger.info('UserController', 'Feedback submitted', {
+        userId: req.user.id,
+        email: req.user.email,
+        rating,
+        category,
+        feedbackText
+      });
+      return res.json({ success: true, message: 'Feedback submitted successfully.' });
+    } catch (err) { next(err); }
+  }
 };

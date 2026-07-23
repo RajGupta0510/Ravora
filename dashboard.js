@@ -3834,7 +3834,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // ==========================================================================
   // SPA Screen Router Navigation
   // ==========================================================================
-  const validScreens = ['dashboard', 'watchlist', 'copilot', 'opportunities', 'portfolio', 'history', 'notifications', 'settings', 'markets', 'papertrading'];
+  const validScreens = ['dashboard', 'watchlist', 'copilot', 'opportunities', 'portfolio', 'history', 'notifications', 'settings', 'markets', 'papertrading', 'help', 'feedback'];
 
   function navigateTo(screenId, pushState = true) {
     if (!validScreens.includes(screenId)) {
@@ -3979,7 +3979,9 @@ document.addEventListener('DOMContentLoaded', () => {
       portfolio: { main: 'Portfolio Intelligence', sub: 'Explore structural diversification weights, safety levels, and risk buffers.' },
       history: { main: 'Trade History Ledger', sub: 'Cryptographically verified clearing records for swap executions.' },
       notifications: { main: 'Notifications & Alerts', sub: 'Araiven safety alerts and background portfolio event logs.' },
-      settings: { main: 'SaaS Settings & Configuration', sub: 'Manage integrated brokerage API keys, active thresholds, and security parameters.' }
+      settings: { main: 'SaaS Settings & Configuration', sub: 'Manage integrated brokerage API keys, active thresholds, and security parameters.' },
+      help: { main: 'Help & Documentation', sub: 'Learn the platform basics and manage system guides.' },
+      feedback: { main: 'Submit Feedback', sub: 'Help us improve Ravora with your features and bug reports.' }
     };
 
     const config = titles[screen] || titles.dashboard;
@@ -7189,7 +7191,7 @@ document.addEventListener('DOMContentLoaded', () => {
           description: 'Add assets to let Araiven monitor opportunities and market changes.',
           primaryText: 'Browse Markets',
           primaryCallback: () => {
-            navigateTo('dashboard');
+            navigateTo('markets');
           }
         });
       }
@@ -9211,15 +9213,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const formNotif = document.getElementById('form-settings-notif');
     if (formNotif) {
-      formNotif.addEventListener('submit', (e) => {
+      formNotif.addEventListener('submit', async (e) => {
         e.preventDefault();
-        localStorage.setItem('ravora_notif_price', document.getElementById('notif-cat-price').checked ? 'true' : 'false');
-        localStorage.setItem('ravora_notif_portfolio', document.getElementById('notif-cat-portfolio').checked ? 'true' : 'false');
-        localStorage.setItem('ravora_notif_risk', document.getElementById('notif-cat-risk').checked ? 'true' : 'false');
-        localStorage.setItem('ravora_notif_opp', document.getElementById('notif-cat-opp').checked ? 'true' : 'false');
-        localStorage.setItem('ravora_notif_email', document.getElementById('notif-chan-email').checked ? 'true' : 'false');
-        localStorage.setItem('ravora_notif_push', document.getElementById('notif-chan-push').checked ? 'true' : 'false');
-        showToast('Notification subscriptions saved.');
+        const priceChecked = document.getElementById('notif-cat-price').checked;
+        const portChecked = document.getElementById('notif-cat-portfolio').checked;
+        const riskChecked = document.getElementById('notif-cat-risk').checked;
+        const oppChecked = document.getElementById('notif-cat-opp').checked;
+        const emailChecked = document.getElementById('notif-chan-email').checked;
+        const pushChecked = document.getElementById('notif-chan-push').checked;
+
+        localStorage.setItem('ravora_notif_price', priceChecked ? 'true' : 'false');
+        localStorage.setItem('ravora_notif_portfolio', portChecked ? 'true' : 'false');
+        localStorage.setItem('ravora_notif_risk', riskChecked ? 'true' : 'false');
+        localStorage.setItem('ravora_notif_opp', oppChecked ? 'true' : 'false');
+        localStorage.setItem('ravora_notif_email', emailChecked ? 'true' : 'false');
+        localStorage.setItem('ravora_notif_push', pushChecked ? 'true' : 'false');
+
+        try {
+          await apiCall('/user/settings', {
+            method: 'POST',
+            body: {
+              notificationsEnabled: pushChecked
+            }
+          });
+          showToast('Notification subscriptions saved.');
+        } catch (err) {
+          console.error(err);
+          showToast('Failed to sync notification settings to database.');
+        }
       });
     }
 
@@ -9688,6 +9709,8 @@ document.addEventListener('DOMContentLoaded', () => {
       initializeWatchlistCenterEvents();
       initializeNotificationsCenterEvents();
       initializeSettingsCenterEvents();
+      initializeHelpCenterEvents();
+      initializeFeedbackPageEvents();
 
       // Bind mobile bottom nav buttons
       const mobileNavBtns = document.querySelectorAll('.mobile-nav-btn');
@@ -9703,6 +9726,93 @@ document.addEventListener('DOMContentLoaded', () => {
       state.terminalEventsInitialized = true;
     }
     window.showRavoraSuccess = showRavoraSuccess;
+  }
+
+  // Help Center Actions
+  function initializeHelpCenterEvents() {
+    const btnTour = document.getElementById('btn-start-interactive-tour');
+    if (btnTour) {
+      btnTour.addEventListener('click', () => {
+        startProductTour();
+      });
+    }
+  }
+
+  // Feedback Page Form Submission
+  function initializeFeedbackPageEvents() {
+    const form = document.getElementById('form-feedback-page');
+    if (!form) return;
+
+    let selectedRating = 5;
+    const stars = form.querySelectorAll('.feedback-page-star-btn');
+    
+    function updateStars(rating) {
+      selectedRating = rating;
+      stars.forEach(btn => {
+        const val = parseInt(btn.getAttribute('data-val'));
+        btn.style.color = val <= rating ? '#f59e0b' : 'var(--text-muted)';
+      });
+    }
+
+    updateStars(5);
+
+    stars.forEach(btn => {
+      btn.addEventListener('click', () => {
+        updateStars(parseInt(btn.getAttribute('data-val')));
+      });
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const category = document.getElementById('feedback-page-category').value;
+      const feedbackText = document.getElementById('feedback-page-text').value.trim();
+
+      if (!feedbackText) {
+        window.ravoraToast.show({
+          type: 'warning',
+          title: 'Validation Error',
+          description: 'Please enter details for your feedback.'
+        });
+        return;
+      }
+
+      const submitBtn = document.getElementById('btn-feedback-page-submit');
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Submitting...';
+      }
+
+      try {
+        await apiCall('/user/feedback', {
+          method: 'POST',
+          body: JSON.stringify({ category, rating: selectedRating, feedbackText })
+        });
+
+        window.ravoraToast.show({
+          type: 'success',
+          title: 'Feedback Submitted',
+          description: 'Thank you! Your feedback has been received.'
+        });
+
+        document.getElementById('feedback-page-text').value = '';
+        updateStars(5);
+        
+        // Go back to dashboard screen
+        navigateTo('dashboard');
+      } catch (err) {
+        console.error(err);
+        window.ravoraToast.show({
+          type: 'error',
+          title: 'Submission Failed',
+          description: 'Failed to submit feedback. Please try again.'
+        });
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Submit Feedback';
+        }
+      }
+    });
   }
 
   async function updateDashboardTopOpportunity() {
