@@ -2,251 +2,116 @@
  * ChartOverlayService
  * 
  * Responsibility: Render AI Trade Plan overlays (Entry, TP, SL, Support, Resistance,
- * Trend Lines, and Buy/Sell markers) directly on the TradingView Lightweight Chart.
- * Adapts drawings dynamically based on recommendation states (LONG, SHORT, HOLD, WAIT).
+ * and Buy/Sell markers) directly on the transparent canvas overlay on top of TradingView.
  */
 class ChartOverlayService {
   constructor() {
     this.priceLines = [];
-    this.trendLineSeries = null;
   }
 
-  /**
-   * Clear all active overlays from the chart and series.
-   */
-  clearOverlays(chart, candleSeries) {
-    if (candleSeries) {
-      this.priceLines.forEach(line => candleSeries.removePriceLine(line));
-      candleSeries.setMarkers([]);
-    }
+  clearOverlays() {
     this.priceLines = [];
-
-    if (this.trendLineSeries && chart) {
-      try {
-        chart.removeSeries(this.trendLineSeries);
-      } catch (e) {
-        console.warn('[ChartOverlayService] Error removing trend line series:', e);
-      }
-      this.trendLineSeries = null;
+    if (window.drawingEngine) {
+      window.drawingEngine.clear();
     }
   }
 
-  /**
-   * Apply AI overlays based on the current state.
-   */
   applyOverlays(chart, candleSeries, state) {
-    this.clearOverlays(chart, candleSeries);
+    this.clearOverlays();
 
     const { opp, history, toggles } = state;
-    if (!opp || !history || history.length === 0 || !candleSeries || !chart) return;
+    if (!opp || !history || history.length === 0) return;
 
     const rec = (opp.recommendation || 'HOLD').toUpperCase();
 
-    // 1. Draw Support and Resistance Levels (Thin solid blue / thin solid orange)
-    // Displayed for all states if toggled on
+    // 1. Draw Support and Resistance Levels
     if (toggles.sr) {
       if (opp.nearestSupport > 0) {
-        const line = candleSeries.createPriceLine({
-          price: opp.nearestSupport,
-          color: '#3b82f6', // Thin solid blue
-          lineWidth: 1,
-          lineStyle: LightweightCharts.LineStyle.Solid,
-          axisLabelVisible: true,
-          title: 'Support'
-        });
-        line.title = 'Support';
-        line.originalWidth = 1;
-        this.priceLines.push(line);
+        window.drawingEngine.drawPriceLine(opp.nearestSupport, '#3b82f6', `Support: $${opp.nearestSupport.toLocaleString()}`, false);
       }
-
       if (opp.nearestResistance > 0) {
-        const line = candleSeries.createPriceLine({
-          price: opp.nearestResistance,
-          color: '#f97316', // Thin solid orange
-          lineWidth: 1,
-          lineStyle: LightweightCharts.LineStyle.Solid,
-          axisLabelVisible: true,
-          title: 'Resistance'
-        });
-        line.title = 'Resistance';
-        line.originalWidth = 1;
-        this.priceLines.push(line);
+        window.drawingEngine.drawPriceLine(opp.nearestResistance, '#f97316', `Resistance: $${opp.nearestResistance.toLocaleString()}`, false);
       }
     }
 
-    // 2. Draw Trend Line (Subtle White Line)
-    // Displayed for all states if toggled on
-    if (toggles.zones) {
-      this.drawTrendLine(chart, history, opp.trendDirection);
-    }
-
-    // 3. Draw Trade Plan Overlays (LONG and SHORT)
+    // 2. Draw Trade Plan Overlays
     if (toggles.targets) {
       if (rec === 'LONG' || rec === 'SHORT') {
-        // Entry Price: Bright Blue solid line
+        // Entry Price
         if (opp.suggestedEntry > 0) {
-          const line = candleSeries.createPriceLine({
-            price: opp.suggestedEntry,
-            color: '#2563eb', // Bright Blue
-            lineWidth: 1.5,
-            lineStyle: LightweightCharts.LineStyle.Solid,
-            axisLabelVisible: true,
-            title: 'Entry Price'
-          });
-          line.title = 'Entry Price';
-          line.originalWidth = 1.5;
-          this.priceLines.push(line);
+          window.drawingEngine.drawPriceLine(opp.suggestedEntry, '#2563eb', `Entry: $${opp.suggestedEntry.toLocaleString()}`, false);
         }
 
-        // Stop Loss: Red dashed line
+        // Stop Loss
         if (opp.suggestedStopLoss > 0) {
-          const line = candleSeries.createPriceLine({
-            price: opp.suggestedStopLoss,
-            color: '#ef4444', // Red
-            lineWidth: 1.5,
-            lineStyle: LightweightCharts.LineStyle.Dashed,
-            axisLabelVisible: true,
-            title: 'Stop Loss'
-          });
-          line.title = 'Stop Loss';
-          line.originalWidth = 1.5;
-          this.priceLines.push(line);
+          window.drawingEngine.drawPriceLine(opp.suggestedStopLoss, '#ef4444', `Stop Loss: $${opp.suggestedStopLoss.toLocaleString()}`, true);
         }
 
-        // Take Profits: Green dashed lines
+        // Take Profits
         if (opp.suggestedTakeProfit1 > 0) {
-          const line = candleSeries.createPriceLine({
-            price: opp.suggestedTakeProfit1,
-            color: '#10b981', // Green
-            lineWidth: 1.5,
-            lineStyle: LightweightCharts.LineStyle.Dashed,
-            axisLabelVisible: true,
-            title: 'Take Profit 1'
-          });
-          line.title = 'Take Profit 1';
-          line.originalWidth = 1.5;
-          this.priceLines.push(line);
+          window.drawingEngine.drawPriceLine(opp.suggestedTakeProfit1, '#10b981', `TP 1: $${opp.suggestedTakeProfit1.toLocaleString()}`, true);
         }
         if (opp.suggestedTakeProfit2 > 0) {
-          const line = candleSeries.createPriceLine({
-            price: opp.suggestedTakeProfit2,
-            color: '#10b981', // Green
-            lineWidth: 1.5,
-            lineStyle: LightweightCharts.LineStyle.Dashed,
-            axisLabelVisible: true,
-            title: 'Take Profit 2'
-          });
-          line.title = 'Take Profit 2';
-          line.originalWidth = 1.5;
-          this.priceLines.push(line);
+          window.drawingEngine.drawPriceLine(opp.suggestedTakeProfit2, '#10b981', `TP 2: $${opp.suggestedTakeProfit2.toLocaleString()}`, true);
         }
         if (opp.suggestedTakeProfit3 > 0) {
-          const line = candleSeries.createPriceLine({
-            price: opp.suggestedTakeProfit3,
-            color: '#10b981', // Green
-            lineWidth: 1.5,
-            lineStyle: LightweightCharts.LineStyle.Dashed,
-            axisLabelVisible: true,
-            title: 'Take Profit 3'
-          });
-          line.title = 'Take Profit 3';
-          line.originalWidth = 1.5;
-          this.priceLines.push(line);
+          window.drawingEngine.drawPriceLine(opp.suggestedTakeProfit3, '#10b981', `TP 3: $${opp.suggestedTakeProfit3.toLocaleString()}`, true);
         }
 
-        // 4. Place Buy/Sell Marker at the latest candle (Blue for Buy, Red for Sell)
-        const lastCandle = history[history.length - 1];
-        const lastTime = Math.floor(lastCandle.timestamp / 1000);
-        
-        const markers = [
-          {
-            time: lastTime,
-            position: rec === 'LONG' ? 'belowBar' : 'aboveBar',
-            color: rec === 'LONG' ? '#2563eb' : '#ef4444', // Blue for Long, Red for Short
-            shape: rec === 'LONG' ? 'arrowUp' : 'arrowDown',
-            text: rec === 'LONG' ? 'BUY / LONG' : 'SELL / SHORT',
-            size: 1.5
-          }
-        ];
-        candleSeries.setMarkers(markers);
+        // 3. Draw BUY/SELL signal markers on the right edge or latest candle
+        this.drawTradeSignalMarker(rec, history);
       }
 
-      // 5. WAIT State: Display Expected Trigger level (Entry rendered as Yellow/Orange Dashed)
+      // WAIT State
       if (rec === 'WAIT' && opp.suggestedEntry > 0) {
-        const line = candleSeries.createPriceLine({
-          price: opp.suggestedEntry,
-          color: '#f59e0b', // Yellow/Orange
-          lineWidth: 1.5,
-          lineStyle: LightweightCharts.LineStyle.Dashed,
-          axisLabelVisible: true,
-          title: 'Expected Trigger'
-        });
-        line.title = 'Expected Trigger';
-        line.originalWidth = 1.5;
-        this.priceLines.push(line);
+        window.drawingEngine.drawPriceLine(opp.suggestedEntry, '#f59e0b', `Expected Trigger: $${opp.suggestedEntry.toLocaleString()}`, true);
       }
     }
   }
 
-  /**
-   * Draw a subtle white trend line connecting swing highs or swing lows.
-   */
-  drawTrendLine(chart, history, trendDirection) {
-    if (history.length < 10) return;
+  drawTradeSignalMarker(rec, history) {
+    if (!window.drawingEngine || !window.drawingEngine.ctx || !window.drawingEngine.canvas) return;
 
-    // Connect swing highs for bearish trend, swing lows for bullish trend
-    const swingPoints = [];
-    const windowSize = 5;
+    const ctx = window.drawingEngine.ctx;
+    const canvas = window.drawingEngine.canvas;
+    const dpr = window.devicePixelRatio || 1;
+    const width = canvas.width / dpr;
+    const height = canvas.height / dpr;
 
-    for (let i = windowSize; i < history.length - windowSize; i++) {
-      const current = history[i];
-      let isExtremum = true;
+    const lastCandle = history[history.length - 1];
+    const y = window.drawingEngine.priceToCoordinate(lastCandle.close);
+    const x = window.drawingEngine.timeToCoordinate(Math.floor(lastCandle.timestamp / 1000));
 
-      if (trendDirection === 'Bearish') {
-        // Swing Highs
-        for (let j = 1; j <= windowSize; j++) {
-          if (history[i - j].high >= current.high || history[i + j].high >= current.high) {
-            isExtremum = false;
-            break;
-          }
-        }
-        if (isExtremum) {
-          swingPoints.push({ time: Math.floor(current.timestamp / 1000), price: current.high });
-        }
-      } else {
-        // Swing Lows
-        for (let j = 1; j <= windowSize; j++) {
-          if (history[i - j].low <= current.low || history[i + j].low <= current.low) {
-            isExtremum = false;
-            break;
-          }
-        }
-        if (isExtremum) {
-          swingPoints.push({ time: Math.floor(current.timestamp / 1000), price: current.low });
-        }
-      }
-    }
+    if (x === null || y === null) return;
 
-    if (swingPoints.length >= 2) {
-      // Connect the last two swing points
-      const p1 = swingPoints[swingPoints.length - 2];
-      const p2 = swingPoints[swingPoints.length - 1];
+    ctx.save();
+    
+    // Draw signal badge on top of the latest price position
+    const text = rec === 'LONG' ? 'RAVORA AI BUY' : 'RAVORA AI SELL';
+    const color = rec === 'LONG' ? '#2563eb' : '#ef4444';
+    
+    ctx.font = 'bold 9px sans-serif';
+    const textWidth = ctx.measureText(text).width;
+    
+    ctx.fillStyle = color;
+    // Draw bubble
+    ctx.beginPath();
+    ctx.roundRect(x - (textWidth + 16) / 2, y - 30, textWidth + 16, 18, 4);
+    ctx.fill();
 
-      this.trendLineSeries = chart.addLineSeries({
-        color: 'rgba(255, 255, 255, 0.6)', // Thin white line
-        lineWidth: 1,
-        lineStyle: LightweightCharts.LineStyle.Solid,
-        priceLineVisible: false,
-        lastPriceAnimationMode: 0
-      });
+    // Draw little arrow pointing down to price
+    ctx.beginPath();
+    ctx.moveTo(x, y - 12);
+    ctx.lineTo(x - 4, y - 8);
+    ctx.lineTo(x + 4, y - 8);
+    ctx.closePath();
+    ctx.fill();
 
-      this.trendLineSeries.setData([
-        { time: p1.time, value: p1.price },
-        { time: p2.time, value: p2.price }
-      ]);
-    }
+    ctx.fillStyle = '#ffffff';
+    ctx.fillText(text, x - textWidth / 2, y - 18);
+
+    ctx.restore();
   }
 }
 
-// Instantiate globally
 window.chartOverlayService = new ChartOverlayService();

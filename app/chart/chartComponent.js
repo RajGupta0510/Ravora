@@ -2,19 +2,19 @@
  * ChartComponent
  * 
  * Responsibility: Initialize, configure, and manage the TradingView 
- * Lightweight Charts container. Renders candles, volume histogram, 
- * overlays canvas, and handles toolbar interactions.
+ * Technical Analysis Widget container. Handles symbol/timeframe changes
+ * and coordinates overlays canvas rendering.
  */
 class ChartComponent {
   constructor(containerId) {
     this.container = document.getElementById(containerId);
-    this.chart = null;
-    this.candleSeries = null;
-    this.volumeSeries = null;
+    this.widget = null;
     this.overlayCanvas = null;
     this.resizeObserver = null;
     this.unsubscribeState = null;
     this.unsubscribeTick = null;
+    this.currentSymbol = null;
+    this.currentTimeframe = null;
     
     if (this.container) {
       this.init();
@@ -25,9 +25,9 @@ class ChartComponent {
     this.container.innerHTML = '';
     this.container.style.position = 'relative';
 
-    // 1. Create chart container div
+    // 1. Create chart container div for TradingView widget
     const chartDiv = document.createElement('div');
-    chartDiv.className = 'tv-chart-inner';
+    chartDiv.id = 'tv-widget-container';
     chartDiv.style.width = '100%';
     chartDiv.style.height = '100%';
     this.container.appendChild(chartDiv);
@@ -46,100 +46,84 @@ class ChartComponent {
 
     window.drawingEngine.setCanvas(this.overlayCanvas);
 
-    // 3. Initialize TradingView Lightweight Chart
-    this.chart = LightweightCharts.createChart(chartDiv, {
-      width: this.container.clientWidth || 800,
-      height: this.container.clientHeight || 320,
-      layout: {
-        background: { type: 'solid', color: 'transparent' },
-        textColor: '#a5b4fc',
-        fontFamily: "'Outfit', sans-serif"
-      },
-      grid: {
-        vertLines: { color: 'rgba(255, 255, 255, 0.02)' },
-        horzLines: { color: 'rgba(255, 255, 255, 0.02)' }
-      },
-      crosshair: {
-        mode: LightweightCharts.CrosshairMode.Normal,
-        vertLine: {
-          color: 'rgba(165, 180, 252, 0.4)',
-          width: 1,
-          style: LightweightCharts.LineStyle.Dashed,
-          labelBackgroundColor: '#4f46e5'
-        },
-        horzLine: {
-          color: 'rgba(165, 180, 252, 0.4)',
-          width: 1,
-          style: LightweightCharts.LineStyle.Dashed,
-          labelBackgroundColor: '#4f46e5'
-        }
-      },
-      timeScale: {
-        borderColor: 'rgba(255, 255, 255, 0.08)',
-        timeVisible: true,
-        secondsVisible: false
-      },
-      rightPriceScale: {
-        borderColor: 'rgba(255, 255, 255, 0.08)',
-        autoScale: true
-      }
-    });
-
-    window.chartStateManager.chartInstance = this.chart;
-
-    // 4. Add Candlestick Series
-    this.candleSeries = this.chart.addCandlestickSeries({
-      upColor: '#10b981',
-      downColor: '#f87171',
-      borderUpColor: '#10b981',
-      borderDownColor: '#f87171',
-      wickUpColor: '#10b981',
-      wickDownColor: '#f87171'
-    });
-
-    window.chartStateManager.candlestickSeries = this.candleSeries;
-
-    // 5. Add Volume Series
-    this.volumeSeries = this.chart.addHistogramSeries({
-      priceFormat: { type: 'volume' },
-      priceScaleId: '' // overlay on main panel
-    });
-
-    this.volumeSeries.priceScale().applyOptions({
-      scaleMargins: {
-        top: 0.8, // volume occupies bottom 20%
-        bottom: 0
-      }
-    });
-
-    window.chartStateManager.volumeSeries = this.volumeSeries;
-
-    // 6. Sync canvas dimensions
+    // 3. Sync canvas dimensions
     this.syncCanvasSize();
 
-    // 7. Subscribe to visible time range changes to redraw overlays
-    this.chart.timeScale().subscribeVisibleTimeRangeChange(() => {
-      this.drawOverlays();
-    });
-
-    // 8. Handle container resizing
+    // 4. Handle container resizing
     this.resizeObserver = new ResizeObserver(() => {
       this.resizeChart();
     });
     this.resizeObserver.observe(this.container);
 
-    // 9. Subscribe to state changes (toolbar toggles, new asset selection)
+    // 5. Subscribe to state changes (toolbar toggles, new asset selection)
     this.unsubscribeState = window.chartStateManager.subscribe((state) => {
       this.handleStateUpdate(state);
     });
 
-    // 10. Subscribe to realtime price ticks
+    // 6. Subscribe to realtime price ticks
     this.unsubscribeTick = window.realtimeDataService.subscribe((tick) => {
       this.handleRealtimeTick(tick);
     });
 
     // Setup Toolbar bindings
     this.setupToolbar();
+  }
+
+  mapInterval(tf) {
+    const mappings = {
+      '1m': '1',
+      '5m': '5',
+      '15m': '15',
+      '30m': '30',
+      '1h': '60',
+      '1H': '60',
+      '4h': '240',
+      '4H': '240',
+      '1d': 'D',
+      '1D': 'D',
+      '1w': 'W',
+      '1W': 'W',
+      '1M': 'M'
+    };
+    return mappings[tf] || 'D';
+  }
+
+  loadTradingViewWidget(symbol, timeframe) {
+    const container = document.getElementById('tv-widget-container');
+    if (!container) return;
+    container.innerHTML = '';
+
+    const interval = this.mapInterval(timeframe);
+
+    if (typeof TradingView !== 'undefined' && TradingView.widget) {
+      this.widget = new TradingView.widget({
+        "autosize": true,
+        "symbol": "BINANCE:" + symbol + "USDT",
+        "interval": interval,
+        "timezone": "Etc/UTC",
+        "theme": "dark",
+        "style": "1", // Candlesticks
+        "locale": "en",
+        "enable_publishing": false,
+        "hide_side_toolbar": false,
+        "allow_symbol_change": true,
+        "container_id": "tv-widget-container",
+        "studies": [
+          "RSI@tv-basicstudies",
+          "MASimple@tv-basicstudies"
+        ],
+        "loading_screen": {
+          "backgroundColor": "#0c0f1d"
+        },
+        "overrides": {
+          "paneProperties.background": "#0c0f1d",
+          "paneProperties.backgroundType": "solid"
+        }
+      });
+    } else {
+      console.warn('TradingView library is not loaded yet.');
+      container.innerHTML = `<div style="display:flex; justify-content:center; align-items:center; height:100%; color:var(--text-secondary); font-size:0.85rem;">Loading TradingView Chart...</div>`;
+    }
   }
 
   syncCanvasSize() {
@@ -155,15 +139,12 @@ class ChartComponent {
   }
 
   resizeChart() {
-    if (this.chart && this.container) {
-      this.chart.resize(this.container.clientWidth, this.container.clientHeight);
-      this.syncCanvasSize();
-      this.drawOverlays();
-    }
+    this.syncCanvasSize();
+    this.drawOverlays();
   }
 
   updateData(details, opp) {
-    if (!this.chart || !details) return;
+    if (!details) return;
 
     window.chartStateManager.setState({
       activeAsset: details.symbol,
@@ -173,52 +154,27 @@ class ChartComponent {
   }
 
   handleStateUpdate(state) {
+    if (state.activeAsset && (state.activeAsset !== this.currentSymbol || state.timeframe !== this.currentTimeframe)) {
+      this.currentSymbol = state.activeAsset;
+      this.currentTimeframe = state.timeframe;
+      this.loadTradingViewWidget(this.currentSymbol, this.currentTimeframe);
+    }
+
     if (state.history.length === 0) return;
-
-    // Update candlesticks
-    const candles = state.history.map(pt => ({
-      time: Math.floor(pt.timestamp / 1000),
-      open: pt.open,
-      high: pt.high,
-      low: pt.low,
-      close: pt.close
-    }));
-    this.candleSeries.setData(candles);
-
-    // Update volume histogram
-    const volumes = state.history.map(pt => ({
-      time: Math.floor(pt.timestamp / 1000),
-      value: pt.volume,
-      color: pt.close >= pt.open ? 'rgba(16, 185, 129, 0.2)' : 'rgba(248, 113, 113, 0.2)'
-    }));
-    this.volumeSeries.setData(volumes);
 
     // Update AI overlays (Entry, SL, TP, Support, Resistance, Trend)
     if (window.chartOverlayService) {
-      window.chartOverlayService.applyOverlays(this.chart, this.candleSeries, state);
+      window.chartOverlayService.applyOverlays(null, null, state);
     }
 
     // Redraw Canvas overlays
     setTimeout(() => {
-      this.chart.timeScale().fitContent();
       this.drawOverlays();
       this.updateExplainersList(state);
-    }, 50);
+    }, 100);
   }
 
   handleRealtimeTick(tick) {
-    if (!this.candleSeries || !this.volumeSeries) return;
-
-    // Update the last candle
-    this.candleSeries.update(tick);
-    
-    // Update the volume tick
-    this.volumeSeries.update({
-      time: tick.time,
-      value: tick.volume,
-      color: tick.close >= tick.open ? 'rgba(16, 185, 129, 0.2)' : 'rgba(248, 113, 113, 0.2)'
-    });
-
     // Update DOM price display
     const priceDisplay = document.getElementById('terminal-chart-price');
     const changeDisplay = document.getElementById('terminal-chart-change');
@@ -248,7 +204,7 @@ class ChartComponent {
   }
 
   drawOverlays() {
-    window.overlayManager.drawOverlays(this.chart, this.candleSeries, window.chartStateManager);
+    window.overlayManager.drawOverlays(null, null, window.chartStateManager);
   }
 
   updateExplainersList(state) {
@@ -287,6 +243,8 @@ class ChartComponent {
         window.chartStateManager.toggleOverlay(overlayName);
         
         btn.classList.toggle('active', window.chartStateManager.toggles[overlayName]);
+        this.drawOverlays();
+        this.updateExplainersList(window.chartStateManager);
       });
     }
 
@@ -294,8 +252,8 @@ class ChartComponent {
     const resetBtn = document.getElementById('btn-reset-chart');
     if (resetBtn) {
       resetBtn.addEventListener('click', () => {
-        if (this.chart) {
-          this.chart.timeScale().fitContent();
+        if (this.currentSymbol && this.currentTimeframe) {
+          this.loadTradingViewWidget(this.currentSymbol, this.currentTimeframe);
         }
       });
     }
@@ -310,24 +268,12 @@ class ChartComponent {
   }
 
   takeScreenshot() {
-    if (!this.chart || !this.overlayCanvas) return;
-    
-    // We combine the TradingView chart image with our Canvas overlay image
-    this.chart.takeScreenshot().then(chartCanvas => {
-      const mergedCanvas = document.createElement('canvas');
-      mergedCanvas.width = chartCanvas.width;
-      mergedCanvas.height = chartCanvas.height;
-      
-      const ctx = mergedCanvas.getContext('2d');
-      ctx.drawImage(chartCanvas, 0, 0);
-      ctx.drawImage(this.overlayCanvas, 0, 0, chartCanvas.width, chartCanvas.height);
-      
-      const url = mergedCanvas.toDataURL('image/png');
-      const link = document.createElement('a');
-      link.download = `ravora-chart-${window.chartStateManager.activeAsset || 'analysis'}.png`;
-      link.href = url;
-      link.click();
-    });
+    if (!this.overlayCanvas) return;
+    const url = this.overlayCanvas.toDataURL('image/png');
+    const link = document.createElement('a');
+    link.download = `ravora-chart-${window.chartStateManager.activeAsset || 'analysis'}.png`;
+    link.href = url;
+    link.click();
   }
 
   destroy() {
@@ -340,10 +286,7 @@ class ChartComponent {
     if (this.unsubscribeTick) {
       this.unsubscribeTick();
     }
-    if (this.chart) {
-      this.chart.remove();
-      this.chart = null;
-    }
+    this.widget = null;
     window.realtimeDataService.disconnect();
   }
 }
