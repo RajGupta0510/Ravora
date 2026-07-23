@@ -278,5 +278,30 @@ export const AiController = {
     } catch (err) {
       next(err);
     }
+  },
+
+  /**
+   * Renames a conversation thread
+   */
+  async renameConversation(req, res, next) {
+    try {
+      const { id } = req.params;
+      const { title } = req.body;
+      const { AIConversationsRepository } = await import('../../repositories/AIConversationsRepository.js');
+      const repo = new AIConversationsRepository();
+      const conv = await repo.findById(id);
+
+      if (!conv || conv.user_id !== req.user.id) {
+        throw ApiError.notFound('Conversation not found');
+      }
+
+      await repo.update(id, { title, updated_at: new Date().toISOString() });
+      return res.json({
+        success: true,
+        message: 'Conversation renamed successfully'
+      });
+    } catch (err) {
+      next(err);
+    }
   }
 };

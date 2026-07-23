@@ -2333,23 +2333,7 @@
                 <span style="font-size: 0.72rem; color: var(--text-muted); text-align: center; padding: 12px 0;">No past conversations found.</span>
               </div>
 
-              <!-- Pinned Analyses Section -->
-              <div class="pinned-analyses-container" style="border-top: 1px solid rgba(255,255,255,0.06); padding-top: 12px; display: flex; flex-direction: column; gap: 8px;">
-                <h6 style="color: #fff; font-family: var(--font-display); font-size: 0.76rem; margin: 0; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Pinned Analyses</h6>
-                <div style="display: flex; flex-direction: column; gap: 6px;">
-                  <div style="font-size: 0.7rem; color: var(--text-secondary); cursor: pointer; padding: 6px; border-radius: 4px; background: rgba(255,255,255,0.02); display: flex; align-items: center; gap: 6px;" class="sidebar-item btn-preset-pinned-analysis" data-query="Analyze BTC">📌 BTC Drawdown Risk Analysis</div>
-                  <div style="font-size: 0.7rem; color: var(--text-secondary); cursor: pointer; padding: 6px; border-radius: 4px; background: rgba(255,255,255,0.02); display: flex; align-items: center; gap: 6px;" class="sidebar-item btn-preset-pinned-analysis" data-query="Find opportunities today.">📌 Stablecoin APY Arbitrage</div>
-                </div>
-              </div>
 
-              <!-- Saved Reports Section -->
-              <div class="saved-reports-container" style="border-top: 1px solid rgba(255,255,255,0.06); padding-top: 12px; display: flex; flex-direction: column; gap: 8px;">
-                <h6 style="color: #fff; font-family: var(--font-display); font-size: 0.76rem; margin: 0; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Saved Reports</h6>
-                <div style="display: flex; flex-direction: column; gap: 6px;">
-                  <div style="font-size: 0.7rem; color: var(--text-secondary); cursor: pointer; padding: 6px; border-radius: 4px; background: rgba(255,255,255,0.02); display: flex; align-items: center; gap: 6px;" class="sidebar-item">📄 Q2 Alpha Ingestion Report.pdf</div>
-                  <div style="font-size: 0.7rem; color: var(--text-secondary); cursor: pointer; padding: 6px; border-radius: 4px; background: rgba(255,255,255,0.02); display: flex; align-items: center; gap: 6px;" class="sidebar-item">📄 Correlation Matrix V1.2.csv</div>
-                </div>
-              </div>
             </div>
 
             <!-- Center Pane: Chat interface container -->
@@ -2372,7 +2356,7 @@
               </div>
 
               <!-- Preset Suggestion pills -->
-              <div class="chat-query-presets" style="padding: 8px 16px; display: flex; gap: 8px; flex-wrap: wrap; border-top: 1px solid rgba(255,255,255,0.04); background: rgba(14, 19, 37, 0.1); overflow-x: auto; white-space: nowrap;">
+              <div class="chat-query-presets" id="copilot-query-presets" style="padding: 8px 16px; display: flex; gap: 8px; flex-wrap: wrap; border-top: 1px solid rgba(255,255,255,0.04); background: rgba(14, 19, 37, 0.1); overflow-x: auto; white-space: nowrap;">
                 <button class="chat-preset-btn" data-query="Analyze BTC" style="padding: 6px 12px; font-size: 0.7rem; border-radius: 4px; border: 1px solid rgba(255,255,255,0.06); background: rgba(255,255,255,0.02); color: var(--text-secondary); cursor: pointer; font-weight: 600;">Analyze BTC</button>
                 <button class="chat-preset-btn" data-query="Review My Portfolio" style="padding: 6px 12px; font-size: 0.7rem; border-radius: 4px; border: 1px solid rgba(255,255,255,0.06); background: rgba(255,255,255,0.02); color: var(--text-secondary); cursor: pointer; font-weight: 600;">Review My Portfolio</button>
                 <button class="chat-preset-btn" data-query="Find Trading Opportunities" style="padding: 6px 12px; font-size: 0.7rem; border-radius: 4px; border: 1px solid rgba(255,255,255,0.06); background: rgba(255,255,255,0.02); color: var(--text-secondary); cursor: pointer; font-weight: 600;">Find Trading Opportunities</button>
@@ -2454,25 +2438,32 @@
                 <h6 style="color: #fff; font-family: var(--font-display); font-size: 0.76rem; margin: 0 0 8px 0; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Quick Actions</h6>
                 <div style="display: flex; flex-direction: column; gap: 6px;">
                   <button class="btn btn-secondary btn-sm block-btn copilot-quick-action" data-prompt="Review Portfolio" style="display: flex; align-items: center; gap: 8px; justify-content: flex-start; padding: 8px 12px; text-align: left; width: 100%; border: 1px solid rgba(255,255,255,0.06); background: rgba(255,255,255,0.02); color: #fff; cursor: pointer; border-radius: 6px; font-weight: 600; font-size: 0.76rem;">
-                    <span>📊</span> Review Portfolio
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px; height:14px; flex-shrink: 0;"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/></svg>
+                    <span>Review Portfolio</span>
                   </button>
                   <button class="btn btn-secondary btn-sm block-btn copilot-quick-action" data-prompt="Find Risks" style="display: flex; align-items: center; gap: 8px; justify-content: flex-start; padding: 8px 12px; text-align: left; width: 100%; border: 1px solid rgba(255,255,255,0.06); background: rgba(255,255,255,0.02); color: #fff; cursor: pointer; border-radius: 6px; font-weight: 600; font-size: 0.76rem;">
-                    <span>🛡️</span> Find Risks
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px; height:14px; flex-shrink: 0;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    <span>Find Risks</span>
                   </button>
-                  <button class="btn btn-secondary btn-sm block-btn copilot-quick-action" data-prompt="Today\'s Market Summary" style="display: flex; align-items: center; gap: 8px; justify-content: flex-start; padding: 8px 12px; text-align: left; width: 100%; border: 1px solid rgba(255,255,255,0.06); background: rgba(255,255,255,0.02); color: #fff; cursor: pointer; border-radius: 6px; font-weight: 600; font-size: 0.76rem;">
-                    <span>📈</span> Market Summary
+                  <button class="btn btn-secondary btn-sm block-btn copilot-quick-action" data-prompt="Market Summary" style="display: flex; align-items: center; gap: 8px; justify-content: flex-start; padding: 8px 12px; text-align: left; width: 100%; border: 1px solid rgba(255,255,255,0.06); background: rgba(255,255,255,0.02); color: #fff; cursor: pointer; border-radius: 6px; font-weight: 600; font-size: 0.76rem;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px; height:14px; flex-shrink: 0;"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+                    <span>Market Summary</span>
                   </button>
                   <button class="btn btn-secondary btn-sm block-btn copilot-quick-action" data-prompt="Analyze BTC" style="display: flex; align-items: center; gap: 8px; justify-content: flex-start; padding: 8px 12px; text-align: left; width: 100%; border: 1px solid rgba(255,255,255,0.06); background: rgba(255,255,255,0.02); color: #fff; cursor: pointer; border-radius: 6px; font-weight: 600; font-size: 0.76rem;">
-                    <span>🪙</span> Analyze BTC
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px; height:14px; flex-shrink: 0;"><circle cx="12" cy="12" r="10"/><path d="M12 6v12M8 12h8"/></svg>
+                    <span>Analyze BTC</span>
                   </button>
                   <button class="btn btn-secondary btn-sm block-btn copilot-quick-action" data-prompt="Review Last Trade" style="display: flex; align-items: center; gap: 8px; justify-content: flex-start; padding: 8px 12px; text-align: left; width: 100%; border: 1px solid rgba(255,255,255,0.06); background: rgba(255,255,255,0.02); color: #fff; cursor: pointer; border-radius: 6px; font-weight: 600; font-size: 0.76rem;">
-                    <span>📝</span> Review Last Trade
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px; height:14px; flex-shrink: 0;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                    <span>Review Last Trade</span>
                   </button>
                   <button class="btn btn-secondary btn-sm block-btn copilot-quick-action" data-prompt="Find Opportunities" style="display: flex; align-items: center; gap: 8px; justify-content: flex-start; padding: 8px 12px; text-align: left; width: 100%; border: 1px solid rgba(255,255,255,0.06); background: rgba(255,255,255,0.02); color: #fff; cursor: pointer; border-radius: 6px; font-weight: 600; font-size: 0.76rem;">
-                    <span>🔍</span> Find Opportunities
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px; height:14px; flex-shrink: 0;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    <span>Find Opportunities</span>
                   </button>
                   <button class="btn btn-secondary btn-sm block-btn copilot-quick-action" data-prompt="Create Watchlist" style="display: flex; align-items: center; gap: 8px; justify-content: flex-start; padding: 8px 12px; text-align: left; width: 100%; border: 1px solid rgba(255,255,255,0.06); background: rgba(255,255,255,0.02); color: #fff; cursor: pointer; border-radius: 6px; font-weight: 600; font-size: 0.76rem;">
-                    <span>👁️</span> Create Watchlist
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px; height:14px; flex-shrink: 0;"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    <span>Create Watchlist</span>
                   </button>
                 </div>
               </div>

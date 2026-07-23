@@ -6331,6 +6331,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  // Toggles visibility of the query presets row when chat has started
+  function updatePresetVisibility() {
+    const log = document.getElementById('copilot-messages-log');
+    const presetsRow = document.getElementById('copilot-query-presets');
+    if (!log || !presetsRow) return;
+    const bubbles = log.querySelectorAll('.chat-message-bubble');
+    if (bubbles.length > 0) {
+      presetsRow.style.display = 'none';
+    } else {
+      presetsRow.style.display = 'flex';
+    }
+  }
+
   // Updates Right Sidebar Context metrics on Copilot screen
   async function updateCopilotLiveContext() {
     try {
@@ -6402,19 +6415,63 @@ document.addEventListener('DOMContentLoaded', () => {
         input.value = query;
         const sendBtn = document.getElementById('btn-copilot-send');
         if (sendBtn) sendBtn.click();
+        
+        window.ravoraToast.show({
+          type: 'info',
+          title: 'Running Pinned Analysis',
+          description: `Araiven is executing: "${query}"`
+        });
       }
     });
   });
 
-  // Bind Quick Actions buttons click listeners
+  // Bind Saved Reports click handlers
+  document.querySelectorAll('.btn-saved-report-item').forEach(item => {
+    item.addEventListener('click', () => {
+      const name = item.querySelector('span')?.textContent || item.textContent.trim();
+      window.ravoraToast.show({
+        type: 'success',
+        title: 'Downloading Report',
+        description: `Downloaded ${name} successfully from Araiven database archives.`
+      });
+    });
+  });
+
+  // Bind Quick Actions buttons click listeners (Redirect to pages)
   document.querySelectorAll('.copilot-quick-action').forEach(btn => {
     btn.addEventListener('click', () => {
-      const query = btn.getAttribute('data-prompt') || btn.textContent.trim();
-      const input = document.getElementById('copilot-chat-input');
-      if (input) {
-        input.value = query;
-        const sendBtn = document.getElementById('btn-copilot-send');
-        if (sendBtn) sendBtn.click();
+      const prompt = btn.getAttribute('data-prompt') || btn.textContent.trim();
+      
+      window.ravoraToast.show({
+        type: 'info',
+        title: 'Navigating',
+        description: `Redirecting to workspace section for: ${prompt}`
+      });
+
+      let targetScreen = '';
+      if (prompt === 'Review Portfolio' || prompt === 'Find Risks') {
+        targetScreen = 'portfolio';
+      } else if (prompt === 'Market Summary') {
+        targetScreen = 'markets';
+      } else if (prompt === 'Analyze BTC') {
+        state.selectedAsset = 'BTC';
+        targetScreen = 'dashboard';
+      } else if (prompt === 'Review Last Trade') {
+        targetScreen = 'history';
+      } else if (prompt === 'Find Opportunities') {
+        targetScreen = 'opportunities';
+      } else if (prompt === 'Create Watchlist') {
+        targetScreen = 'watchlist';
+      }
+
+      if (targetScreen) {
+        // Find corresponding sidebar tab and click it to trigger full navigation flow
+        const menuBtn = document.querySelector(`.menu-tab-btn[data-screen="${targetScreen}"]`);
+        if (menuBtn) {
+          menuBtn.click();
+        } else {
+          navigateTo(targetScreen);
+        }
       }
     });
   });
@@ -9899,8 +9956,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
           card.innerHTML = `
             <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:6px;">
-              <span style="font-weight:700; font-size:0.74rem; color:#fff; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:130px;" title="${conv.title}">
-                ${isPinned ? '📌 ' : ''}${conv.title || 'Audit Thread'}
+              <span style="font-weight:700; font-size:0.74rem; color:#fff; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:130px; display:flex; align-items:center; gap:4px;" title="${conv.title}">
+                ${isPinned ? '<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" style="width:10px; height:10px; flex-shrink:0;"><line x1="18" y1="8" x2="22" y2="12"/><line x1="12" y1="2" x2="22" y2="12"/><path d="M12 2L2 12h5l5 5v5l10-10H17l-5-5z"/></svg>' : ''}${conv.title || 'Audit Thread'}
               </span>
               <span style="font-size:0.62rem; color:var(--text-muted); flex-shrink:0;">${time}</span>
             </div>
@@ -9911,18 +9968,21 @@ document.addEventListener('DOMContentLoaded', () => {
               </span>
             </div>
             <div class="thread-actions" style="display:flex; gap:6px; align-self:flex-end; margin-top:4px;">
-              <button class="btn-thread-pin" style="background:none; border:none; color:${isPinned ? 'var(--accent)' : 'var(--text-muted)'}; cursor:pointer; font-size:0.68rem; padding:2px;" title="${isPinned ? 'Unpin' : 'Pin'}">
-                ${isPinned ? '📍' : '📌'}
+              <button class="btn-thread-pin" style="background:none; border:none; color:${isPinned ? 'var(--accent)' : 'var(--text-muted)'}; cursor:pointer; display:flex; align-items:center; justify-content:center; padding:2px;" title="${isPinned ? 'Unpin' : 'Pin'}">
+                ${isPinned ? '<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" style="width:12px; height:12px;"><line x1="18" y1="8" x2="22" y2="12"/><line x1="12" y1="2" x2="22" y2="12"/><path d="M12 2L2 12h5l5 5v5l10-10H17l-5-5z"/></svg>' : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px; height:12px;"><line x1="18" y1="8" x2="22" y2="12"/><line x1="12" y1="2" x2="22" y2="12"/><path d="M12 2L2 12h5l5 5v5l10-10H17l-5-5z"/></svg>'}
               </button>
-              <button class="btn-thread-delete" style="background:none; border:none; color:#ef4444; cursor:pointer; font-size:0.68rem; padding:2px;" title="Delete">
-                🗑️
+              <button class="btn-thread-rename" style="background:none; border:none; color:var(--text-muted); cursor:pointer; display:flex; align-items:center; justify-content:center; padding:2px;" title="Rename">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px; height:12px;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4z"/></svg>
+              </button>
+              <button class="btn-thread-delete" style="background:none; border:none; color:#ef4444; cursor:pointer; display:flex; align-items:center; justify-content:center; padding:2px;" title="Delete">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px; height:12px;"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
               </button>
             </div>
           `;
 
           // Card click to load details
           card.addEventListener('click', (e) => {
-            if (e.target.closest('.btn-thread-pin') || e.target.closest('.btn-thread-delete')) {
+            if (e.target.closest('.btn-thread-pin') || e.target.closest('.btn-thread-rename') || e.target.closest('.btn-thread-delete')) {
               return;
             }
             activeCopilotConversationId = conv.id;
@@ -9947,6 +10007,23 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             localStorage.setItem('ravora_pinned_conversations', JSON.stringify(pins));
             loadCopilotData();
+          });
+
+          // Rename Button listener
+          card.querySelector('.btn-thread-rename').addEventListener('click', async (e) => {
+            e.stopPropagation();
+            const newTitle = prompt('Rename this conversation:', conv.title || 'Audit Thread');
+            if (newTitle && newTitle.trim()) {
+              try {
+                await apiCall(`/ai/conversations/${conv.id}`, {
+                  method: 'PATCH',
+                  body: JSON.stringify({ title: newTitle.trim() })
+                });
+                loadCopilotData();
+              } catch (err) {
+                console.error('Failed to rename conversation:', err);
+              }
+            }
           });
 
           // Delete Button listener
@@ -10002,6 +10079,7 @@ document.addEventListener('DOMContentLoaded', () => {
           });
         }
         log.scrollTop = log.scrollHeight;
+        updatePresetVisibility();
       }
     } catch (err) {
       console.error(err);
@@ -10029,6 +10107,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     log.appendChild(bubble);
     log.scrollTop = log.scrollHeight;
+    updatePresetVisibility();
     return bubble;
   }
 
@@ -10080,6 +10159,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // Hide empty welcome state if showing
     toggleCopilotEmptyState(false);
     
+    // Hide presets row once chat starts
+    const presetsRow = document.getElementById('copilot-query-presets');
+    if (presetsRow) presetsRow.style.display = 'none';
+    
     // Inject thinking animation styles if missing
     if (!document.getElementById('copilot-animation-styles')) {
       const style = document.createElement('style');
@@ -10112,12 +10195,13 @@ document.addEventListener('DOMContentLoaded', () => {
     agentBubble.className = 'chat-message-bubble agent';
     agentBubble.innerHTML = `
       <div class="message-meta">Araiven AI</div>
-      <div class="message-body">
-        <div class="copilot-thinking-dots">
+      <div class="message-body" style="display:flex; align-items:center; gap:8px;">
+        <div class="copilot-thinking-dots" style="display:flex; align-items:center;">
           <span></span>
           <span></span>
           <span></span>
         </div>
+        <span style="font-size:0.75rem; color:var(--text-secondary);">Araiven is auditing strategy logs...</span>
       </div>
     `;
     log.appendChild(agentBubble);
@@ -10519,6 +10603,7 @@ document.addEventListener('DOMContentLoaded', () => {
       activeCopilotConversationId = 'new';
       toggleCopilotEmptyState(true);
       loadCopilotData();
+      updatePresetVisibility();
     });
   }
 
