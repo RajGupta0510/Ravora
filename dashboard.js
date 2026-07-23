@@ -6280,98 +6280,144 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ==========================================================================
-  // Araiven Copilot Chat System
+  // Araiven Copilot Presets and Live Context Listeners
   // ==========================================================================
-  function appendChatMessage(sender, text, stats = '', actionHtml = '') {
-    if (!copilotMessagesLog) return;
-
-    const bubble = document.createElement('div');
-    bubble.className = `msg-bubble ${sender}`;
-
-    let content = `<p>${text}</p>`;
-    if (stats) {
-      content += `<div style="font-family: monospace; font-size: 0.725rem; color: var(--accent-secondary); margin-top: 10px; border-top: 1px dashed rgba(255,255,255,0.06); padding-top: 8px;">${stats}</div>`;
+  
+  // Toggles the welcome empty state on the copilot page
+  function toggleCopilotEmptyState(show) {
+    const log = document.getElementById('copilot-messages-log');
+    if (!log) return;
+    
+    let emptyState = document.getElementById('copilot-empty-state');
+    
+    if (show) {
+      if (!emptyState) {
+        emptyState = document.createElement('div');
+        emptyState.id = 'copilot-empty-state';
+        emptyState.style.cssText = 'display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; padding: 40px; text-align: center; gap: 16px; box-sizing: border-box;';
+        emptyState.innerHTML = `
+          <div style="width: 60px; height: 60px; border-radius: 50%; background: rgba(139, 92, 246, 0.1); border: 1px solid rgba(139, 92, 246, 0.2); display: flex; align-items: center; justify-content: center;">
+            <span style="font-size: 2rem; color: #a78bfa;">A</span>
+          </div>
+          <h3 style="color: #fff; font-family: var(--font-display); font-size: 1.25rem; font-weight: 700; margin: 0;">Welcome to Araiven</h3>
+          <p style="color: var(--text-secondary); font-size: 0.8rem; max-width: 400px; margin: 0; line-height: 1.5;">
+            Ravora's flagship AI trading copilot. Ask me about asset allocations, risk metrics, or market opportunities.
+          </p>
+          <div style="display: flex; flex-direction: column; gap: 8px; width: 100%; max-width: 320px; margin-top: 12px;">
+            <button class="chat-empty-preset-btn" style="text-align: left; padding: 8px 12px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 6px; color: var(--text-secondary); font-size: 0.76rem; cursor: pointer; font-weight: 500;" data-query="Should I buy BTC?">Should I buy BTC?</button>
+            <button class="chat-empty-preset-btn" style="text-align: left; padding: 8px 12px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 6px; color: var(--text-secondary); font-size: 0.76rem; cursor: pointer; font-weight: 500;" data-query="Review my portfolio.">Review my portfolio.</button>
+            <button class="chat-empty-preset-btn" style="text-align: left; padding: 8px 12px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 6px; color: var(--text-secondary); font-size: 0.76rem; cursor: pointer; font-weight: 500;" data-query="Analyze ETH.">Analyze ETH.</button>
+            <button class="chat-empty-preset-btn" style="text-align: left; padding: 8px 12px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 6px; color: var(--text-secondary); font-size: 0.76rem; cursor: pointer; font-weight: 500;" data-query="Find opportunities today.">Find opportunities today.</button>
+          </div>
+        `;
+        log.innerHTML = '';
+        log.appendChild(emptyState);
+        
+        // Bind empty state buttons
+        emptyState.querySelectorAll('.chat-empty-preset-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const query = btn.getAttribute('data-query');
+            const input = document.getElementById('copilot-chat-input');
+            if (input) {
+              input.value = query;
+              const sendBtn = document.getElementById('btn-copilot-send');
+              if (sendBtn) sendBtn.click();
+            }
+          });
+        });
+      }
+    } else {
+      if (emptyState) emptyState.remove();
     }
-    if (actionHtml) {
-      content += actionHtml;
-    }
-
-    bubble.innerHTML = content;
-    copilotMessagesLog.appendChild(bubble);
-    copilotMessagesLog.scrollTop = copilotMessagesLog.scrollHeight;
   }
 
-  // Presets inside copilot panel click
-  chatPresetBtns.forEach(btn => {
-    btn.addEventListener('click', async () => {
-      const qKey = btn.getAttribute('data-preset');
-      const queries = {
-        'yield-audit': 'Analyze my current yield spread',
-        'hedge-stance': 'Review macro hedging parameters',
-        'btc-alloc': 'Evaluate Bitcoin halving momentum impact'
-      };
-      const text = queries[qKey] || btn.textContent;
+  // Updates Right Sidebar Context metrics on Copilot screen
+  async function updateCopilotLiveContext() {
+    try {
+      const portfolio = await apiCall('/portfolio');
+      const paperAccount = await apiCall('/paper/account');
+      const paperPositions = await apiCall('/paper/positions');
+      
+      if (portfolio) {
+        const valEl = document.getElementById('copilot-context-value');
+        if (valEl) valEl.textContent = `$${(portfolio.currentBalance || 100000).toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+        
+        const riskEl = document.getElementById('copilot-context-risk-score');
+        if (riskEl) riskEl.textContent = `${portfolio.safetyScore || 96}/100`;
 
-      appendChatMessage('user', text);
-      chatPresetBtns.forEach(b => b.disabled = true);
+        const pnlEl = document.getElementById('copilot-context-pnl');
+        if (pnlEl) {
+          const change = portfolio.valueChange24h || 0;
+          const sign = change >= 0 ? '+' : '';
+          pnlEl.textContent = `${sign}$${change.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+          pnlEl.style.color = change >= 0 ? '#10b981' : '#ef4444';
+        }
+      }
 
-      // Typing animation
-      const typingBubble = document.createElement('div');
-      typingBubble.className = 'msg-bubble system typing-bubble';
-      typingBubble.innerHTML = '<div class="typing-indicator"><span></span><span></span><span></span></div>';
-      copilotMessagesLog.appendChild(typingBubble);
-      copilotMessagesLog.scrollTop = copilotMessagesLog.scrollHeight;
+      if (paperAccount) {
+        const paperEl = document.getElementById('copilot-context-paper-status');
+        if (paperEl) paperEl.textContent = paperAccount.balance > 0 ? 'Active' : 'Inactive';
+      }
 
-      try {
-        const res = await apiCall('/copilot/message', {
-          method: 'POST',
-          body: JSON.stringify({ message: text })
-        });
-        typingBubble.remove();
-        appendChatMessage('system', res.reply, res.stats);
-      } catch (e) {
-        typingBubble.remove();
-        appendChatMessage('system', 'Copilot encountered an error auditing strategy parameters.');
-      } finally {
-        chatPresetBtns.forEach(b => b.disabled = false);
+      if (paperPositions) {
+        const ordersEl = document.getElementById('copilot-context-orders');
+        if (ordersEl) ordersEl.textContent = Array.isArray(paperPositions) ? paperPositions.length.toString() : '0';
+        
+        if (Array.isArray(paperPositions) && paperPositions.length > 0) {
+          const sortedPos = [...paperPositions].sort((a, b) => b.positionSize - a.positionSize);
+          const largestEl = document.getElementById('copilot-context-largest-pos');
+          if (largestEl) largestEl.textContent = sortedPos[0].symbol || 'None';
+        } else {
+          const largestEl = document.getElementById('copilot-context-largest-pos');
+          if (largestEl) largestEl.textContent = 'None';
+        }
+      }
+
+      const timeEl = document.getElementById('copilot-context-update-time');
+      if (timeEl) timeEl.textContent = new Date().toLocaleTimeString();
+    } catch (e) {
+      console.warn('Failed to load live context for copilot:', e);
+    }
+  }
+
+  // Bind Preset Query Pills click listeners
+  document.querySelectorAll('.chat-preset-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const query = btn.getAttribute('data-query') || btn.textContent.trim();
+      const input = document.getElementById('copilot-chat-input');
+      if (input) {
+        input.value = query;
+        const sendBtn = document.getElementById('btn-copilot-send');
+        if (sendBtn) sendBtn.click();
       }
     });
   });
 
-  // Text send button custom trigger
-  if (btnCopilotSend && copilotChatInput) {
-    btnCopilotSend.addEventListener('click', async () => {
-      const text = copilotChatInput.value.trim();
-      if (!text) return;
-
-      copilotChatInput.value = '';
-      appendChatMessage('user', text);
-
-      const typingBubble = document.createElement('div');
-      typingBubble.className = 'msg-bubble system typing-bubble';
-      typingBubble.innerHTML = '<div class="typing-indicator"><span></span><span></span><span></span></div>';
-      copilotMessagesLog.appendChild(typingBubble);
-      copilotMessagesLog.scrollTop = copilotMessagesLog.scrollHeight;
-
-      try {
-        const res = await apiCall('/copilot/message', {
-          method: 'POST',
-          body: JSON.stringify({ message: text })
-        });
-        typingBubble.remove();
-        appendChatMessage('system', res.reply, res.stats);
-      } catch (e) {
-        typingBubble.remove();
-        appendChatMessage('system', 'Audit engine offline.');
+  // Bind Pinned Preset click listeners
+  document.querySelectorAll('.btn-preset-pinned-analysis').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const query = btn.getAttribute('data-query') || btn.textContent.trim();
+      const input = document.getElementById('copilot-chat-input');
+      if (input) {
+        input.value = query;
+        const sendBtn = document.getElementById('btn-copilot-send');
+        if (sendBtn) sendBtn.click();
       }
     });
+  });
 
-    copilotChatInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-        btnCopilotSend.click();
+  // Bind Quick Actions buttons click listeners
+  document.querySelectorAll('.copilot-quick-action').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const query = btn.getAttribute('data-prompt') || btn.textContent.trim();
+      const input = document.getElementById('copilot-chat-input');
+      if (input) {
+        input.value = query;
+        const sendBtn = document.getElementById('btn-copilot-send');
+        if (sendBtn) sendBtn.click();
       }
     });
-  }
+  });
 
   // Execute swap rebalance button in Copilot Side Panel
   if (btnCopilotRebalanceExecute) {
@@ -9805,42 +9851,131 @@ document.addEventListener('DOMContentLoaded', () => {
       if (res && res.success && Array.isArray(res.data)) {
         listContainer.innerHTML = '';
         if (res.data.length === 0) {
-          listContainer.innerHTML = '<span style="font-size: 0.72rem; color: var(--text-muted); text-align: center; padding: 12px 0;">No past audits found.</span>';
+          listContainer.innerHTML = '<span style="font-size: 0.72rem; color: var(--text-muted); text-align: center; padding: 12px 0;">No past conversations found.</span>';
+          toggleCopilotEmptyState(true);
           return;
         }
-        res.data.forEach(conv => {
+        
+        toggleCopilotEmptyState(false);
+        
+        const pinnedIds = JSON.parse(localStorage.getItem('ravora_pinned_conversations') || '[]');
+        
+        // Sort conversations: pinned first, then updated_at desc
+        const sortedConvs = [...res.data].sort((a, b) => {
+          const aPinned = pinnedIds.includes(a.id);
+          const bPinned = pinnedIds.includes(b.id);
+          if (aPinned && !bPinned) return -1;
+          if (!aPinned && bPinned) return 1;
+          return new Date(b.updated_at || b.created_at) - new Date(a.updated_at || a.created_at);
+        });
+
+        sortedConvs.forEach(conv => {
           const card = document.createElement('div');
-          card.className = 'card-glass';
-          card.style.cssText = 'padding: 10px; border-radius: 6px; cursor: pointer; transition: all 0.15s ease; border: 1px solid rgba(255,255,255,0.04);';
+          card.className = 'card-glass conversation-thread-item';
+          card.style.cssText = 'padding: 10px; border-radius: 6px; cursor: pointer; transition: all 0.15s ease; border: 1px solid rgba(255,255,255,0.04); display: flex; flex-direction: column; gap: 4px; position: relative;';
+          
           if (activeCopilotConversationId === conv.id) {
             card.style.borderColor = 'var(--accent)';
             card.style.background = 'rgba(255,255,255,0.04)';
           }
+
+          const isPinned = pinnedIds.includes(conv.id);
+          const time = new Date(conv.updated_at || conv.created_at).toLocaleDateString();
           
-          const time = new Date(conv.created_at).toLocaleDateString();
+          // Deduce asset
+          let detectedAsset = 'Portfolio';
+          const titleLower = (conv.title || '').toLowerCase();
+          if (titleLower.includes('btc') || titleLower.includes('bitcoin')) detectedAsset = 'BTC';
+          else if (titleLower.includes('eth') || titleLower.includes('ethereum')) detectedAsset = 'ETH';
+          else if (titleLower.includes('sol') || titleLower.includes('solana')) detectedAsset = 'SOL';
+          else if (titleLower.includes('usdc') || titleLower.includes('stablecoin')) detectedAsset = 'USDC';
+          
+          // Last message preview
+          let previewText = 'No messages yet';
+          if (Array.isArray(conv.messages) && conv.messages.length > 0) {
+            const lastMsg = conv.messages[conv.messages.length - 1];
+            previewText = lastMsg.text || lastMsg.content || '...';
+          }
+
           card.innerHTML = `
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-              <span style="font-weight:700; font-size:0.74rem; color:#fff;">${conv.title || 'Audit Thread'}</span>
-              <span style="font-size:0.62rem; color:var(--text-muted);">${time}</span>
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:6px;">
+              <span style="font-weight:700; font-size:0.74rem; color:#fff; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:130px;" title="${conv.title}">
+                ${isPinned ? '📌 ' : ''}${conv.title || 'Audit Thread'}
+              </span>
+              <span style="font-size:0.62rem; color:var(--text-muted); flex-shrink:0;">${time}</span>
             </div>
-            <p style="font-size:0.66rem; color:var(--text-secondary); margin:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">ID: ${conv.id.substring(0, 8)}...</p>
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+              <span style="font-size:0.66rem; color:var(--accent); font-weight:600;">${detectedAsset}</span>
+              <span style="font-size:0.64rem; color:var(--text-secondary); max-width:140px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1; text-align:left; margin-left:4px;">
+                ${previewText}
+              </span>
+            </div>
+            <div class="thread-actions" style="display:flex; gap:6px; align-self:flex-end; margin-top:4px;">
+              <button class="btn-thread-pin" style="background:none; border:none; color:${isPinned ? 'var(--accent)' : 'var(--text-muted)'}; cursor:pointer; font-size:0.68rem; padding:2px;" title="${isPinned ? 'Unpin' : 'Pin'}">
+                ${isPinned ? '📍' : '📌'}
+              </button>
+              <button class="btn-thread-delete" style="background:none; border:none; color:#ef4444; cursor:pointer; font-size:0.68rem; padding:2px;" title="Delete">
+                🗑️
+              </button>
+            </div>
           `;
-          card.addEventListener('click', () => {
+
+          // Card click to load details
+          card.addEventListener('click', (e) => {
+            if (e.target.closest('.btn-thread-pin') || e.target.closest('.btn-thread-delete')) {
+              return;
+            }
             activeCopilotConversationId = conv.id;
             loadCopilotConversationDetails(conv.id);
-            const children = listContainer.children;
-            for (let i = 0; i < children.length; i++) {
-              children[i].style.borderColor = 'rgba(255,255,255,0.04)';
-              children[i].style.background = 'none';
-            }
+            const children = listContainer.querySelectorAll('.conversation-thread-item');
+            children.forEach(c => {
+              c.style.borderColor = 'rgba(255,255,255,0.04)';
+              c.style.background = 'none';
+            });
             card.style.borderColor = 'var(--accent)';
             card.style.background = 'rgba(255,255,255,0.04)';
           });
+
+          // Pin Button listener
+          card.querySelector('.btn-thread-pin').addEventListener('click', (e) => {
+            e.stopPropagation();
+            let pins = JSON.parse(localStorage.getItem('ravora_pinned_conversations') || '[]');
+            if (isPinned) {
+              pins = pins.filter(pid => pid !== conv.id);
+            } else {
+              pins.push(conv.id);
+            }
+            localStorage.setItem('ravora_pinned_conversations', JSON.stringify(pins));
+            loadCopilotData();
+          });
+
+          // Delete Button listener
+          card.querySelector('.btn-thread-delete').addEventListener('click', async (e) => {
+            e.stopPropagation();
+            if (confirm('Are you sure you want to delete this conversation?')) {
+              try {
+                await apiCall(`/ai/conversations/${conv.id}`, { method: 'DELETE' });
+                if (activeCopilotConversationId === conv.id) {
+                  activeCopilotConversationId = null;
+                  const log = document.getElementById('copilot-messages-log');
+                  if (log) log.innerHTML = '';
+                }
+                loadCopilotData();
+              } catch (err) {
+                console.error('Failed to delete conversation:', err);
+              }
+            }
+          });
+
           listContainer.appendChild(card);
         });
       } else {
-        listContainer.innerHTML = '<span style="font-size: 0.72rem; color: var(--text-muted); text-align: center; padding: 12px 0;">No past audits found.</span>';
+        listContainer.innerHTML = '<span style="font-size: 0.72rem; color: var(--text-muted); text-align: center; padding: 12px 0;">No past conversations found.</span>';
+        toggleCopilotEmptyState(true);
       }
+      
+      // Keep Right sidebar context values synced
+      updateCopilotLiveContext();
     } catch (err) {
       console.error(err);
       listContainer.innerHTML = '<span style="font-size: 0.72rem; color: #ef4444; text-align: center; padding: 12px 0;">Failed to load history.</span>';
@@ -9858,9 +9993,14 @@ document.addEventListener('DOMContentLoaded', () => {
       if (res && res.success && res.data) {
         log.innerHTML = '';
         const messages = res.data.messages || [];
-        messages.forEach(msg => {
-          appendCopilotMessage(msg.role === 'user' ? 'user' : 'agent', msg.content);
-        });
+        if (messages.length === 0) {
+          toggleCopilotEmptyState(true);
+        } else {
+          toggleCopilotEmptyState(false);
+          messages.forEach(msg => {
+            appendCopilotMessage(msg.role === 'user' ? 'user' : 'agent', msg.content || msg.text);
+          });
+        }
         log.scrollTop = log.scrollHeight;
       }
     } catch (err) {
@@ -9937,6 +10077,37 @@ document.addEventListener('DOMContentLoaded', () => {
     const log = document.getElementById('copilot-messages-log');
     if (!log) return;
     
+    // Hide empty welcome state if showing
+    toggleCopilotEmptyState(false);
+    
+    // Inject thinking animation styles if missing
+    if (!document.getElementById('copilot-animation-styles')) {
+      const style = document.createElement('style');
+      style.id = 'copilot-animation-styles';
+      style.innerHTML = `
+        @keyframes copilotThinking {
+          0%, 100% { opacity: 0.2; }
+          50% { opacity: 1; }
+        }
+        .copilot-thinking-dots span {
+          animation: copilotThinking 1.4s infinite both;
+          width: 6px;
+          height: 6px;
+          background: #fff;
+          border-radius: 50%;
+          display: inline-block;
+          margin: 0 2px;
+        }
+        .copilot-thinking-dots span:nth-child(2) {
+          animation-delay: 0.2s;
+        }
+        .copilot-thinking-dots span:nth-child(3) {
+          animation-delay: 0.4s;
+        }
+      `;
+      document.head.appendChild(style);
+    }
+    
     const agentBubble = document.createElement('div');
     agentBubble.className = 'chat-message-bubble agent';
     agentBubble.innerHTML = `
@@ -9991,6 +10162,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             try {
               const dataObj = JSON.parse(dataStr);
+              if (dataObj.conversationId) {
+                activeCopilotConversationId = dataObj.conversationId;
+              }
               if (dataObj.text) {
                 accumulatedText += dataObj.text;
                 bodyContainer.innerHTML = formatMarkdown(accumulatedText) + '<span class="copilot-cursor" style="display:inline-block; width:6px; height:12px; background:#fff; animation: blink 0.8s infinite;"></span>';
@@ -10342,11 +10516,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnCopilotNewChat = document.getElementById('btn-copilot-new-chat');
   if (btnCopilotNewChat) {
     btnCopilotNewChat.addEventListener('click', () => {
-      activeCopilotConversationId = null;
-      const log = document.getElementById('copilot-messages-log');
-      if (log) {
-        log.innerHTML = '<div style="text-align: center; padding: 24px; color: var(--text-muted); font-size: 0.76rem;">New conversation initialized. Ask Araiven something to start.</div>';
-      }
+      activeCopilotConversationId = 'new';
+      toggleCopilotEmptyState(true);
       loadCopilotData();
     });
   }

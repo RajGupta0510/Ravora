@@ -24,19 +24,24 @@ export const AiController = {
         let accumulatedReply = '';
         
         try {
+          // Pre-resolve conversation ID and send to client
+          const { ConversationMemory } = await import('../memory/ConversationMemory.js');
+          const conv = await ConversationMemory.getOrCreateConversation(userId, conversationId);
+          
+          res.write(`data: ${JSON.stringify({ conversationId: conv.id })}\n\n`);
+
           const onChunk = (chunk) => {
             accumulatedReply += chunk;
             res.write(`data: ${JSON.stringify({ text: chunk })}\n\n`);
           };
 
-          const result = await AiService.askAraiven(userId, message, conversationId, {
+          const result = await AiService.askAraiven(userId, message, conv.id, {
             stream: true,
             onChunk
           });
 
           // Save final message record in database since streaming loop bypassed it
-          const { ConversationMemory } = await import('../memory/ConversationMemory.js');
-          await ConversationMemory.saveCopilotMessage(userId, result.conversationId, accumulatedReply);
+          await ConversationMemory.saveCopilotMessage(userId, conv.id, accumulatedReply);
 
           res.write('data: [DONE]\n\n');
           return res.end();
@@ -79,7 +84,8 @@ export const AiController = {
       return res.json({
         reply: data.reply,
         stats: lastMsg?.statsMeta || '',
-        actions: []
+        actions: [],
+        conversationId: data.conversationId
       });
     } catch (err) {
       next(err);
@@ -244,6 +250,30 @@ export const AiController = {
       return res.json({
         success: true,
         data: conv
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  /**
+   * Deletes a conversation thread
+   */
+  async deleteConversation(req, res, next) {
+    try {
+      const { id } = req.params;
+      const { AIConversationsRepository } = await import('../../repositories/AIConversationsRepository.js');
+      const repo = new AIConversationsRepository();
+      const conv = await repo.findById(id);
+
+      if (!conv || conv.user_id !== req.user.id) {
+        throw ApiError.notFound('Conversation not found');
+      }
+
+      await repo.hardDelete(id);
+      return res.json({
+        success: true,
+        message: 'Conversation deleted successfully'
       });
     } catch (err) {
       next(err);

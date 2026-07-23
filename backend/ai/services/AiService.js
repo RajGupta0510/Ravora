@@ -37,7 +37,98 @@ export const AiService = {
     // 3. Save User message to Database immediately
     const savedConvId = await ConversationMemory.saveUserMessage(userId, conversation.id, message);
 
-    // 4. Build system prompt enclosing live context parameters
+    // 4. Classify user intent to fetch precise backend context
+    const msgLower = message.toLowerCase();
+    let classifiedIntent = 'general';
+    let intentContextBlock = '';
+
+    if (msgLower.includes('portfolio') || msgLower.includes('balance') || msgLower.includes('holding') || msgLower.includes('worth') || msgLower.includes('equity') || msgLower.includes('allocation')) {
+      classifiedIntent = 'portfolio';
+      intentContextBlock = `
+CLASSIFIED INTENT: PORTFOLIO STATUS AUDIT
+STRUCTURED PORTFOLIO DATA (from PortfolioService):
+- Valuations: Current Value: $${portfolioCtx.valuation?.currentValue || 0}, Cash Balance: $${portfolioCtx.valuation?.cashBalance || 0}, Safety Score: ${portfolioCtx.valuation?.safetyScore || 100}/100
+- Asset Splits: ${JSON.stringify(portfolioCtx.assets)}
+- Risk Stance: ${portfolioCtx.riskStance} (Drawdown Limit: ${portfolioCtx.maxDrawdownCap}%)
+`;
+    } else if (msgLower.includes('risk') || msgLower.includes('drawdown') || msgLower.includes('exposure') || msgLower.includes('hhi') || msgLower.includes('leverage') || msgLower.includes('hedge')) {
+      classifiedIntent = 'risk';
+      intentContextBlock = `
+CLASSIFIED INTENT: RISK PROFILE AUDIT
+STRUCTURED RISK METRICS (from RiskService):
+- Volatility Risks & Exposures: ${JSON.stringify(riskCtx)}
+- Target Stance: ${userStance.riskStance.toUpperCase()} (Max Drawdown: ${userStance.maxDrawdown}%)
+`;
+    } else if (msgLower.includes('paper') || msgLower.includes('virtual') || msgLower.includes('simulation') || msgLower.includes('simulated') || msgLower.includes('mock') || msgLower.includes('positions') || msgLower.includes('trades')) {
+      classifiedIntent = 'paper_trading';
+      try {
+        const { PaperTradingService } = await import('../../services/PaperTradingService.js');
+        const paperAccount = await PaperTradingService.getAccount(userId);
+        const paperPositions = await PaperTradingService.getOpenPositions(userId);
+        const paperHistory = await PaperTradingService.getTradeHistory(userId, 5);
+        intentContextBlock = `
+CLASSIFIED INTENT: PAPER TRADING AUDIT
+STRUCTURED SIMULATION DATA (from PaperTradingService):
+- Virtual Account Balance: $${paperAccount.balance}, Net Equity: $${paperAccount.equity}
+- Active Simulated Positions: ${JSON.stringify(paperPositions)}
+- Recent Simulated Trades: ${JSON.stringify(paperHistory)}
+`;
+      } catch (err) {
+        logger.warn('AiService', 'Failed to gather paper trading context for AI prompt:', err);
+      }
+    } else if (msgLower.includes('trade') || msgLower.includes('order') || msgLower.includes('buy') || msgLower.includes('sell') || msgLower.includes('executed') || msgLower.includes('filled')) {
+      classifiedIntent = 'trade';
+      const tradeCtx = await ToolRegistry.getTradeHistoryContext(userId);
+      intentContextBlock = `
+CLASSIFIED INTENT: TRANSACTION HISTORY AUDIT
+STRUCTURED ORDER BOOK DATA (from TradeService):
+- Recent Orders: ${JSON.stringify(tradeCtx.recentOrders)}
+- Recent Executed Fills: ${JSON.stringify(tradeCtx.recentExecutions)}
+`;
+    } else if (msgLower.includes('news') || msgLower.includes('sentiment') || msgLower.includes('headline') || msgLower.includes('tweet') || msgLower.includes('impact') || msgLower.includes('market impact')) {
+      classifiedIntent = 'news';
+      let symbol = 'BTC';
+      if (msgLower.includes('eth') || msgLower.includes('ethereum')) symbol = 'ETH';
+      else if (msgLower.includes('sol') || msgLower.includes('solana')) symbol = 'SOL';
+      const newsCtx = await ToolRegistry.getNewsSentimentContext(symbol);
+      intentContextBlock = `
+CLASSIFIED INTENT: MARKET NEWS & SENTIMENT AUDIT
+STRUCTURED SENTIMENT DATA (from NewsService for ${symbol}):
+- Overall Sentiment: ${newsCtx.overallSentiment} (Average Sentiment Score: ${newsCtx.averageScore})
+- News Impact Score: ${newsCtx.overallImpact}
+- Recent Headlines: ${JSON.stringify(newsCtx.recentHeadlines)}
+`;
+    } else if (msgLower.includes('market') || msgLower.includes('price') || msgLower.includes('btc') || msgLower.includes('eth') || msgLower.includes('sol') || msgLower.includes('sui') || msgLower.includes('ticker')) {
+      classifiedIntent = 'market';
+      let assetBlock = '';
+      let symbol = null;
+      if (msgLower.includes('btc') || msgLower.includes('bitcoin')) symbol = 'BTC';
+      else if (msgLower.includes('eth') || msgLower.includes('ethereum')) symbol = 'ETH';
+      else if (msgLower.includes('sol') || msgLower.includes('solana')) symbol = 'SOL';
+      else if (msgLower.includes('sui')) symbol = 'SUI';
+
+      if (symbol) {
+        const assetCtx = await ToolRegistry.getAssetContext(symbol);
+        assetBlock = `
+STRUCTURED SINGLE ASSET METRICS (from MarketDataService for ${symbol}):
+- Current Price: $${assetCtx.currentPrice || 'N/A'}
+- Technical Indicators: SMA20: ${assetCtx.sma20}, EMA12: ${assetCtx.ema12}, RSI14: ${assetCtx.rsi14}
+- Bollinger Bands: Upper: ${assetCtx.bollingerBands?.upper}, Middle: ${assetCtx.bollingerBands?.middle}, Lower: ${assetCtx.bollingerBands?.lower}
+- Detected Patterns: ${JSON.stringify(assetCtx.recentPatternsDetected)}
+`;
+      }
+
+      intentContextBlock = `
+CLASSIFIED INTENT: MARKET DATA AUDIT
+STRUCTURED MARKET DATA (from MarketDataService):
+- Overview Prices: ${JSON.stringify(marketCtx.overview)}
+- Top Gainers: ${JSON.stringify(marketCtx.gainers)}
+- Top Losers: ${JSON.stringify(marketCtx.losers)}
+${assetBlock}
+`;
+    }
+
+    // 5. Build system prompt enclosing live context parameters and compliance directives
     const liveContextBlock = `
 LIVE PORTFOLIO CONTEXT:
 - Audited Valuation: $${(portfolioCtx.valuation?.currentValue || 0).toLocaleString()} ${portfolioCtx.preferredCurrency || 'USD'}
@@ -48,9 +139,26 @@ LIVE PORTFOLIO CONTEXT:
 - Risk Metrics: ${JSON.stringify(riskCtx)}
 - Watchlist symbols: ${JSON.stringify(watchlistCtx)}
 - Top market prices: ${JSON.stringify(marketCtx.overview?.slice(0, 5))}
+${intentContextBlock}
 `;
 
-    const systemPrompt = `${AraivenPrompts.SYSTEM_INSTRUCTIONS}\n\n${liveContextBlock}`;
+    const instructionsBlock = `
+STRICT COMPLIANCE DIRECTIVES:
+1. You are Araiven, the flagship AI Trading Copilot at Ravora.
+2. Under no circumstances are you allowed to invent or fabricate data about the user's portfolio, trades, simulated positions, orders, or live prices.
+3. If factual data is missing or empty, explicitly state that the information is unavailable from backend services.
+4. Your response MUST be structured, clear, and comprehensive. Provide:
+   - SUMMARY: A brief high-level overview.
+   - ANALYSIS: Detailed logical breakdown.
+   - SUPPORTING EVIDENCE: Refer to the structured context values provided.
+   - CONFIDENCE: Your score or confidence level in this analysis.
+   - RISKS & ALTERNATIVE SCENARIOS: Potential downfalls, alternative perspectives, and hedging actions.
+   - RECOMMENDED ACTIONS: Actionable next steps.
+   - EDUCATIONAL INSIGHT: A helpful trading concept or explanation.
+5. Render tables or list items rather than large walls of text. Avoid verbose conversational filler.
+`;
+
+    const systemPrompt = `${AraivenPrompts.SYSTEM_INSTRUCTIONS}\n\n${liveContextBlock}\n\n${instructionsBlock}`;
 
     let reply = '';
     const { stream = false, onChunk = null } = options;

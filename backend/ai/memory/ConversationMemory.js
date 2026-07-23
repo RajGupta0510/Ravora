@@ -9,17 +9,19 @@ export const ConversationMemory = {
    * Retrieves or initializes a conversation thread.
    */
   async getOrCreateConversation(userId, conversationId = null) {
-    if (conversationId) {
+    if (conversationId && conversationId !== 'new') {
       const conv = await convRepo.findById(conversationId);
       if (conv && conv.user_id === userId) {
         return conv;
       }
     }
 
-    // Try finding the user's most recent conversation first
-    const list = await convRepo.findByUserId(userId);
-    if (list && list.length > 0) {
-      return list[0];
+    if (conversationId !== 'new') {
+      // Try finding the user's most recent conversation first
+      const list = await convRepo.findByUserId(userId);
+      if (list && list.length > 0) {
+        return list[0];
+      }
     }
 
     // Create a new default conversation thread

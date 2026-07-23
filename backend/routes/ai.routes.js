@@ -23,5 +23,6 @@ router.post('/watchlist-review', AiController.watchlistReview);
 
 router.get('/conversations', AiController.getConversations);
 router.get('/conversations/:id', AiController.getConversationDetails);
+router.delete('/conversations/:id', AiController.deleteConversation);
 
 export default router;
