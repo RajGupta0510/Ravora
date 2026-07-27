@@ -5,6 +5,7 @@
 import { PortfolioService } from '../services/PortfolioService.js';
 import { MarketDataService } from '../services/MarketDataService.js';
 import { PortfolioIntelligenceService } from '../services/PortfolioIntelligenceService.js';
+import { PortfolioOptimizationService } from '../services/PortfolioOptimizationService.js';
 import { getSupabaseAdmin } from '../config/database.js';
 import { ApiError } from '../utils/ApiError.js';
 import crypto from 'crypto';
@@ -362,8 +363,36 @@ export const PortfolioController = {
 
   async getHealth(req, res, next) {
     try {
-      const health = await PortfolioIntelligenceService.getPortfolioHealth(req.user.id);
+      const health = await PortfolioOptimizationService.evaluateHealthBreakdown(req.user.id);
       return res.json(health);
+    } catch (err) { next(err); }
+  },
+
+  async getRecommendations(req, res, next) {
+    try {
+      const recommendations = await PortfolioOptimizationService.getRecommendations(req.user.id);
+      return res.json(recommendations);
+    } catch (err) { next(err); }
+  },
+
+  async getOpportunities(req, res, next) {
+    try {
+      const opportunities = await PortfolioOptimizationService.getOpportunities(req.user.id);
+      return res.json(opportunities);
+    } catch (err) { next(err); }
+  },
+
+  async getScenarios(req, res, next) {
+    try {
+      const scenarios = await PortfolioOptimizationService.simulateScenarios(req.user.id);
+      return res.json(scenarios);
+    } catch (err) { next(err); }
+  },
+
+  async rebalance(req, res, next) {
+    try {
+      const proposal = await PortfolioOptimizationService.calculateRebalancing(req.user.id);
+      return res.json(proposal);
     } catch (err) { next(err); }
   },
 };
