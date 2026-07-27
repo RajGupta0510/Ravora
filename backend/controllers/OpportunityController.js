@@ -8,6 +8,7 @@ import { PortfolioRepository } from '../repositories/PortfolioRepository.js';
 import { MarketDataService } from '../services/MarketDataService.js';
 import { NotificationService } from '../services/NotificationService.js';
 import { QuantitativeScannerService } from '../services/QuantitativeScannerService.js';
+import { OpportunityDiscoveryService } from '../services/OpportunityDiscoveryService.js';
 import { getSupabaseAdmin } from '../config/database.js';
 import { ApiError } from '../utils/ApiError.js';
 import crypto from 'crypto';
@@ -19,20 +20,68 @@ const portfolioRepo = new PortfolioRepository();
 export const OpportunityController = {
   async getOpportunities(req, res, next) {
     try {
-      const opps = await oppRepo.findAllOpportunities();
-      
-      // If table is empty, seed mock opportunities first
-      if (opps.length === 0) {
-        await OpportunityController._seedDefaultOpportunities();
-        const seeded = await oppRepo.findAllOpportunities();
-        return res.json(seeded.map(o => OpportunityController._formatOpportunity(o)));
-      }
+      const userId = req.user.id;
+      const filters = {
+        opportunity_type: req.query.opportunity_type || req.query.type,
+        risk_level: req.query.risk_level || req.query.risk,
+        trend_direction: req.query.trend_direction || req.query.trend,
+        min_confidence_score: req.query.min_confidence_score || req.query.confidence
+      };
 
+      const opps = await OpportunityDiscoveryService.getPersonalizedOpportunities(userId, filters);
       return res.json(opps.map(o => OpportunityController._formatOpportunity(o)));
     } catch (err) {
       console.error('[Opportunities Controller Error]:', err);
       next(err);
     }
+  },
+
+  async getOpportunityById(req, res, next) {
+    try {
+      const userId = req.user.id;
+      const { id } = req.params;
+      const details = await OpportunityDiscoveryService.getOpportunityDetails(userId, id);
+      return res.json({
+        ...OpportunityController._formatOpportunity(details.opportunity),
+        aiAnalysis: details.aiAnalysis
+      });
+    } catch (err) { next(err); }
+  },
+
+  async getTrending(req, res, next) {
+    try {
+      const userId = req.user.id;
+      const trending = await OpportunityDiscoveryService.getTrendingOpportunities(userId);
+      return res.json(trending.map(o => OpportunityController._formatOpportunity(o)));
+    } catch (err) { next(err); }
+  },
+
+  async getHistory(req, res, next) {
+    try {
+      const userId = req.user.id;
+      const history = await OpportunityDiscoveryService.getInteractionHistory(userId);
+      return res.json(history);
+    } catch (err) { next(err); }
+  },
+
+  async saveOpportunity(req, res, next) {
+    try {
+      const userId = req.user.id;
+      const { opportunityId } = req.body;
+      if (!opportunityId) throw ApiError.badRequest('opportunityId is required');
+      const result = await OpportunityDiscoveryService.saveOpportunity(userId, opportunityId);
+      return res.json({ success: true, data: result });
+    } catch (err) { next(err); }
+  },
+
+  async dismissOpportunity(req, res, next) {
+    try {
+      const userId = req.user.id;
+      const { opportunityId } = req.body;
+      if (!opportunityId) throw ApiError.badRequest('opportunityId is required');
+      const result = await OpportunityDiscoveryService.dismissOpportunity(userId, opportunityId);
+      return res.json({ success: true, data: result });
+    } catch (err) { next(err); }
   },
 
   async getRecommendations(req, res, next) {
