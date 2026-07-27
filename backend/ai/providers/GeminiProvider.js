@@ -12,7 +12,7 @@ export class GeminiProvider extends AiServiceInterface {
       throw new Error('Gemini API Key is not configured in environment variables');
     }
 
-    const { stream = false, onChunk = null, jsonMode = false, systemInstruction = '', systemPrompt = '' } = options;
+    const { stream = false, onChunk = null, jsonMode = false, systemInstruction = '', systemPrompt = '', signal = null } = options;
     const activeSystemInstruction = systemInstruction || systemPrompt;
     
     const action = stream ? 'streamGenerateContent' : 'generateContent';
@@ -58,7 +58,8 @@ export class GeminiProvider extends AiServiceInterface {
     const res = await fetch(url, {
       method: 'POST',
       headers,
-      body: JSON.stringify(body)
+      body: JSON.stringify(body),
+      signal
     });
 
     if (!res.ok) {

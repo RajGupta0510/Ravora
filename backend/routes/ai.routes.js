@@ -20,6 +20,18 @@ router.post('/review', AiController.review);
 router.post('/tools', AiController.tools);
 router.get('/history', AiController.history);
 
+// Real-Time Streaming Endpoints
+router.post('/chat/stream', AiController.chatStream);
+router.post('/analyze/stream', AiController.analyzeStream);
+router.post('/review/stream', AiController.reviewStream);
+
+// Memory & Personalization API
+router.get('/memory', AiController.getMemory);
+router.post('/memory', AiController.createMemory);
+router.delete('/memory', AiController.deleteMemory);
+router.get('/preferences', AiController.getPreferences);
+router.put('/preferences', AiController.updatePreferences);
+
 router.post('/analyze-asset', AiController.analyzeAsset);
 router.post('/analyze-portfolio', AiController.portfolioReview);
 router.post('/analyze-trade', AiController.tradeReview);

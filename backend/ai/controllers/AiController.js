@@ -1,6 +1,69 @@
 import { AiService } from '../services/AiService.js';
 import { AgentOrchestrator } from '../services/AgentOrchestrator.js';
 import { ApiError } from '../../utils/ApiError.js';
+import { UserPreferencesRepository } from '../../repositories/UserPreferencesRepository.js';
+import { LearningProgressRepository } from '../../repositories/LearningProgressRepository.js';
+import { RecommendationHistoryRepository } from '../../repositories/RecommendationHistoryRepository.js';
+import { ContextSummaryRepository } from '../../repositories/ContextSummaryRepository.js';
+import { logger } from '../../utils/logger.js';
+
+async function runSseOrchestrator(req, res, next, messageBuilder) {
+  try {
+    const userId = req.user.id;
+    const abortController = new AbortController();
+
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+    res.flushHeaders();
+
+    req.on('close', () => {
+      logger.info('AiController', 'SSE stream connection closed by client. Aborting orchestrator signal...');
+      abortController.abort();
+    });
+
+    const { conversationId } = req.body;
+    const { ConversationMemory } = await import('../memory/ConversationMemory.js');
+    const conv = await ConversationMemory.getOrCreateConversation(userId, conversationId);
+
+    res.write(`data: ${JSON.stringify({ conversationId: conv.id })}\n\n`);
+
+    const message = typeof messageBuilder === 'function' ? messageBuilder(req) : messageBuilder;
+
+    let accumulatedReply = '';
+
+    const onProgress = (prog) => {
+      res.write(`data: ${JSON.stringify(prog)}\n\n`);
+    };
+
+    const onChunk = (chunk) => {
+      accumulatedReply += chunk;
+      res.write(`data: ${JSON.stringify({ text: chunk })}\n\n`);
+    };
+
+    const result = await AgentOrchestrator.orchestrate(userId, message, conv.id, {
+      stream: true,
+      onProgress,
+      onChunk,
+      signal: abortController.signal
+    });
+
+    await ConversationMemory.saveCopilotMessage(userId, conv.id, accumulatedReply, result.stats);
+
+    res.write('data: [DONE]\n\n');
+    return res.end();
+  } catch (err) {
+    if (res.headersSent) {
+      if (err.name === 'AbortError') {
+        res.write(`data: ${JSON.stringify({ status: 'aborted', message: 'Stream stopped by user.' })}\n\n`);
+      } else {
+        res.write(`data: ${JSON.stringify({ error: err.message })}\n\n`);
+      }
+      return res.end();
+    }
+    next(err);
+  }
+}
 
 export const AiController = {
   /**
@@ -64,6 +127,194 @@ export const AiController = {
    */
   async chat(req, res, next) {
     return AiController.ask(req, res, next);
+  },
+
+  /**
+   * POST /api/ai/chat/stream
+   */
+  async chatStream(req, res, next) {
+    const { message } = req.body;
+    if (!message) {
+      return next(ApiError.badRequest('message content is required'));
+    }
+    return runSseOrchestrator(req, res, next, message);
+  },
+
+  /**
+   * POST /api/ai/analyze/stream
+   */
+  async analyzeStream(req, res, next) {
+    const symbol = req.query.symbol || req.body.symbol;
+    const message = req.body.message || (symbol ? `Perform technical and indicator analysis for ${symbol}` : 'Perform general market analysis');
+    return runSseOrchestrator(req, res, next, message);
+  },
+
+  /**
+   * POST /api/ai/review/stream
+   */
+  async reviewStream(req, res, next) {
+    const { type, tradeParams } = req.body;
+    let promptText = '';
+    if (type === 'portfolio') {
+      promptText = 'Review my active portfolio, sector allocations, and asset weights.';
+    } else if (type === 'risk') {
+      promptText = 'Calculate risk vectors, HHI index, and identify leverage exposure.';
+    } else if (type === 'trade') {
+      if (!tradeParams || !tradeParams.symbol || !tradeParams.quantity) {
+        return next(ApiError.badRequest('tradeParams (symbol, quantity) are required for trade reviews'));
+      }
+      promptText = `Perform a pre-trade safety review for executing: ${tradeParams.action || 'BUY'} ${tradeParams.quantity} of ${tradeParams.symbol}`;
+    } else {
+      promptText = 'Perform a complete review of my portfolio, risk factors, and trade settings.';
+    }
+    return runSseOrchestrator(req, res, next, promptText);
+  },
+
+  /**
+   * GET /api/ai/memory
+   */
+  async getMemory(req, res, next) {
+    try {
+      const userId = req.user.id;
+
+      const userPrefRepo = new UserPreferencesRepository();
+      const learnRepo = new LearningProgressRepository();
+      const recRepo = new RecommendationHistoryRepository();
+      const summaryRepo = new ContextSummaryRepository();
+
+      const preferences = await userPrefRepo.findByUserId(userId);
+      const learningProgress = await learnRepo.findByUserId(userId);
+      const recommendations = await recRepo.findByUserId(userId, 50);
+      const summaries = await summaryRepo.findByUserId(userId, 50);
+
+      return res.json({
+        success: true,
+        data: {
+          preferences: preferences || null,
+          learningProgress: learningProgress || null,
+          recommendationHistory: recommendations || [],
+          contextSummaries: summaries || []
+        }
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  /**
+   * POST /api/ai/memory
+   */
+  async createMemory(req, res, next) {
+    try {
+      const userId = req.user.id;
+      const { content, summary_type = 'general', keywords = [], conversationId } = req.body;
+
+      if (!content) {
+        throw ApiError.badRequest('content is required');
+      }
+
+      const summaryRepo = new ContextSummaryRepository();
+      const newSummary = await summaryRepo.recordSummary(userId, {
+        conversation_id: conversationId,
+        summary_type,
+        content,
+        keywords
+      });
+
+      return res.json({
+        success: true,
+        message: 'Personalization memory recorded successfully',
+        data: newSummary
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  /**
+   * DELETE /api/ai/memory
+   */
+  async deleteMemory(req, res, next) {
+    try {
+      const userId = req.user.id;
+      const { type = 'all', id } = req.query;
+
+      const userPrefRepo = new UserPreferencesRepository();
+      const learnRepo = new LearningProgressRepository();
+      const recRepo = new RecommendationHistoryRepository();
+      const summaryRepo = new ContextSummaryRepository();
+
+      if (type === 'specific' && id) {
+        await summaryRepo.hardDelete(id);
+      } else {
+        // Clear all memory types
+        await summaryRepo.clearUserSummaries(userId);
+        
+        const prefs = await userPrefRepo.findByUserId(userId);
+        if (prefs) await userPrefRepo.hardDelete(prefs.id);
+
+        const learn = await learnRepo.findByUserId(userId);
+        if (learn) await learnRepo.hardDelete(learn.id);
+
+        const recs = await recRepo.findByUserId(userId, 500);
+        for (const r of recs) {
+          await recRepo.hardDelete(r.id);
+        }
+      }
+
+      return res.json({
+        success: true,
+        message: 'Personalization memory cleared successfully'
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  /**
+   * GET /api/ai/preferences
+   */
+  async getPreferences(req, res, next) {
+    try {
+      const userId = req.user.id;
+      const userPrefRepo = new UserPreferencesRepository();
+      const preferences = await userPrefRepo.findByUserId(userId);
+
+      return res.json({
+        success: true,
+        data: preferences || null
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  /**
+   * PUT /api/ai/preferences
+   */
+  async updatePreferences(req, res, next) {
+    try {
+      const userId = req.user.id;
+      const preferences = req.body;
+
+      const userPrefRepo = new UserPreferencesRepository();
+      const updated = await userPrefRepo.upsertPreferences(userId, preferences);
+
+      // Optionally sync trading experience with knowledge level in learning progress
+      if (preferences.trading_experience) {
+        const learnRepo = new LearningProgressRepository();
+        await learnRepo.upsertLearningProgress(userId, {
+          knowledge_level: preferences.trading_experience
+        });
+      }
+
+      return res.json({
+        success: true,
+        data: updated
+      });
+    } catch (err) {
+      next(err);
+    }
   },
 
   /**
