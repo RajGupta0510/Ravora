@@ -13,7 +13,13 @@ router.get('/opportunity-analysis', AiController.opportunityAnalysis);
 router.get('/analyze-asset', AiController.analyzeAsset);
 
 // Spec v1 Endpoint Standardizations (POST/GET mounts)
-router.post('/chat', AiController.ask);
+router.post('/chat', AiController.chat);
+router.post('/agent', AiController.agent);
+router.post('/analyze', AiController.analyze);
+router.post('/review', AiController.review);
+router.post('/tools', AiController.tools);
+router.get('/history', AiController.history);
+
 router.post('/analyze-asset', AiController.analyzeAsset);
 router.post('/analyze-portfolio', AiController.portfolioReview);
 router.post('/analyze-trade', AiController.tradeReview);
