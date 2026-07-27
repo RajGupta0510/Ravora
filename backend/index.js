@@ -14,6 +14,8 @@ import { errorHandler } from './middleware/errorHandler.js';
 import routes from './routes/index.js';
 import aiRoutes from './routes/ai.routes.js';
 import { authenticate } from './middleware/auth.js';
+import { rateLimiter } from './middleware/rateLimiter.js';
+import { RATE_LIMITS } from './config/constants.js';
 import env from './config/environment.js';
 import { logger } from './utils/logger.js';
 
@@ -43,7 +45,7 @@ async function bootstrap() {
 
     // 4. Register REST API Routes
     app.use('/api/v1', routes);
-    app.use('/api/ai', authenticate, aiRoutes);
+    app.use('/api/ai', authenticate, rateLimiter(RATE_LIMITS.STANDARD), aiRoutes);
 
     // 5. Catch-all for API 404
     app.use((req, res, next) => {
