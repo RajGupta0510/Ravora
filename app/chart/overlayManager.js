@@ -100,6 +100,17 @@ class OverlayManager {
           type: 'bullish'
         });
       }
+
+      // 5. Bearish Engulfing (current bearish body engulfs previous bullish body)
+      if (curr.close < curr.open && prev.close > prev.open &&
+          curr.open >= prev.close && curr.close <= prev.open) {
+        patterns.push({
+          time: Math.floor(curr.timestamp / 1000),
+          price: curr.high,
+          text: 'Engulfing',
+          type: 'bearish'
+        });
+      }
     }
 
     return patterns;
@@ -226,6 +237,92 @@ class OverlayManager {
           p.type === 'bullish' ? 'bullish' : (p.type === 'bearish' ? 'bearish' : 'bullish')
         );
       });
+    }
+
+    // 5. Draw FVG and OB Zones
+    if (toggles.zones) {
+      // Find the most recent Fair Value Gap (Bullish FVG)
+      let lastFvg = null;
+      for (let i = 2; i < history.length; i++) {
+        if (history[i-2].high < history[i].low) {
+          lastFvg = { low: history[i-2].high, high: history[i].low };
+        }
+      }
+      if (lastFvg) {
+        window.drawingEngine.drawPriceZone(
+          chart,
+          series,
+          lastFvg.low,
+          lastFvg.high,
+          'rgba(16, 185, 129, 0.05)',
+          'Bullish FVG'
+        );
+      }
+
+      // Find the most recent Order Block (OB)
+      let sumBody = 0;
+      for (let i = 0; i < history.length; i++) {
+        sumBody += Math.abs(history[i].close - history[i].open);
+      }
+      const avgBody = sumBody / history.length;
+
+      let lastOb = null;
+      for (let i = 1; i < history.length; i++) {
+        const bodySize = Math.abs(history[i].close - history[i].open);
+        if (history[i].close < history[i].open && bodySize > 2 * avgBody) {
+          if (history[i-1].close > history[i-1].open) {
+            lastOb = { open: history[i-1].open, close: history[i-1].close };
+          }
+        }
+      }
+      if (lastOb) {
+        window.drawingEngine.drawPriceZone(
+          chart,
+          series,
+          lastOb.open,
+          lastOb.close,
+          'rgba(239, 68, 68, 0.06)',
+          'Order Block'
+        );
+      }
+    }
+
+    // 6. Draw Projected Price Paths (Dashed Arrows)
+    if (toggles.targets) {
+      const step = history[history.length - 1].timestamp - history[history.length - 2].timestamp;
+      const stepSec = Math.floor(step / 1000);
+      const lastTime = Math.floor(history[history.length - 1].timestamp / 1000);
+      const lastClose = history[history.length - 1].close;
+
+      const optimalEntry = opp.tradePlan?.optimalEntry ? parseFloat(opp.tradePlan.optimalEntry.replace('$', '')) : lastClose;
+      const stopLoss = opp.tradePlan?.stopLoss ? parseFloat(opp.tradePlan.stopLoss.replace('$', '')) : lastClose * 0.95;
+      
+      const tps = opp.tradePlan?.takeProfitTargets || [];
+      const tp1 = tps[0] ? parseFloat(tps[0].replace('$', '')) : lastClose * 1.04;
+      const tp2 = tps[1] ? parseFloat(tps[1].replace('$', '')) : lastClose * 1.08;
+      const tp3 = tps[2] ? parseFloat(tps[2].replace('$', '')) : lastClose * 1.12;
+
+      const support = parseFloat(opp.indicators?.support || lastClose * 0.97);
+
+      // Bullish path
+      const bullishPath = [
+        { time: lastTime, price: lastClose },
+        { time: lastTime + stepSec * 2, price: optimalEntry },
+        { time: lastTime + stepSec * 5, price: tp1 },
+        { time: lastTime + stepSec * 7, price: tp1 * 0.995 },
+        { time: lastTime + stepSec * 11, price: tp2 },
+        { time: lastTime + stepSec * 15, price: tp3 }
+      ];
+      window.drawingEngine.drawProjectedPath(bullishPath, 'rgba(16, 185, 129, 0.7)');
+
+      // Bearish path
+      const bearishPath = [
+        { time: lastTime, price: lastClose },
+        { time: lastTime + stepSec * 3, price: support * 0.99 },
+        { time: lastTime + stepSec * 5, price: support * 1.002 },
+        { time: lastTime + stepSec * 9, price: stopLoss }
+      ];
+      window.drawingEngine.drawProjectedPath(bearishPath, 'rgba(239, 68, 68, 0.7)');
     }
   }
 

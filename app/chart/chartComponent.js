@@ -67,6 +67,7 @@ class ChartComponent {
 
     // Setup Toolbar bindings
     this.setupToolbar();
+    this.setupInteractivity();
   }
 
   mapInterval(tf) {
@@ -265,6 +266,106 @@ class ChartComponent {
         this.takeScreenshot();
       });
     }
+  }
+
+  setupInteractivity() {
+    if (!this.overlayCanvas) return;
+
+    this.isDragging = false;
+    this.draggedLine = null; // 'entry' | 'stopLoss' | 'tp1' | 'tp2' | 'tp3'
+
+    const container = this.container;
+    const canvas = this.overlayCanvas;
+
+    const checkHover = (e) => {
+      if (this.isDragging) return;
+
+      const rect = canvas.getBoundingClientRect();
+      const mouseY = e.clientY - rect.top;
+
+      const opp = window.chartStateManager.opp;
+      if (!opp || !opp.tradePlan) return;
+
+      const lastClose = window.chartStateManager.history[window.chartStateManager.history.length - 1]?.close || 65000;
+      
+      const entryVal = opp.tradePlan.optimalEntry ? parseFloat(opp.tradePlan.optimalEntry.replace('$', '')) : lastClose;
+      const slVal = opp.tradePlan.stopLoss ? parseFloat(opp.tradePlan.stopLoss.replace('$', '')) : lastClose * 0.95;
+      
+      const tps = opp.tradePlan.takeProfitTargets || [];
+      const tp1Val = tps[0] ? parseFloat(tps[0].replace('$', '')) : lastClose * 1.04;
+      const tp2Val = tps[1] ? parseFloat(tps[1].replace('$', '')) : lastClose * 1.08;
+      const tp3Val = tps[2] ? parseFloat(tps[2].replace('$', '')) : lastClose * 1.12;
+
+      const levels = [
+        { name: 'entry', price: entryVal },
+        { name: 'stopLoss', price: slVal },
+        { name: 'tp1', price: tp1Val },
+        { name: 'tp2', price: tp2Val },
+        { name: 'tp3', price: tp3Val }
+      ];
+
+      let found = null;
+      for (const lvl of levels) {
+        const y = window.drawingEngine.priceToCoordinate(lvl.price);
+        if (y !== null && Math.abs(mouseY - y) < 8) {
+          found = lvl.name;
+          break;
+        }
+      }
+
+      if (found) {
+        canvas.style.pointerEvents = 'auto';
+        container.style.cursor = 'ns-resize';
+        this.draggedLine = found;
+      } else {
+        canvas.style.pointerEvents = 'none';
+        container.style.cursor = 'default';
+        this.draggedLine = null;
+      }
+    };
+
+    container.addEventListener('mousemove', (e) => {
+      if (this.isDragging) {
+        const rect = canvas.getBoundingClientRect();
+        const mouseY = e.clientY - rect.top;
+        const newPrice = window.drawingEngine.coordinateToPrice(mouseY);
+        
+        if (newPrice !== null && window.chartStateManager.opp && window.chartStateManager.opp.tradePlan) {
+          const opp = window.chartStateManager.opp;
+          
+          if (this.draggedLine === 'entry') {
+            opp.tradePlan.optimalEntry = `$${newPrice.toFixed(2)}`;
+          } else if (this.draggedLine === 'stopLoss') {
+            opp.tradePlan.stopLoss = `$${newPrice.toFixed(2)}`;
+          } else if (this.draggedLine === 'tp1') {
+            opp.tradePlan.takeProfitTargets[0] = `$${newPrice.toFixed(2)}`;
+          } else if (this.draggedLine === 'tp2') {
+            opp.tradePlan.takeProfitTargets[1] = `$${newPrice.toFixed(2)}`;
+          } else if (this.draggedLine === 'tp3') {
+            opp.tradePlan.takeProfitTargets[2] = `$${newPrice.toFixed(2)}`;
+          }
+          
+          this.drawOverlays();
+        }
+      } else {
+        checkHover(e);
+      }
+    });
+
+    canvas.addEventListener('mousedown', (e) => {
+      if (this.draggedLine) {
+        this.isDragging = true;
+        canvas.style.pointerEvents = 'auto';
+      }
+    });
+
+    window.addEventListener('mouseup', () => {
+      if (this.isDragging) {
+        this.isDragging = false;
+        canvas.style.pointerEvents = 'none';
+        container.style.cursor = 'default';
+      }
+    });
   }
 
   takeScreenshot() {

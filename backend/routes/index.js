@@ -22,6 +22,7 @@ import strategyRoutes from './strategy.routes.js';
 import newsRoutes from './news.routes.js';
 import adminRoutes from './admin.routes.js';
 import discoverRoutes from './discover.routes.js';
+import workspaceRoutes from './workspace.routes.js';
 import { AiController } from '../ai/controllers/AiController.js';
 import { getSupabaseAdmin, isConfigured } from '../config/database.js';
 import env from '../config/environment.js';
@@ -92,6 +93,7 @@ authRouter.use('/strategy', strategyRoutes);
 authRouter.use('/news', newsRoutes);
 authRouter.use('/admin', adminRoutes);
 authRouter.use('/discover', discoverRoutes);
+authRouter.use('/workspace', workspaceRoutes);
 authRouter.post('/copilot/message', AiController.copilotMessage);
 
 router.use(authRouter);

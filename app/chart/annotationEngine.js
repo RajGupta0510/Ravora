@@ -9,11 +9,11 @@ class AnnotationEngine {
    * Draws a beautiful rounded callout tag with a vertical connector line.
    */
   drawPatternLabel(chart, series, time, price, text, type = 'bullish') {
-    const ctx = window.drawingEngine.ctx;
-    if (!ctx || !chart || !series) return;
+    const ctx = window.drawingEngine ? window.drawingEngine.ctx : null;
+    if (!ctx) return;
 
-    const x = chart.timeScale().timeToCoordinate(time);
-    const y = series.priceToCoordinate(price);
+    const x = chart ? chart.timeScale().timeToCoordinate(time) : window.drawingEngine.timeToCoordinate(time);
+    const y = series ? series.priceToCoordinate(price) : window.drawingEngine.priceToCoordinate(price);
 
     if (x === null || y === null) return;
 
