@@ -7368,7 +7368,7 @@ h2 {
 /* Bottom Tabbed Workspace */
 .terminal-positions-panel {
   grid-column: 1 / span 3 !important;
-  height: 320px !important;
+  height: 520px !important;
   margin-top: 0 !important;
   /* Managed by grid gap */
   transition: height 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
