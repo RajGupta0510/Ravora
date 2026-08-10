@@ -1,6 +1,6 @@
 import { PortfolioIntelligenceService } from './PortfolioIntelligenceService.js';
 import { MarketDataService } from './MarketDataService.js';
-import { AiServiceFactory } from './AiServiceFactory.js';
+import { AiServiceFactory } from '../ai/AiServiceFactory.js';
 import { logger } from '../utils/logger.js';
 
 export const PortfolioOptimizationService = {

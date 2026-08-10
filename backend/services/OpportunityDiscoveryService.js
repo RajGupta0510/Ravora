@@ -3,7 +3,7 @@ import { OpportunityRepository } from '../repositories/OpportunityRepository.js'
 import { OpportunityInteractionRepository } from '../repositories/OpportunityInteractionRepository.js';
 import { QuantitativeScannerService } from './QuantitativeScannerService.js';
 import { NotificationService } from './NotificationService.js';
-import { AiServiceFactory } from './AiServiceFactory.js';
+import { AiServiceFactory } from '../ai/AiServiceFactory.js';
 import { logger } from '../utils/logger.js';
 import { ApiError } from '../utils/ApiError.js';
 

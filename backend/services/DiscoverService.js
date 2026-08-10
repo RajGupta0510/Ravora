@@ -4,7 +4,7 @@ import { PortfolioIntelligenceService } from './PortfolioIntelligenceService.js'
 import { PortfolioOptimizationService } from './PortfolioOptimizationService.js';
 import { DiscoverInteractionRepository } from '../repositories/DiscoverInteractionRepository.js';
 import { NotificationService } from './NotificationService.js';
-import { AiServiceFactory } from './AiServiceFactory.js';
+import { AiServiceFactory } from '../ai/AiServiceFactory.js';
 import { logger } from '../utils/logger.js';
 import { ApiError } from '../utils/ApiError.js';
 
