@@ -25,11 +25,11 @@ COPY --from=frontend-builder /app/server.js ./server.js
 COPY --from=frontend-builder /app/ravora.db ./ravora.db
 
 # Expose backend REST API / WebSocket port
-EXPOSE 3001
+EXPOSE 10000
 
 # Production Health Check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:3001/api/v1/health || exit 1
+  CMD wget --no-verbose --tries=1 --spider http://localhost:10000/api/v1/health || exit 1
 
 # Start production server
 CMD ["node", "backend/index.js"]

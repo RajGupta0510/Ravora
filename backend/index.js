@@ -93,7 +93,7 @@ async function bootstrap() {
 
     // 10. Start Listening
     const port = env.PORT;
-    server.listen(port, () => {
+    server.listen(port, '0.0.0.0', () => {
       logger.info('Bootstrap', `✓ Ravora Backend V1 running on http://localhost:${port}`);
     });
 
