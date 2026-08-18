@@ -2,7 +2,7 @@
 # Multi-stage build for scaling and security optimization.
 
 # Stage 1: Build Frontend Assets
-FROM node:20-alpine AS frontend-builder
+FROM node:22-alpine AS frontend-builder
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci
@@ -10,7 +10,7 @@ COPY . .
 RUN npm run build
 
 # Stage 2: Production Runtime
-FROM node:20-alpine AS runtime
+FROM node:22-alpine AS runtime
 WORKDIR /app
 ENV NODE_ENV=production
 
