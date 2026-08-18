@@ -21,8 +21,7 @@ RUN npm ci --omit=dev
 # Copy backend files and built frontend assets
 COPY backend/ ./backend/
 COPY --from=frontend-builder /app/dist/ ./dist/
-COPY --from=frontend-builder /app/server.js ./server.js
-COPY --from=frontend-builder /app/ravora.db ./ravora.db
+COPY --from=frontend-builder /app/server.js ./server.j
 
 # Expose backend REST API / WebSocket port
 EXPOSE 10000
