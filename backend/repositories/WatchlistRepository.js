@@ -1,4 +1,4 @@
-import { BaseRepository } from './BaseRepository.js';
+import { BaseRepository, getMemoryStore, withTimeout } from './BaseRepository.js';
 
 export class WatchlistRepository extends BaseRepository {
   constructor() { super('watchlist'); }
@@ -13,12 +13,58 @@ export class WatchlistRepository extends BaseRepository {
   }
 
   async removeSymbol(userId, symbol) {
-    const { error } = await this.db
-      .from(this.tableName)
-      .delete()
-      .eq('user_id', userId)
-      .eq('symbol', symbol);
-    if (error) throw error;
+    try {
+      const { error } = await withTimeout(this.db
+        .from(this.tableName)
+        .delete()
+        .eq('user_id', userId)
+        .eq('symbol', symbol));
+      if (error) {
+        if (this.isMissingTableError(error)) {
+          this._memoryRemoveSymbol(userId, symbol);
+          return;
+        }
+        throw error;
+      }
+    } catch (err) {
+      this._memoryRemoveSymbol(userId, symbol);
+    }
+  }
+
+  _memoryRemoveSymbol(userId, symbol) {
+    const store = getMemoryStore(this.tableName);
+    for (const [id, record] of store.entries()) {
+      if (record.user_id === userId && record.symbol === symbol) {
+        store.delete(id);
+      }
+    }
+  }
+
+  async clearWatchlist(userId) {
+    try {
+      const { error } = await withTimeout(this.db
+        .from(this.tableName)
+        .delete()
+        .eq('user_id', userId));
+      if (error) {
+        if (this.isMissingTableError(error)) {
+          this._memoryClearWatchlist(userId);
+          return;
+        }
+        throw error;
+      }
+    } catch (err) {
+      this._memoryClearWatchlist(userId);
+    }
+  }
+
+  _memoryClearWatchlist(userId) {
+    const store = getMemoryStore(this.tableName);
+    for (const [id, record] of store.entries()) {
+      if (record.user_id === userId) {
+        store.delete(id);
+      }
+    }
   }
 
   async hasSymbol(userId, symbol) {

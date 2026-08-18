@@ -96,21 +96,20 @@ export const UserService = {
     }
 
     // Clear existing assets and batch upsert new ones
-    const db = userRepo.db;
-    await db.from('portfolio_assets').delete().eq('portfolio_id', portfolio.id);
+    await portfolioRepo.clearAssets(portfolio.id);
     for (const asset of assets) {
       await portfolioRepo.upsertAsset(portfolio.id, asset);
     }
 
     // Seed Watchlist
-    await db.from('watchlist').delete().eq('user_id', userId);
+    await watchlistRepo.clearWatchlist(userId);
     const defaultSymbols = ['BTC', 'ETH', 'SOL', 'BNB', 'SUI'];
     for (const sym of defaultSymbols) {
       await watchlistRepo.addSymbol(userId, sym);
     }
 
     // Seed default onboarding notifications
-    await db.from('notifications').delete().eq('user_id', userId);
+    await notifRepo.clearNotifications(userId);
     await notifRepo.create({
       user_id: userId,
       channel: 'security',

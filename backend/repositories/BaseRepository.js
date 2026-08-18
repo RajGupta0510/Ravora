@@ -12,11 +12,20 @@ import { logger } from '../utils/logger.js';
 // Global in-memory fallback stores for unmigrated database tables
 const memoryStores = new Map();
 
-function getMemoryStore(tableName) {
+export function getMemoryStore(tableName) {
   if (!memoryStores.has(tableName)) {
     memoryStores.set(tableName, new Map());
   }
   return memoryStores.get(tableName);
+}
+
+export function withTimeout(promise, timeoutMs = 2000) {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('Database query timed out')), timeoutMs)
+    )
+  ]);
 }
 
 export class BaseRepository {
@@ -46,11 +55,11 @@ export class BaseRepository {
    */
   async findById(id, select = '*') {
     try {
-      const { data, error } = await this.db
+      const { data, error } = await withTimeout(this.db
         .from(this.tableName)
         .select(select)
         .eq('id', id)
-        .maybeSingle();
+        .maybeSingle());
 
       if (error) {
         if (this.isMissingTableError(error)) {
@@ -81,7 +90,7 @@ export class BaseRepository {
         query = query.eq(key, value);
       }
 
-      const { data, error } = await query.maybeSingle();
+      const { data, error } = await withTimeout(query.maybeSingle());
 
       if (error) {
         if (this.isMissingTableError(error)) {
@@ -134,7 +143,7 @@ export class BaseRepository {
       // Pagination
       query = query.range(offset, offset + limit - 1);
 
-      const { data, error, count } = await query;
+      const { data, error, count } = await withTimeout(query);
 
       if (error) {
         if (this.isMissingTableError(error)) {
@@ -165,7 +174,7 @@ export class BaseRepository {
       }
       query = query.order(sortBy, { ascending: sortOrder === 'asc' });
       query = query.range(offset, offset + limit - 1);
-      const { data, error, count } = await query;
+      const { data, error, count } = await withTimeout(query);
       if (error) {
         if (this.isMissingTableError(error)) {
           return this._memoryFindAll({ filters, offset, limit, sortBy, sortOrder });
@@ -213,11 +222,11 @@ export class BaseRepository {
    */
   async create(data) {
     try {
-      const { data: created, error } = await this.db
+      const { data: created, error } = await withTimeout(this.db
         .from(this.tableName)
         .insert(data)
         .select()
-        .single();
+        .single());
 
       if (error) {
         if (this.isMissingTableError(error)) {
@@ -256,12 +265,12 @@ export class BaseRepository {
    */
   async update(id, updates) {
     try {
-      const { data, error } = await this.db
+      const { data, error } = await withTimeout(this.db
         .from(this.tableName)
         .update(updates)
         .eq('id', id)
         .select()
-        .single();
+        .single());
 
       if (error) {
         if (this.isMissingTableError(error)) {
@@ -310,10 +319,10 @@ export class BaseRepository {
    */
   async hardDelete(id) {
     try {
-      const { error } = await this.db
+      const { error } = await withTimeout(this.db
         .from(this.tableName)
         .delete()
-        .eq('id', id);
+        .eq('id', id));
 
       if (error) {
         if (this.isMissingTableError(error)) {
@@ -335,11 +344,11 @@ export class BaseRepository {
    */
   async upsert(data, onConflict = 'id') {
     try {
-      const { data: result, error } = await this.db
+      const { data: result, error } = await withTimeout(this.db
         .from(this.tableName)
         .upsert(data, { onConflict })
         .select()
-        .single();
+        .single());
 
       if (error) {
         if (this.isMissingTableError(error)) {

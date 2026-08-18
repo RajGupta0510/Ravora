@@ -44,7 +44,7 @@ export const LandingPage: React.FC = () => {
   const [selectedAssetTab, setSelectedAssetTab] = useState<'eth' | 'btc' | 'yield'>('eth');
 
   // References
-  const simulationTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const simulationTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Navbar Scroll Trigger
   useEffect(() => {

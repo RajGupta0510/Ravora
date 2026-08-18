@@ -47,7 +47,7 @@ export const OpportunitiesPanel: React.FC = () => {
     }
   }, [scanMarkets]);
 
-  const handleDeploy = async (e: React.FormEvent) => {
+  const handleDeploy = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedOpp) return;
     try {
