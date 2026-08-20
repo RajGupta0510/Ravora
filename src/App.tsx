@@ -2,7 +2,9 @@ import React, { Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useSearchParams } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { AppProvider } from './context/AppContext';
+import { AppDashboard } from './components/dashboard/AppDashboard';
 import { Toaster } from 'sonner';
+
 
 const Agentation = import.meta.env.DEV
   ? lazy(() => import('agentation').then(module => ({ default: module.Agentation })))
@@ -158,28 +160,6 @@ const AppContent: React.FC = () => {
   return <Navigate to="/auth/login" replace />;
 };
 
-  // Redirect to legacy HTML/JS dashboard
-  const DashboardRedirect: React.FC = () => {
-    React.useEffect(() => {
-      window.location.href = '/app/index.html';
-    }, []);
-    return (
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        width: '100vw',
-        height: '100vh',
-        background: '#060B17',
-        color: '#fff',
-        fontFamily: 'sans-serif'
-      }}>
-        <div style={{ fontSize: '0.78rem', letterSpacing: '0.08em', color: '#94a3b8', fontWeight: 600 }}>
-          LOADING WORKSPACE...
-        </div>
-      </div>
-    );
-  };
 
   // Catch reloads on /app/* paths and redirect them to /app/index.html with initialRoute set
   const LegacyDashboardRedirect: React.FC = () => {
@@ -228,12 +208,11 @@ const AppContent: React.FC = () => {
           } />
 
           <Route path="/dashboard" element={
-            <ProtectedRoute>
-              <DashboardRedirect />
-            </ProtectedRoute>
-          } />
+  <ProtectedRoute>
+    <AppDashboard />
+  </ProtectedRoute>
+} />
 
-          <Route path="/app/*" element={<LegacyDashboardRedirect />} />
 
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

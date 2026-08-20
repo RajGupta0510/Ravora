@@ -10,3 +10,6 @@ Thumbs.db
 
 # Environmental variables secrets
 .env
+
+# Build output
+dist/
