@@ -135,15 +135,28 @@ const AppContent: React.FC = () => {
   }
 
   // Redirect legacy query-parameter based auth to the clean path-based routing
-  const AuthRedirect: React.FC = () => {
-    const [searchParams] = useSearchParams();
-    const mode = searchParams.get('mode');
-    if (mode === 'register') return <Navigate to="/auth/register" replace />;
-    if (mode === 'forgot') return <Navigate to="/auth/forgot" replace />;
-    if (mode === 'reset') return <Navigate to="/auth/reset" replace />;
-    if (mode === 'otp') return <Navigate to="/auth/otp" replace />;
-    return <Navigate to="/auth/login" replace />;
-  };
+ const AuthRedirect: React.FC = () => {
+  const [searchParams] = useSearchParams();
+
+  // Supabase OAuth callback arrives with the session in the URL hash.
+  // Do not redirect while Supabase is processing that callback.
+  const hasOAuthCallback =
+    window.location.hash.includes('access_token=') ||
+    window.location.hash.includes('refresh_token=');
+
+  if (hasOAuthCallback) {
+    return null;
+  }
+
+  const mode = searchParams.get('mode');
+
+  if (mode === 'register') return <Navigate to="/auth/register" replace />;
+  if (mode === 'forgot') return <Navigate to="/auth/forgot" replace />;
+  if (mode === 'reset') return <Navigate to="/auth/reset" replace />;
+  if (mode === 'otp') return <Navigate to="/auth/otp" replace />;
+
+  return <Navigate to="/auth/login" replace />;
+};
 
   // Redirect to legacy HTML/JS dashboard
   const DashboardRedirect: React.FC = () => {
