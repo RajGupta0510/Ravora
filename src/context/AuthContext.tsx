@@ -114,11 +114,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   useEffect(() => {
-    // Get initial session
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
+  let mounted = true;
+
+  const initializeAuth = async () => {
+    try {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (!mounted) return;
+
       if (session) {
         setToken(session.access_token);
-        const syncedUser = await syncAndGetUserProfile(session.access_token, session.user);
+
+        const syncedUser = await syncAndGetUserProfile(
+          session.access_token,
+          session.user
+        );
+
+        if (!mounted) return;
+
         setUser(syncedUser);
         saveLegacySession(session, syncedUser.onboardingCompleted);
       } else {
@@ -126,27 +141,73 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUser(null);
         clearLegacySession();
       }
-      setLoading(false);
-    });
+    } catch (error) {
+      console.error('[AuthContext] Initial auth error:', error);
 
-    // Listen to changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('[Supabase Auth Event]', event);
-      if (session) {
-        setToken(session.access_token);
-        const syncedUser = await syncAndGetUserProfile(session.access_token, session.user);
-        setUser(syncedUser);
-        saveLegacySession(session, syncedUser.onboardingCompleted);
-      } else {
+      if (mounted) {
         setToken(null);
         setUser(null);
         clearLegacySession();
       }
-      setLoading(false);
-    });
+    } finally {
+      if (mounted) {
+        setLoading(false);
+      }
+    }
+  };
 
-    return () => subscription.unsubscribe();
-  }, []);
+  initializeAuth();
+
+  const {
+    data: { subscription },
+  } = supabase.auth.onAuthStateChange((event, session) => {
+    console.log('[Supabase Auth Event]', event);
+
+    // INITIAL_SESSION is already handled by initializeAuth().
+    if (event === 'INITIAL_SESSION') {
+      return;
+    }
+
+    // Don't make the auth callback itself wait for API requests.
+    setTimeout(async () => {
+      if (!mounted) return;
+
+      try {
+        if (session) {
+          setToken(session.access_token);
+
+          const syncedUser = await syncAndGetUserProfile(
+            session.access_token,
+            session.user
+          );
+
+          if (!mounted) return;
+
+          setUser(syncedUser);
+          saveLegacySession(
+            session,
+            syncedUser.onboardingCompleted
+          );
+        } else {
+          setToken(null);
+          setUser(null);
+          clearLegacySession();
+        }
+      } catch (error) {
+        console.error('[AuthContext] Auth state error:', error);
+      } finally {
+        if (mounted) {
+          setLoading(false);
+        }
+      }
+    }, 0);
+  });
+
+  return () => {
+    mounted = false;
+    subscription.unsubscribe();
+  };
+}, []);
 
   const checkAuth = async () => {
     try {
