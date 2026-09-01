@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { HelpCircle, Menu, X, ChevronRight } from 'lucide-react';
+import { HelpCircle, Menu, X } from 'lucide-react';
 
 interface RiskConfig {
   label: string;
@@ -603,6 +603,8 @@ export const LandingPage: React.FC = () => {
             </div>
           </div>
         </div>
+      </section>
+
       {/* The Problem Section */}
       <section id="problem-section" style={{ padding: '60px 0', borderTop: '1px solid var(--border)' }}>
         <div className="container" style={{ maxWidth: '1000px', margin: '0 auto', padding: '0 20px', textAlign: 'center' }}>
