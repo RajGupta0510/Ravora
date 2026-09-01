@@ -68,19 +68,19 @@ export const SettingsPanel: React.FC = () => {
   };
 
   return (
-    <div className="settings-grid" style={{ display: 'grid', gridTemplateColumns: '1.1fr 0.9fr', gap: 'var(--space-8)', alignItems: 'start' }}>
+    <div className="settings-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px', alignItems: 'start' }}>
       
       {/* Col 1: System settings */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
         
         {/* Execution Mode */}
-        <div className="card-glass" style={{ padding: 'var(--space-6)', borderRadius: 'var(--radius-md)', border: 'var(--border-thickness) solid var(--color-border)' }}>
-          <h3 style={{ fontSize: '0.9rem', fontWeight: 700, margin: '0 0 var(--space-4) 0', display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-            <Radio size={16} style={{ color: 'var(--color-ai-accent)' }} />
+        <div className="card-glass" style={{ padding: 'clamp(16px, 2.5vw, 24px)', borderRadius: '12px', border: '1px solid var(--border)' }}>
+          <h3 style={{ fontSize: '0.88rem', fontWeight: 700, margin: '0 0 14px 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Radio size={16} style={{ color: 'var(--color-ai-accent)', flexShrink: 0 }} />
             SYSTEM EXECUTION MODE
           </h3>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
             {[
               { key: 'advisory', label: '1-Click Advisory Approval (Default V1)', desc: 'Araiven scans markets and drafts recommended rebalances. You must manually review and confirm each order.' },
               { key: 'autopilot_guard', label: 'Autopilot Guard Protective Shield', desc: 'Allows Araiven to execute protective swaps to stablecoins automatically when drawdown limits are breached.' },
@@ -90,47 +90,47 @@ export const SettingsPanel: React.FC = () => {
                 key={mode.key}
                 onClick={() => handleChangeExecutionMode(mode.key)}
                 style={{
-                  padding: 'var(--space-4)',
-                  borderRadius: 'var(--radius-sm)',
-                  border: settings?.execution_mode === mode.key ? 'var(--border-thickness) solid var(--color-ai-accent)' : 'var(--border-thickness) solid var(--color-border-divider)',
-                  background: settings?.execution_mode === mode.key ? 'rgba(124, 58, 237, 0.05)' : 'rgba(255,255,255,0.005)',
+                  padding: '12px 14px',
+                  borderRadius: '8px',
+                  border: settings?.execution_mode === mode.key ? '1px solid var(--color-ai-accent)' : '1px solid rgba(255,255,255,0.04)',
+                  background: settings?.execution_mode === mode.key ? 'rgba(124, 58, 237, 0.08)' : 'rgba(255,255,255,0.005)',
                   cursor: 'pointer',
-                  transition: 'all var(--motion-duration-fast) var(--motion-ease-in-out)'
+                  transition: 'all 0.15s ease'
                 }}
               >
-                <div style={{ fontWeight: 600, fontSize: '0.85rem', color: settings?.execution_mode === mode.key ? '#fff' : 'var(--text-secondary)' }}>{mode.label}</div>
-                <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)', marginTop: '4px', lineHeight: 1.35 }}>{mode.desc}</div>
+                <div style={{ fontWeight: 600, fontSize: '0.84rem', color: settings?.execution_mode === mode.key ? '#fff' : 'var(--text-secondary)' }}>{mode.label}</div>
+                <div style={{ fontSize: '0.73rem', color: 'var(--text-muted)', marginTop: '4px', lineHeight: 1.35 }}>{mode.desc}</div>
               </div>
             ))}
           </div>
         </div>
 
         {/* Safety & Alerts config */}
-        <div className="card-glass" style={{ padding: '24px', borderRadius: '12px', border: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          <h3 style={{ fontSize: '0.9rem', fontWeight: 700, margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Shield size={16} style={{ color: 'var(--ai-accent)' }} />
+        <div className="card-glass" style={{ padding: 'clamp(16px, 2.5vw, 24px)', borderRadius: '12px', border: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <h3 style={{ fontSize: '0.88rem', fontWeight: 700, margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Shield size={16} style={{ color: 'var(--ai-accent)', flexShrink: 0 }} />
             SAFETY & NOTIFICATION CONTEXT
           </h3>
 
           {/* Auto Hedge */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.82rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.82rem', gap: '12px' }}>
             <div>
               <div style={{ fontWeight: 600, color: '#fff' }}>Automated Portfolio Hedging</div>
-              <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Rotate to USDC pools during high-drawdown macro spikes</span>
+              <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', lineHeight: 1.3, display: 'block', marginTop: '2px' }}>Rotate to USDC pools during high-drawdown macro spikes</span>
             </div>
-            <button onClick={handleToggleAutoHedge} style={{ background: 'none', border: 'none', cursor: 'pointer', color: settings?.auto_hedge_enabled === 1 ? 'var(--success)' : 'var(--text-muted)' }}>
-              {settings?.auto_hedge_enabled === 1 ? <ToggleRight size={38} /> : <ToggleLeft size={38} />}
+            <button onClick={handleToggleAutoHedge} style={{ background: 'none', border: 'none', cursor: 'pointer', color: settings?.auto_hedge_enabled === 1 ? 'var(--success)' : 'var(--text-muted)', padding: 0, flexShrink: 0 }}>
+              {settings?.auto_hedge_enabled === 1 ? <ToggleRight size={36} /> : <ToggleLeft size={36} />}
             </button>
           </div>
 
           {/* Notifications */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.82rem', borderTop: '1px solid rgba(255,255,255,0.03)', paddingTop: '16px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.82rem', borderTop: '1px solid rgba(255,255,255,0.04)', paddingTop: '14px', gap: '12px' }}>
             <div>
               <div style={{ fontWeight: 600, color: '#fff' }}>Email / SMS Safety Reports</div>
-              <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Receive summaries when opportunities are found or rebalances trigger</span>
+              <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', lineHeight: 1.3, display: 'block', marginTop: '2px' }}>Receive summaries when opportunities are found</span>
             </div>
-            <button onClick={handleToggleNotifications} style={{ background: 'none', border: 'none', cursor: 'pointer', color: settings?.notifications_enabled === 1 ? 'var(--success)' : 'var(--text-muted)' }}>
-              {settings?.notifications_enabled === 1 ? <ToggleRight size={38} /> : <ToggleLeft size={38} />}
+            <button onClick={handleToggleNotifications} style={{ background: 'none', border: 'none', cursor: 'pointer', color: settings?.notifications_enabled === 1 ? 'var(--success)' : 'var(--text-muted)', padding: 0, flexShrink: 0 }}>
+              {settings?.notifications_enabled === 1 ? <ToggleRight size={36} /> : <ToggleLeft size={36} />}
             </button>
           </div>
         </div>
@@ -138,22 +138,22 @@ export const SettingsPanel: React.FC = () => {
       </div>
 
       {/* Col 2: Connections */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
         
         {/* Connect Exchange */}
-        <div className="card-glass" style={{ padding: '24px', borderRadius: '12px', border: '1px solid var(--border)' }}>
-          <h3 style={{ fontSize: '0.9rem', fontWeight: 700, margin: '0 0 16px 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Key size={16} style={{ color: 'var(--ai-accent)' }} />
+        <div className="card-glass" style={{ padding: 'clamp(16px, 2.5vw, 24px)', borderRadius: '12px', border: '1px solid var(--border)' }}>
+          <h3 style={{ fontSize: '0.88rem', fontWeight: 700, margin: '0 0 14px 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Key size={16} style={{ color: 'var(--ai-accent)', flexShrink: 0 }} />
             CONNECT EXCHANGE API
           </h3>
 
-          <form onSubmit={handleConnectExchange} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+          <form onSubmit={handleConnectExchange} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             <div>
-              <label style={{ display: 'block', fontSize: '0.68rem', color: 'var(--text-muted)', marginBottom: '6px' }}>EXCHANGE PROVIDER</label>
+              <label style={{ display: 'block', fontSize: '0.66rem', color: 'var(--text-muted)', marginBottom: '6px' }}>EXCHANGE PROVIDER</label>
               <select 
                 value={exchangeName} 
                 onChange={(e) => setExchangeName(e.target.value)}
-                style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.03)', color: '#fff', fontSize: '0.8rem', outline: 'none' }}
+                style={{ width: '100%', padding: '10px 12px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.03)', color: '#fff', fontSize: '0.8rem', outline: 'none', boxSizing: 'border-box' }}
               >
                 <option value="binance" style={{ background: '#0e1325' }}>Binance Connection (Standard V1)</option>
                 <option value="kraken" style={{ background: '#0e1325' }}>Kraken Exchange</option>
@@ -162,7 +162,7 @@ export const SettingsPanel: React.FC = () => {
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: '0.68rem', color: 'var(--text-muted)', marginBottom: '6px' }}>API KEY</label>
+              <label style={{ display: 'block', fontSize: '0.66rem', color: 'var(--text-muted)', marginBottom: '6px' }}>API KEY</label>
               <input 
                 type="text" 
                 required
@@ -174,7 +174,7 @@ export const SettingsPanel: React.FC = () => {
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: '0.68rem', color: 'var(--text-muted)', marginBottom: '6px' }}>API SECRET</label>
+              <label style={{ display: 'block', fontSize: '0.66rem', color: 'var(--text-muted)', marginBottom: '6px' }}>API SECRET</label>
               <input 
                 type="password" 
                 required
@@ -210,8 +210,8 @@ export const SettingsPanel: React.FC = () => {
         </div>
 
         {/* KMS encryption banner */}
-        <div style={{ padding: '16px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.02)', background: 'rgba(255,255,255,0.003)', display: 'flex', gap: '10px', fontSize: '0.74rem', color: 'var(--text-secondary)', lineHeight: 1.4 }}>
-          <Server size={24} style={{ color: 'var(--primary)', flexShrink: 0 }} />
+        <div style={{ padding: '14px 16px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.02)', background: 'rgba(255,255,255,0.003)', display: 'flex', gap: '10px', fontSize: '0.74rem', color: 'var(--text-secondary)', lineHeight: 1.4 }}>
+          <Server size={22} style={{ color: 'var(--primary)', flexShrink: 0 }} />
           <span>
             API credentials are encrypted in transmission and sealed dynamically within AWS KMS key vaults. Ravora does not cache secret keys in plain text.
           </span>

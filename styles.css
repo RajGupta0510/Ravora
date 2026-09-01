@@ -9081,6 +9081,8 @@ h2 {
 @media (max-width: 768px) {
   #mobile-bottom-nav {
     display: flex !important;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    height: calc(64px + env(safe-area-inset-bottom, 0px)) !important;
   }
   .app-sidebar {
     display: none !important;
@@ -9088,13 +9090,13 @@ h2 {
   .app-main-window {
     margin-left: 0 !important;
     width: 100% !important;
-    padding: var(--space-4) var(--space-4) 88px var(--space-4) !important;
+    padding: var(--space-3) var(--space-3) calc(76px + env(safe-area-inset-bottom, 0px)) var(--space-3) !important;
   }
   
-  /* Touch target rule */
-  .btn, button, .form-input, .form-select, select {
-    min-height: 44px !important;
-    font-size: 14px !important;
+  /* Touch targets for primary UI action buttons and inputs */
+  .btn, .form-input, .form-select, select, .btn-primary, .btn-secondary {
+    min-height: 42px;
+    font-size: 14px;
   }
 
   /* Split layout to full-card on Auth screens */
@@ -9596,4 +9598,107 @@ body.ai-workspace-active .tab-content-wrapper {
   font-size: 0.7rem;
   line-height: 1.45;
   color: var(--text-secondary);
+}
+
+/* ==========================================================================
+   LANDING PAGE & DRAWER RESPONSIVE ENHANCEMENTS
+   ========================================================================== */
+
+/* Mobile Hamburger Menu */
+.mobile-menu-btn {
+  display: none;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  color: #fff;
+  padding: 8px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+.mobile-menu-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.mobile-nav-drawer {
+  position: fixed;
+  top: 76px;
+  left: 0;
+  right: 0;
+  background: rgba(6, 9, 19, 0.96);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 20px 24px 28px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  z-index: 999;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+  animation: slideDownMenu 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideDownMenu {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.mobile-nav-link {
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 1rem;
+  font-weight: 500;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  transition: color 0.2s ease, padding-left 0.2s ease;
+}
+.mobile-nav-link:hover,
+.mobile-nav-link.active-nav {
+  color: #fff;
+  padding-left: 6px;
+}
+
+@media (max-width: 900px) {
+  .nav-desktop-links {
+    display: none !important;
+  }
+  .nav-desktop-auth {
+    display: none !important;
+  }
+  .mobile-menu-btn {
+    display: flex !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .hero-mock-grid {
+    grid-template-columns: 1fr !important;
+    height: auto !important;
+    gap: 12px !important;
+  }
+  .hero-mock-col-1,
+  .hero-mock-col-2 {
+    border-right: none !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+    padding-right: 0 !important;
+    padding-bottom: 10px !important;
+  }
+  .hero-mock-col-2 {
+    height: 120px;
+  }
+}
+
+/* Responsive Table Wrapper */
+.responsive-table-container {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }

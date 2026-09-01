@@ -316,7 +316,7 @@ export const AuthCardPage: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 w-full h-full bg-[#060B17] text-white flex flex-col lg:flex-row overflow-hidden font-body">
+    <div className="fixed inset-0 w-full h-full bg-[#060B17] text-white flex flex-col lg:flex-row overflow-y-auto lg:overflow-hidden font-body">
       
       {/* Background ambient lighting */}
       <div className="absolute top-[20%] left-[10%] w-[350px] h-[350px] bg-[#4F7CFF]/5 rounded-full blur-[120px] pointer-events-none" />

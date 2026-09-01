@@ -187,20 +187,22 @@ export const AppDashboard: React.FC = () => {
         
         {/* Header Bar */}
         <header className="app-header-bar" style={{
-          height: '76px',
+          minHeight: '60px',
           borderBottom: 'var(--border-thickness) solid var(--color-border)',
-          padding: '0 var(--space-8)',
+          padding: '0 clamp(12px, 3vw, 24px)',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          background: 'rgba(6, 9, 19, 0.7)',
-          backdropFilter: 'blur(12px)',
+          background: 'rgba(6, 9, 19, 0.85)',
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(16px)',
           position: 'sticky',
           top: 0,
-          zIndex: 90
+          zIndex: 90,
+          gap: '12px'
         }}>
           <div>
-            <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--font-size-card)', fontWeight: 700, margin: 0 }}>
+            <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(0.95rem, 3.5vw, 1.15rem)', fontWeight: 700, margin: 0, whiteSpace: 'nowrap' }}>
               {activeTab === 'portfolio' && 'Wealth Workspace'}
               {activeTab === 'opportunities' && 'Araiven Scan Matrix'}
               {activeTab === 'copilot' && 'AI Portfolio Audit'}
@@ -208,20 +210,21 @@ export const AppDashboard: React.FC = () => {
             </h1>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-5)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'clamp(8px, 2vw, 16px)' }}>
             {/* Active Risk Guard tag */}
             <div style={{
               background: 'rgba(255,255,255,0.02)',
               border: 'var(--border-thickness) solid var(--color-border)',
-              padding: 'var(--space-1.5) var(--space-3)',
+              padding: '4px 10px',
               borderRadius: 'var(--radius-pill)',
-              fontSize: '0.7rem',
+              fontSize: '0.68rem',
               fontWeight: 600,
               display: 'flex',
               alignItems: 'center',
-              gap: 'var(--space-1.5)'
+              gap: '6px',
+              whiteSpace: 'nowrap'
             }}>
-              <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: getRiskStanceColor() }}></span>
+              <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: getRiskStanceColor(), flexShrink: 0 }}></span>
               <span>Guard: {getRiskStanceLabel()}</span>
             </div>
 
@@ -238,21 +241,41 @@ export const AppDashboard: React.FC = () => {
                 position: 'relative',
                 display: 'flex',
                 alignItems: 'center',
-                padding: '4px'
+                justifyContent: 'center',
+                padding: '6px'
               }}
             >
-              <Bell size={20} aria-hidden="true" />
+              <Bell size={18} aria-hidden="true" />
               {unreadNotifsCount > 0 && (
                 <span style={{
                   position: 'absolute',
-                  top: '0px',
-                  right: '0px',
-                  width: '7px',
-                  height: '7px',
+                  top: '4px',
+                  right: '4px',
+                  width: '6px',
+                  height: '6px',
                   background: 'var(--danger)',
                   borderRadius: '50%'
                 }}></span>
               )}
+            </button>
+
+            {/* Mobile-only Logout button in header */}
+            <button
+              onClick={logout}
+              className="mobile-header-logout"
+              aria-label="Log Out"
+              title="Log Out"
+              style={{
+                background: 'none',
+                border: 'none',
+                color: 'var(--text-muted)',
+                cursor: 'pointer',
+                display: 'none',
+                alignItems: 'center',
+                padding: '6px'
+              }}
+            >
+              <LogOut size={16} />
             </button>
           </div>
         </header>
@@ -262,23 +285,25 @@ export const AppDashboard: React.FC = () => {
           <div style={{
             background: 'linear-gradient(90deg, rgba(124, 58, 237, 0.15) 0%, rgba(37, 99, 235, 0.05) 100%)',
             borderBottom: 'var(--border-thickness) solid rgba(124, 58, 237, 0.2)',
-            padding: 'var(--space-3) var(--space-8)',
+            padding: '10px clamp(12px, 3vw, 24px)',
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
             fontSize: '0.78rem',
-            animation: 'fadeIn var(--motion-duration-slow) var(--motion-ease-out)'
+            animation: 'fadeIn var(--motion-duration-slow) var(--motion-ease-out)',
+            flexWrap: 'wrap',
+            gap: '8px'
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2.5)' }}>
-              <Sparkles size={14} style={{ color: 'var(--color-ai-accent)' }} />
-              <span>
-                <strong>Araiven Directive Alert:</strong> Optimization plan drafted. Rebalance USDC reserves into confident market opportunity vectors.
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: '1 1 240px' }}>
+              <Sparkles size={14} style={{ color: 'var(--color-ai-accent)', flexShrink: 0 }} />
+              <span style={{ lineHeight: 1.35 }}>
+                <strong>Araiven Directive:</strong> Optimization plan drafted. Rebalance USDC reserves into market vectors.
               </span>
             </div>
-            <div style={{ display: 'flex', gap: 'var(--space-3)' }}>
+            <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
               <button 
                 onClick={() => setActiveTab('opportunities')}
-                style={{ background: 'none', border: 'none', color: '#fff', textDecoration: 'underline', cursor: 'pointer', fontWeight: 600 }}
+                style={{ background: 'none', border: 'none', color: '#fff', textDecoration: 'underline', cursor: 'pointer', fontWeight: 600, fontSize: '0.75rem' }}
               >
                 Inspect Plan
               </button>
@@ -288,7 +313,7 @@ export const AppDashboard: React.FC = () => {
                 className="btn btn-primary"
                 style={{
                   height: '28px',
-                  padding: '0 var(--space-3)',
+                  padding: '0 12px',
                   borderRadius: 'var(--radius-sm)',
                   fontSize: '0.7rem',
                   fontWeight: 700
@@ -303,38 +328,43 @@ export const AppDashboard: React.FC = () => {
         {/* Notifications Dropdown Drawer */}
         {showNotifications && (
           <div style={{
-            position: 'absolute',
-            top: '76px',
-            right: '32px',
-            width: '340px',
-            background: 'rgba(14, 19, 37, 0.95)',
+            position: 'fixed',
+            top: '68px',
+            right: '16px',
+            left: '16px',
+            maxWidth: '360px',
+            marginLeft: 'auto',
+            background: 'rgba(14, 19, 37, 0.98)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
             border: 'var(--border-thickness) solid var(--color-border)',
             borderRadius: 'var(--radius-md)',
             boxShadow: 'var(--shadow-overlay)',
             zIndex: 999,
             maxHeight: '400px',
             overflowY: 'auto',
-            padding: 'var(--space-4)'
+            padding: '16px',
+            boxSizing: 'border-box'
           }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-3)', borderBottom: 'var(--border-thickness) solid var(--color-border-divider)', paddingBottom: 'var(--space-2)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', borderBottom: 'var(--border-thickness) solid var(--color-border-divider)', paddingBottom: '8px' }}>
               <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-secondary)' }}>NOTIFICATIONS LOG</span>
               <button 
                 onClick={() => setShowNotifications(false)} 
                 aria-label="Close Notifications Log"
-                style={{ background: 'none', border: 'none', fontSize: '0.72rem', cursor: 'pointer', color: 'var(--text-muted)', padding: 0 }}
+                style={{ background: 'none', border: 'none', fontSize: '0.75rem', cursor: 'pointer', color: 'var(--text-muted)', padding: '2px 6px' }}
               >
                 Close
               </button>
             </div>
             
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               {notifications.length === 0 ? (
-                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textAlign: 'center', padding: 'var(--space-3) 0' }}>
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textAlign: 'center', padding: '16px 0' }}>
                   No notifications recorded.
                 </div>
               ) : (
                 notifications.map((notif) => (
-                  <div key={notif.id} style={{ display: 'flex', gap: 'var(--space-2)', fontSize: '0.76rem' }}>
+                  <div key={notif.id} style={{ display: 'flex', gap: '10px', fontSize: '0.76rem' }}>
                     <ShieldAlert size={14} aria-hidden="true" style={{ color: notif.priority === 'high' ? 'var(--color-danger)' : 'var(--color-ai-accent)', flexShrink: 0, marginTop: '2px' }} />
                     <div>
                       <div style={{ fontWeight: 600, color: '#fff' }}>{notif.title}</div>
@@ -348,7 +378,7 @@ export const AppDashboard: React.FC = () => {
         )}
 
         {/* Content view routing router */}
-        <main style={{ flex: 1, padding: 'var(--space-8)' }}>
+        <main style={{ flex: 1, padding: 'clamp(12px, 3vw, 24px)' }}>
           {activeTab === 'portfolio' && <PortfolioPanel />}
           {activeTab === 'opportunities' && <OpportunitiesPanel />}
           {activeTab === 'copilot' && <CopilotChat />}
@@ -373,12 +403,21 @@ export const AppDashboard: React.FC = () => {
               onClick={() => setActiveTab(tab.id as any)}
               className={`mobile-nav-btn ${isActive ? 'active' : ''}`}
             >
-              <Icon size={20} />
+              <Icon size={18} />
               <span>{tab.label}</span>
             </button>
           );
         })}
       </div>
+
+      {/* Mobile Header Logout Media Query Style */}
+      <style>{`
+        @media (max-width: 768px) {
+          .mobile-header-logout {
+            display: flex !important;
+          }
+        }
+      `}</style>
 
     </div>
   );

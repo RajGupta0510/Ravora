@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { HelpCircle } from 'lucide-react';
+import { HelpCircle, Menu, X, ChevronRight } from 'lucide-react';
 
 interface RiskConfig {
   label: string;
@@ -27,6 +27,7 @@ export const LandingPage: React.FC = () => {
   // UI states
   const [activeNav, setActiveNav] = useState('problem-section');
   const [navbarScrolled, setNavbarScrolled] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [selectedRisk, setSelectedRisk] = useState<0 | 1 | 2>(1); // 0=Cons, 1=Mod, 2=Agg
 
   // 3D Parallax Mouse States
@@ -55,7 +56,18 @@ export const LandingPage: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // 3D scene continuous lerp tilt
+  // Close mobile menu on resize
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth > 900) {
+        setMobileMenuOpen(false);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // 3D scene continuous lerp tilt (reduced on mobile)
   useEffect(() => {
     if (!isHovered3D) {
       setTilt3D(prev => ({
@@ -232,6 +244,11 @@ export const LandingPage: React.FC = () => {
 
   const currentOpp = opportunityData[selectedAssetTab];
 
+  const handleNavClick = (sect: string) => {
+    setActiveNav(sect);
+    setMobileMenuOpen(false);
+  };
+
   return (
     <div style={{ background: 'var(--background)', color: '#fff', minHeight: '100vh', overflowX: 'hidden' }}>
 
@@ -245,19 +262,20 @@ export const LandingPage: React.FC = () => {
       {/* Navbar */}
       <nav className={`navbar ${navbarScrolled ? 'scrolled' : ''}`} style={{
         borderBottom: '1px solid var(--border)',
-        background: navbarScrolled ? 'rgba(6, 9, 19, 0.85)' : 'rgba(6, 9, 19, 0.7)',
-        backdropFilter: 'blur(12px)',
+        background: navbarScrolled ? 'rgba(6, 9, 19, 0.92)' : 'rgba(6, 9, 19, 0.8)',
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)',
         position: 'fixed',
         top: 0,
         left: 0,
-        width: 100 + '%',
+        width: '100%',
         zIndex: 1000,
         transition: 'all 0.3s ease'
       }}>
         <div className="container" style={{
           maxWidth: 'var(--max-content-width)',
           margin: '0 auto',
-          padding: '0 var(--margin-outer)',
+          padding: '0 20px',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
@@ -288,13 +306,14 @@ export const LandingPage: React.FC = () => {
             Ravora
           </a>
 
-          <ul className="nav-links" style={{ listStyle: 'none', display: 'flex', gap: '24px', margin: 0, padding: 0 }}>
+          {/* Desktop Nav Links */}
+          <ul className="nav-links nav-desktop-links" style={{ listStyle: 'none', display: 'flex', gap: '24px', margin: 0, padding: 0 }}>
             {['problem-section', 'workflow-section', 'showcase-section', 'features-section', 'faq-section'].map((sect) => (
               <li key={sect}>
                 <a
                   href={`#${sect}`}
                   className={activeNav === sect ? 'active-nav' : ''}
-                  onClick={() => setActiveNav(sect)}
+                  onClick={() => handleNavClick(sect)}
                   style={{
                     color: activeNav === sect ? '#fff' : 'var(--text-secondary)',
                     textDecoration: 'none',
@@ -313,9 +332,10 @@ export const LandingPage: React.FC = () => {
             ))}
           </ul>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          {/* Desktop Auth Buttons */}
+          <div className="nav-desktop-auth" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
             <button
-              onClick={() => navigate('/auth?mode=login')}
+              onClick={() => navigate('/auth/login')}
               style={{
                 background: 'none',
                 border: 'none',
@@ -329,25 +349,72 @@ export const LandingPage: React.FC = () => {
               Sign In
             </button>
             <button
-              onClick={() => navigate('/auth?mode=register')}
+              onClick={() => navigate('/auth/register')}
               className="btn btn-primary"
               style={{ fontSize: '0.82rem', padding: '8px 16px', height: '36px', borderRadius: '6px' }}
             >
               Start Free
             </button>
           </div>
+
+          {/* Mobile Hamburger Toggle Button */}
+          <button 
+            className="mobile-menu-btn"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label="Toggle navigation menu"
+            aria-expanded={mobileMenuOpen}
+          >
+            {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
+          </button>
         </div>
+
+        {/* Mobile Navigation Drawer */}
+        {mobileMenuOpen && (
+          <div className="mobile-nav-drawer">
+            {['problem-section', 'workflow-section', 'showcase-section', 'features-section', 'faq-section'].map((sect) => (
+              <a
+                key={sect}
+                href={`#${sect}`}
+                className={`mobile-nav-link ${activeNav === sect ? 'active-nav' : ''}`}
+                onClick={() => handleNavClick(sect)}
+              >
+                {sect === 'problem-section' && 'The Problem'}
+                {sect === 'workflow-section' && 'How It Works'}
+                {sect === 'showcase-section' && 'Showcase Matrix'}
+                {sect === 'features-section' && 'AI Features'}
+                {sect === 'faq-section' && 'FAQ'}
+              </a>
+            ))}
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '12px' }}>
+              <button
+                onClick={() => { setMobileMenuOpen(false); navigate('/auth/login'); }}
+                className="btn btn-secondary"
+                style={{ width: '100%', height: '42px', fontWeight: 600, fontSize: '0.9rem', justifyContent: 'center' }}
+              >
+                Sign In
+              </button>
+              <button
+                onClick={() => { setMobileMenuOpen(false); navigate('/auth/register'); }}
+                className="btn btn-primary"
+                style={{ width: '100%', height: '42px', fontWeight: 600, fontSize: '0.9rem', justifyContent: 'center' }}
+              >
+                Start Free
+              </button>
+            </div>
+          </div>
+        )}
       </nav>
 
       {/* Hero Section */}
-      <section className="hero" id="hero-section" style={{ paddingTop: '160px', paddingBottom: '100px' }}>
+      <section className="hero" id="hero-section" style={{ paddingTop: '130px', paddingBottom: '70px' }}>
         <div className="container" style={{
           maxWidth: 'var(--max-content-width)',
           margin: '0 auto',
-          padding: '0 var(--margin-outer)',
+          padding: '0 20px',
           display: 'grid',
-          gridTemplateColumns: '0.94fr 1.06fr',
-          gap: '60px',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(310px, 1fr))',
+          gap: '40px',
           alignItems: 'center'
         }}>
           {/* Left Text */}
@@ -368,23 +435,23 @@ export const LandingPage: React.FC = () => {
               Ravora AI-Powered Wealth Operations
             </div>
 
-            <h1 className="display-title" style={{ fontSize: '3.1rem', lineHeight: 1.15, fontFamily: 'var(--font-display)', fontWeight: 700, color: '#fff', letterSpacing: '-0.02em', margin: '0 0 10px 0' }}>
+            <h1 className="display-title" style={{ fontSize: 'clamp(2.1rem, 5.2vw, 3.1rem)', lineHeight: 1.18, fontFamily: 'var(--font-display)', fontWeight: 700, color: '#fff', letterSpacing: '-0.02em', margin: '0 0 8px 0' }}>
               Trade with <span className="text-accent-gradient">AI</span>, not emotions.
             </h1>
 
-            <p className="body-text" style={{ fontSize: '1.05rem', color: 'var(--text-secondary)', lineHeight: 1.55, margin: '0 0 16px 0', maxWidth: '500px' }}>
+            <p className="body-text" style={{ fontSize: 'clamp(0.92rem, 2.4vw, 1.05rem)', color: 'var(--text-secondary)', lineHeight: 1.55, margin: '0 0 16px 0', maxWidth: '500px' }}>
               Araiven scans global orderbooks, drafts structured execution plan ladders, explains recommendation logic, and handles simulated drawdown limits automatically.
             </p>
 
-            <div style={{ display: 'flex', gap: '12px', marginBottom: '24px' }}>
+            <div style={{ display: 'flex', gap: '12px', marginBottom: '20px', flexWrap: 'wrap', width: '100%' }}>
               <button
-                onClick={() => navigate('/auth?mode=register')}
+                onClick={() => navigate('/auth/register')}
                 className="btn btn-primary"
-                style={{ height: '44px', padding: '0 24px', fontSize: '0.9rem', borderRadius: '6px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600 }}
+                style={{ height: '44px', padding: '0 24px', fontSize: '0.9rem', borderRadius: '6px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, flex: '1 1 140px', minWidth: '140px' }}
               >
                 Start Free
               </button>
-              <a href="#showcase-section" className="btn btn-secondary" style={{ height: '44px', padding: '0 24px', fontSize: '0.9rem', borderRadius: '6px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, textDecoration: 'none', color: '#fff' }}>
+              <a href="#showcase-section" className="btn btn-secondary" style={{ height: '44px', padding: '0 24px', fontSize: '0.9rem', borderRadius: '6px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, textDecoration: 'none', color: '#fff', flex: '1 1 160px', minWidth: '160px' }}>
                 Explore Showcase
               </a>
             </div>
@@ -458,10 +525,10 @@ export const LandingPage: React.FC = () => {
                 </span>
               </div>
 
-              {/* Three column mock dashboard */}
-              <div style={{ display: 'grid', gridTemplateColumns: '0.95fr 1.3fr 0.75fr', gap: '14px', height: '240px', position: 'relative' }}>
+              {/* Responsive mock dashboard grid */}
+              <div className="hero-mock-grid" style={{ display: 'grid', gridTemplateColumns: '0.95fr 1.3fr 0.75fr', gap: '14px', minHeight: '220px', position: 'relative' }}>
                 {/* Col 1: Scanner */}
-                <div style={{ borderRight: '1px solid rgba(255,255,255,0.06)', paddingRight: '10px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <div className="hero-mock-col-1" style={{ borderRight: '1px solid rgba(255,255,255,0.06)', paddingRight: '10px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   <span style={{ fontSize: '0.65rem', fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.02em' }}>MARKET SCANNER</span>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                     {/* BTC */}
@@ -484,9 +551,9 @@ export const LandingPage: React.FC = () => {
                 </div>
 
                 {/* Col 2: Chart & Detail */}
-                <div style={{ borderRight: '1px solid rgba(255,255,255,0.06)', paddingRight: '10px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <div className="hero-mock-col-2" style={{ borderRight: '1px solid rgba(255,255,255,0.06)', paddingRight: '10px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   <span style={{ fontSize: '0.65rem', fontWeight: 700, color: 'var(--text-muted)' }}>ACTIVE CHART</span>
-                  <div style={{ flex: 1, background: 'rgba(255,255,255,0.01)', border: '1px solid rgba(255,255,255,0.04)', borderRadius: '6px', position: 'relative', overflow: 'hidden' }}>
+                  <div style={{ flex: 1, minHeight: '80px', background: 'rgba(255,255,255,0.01)', border: '1px solid rgba(255,255,255,0.04)', borderRadius: '6px', position: 'relative', overflow: 'hidden' }}>
                     <svg viewBox="0 0 200 100" style={{ width: '100%', height: '100%' }}>
                       <path
                         d="M10 80 Q 40 40 90 60 T 190 20"
@@ -505,7 +572,7 @@ export const LandingPage: React.FC = () => {
                 </div>
 
                 {/* Col 3: Execute Target */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', justifyContent: 'space-between' }}>
+                <div className="hero-mock-col-3" style={{ display: 'flex', flexDirection: 'column', gap: '8px', justifyContent: 'space-between' }}>
                   <span style={{ fontSize: '0.65rem', fontWeight: 700, color: 'var(--text-muted)' }}>EXECUTION</span>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', flex: 1, justifyContent: 'center' }}>
                     <div style={{ fontSize: '0.6rem', color: 'var(--text-secondary)' }}>Entry Target:</div>
@@ -521,8 +588,8 @@ export const LandingPage: React.FC = () => {
                       background: simState === 'deployed' ? 'rgba(16, 185, 129, 0.15)' : (simState === 'plan-active' ? 'var(--gradient-primary)' : 'rgba(255,255,255,0.03)'),
                       border: simState === 'deployed' ? '1px solid var(--success)' : '1px solid rgba(255,255,255,0.06)',
                       borderRadius: '4px',
-                      padding: '6px 0',
-                      fontSize: '0.62rem',
+                      padding: '8px 0',
+                      fontSize: '0.65rem',
                       fontWeight: 600,
                       color: simState === 'deployed' ? '#10b981' : '#fff',
                       cursor: simState === 'plan-active' ? 'pointer' : 'default',
@@ -536,59 +603,61 @@ export const LandingPage: React.FC = () => {
             </div>
           </div>
         </div>
-      </section>
-
       {/* The Problem Section */}
-      <section id="problem-section" style={{ padding: '80px 0', borderTop: '1px solid var(--border)' }}>
-        <div className="container" style={{ maxWidth: '1000px', margin: '0 auto', padding: '0 24px', textAlign: 'center' }}>
-          <h2 className="section-title" style={{ marginBottom: '16px' }}>Traditional trading terminals are designed for active stress.</h2>
-          <p className="body-text" style={{ color: 'var(--text-secondary)', fontSize: '1rem', lineHeight: '1.6', maxWidth: '700px', margin: '0 auto' }}>
+      <section id="problem-section" style={{ padding: '60px 0', borderTop: '1px solid var(--border)' }}>
+        <div className="container" style={{ maxWidth: '1000px', margin: '0 auto', padding: '0 20px', textAlign: 'center' }}>
+          <h2 className="section-title" style={{ fontSize: 'clamp(1.4rem, 3.5vw, 2rem)', marginBottom: '16px', lineHeight: 1.3 }}>
+            Traditional trading terminals are designed for active stress.
+          </h2>
+          <p className="body-text" style={{ color: 'var(--text-secondary)', fontSize: 'clamp(0.9rem, 2.2vw, 1rem)', lineHeight: '1.6', maxWidth: '700px', margin: '0 auto' }}>
             Watching candle charts, managing order grids, and setting alarms wastes time. Ravora changes the paradigm: you define your capital, horizon, and drawdown limits, and our AI (Araiven) constructs structured execution plans for you to approve in one click.
           </p>
         </div>
       </section>
 
       {/* Interactive Risk Profile & Showcase Section */}
-      <section id="showcase-section" style={{ padding: '80px 0', background: 'rgba(255,255,255,0.01)', borderTop: '1px solid var(--border)' }}>
-        <div className="container" style={{ maxWidth: 'var(--max-content-width)', margin: '0 auto', padding: '0 24px' }}>
-          <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-            <h2 className="section-title">Interactive Risk Sync & Diversification Matrix</h2>
-            <p className="body-text" style={{ color: 'var(--text-secondary)', maxWidth: '600px', margin: '8px auto 0' }}>
+      <section id="showcase-section" style={{ padding: '60px 0', background: 'rgba(255,255,255,0.01)', borderTop: '1px solid var(--border)' }}>
+        <div className="container" style={{ maxWidth: 'var(--max-content-width)', margin: '0 auto', padding: '0 20px' }}>
+          <div style={{ textAlign: 'center', marginBottom: '36px' }}>
+            <h2 className="section-title" style={{ fontSize: 'clamp(1.4rem, 3.5vw, 2rem)' }}>Interactive Risk Sync & Diversification Matrix</h2>
+            <p className="body-text" style={{ color: 'var(--text-secondary)', maxWidth: '600px', margin: '8px auto 0', fontSize: '0.9rem' }}>
               Choose a guard profile to preview the allocation adjustments drafted automatically by Araiven.
             </p>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '0.8fr 1.2fr', gap: '40px', alignItems: 'stretch' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '30px', alignItems: 'stretch' }}>
             {/* Controls */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', justifyContent: 'center' }}>
-              <div className="filter-segmented" style={{ display: 'flex', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', padding: '4px' }}>
+              <div className="filter-segmented" style={{ display: 'flex', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', padding: '4px', flexWrap: 'wrap', gap: '4px' }}>
                 {([0, 1, 2] as const).map((v) => (
                   <button
                     key={v}
                     onClick={() => setSelectedRisk(v)}
                     className={`segmented-tab ${selectedRisk === v ? 'active' : ''}`}
                     style={{
-                      flex: 1,
-                      padding: '10px 0',
+                      flex: '1 1 90px',
+                      padding: '10px 4px',
                       border: 'none',
                       background: selectedRisk === v ? 'var(--gradient-primary)' : 'transparent',
                       color: selectedRisk === v ? '#fff' : 'var(--text-secondary)',
                       borderRadius: '6px',
                       cursor: 'pointer',
-                      fontSize: '0.78rem',
+                      fontSize: '0.76rem',
                       fontWeight: 600,
-                      transition: 'all 0.2s'
+                      transition: 'all 0.2s',
+                      whiteSpace: 'nowrap',
+                      textAlign: 'center'
                     }}
                   >
                     {v === 0 && 'Conservative'}
-                    {v === 1 && 'Balanced Shield'}
-                    {v === 2 && 'Aggressive Swing'}
+                    {v === 1 && 'Balanced'}
+                    {v === 2 && 'Aggressive'}
                   </button>
                 ))}
               </div>
 
-              <div className="card-glass" style={{ padding: '24px', borderRadius: '12px', border: '1px solid var(--border)', background: 'rgba(14, 19, 37, 0.4)' }}>
-                <h3 style={{ fontSize: '1.05rem', marginBottom: '12px', fontWeight: 600 }}>Guard parameters</h3>
+              <div className="card-glass" style={{ padding: '20px', borderRadius: '12px', border: '1px solid var(--border)', background: 'rgba(14, 19, 37, 0.4)' }}>
+                <h3 style={{ fontSize: '1rem', marginBottom: '12px', fontWeight: 600 }}>Guard parameters</h3>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem' }}>
                     <span style={{ color: 'var(--text-secondary)' }}>Stance Profile:</span>
@@ -607,13 +676,13 @@ export const LandingPage: React.FC = () => {
             </div>
 
             {/* Dashboard Mock */}
-            <div className="card-glass" style={{ padding: '24px', borderRadius: '12px', border: '1px solid var(--border)', display: 'grid', gridTemplateColumns: '1.1fr 0.9fr', gap: '24px' }}>
+            <div className="card-glass" style={{ padding: '20px', borderRadius: '12px', border: '1px solid var(--border)', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '20px' }}>
               <div>
                 <span style={{ fontSize: '0.62rem', fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.05em' }}>PORTFOLIO BALANCE</span>
-                <div style={{ fontSize: '1.8rem', fontWeight: 700, color: '#fff', margin: '4px 0' }}>{currentRisk.balance}</div>
+                <div style={{ fontSize: '1.6rem', fontWeight: 700, color: '#fff', margin: '4px 0' }}>{currentRisk.balance}</div>
                 <div style={{ fontSize: '0.78rem', color: '#10b981', fontWeight: 600 }}>{currentRisk.growth}</div>
 
-                <div style={{ marginTop: '20px', height: '120px', border: '1px solid rgba(255,255,255,0.03)', borderRadius: '8px', background: 'rgba(255,255,255,0.01)', position: 'relative' }}>
+                <div style={{ marginTop: '16px', height: '110px', border: '1px solid rgba(255,255,255,0.03)', borderRadius: '8px', background: 'rgba(255,255,255,0.01)', position: 'relative' }}>
                   <svg viewBox="0 0 200 50" style={{ width: '100%', height: '100%' }}>
                     <path d={currentRisk.chartD} fill="none" stroke="var(--primary)" strokeWidth="2" style={{ transition: 'd 0.3s' }} />
                     <path d={currentRisk.chartGradD} fill="rgba(37,99,235,0.03)" style={{ transition: 'd 0.3s' }} />
@@ -622,7 +691,7 @@ export const LandingPage: React.FC = () => {
                 </div>
               </div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', justifyContent: 'center' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', justifyContent: 'center' }}>
                 <span style={{ fontSize: '0.62rem', fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.05em' }}>DIVERSIFICATION SCALING</span>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   {[
@@ -649,11 +718,11 @@ export const LandingPage: React.FC = () => {
       </section>
 
       {/* How it works: Sequential AI reasoning pipeline */}
-      <section id="workflow-section" style={{ padding: '80px 0', borderTop: '1px solid var(--border)' }}>
-        <div className="container" style={{ maxWidth: 'var(--max-content-width)', margin: '0 auto', padding: '0 24px' }}>
-          <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-            <h2 className="section-title">How Araiven Evaluates Market Feeds</h2>
-            <p className="body-text" style={{ color: 'var(--text-secondary)', maxWidth: '600px', margin: '8px auto 0' }}>
+      <section id="workflow-section" style={{ padding: '60px 0', borderTop: '1px solid var(--border)' }}>
+        <div className="container" style={{ maxWidth: 'var(--max-content-width)', margin: '0 auto', padding: '0 20px' }}>
+          <div style={{ textAlign: 'center', marginBottom: '36px' }}>
+            <h2 className="section-title" style={{ fontSize: 'clamp(1.4rem, 3.5vw, 2rem)' }}>How Araiven Evaluates Market Feeds</h2>
+            <p className="body-text" style={{ color: 'var(--text-secondary)', maxWidth: '600px', margin: '8px auto 0', fontSize: '0.9rem' }}>
               Araiven processes continuous feeds sequentially to arrive at execution-ready target rebalances.
             </p>
           </div>
@@ -676,16 +745,16 @@ export const LandingPage: React.FC = () => {
                 key={step.id}
                 style={{
                   display: 'flex',
-                  gap: '16px',
+                  gap: '14px',
                   alignItems: 'flex-start',
                   position: 'relative',
-                  opacity: pipelineStep === step.id ? 1 : 0.4,
+                  opacity: pipelineStep === step.id ? 1 : 0.45,
                   transition: 'opacity 0.3s'
                 }}
               >
                 <div style={{
-                  width: '34px',
-                  height: '34px',
+                  width: '32px',
+                  height: '32px',
                   borderRadius: '50%',
                   background: pipelineStep === step.id ? 'var(--gradient-primary)' : 'rgba(255,255,255,0.02)',
                   border: '1px solid rgba(255,255,255,0.08)',
@@ -693,13 +762,14 @@ export const LandingPage: React.FC = () => {
                   alignItems: 'center',
                   justifyContent: 'center',
                   fontWeight: 'bold',
-                  fontSize: '0.82rem',
+                  fontSize: '0.8rem',
                   zIndex: 2,
-                  color: '#fff'
+                  color: '#fff',
+                  flexShrink: 0
                 }}>{step.id}</div>
                 <div>
-                  <h4 style={{ fontSize: '0.9rem', fontWeight: 600, color: pipelineStep === step.id ? 'var(--ai-accent)' : '#fff' }}>{step.title}</h4>
-                  <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '4px' }}>{step.desc}</p>
+                  <h4 style={{ fontSize: '0.88rem', fontWeight: 600, color: pipelineStep === step.id ? 'var(--ai-accent)' : '#fff', margin: '0 0 4px 0' }}>{step.title}</h4>
+                  <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.45 }}>{step.desc}</p>
                 </div>
               </div>
             ))}
@@ -708,18 +778,18 @@ export const LandingPage: React.FC = () => {
       </section>
 
       {/* Fed Interest Rate Scenario Simulator Section */}
-      <section style={{ padding: '80px 0', borderTop: '1px solid var(--border)', background: 'rgba(255,255,255,0.01)' }}>
-        <div className="container" style={{ maxWidth: '900px', margin: '0 auto', padding: '0 24px' }}>
+      <section style={{ padding: '60px 0', borderTop: '1px solid var(--border)', background: 'rgba(255,255,255,0.01)' }}>
+        <div className="container" style={{ maxWidth: '900px', margin: '0 auto', padding: '0 20px' }}>
           <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-            <h2 className="section-title">Macro Event Ingestion Simulator</h2>
-            <p className="body-text" style={{ color: 'var(--text-secondary)', marginTop: '6px' }}>
+            <h2 className="section-title" style={{ fontSize: 'clamp(1.4rem, 3.5vw, 2rem)' }}>Macro Event Ingestion Simulator</h2>
+            <p className="body-text" style={{ color: 'var(--text-secondary)', marginTop: '6px', fontSize: '0.9rem' }}>
               Simulate how Araiven intercepts major global announcements and protects asset allocations dynamically.
             </p>
           </div>
 
-          <div className="card-glass" style={{ padding: '24px', borderRadius: '12px', border: '1px solid var(--border)', display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: '30px' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+          <div className="card-glass" style={{ padding: '20px', borderRadius: '12px', border: '1px solid var(--border)', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                 <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: simInteractiveStep === 5 ? '#10b981' : '#f59e0b' }}></span>
                 <span style={{ fontFamily: 'monospace', fontSize: '0.72rem', color: 'var(--text-secondary)' }}>
                   SIMULATOR STATUS LOG
@@ -729,11 +799,12 @@ export const LandingPage: React.FC = () => {
                 background: 'rgba(0,0,0,0.3)',
                 border: '1px solid rgba(255,255,255,0.04)',
                 borderRadius: '8px',
-                padding: '16px',
+                padding: '14px',
                 fontFamily: 'monospace',
                 fontSize: '0.75rem',
-                minHeight: '80px',
-                color: simInteractiveStep === 5 ? '#10b981' : (simInteractiveStep > 0 ? '#3b82f6' : '#94a3b8')
+                minHeight: '76px',
+                color: simInteractiveStep === 5 ? '#10b981' : (simInteractiveStep > 0 ? '#3b82f6' : '#94a3b8'),
+                lineHeight: 1.45
               }}>{simStatusText}</div>
 
               <button
@@ -743,7 +814,9 @@ export const LandingPage: React.FC = () => {
                 style={{
                   height: '42px',
                   fontWeight: 600,
-                  fontSize: '0.85rem'
+                  fontSize: '0.85rem',
+                  width: '100%',
+                  justifyContent: 'center'
                 }}
               >
                 {simInteractiveStep > 0 && simInteractiveStep < 5 ? 'Analyzing...' : 'Simulate Fed CPI Announcement'}
@@ -763,20 +836,21 @@ export const LandingPage: React.FC = () => {
                   alignItems: 'center',
                   gap: '8px',
                   fontSize: '0.78rem',
-                  opacity: simInteractiveStep >= idx + 1 ? 1 : 0.3,
+                  opacity: simInteractiveStep >= idx + 1 ? 1 : 0.4,
                   transition: 'opacity 0.2s'
                 }}>
                   <span style={{
-                    width: '16px',
-                    height: '16px',
+                    width: '18px',
+                    height: '18px',
                     borderRadius: '50%',
                     background: simInteractiveStep >= idx + 1 ? '#10b981' : 'rgba(255,255,255,0.05)',
                     color: '#fff',
-                    fontSize: '0.6rem',
+                    fontSize: '0.65rem',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    fontWeight: 'bold'
+                    fontWeight: 'bold',
+                    flexShrink: 0
                   }}>{simInteractiveStep >= idx + 1 ? '✓' : idx + 1}</span>
                   <span style={{ color: simInteractiveStep === idx + 1 ? 'var(--ai-accent)' : '#fff' }}>{label}</span>
                 </div>
@@ -787,27 +861,27 @@ export const LandingPage: React.FC = () => {
       </section>
 
       {/* Opportunity Scans Demo */}
-      <section id="features-section" style={{ padding: '80px 0', borderTop: '1px solid var(--border)' }}>
-        <div className="container" style={{ maxWidth: 'var(--max-content-width)', margin: '0 auto', padding: '0 24px' }}>
+      <section id="features-section" style={{ padding: '60px 0', borderTop: '1px solid var(--border)' }}>
+        <div className="container" style={{ maxWidth: 'var(--max-content-width)', margin: '0 auto', padding: '0 20px' }}>
           <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-            <h2 className="section-title">Active AI Opportunity Signals</h2>
-            <p className="body-text" style={{ color: 'var(--text-secondary)', maxWidth: '500px', margin: '8px auto 0' }}>
+            <h2 className="section-title" style={{ fontSize: 'clamp(1.4rem, 3.5vw, 2rem)' }}>Active AI Opportunity Signals</h2>
+            <p className="body-text" style={{ color: 'var(--text-secondary)', maxWidth: '500px', margin: '8px auto 0', fontSize: '0.9rem' }}>
               Araiven generates confidence gauges and risk metrics for each scanned market.
             </p>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '0.8fr 1.2fr', gap: '40px', alignItems: 'stretch' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '30px', alignItems: 'stretch' }}>
             {/* Tabs */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', justifyContent: 'center' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', justifyContent: 'center' }}>
               {(['eth', 'btc', 'yield'] as const).map((asset) => (
                 <button
                   key={asset}
                   onClick={() => setSelectedAssetTab(asset)}
                   className={`card-glass ${selectedAssetTab === asset ? 'active' : ''}`}
                   style={{
-                    padding: '16px 20px',
+                    padding: '14px 18px',
                     borderRadius: '10px',
-                    border: '1px solid var(--border)',
+                    border: selectedAssetTab === asset ? '1px solid var(--primary)' : '1px solid var(--border)',
                     background: selectedAssetTab === asset ? 'rgba(124, 58, 237, 0.08)' : 'rgba(14, 19, 37, 0.3)',
                     color: '#fff',
                     textAlign: 'left',
@@ -817,10 +891,10 @@ export const LandingPage: React.FC = () => {
                   }}
                 >
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ fontWeight: 700, fontSize: '0.9rem' }}>
+                    <span style={{ fontWeight: 700, fontSize: '0.88rem' }}>
                       {asset === 'eth' && 'Ethereum Staking'}
                       {asset === 'btc' && 'Bitcoin Inflows'}
-                      {asset === 'yield' && 'Hedged stable pools'}
+                      {asset === 'yield' && 'Hedged Stable Pools'}
                     </span>
                     <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontFamily: 'monospace' }}>
                       {opportunityData[asset].symbol}
@@ -831,38 +905,38 @@ export const LandingPage: React.FC = () => {
             </div>
 
             {/* Info display */}
-            <div className="card-glass" style={{ padding: '24px', borderRadius: '12px', border: '1px solid var(--border)', display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: '30px' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            <div className="card-glass" style={{ padding: '20px', borderRadius: '12px', border: '1px solid var(--border)', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '24px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                   <span style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'rgba(255,255,255,0.03)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>
                     {currentOpp.icon}
                   </span>
                   <div>
-                    <h3 style={{ fontSize: '1.05rem', fontWeight: 700 }}>{currentOpp.name}</h3>
+                    <h3 style={{ fontSize: '1rem', fontWeight: 700, margin: 0 }}>{currentOpp.name}</h3>
                     <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>Strategy: {currentOpp.strategy}</span>
                   </div>
                 </div>
 
-                <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: 1.5, margin: 0 }}>
                   {currentOpp.reasoning}
                 </p>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginTop: '10px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginTop: '4px' }}>
                   <div>
                     <span style={{ fontSize: '0.62rem', color: 'var(--text-muted)', letterSpacing: '0.05em' }}>EXPECTED RETURN</span>
-                    <div style={{ fontSize: '0.9rem', fontWeight: 700, marginTop: '2px' }}>{currentOpp.return}</div>
+                    <div style={{ fontSize: '0.88rem', fontWeight: 700, marginTop: '2px' }}>{currentOpp.return}</div>
                   </div>
                   <div>
                     <span style={{ fontSize: '0.62rem', color: 'var(--text-muted)', letterSpacing: '0.05em' }}>RISK RATING</span>
-                    <div style={{ fontSize: '0.9rem', fontWeight: 700, marginTop: '2px', color: selectedAssetTab === 'btc' ? 'var(--ai-accent)' : '#10b981' }}>{currentOpp.risk}</div>
+                    <div style={{ fontSize: '0.88rem', fontWeight: 700, marginTop: '2px', color: selectedAssetTab === 'btc' ? 'var(--ai-accent)' : '#10b981' }}>{currentOpp.risk}</div>
                   </div>
                 </div>
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                <span style={{ fontSize: '0.62rem', color: 'var(--text-muted)', letterSpacing: '0.05em', marginBottom: '14px' }}>AI CONFIDENCE</span>
-                <div style={{ position: 'relative', width: '100px', height: '100px' }}>
-                  <svg width="100" height="100" viewBox="0 0 100 100">
+                <span style={{ fontSize: '0.62rem', color: 'var(--text-muted)', letterSpacing: '0.05em', marginBottom: '10px' }}>AI CONFIDENCE</span>
+                <div style={{ position: 'relative', width: '90px', height: '90px' }}>
+                  <svg width="90" height="90" viewBox="0 0 100 100">
                     <circle cx="50" cy="50" r="40" fill="none" stroke="rgba(255,255,255,0.02)" strokeWidth="8" />
                     <circle
                       cx="50"
@@ -877,7 +951,7 @@ export const LandingPage: React.FC = () => {
                       style={{ transition: 'stroke-dashoffset 0.5s' }}
                     />
                   </svg>
-                  <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', fontSize: '1.25rem', fontWeight: 700 }}>
+                  <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', fontSize: '1.15rem', fontWeight: 700 }}>
                     {currentOpp.confidence}
                   </div>
                 </div>
@@ -888,29 +962,29 @@ export const LandingPage: React.FC = () => {
       </section>
 
       {/* FAQ */}
-      <section id="faq-section" style={{ padding: '80px 0', borderTop: '1px solid var(--border)', background: 'rgba(255,255,255,0.005)' }}>
-        <div className="container" style={{ maxWidth: '800px', margin: '0 auto', padding: '0 24px' }}>
-          <h2 className="section-title" style={{ textAlign: 'center', marginBottom: '32px' }}>Frequently Asked Questions</h2>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+      <section id="faq-section" style={{ padding: '60px 0', borderTop: '1px solid var(--border)', background: 'rgba(255,255,255,0.005)' }}>
+        <div className="container" style={{ maxWidth: '800px', margin: '0 auto', padding: '0 20px' }}>
+          <h2 className="section-title" style={{ textAlign: 'center', marginBottom: '28px', fontSize: 'clamp(1.4rem, 3.5vw, 2rem)' }}>Frequently Asked Questions</h2>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             {[
               { q: 'Is my capital safe?', a: 'Ravora has withdrawal permissions locked out. We connect to your exchange via read-only and trade-execution API keys. Ravora cannot withdraw your funds.' },
               { q: 'What is Araiven?', a: 'Araiven is the underlying intelligence framework. It operates as a strict math model calculating index values, volatility thresholds, and rebalancing parameters autonomously.' },
               { q: 'How does paper trading work?', a: 'Paper trading uses our live price streams to let you deploy virtual balances ($100k) into proposed opportunities without risk.' }
             ].map((item, idx) => (
-              <div key={idx} className="card-glass" style={{ padding: '20px', borderRadius: '8px', border: '1px solid var(--border)', background: 'rgba(14, 19, 37, 0.2)' }}>
-                <h4 style={{ fontSize: '0.9rem', fontWeight: 600, display: 'flex', gap: '8px', alignItems: 'center' }}>
-                  <HelpCircle size={15} style={{ color: 'var(--ai-accent)' }} />
+              <div key={idx} className="card-glass" style={{ padding: '18px', borderRadius: '10px', border: '1px solid var(--border)', background: 'rgba(14, 19, 37, 0.2)' }}>
+                <h4 style={{ fontSize: '0.88rem', fontWeight: 600, display: 'flex', gap: '8px', alignItems: 'center', margin: '0 0 6px 0' }}>
+                  <HelpCircle size={15} style={{ color: 'var(--ai-accent)', flexShrink: 0 }} />
                   {item.q}
                 </h4>
-                <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '8px', lineHeight: 1.45 }}>{item.a}</p>
+                <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.45 }}>{item.a}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      <footer style={{ padding: '40px 0', borderTop: '1px solid var(--border)', textAlign: 'center', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-        <p>© 2026 Ravora Intelligence Operating System. Managed in Sandbox Developer Mode.</p>
+      <footer style={{ padding: '32px 20px', borderTop: '1px solid var(--border)', textAlign: 'center', fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+        <p style={{ margin: 0 }}>© 2026 Ravora Intelligence Operating System. Managed in Sandbox Developer Mode.</p>
       </footer>
 
     </div>
@@ -918,3 +992,4 @@ export const LandingPage: React.FC = () => {
 };
 
 export default LandingPage;
+

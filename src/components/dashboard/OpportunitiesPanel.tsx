@@ -84,11 +84,11 @@ export const OpportunitiesPanel: React.FC = () => {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', position: 'relative' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', position: 'relative' }}>
       
       {/* Top Controls: Scan & Filter */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div className="filter-segmented" style={{ display: 'flex', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '6px', padding: '2px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+        <div className="filter-segmented" style={{ display: 'flex', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '6px', padding: '2px', flexWrap: 'wrap', gap: '2px' }}>
           {(['ALL', 'LONG', 'SHORT'] as const).map((t) => (
             <button
               key={t}
@@ -130,7 +130,7 @@ export const OpportunitiesPanel: React.FC = () => {
       </div>
 
       {/* Grid List */}
-      <div className="opportunities-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '20px' }}>
+      <div className="opportunities-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px' }}>
         {filteredOpps.length === 0 ? (
           <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: '48px 0', color: 'var(--text-muted)', fontSize: '0.8rem' }}>
             No opportunities matching that criteria were ingested in this epoch.
@@ -148,22 +148,22 @@ export const OpportunitiesPanel: React.FC = () => {
               }}
               className="card-glass"
               style={{
-                padding: 'var(--space-5)',
-                borderRadius: 'var(--radius-md)',
-                border: 'var(--border-thickness) solid var(--color-border)',
+                padding: '16px',
+                borderRadius: '12px',
+                border: '1px solid var(--border)',
                 cursor: 'pointer',
-                transition: 'all var(--transition-hover)',
+                transition: 'all 0.2s ease',
                 display: 'flex',
                 flexDirection: 'column',
-                gap: 'var(--space-3.5)',
+                gap: '12px',
                 background: 'rgba(14, 19, 37, 0.3)'
               }}
               onMouseOver={(e) => e.currentTarget.style.borderColor = 'var(--color-border-hover)'}
               onMouseOut={(e) => e.currentTarget.style.borderColor = 'var(--color-border)'}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-                  <div style={{ width: '28px', height: '28px', borderRadius: 'var(--radius-pill)', background: 'rgba(255,255,255,0.03)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'rgba(255,255,255,0.03)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '0.85rem' }}>
                     {opp.icon}
                   </div>
                   <div>
@@ -172,7 +172,7 @@ export const OpportunitiesPanel: React.FC = () => {
                   </div>
                 </div>
                 
-                <span className={`badge-ds ${opp.type === 'LONG' ? 'badge-long' : (opp.type === 'SHORT' ? 'badge-short' : 'badge-hold')}`} style={{ fontSize: '0.62rem' }}>
+                <span className={`badge-ds ${opp.type === 'LONG' ? 'badge-long' : (opp.type === 'SHORT' ? 'badge-short' : 'badge-hold')}`} style={{ fontSize: '0.62rem', padding: '2px 6px' }}>
                   {opp.type}
                 </span>
               </div>
@@ -181,7 +181,7 @@ export const OpportunitiesPanel: React.FC = () => {
                 {opp.reasoningText}
               </p>
 
-              <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: 'var(--border-thickness) dashed var(--color-border-divider)', paddingTop: 'var(--space-3)', fontSize: '0.75rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px dashed rgba(255,255,255,0.04)', paddingTop: '10px', fontSize: '0.75rem' }}>
                 <div>
                   <span style={{ color: 'var(--text-muted)' }}>Confidence:</span>
                   <span style={{ fontWeight: 700, marginLeft: '4px', color: 'var(--success)' }}>{opp.confidenceScore}%</span>
@@ -203,58 +203,60 @@ export const OpportunitiesPanel: React.FC = () => {
           top: 0,
           right: 0,
           bottom: 0,
-          width: '460px',
-          background: 'rgba(14, 19, 37, 0.96)',
-          backdropFilter: 'blur(16px)',
-          borderLeft: 'var(--border-thickness) solid var(--color-border)',
+          width: '100%',
+          maxWidth: '460px',
+          background: 'rgba(14, 19, 37, 0.98)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          borderLeft: '1px solid var(--border)',
           zIndex: 999,
-          padding: 'var(--space-8)',
+          padding: 'clamp(16px, 3vw, 24px)',
           boxSizing: 'border-box',
           display: 'flex',
           flexDirection: 'column',
-          gap: '24px',
-          boxShadow: '-20px 0 40px rgba(0,0,0,0.5)',
-          animation: 'slideIn 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
+          gap: '18px',
+          boxShadow: '-20px 0 40px rgba(0,0,0,0.6)',
+          animation: 'slideIn 0.22s cubic-bezier(0.16, 1, 0.3, 1)'
         }}>
           {/* Header */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.03)', paddingBottom: '16px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.04)', paddingBottom: '14px' }}>
             <div>
-              <h2 style={{ fontSize: '1.15rem', fontWeight: 700, margin: 0 }}>{selectedOpp.symbol} Plan Details</h2>
+              <h2 style={{ fontSize: '1.1rem', fontWeight: 700, margin: 0 }}>{selectedOpp.symbol} Plan Details</h2>
               <span style={{ fontSize: '0.72rem', color: 'var(--text-secondary)' }}>Scanned by Araiven Core</span>
             </div>
             <button 
               onClick={() => setSelectedOpp(null)}
               aria-label="Close Details Dialog"
-              style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: '1.2rem' }}
+              style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: '1.3rem', padding: '4px 8px' }}
             >
               ✕
             </button>
           </div>
 
-          <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '20px', paddingRight: '4px' }}>
+          <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '16px', paddingRight: '2px' }}>
             
             {/* Confidence & Risk Level row */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-              <div className="card-glass" style={{ padding: '12px 16px', borderRadius: '8px', border: '1px solid var(--border)', background: 'rgba(255,255,255,0.01)' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '10px' }}>
+              <div className="card-glass" style={{ padding: '12px 14px', borderRadius: '8px', border: '1px solid var(--border)', background: 'rgba(255,255,255,0.01)' }}>
                 <span style={{ fontSize: '0.62rem', color: 'var(--text-muted)' }}>CONFIDENCE INDEX</span>
-                <div style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--success)', marginTop: '2px' }}>{selectedOpp.confidenceScore}%</div>
+                <div style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--success)', marginTop: '2px' }}>{selectedOpp.confidenceScore}%</div>
               </div>
-              <div className="card-glass" style={{ padding: '12px 16px', borderRadius: '8px', border: '1px solid var(--border)', background: 'rgba(255,255,255,0.01)' }}>
+              <div className="card-glass" style={{ padding: '12px 14px', borderRadius: '8px', border: '1px solid var(--border)', background: 'rgba(255,255,255,0.01)' }}>
                 <span style={{ fontSize: '0.62rem', color: 'var(--text-muted)' }}>RISK LEVEL</span>
-                <div style={{ fontSize: '1.15rem', fontWeight: 700, color: selectedOpp.riskLevel === 'low' ? '#10b981' : 'var(--danger)', marginTop: '2px', textTransform: 'capitalize' }}>
+                <div style={{ fontSize: '1.1rem', fontWeight: 700, color: selectedOpp.riskLevel === 'low' ? '#10b981' : 'var(--danger)', marginTop: '2px', textTransform: 'capitalize' }}>
                   {selectedOpp.riskLevel}
                 </div>
               </div>
             </div>
 
             {/* Exit parameters */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
               <span style={{ fontSize: '0.62rem', fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.05em' }}>PROPOSED ORDER LADDER</span>
               <div style={{
-                background: 'rgba(0,0,0,0.2)',
+                background: 'rgba(0,0,0,0.25)',
                 border: '1px solid rgba(255,255,255,0.03)',
                 borderRadius: '8px',
-                padding: '16px',
+                padding: '14px',
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '10px',
@@ -276,25 +278,25 @@ export const OpportunitiesPanel: React.FC = () => {
             </div>
 
             {/* AI Text explanation */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
               <span style={{ fontSize: '0.62rem', fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.05em' }}>QUANT REASONING STATEMENT</span>
               <p style={{
                 fontSize: '0.78rem',
                 color: 'var(--text-secondary)',
                 lineHeight: 1.5,
                 background: 'rgba(255,255,255,0.005)',
-                border: '1px solid rgba(255,255,255,0.01)',
-                padding: '14px',
+                border: '1px solid rgba(255,255,255,0.02)',
+                padding: '12px',
                 borderRadius: '8px',
                 margin: 0
               }}>{selectedOpp.reasoningText}</p>
             </div>
 
             {/* Order execution form */}
-            <form onSubmit={handleDeploy} style={{ borderTop: '1px solid rgba(255,255,255,0.04)', paddingTop: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <form onSubmit={handleDeploy} style={{ borderTop: '1px solid rgba(255,255,255,0.04)', paddingTop: '16px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
               <h3 style={{ fontSize: '0.85rem', fontWeight: 700, margin: 0 }}>Deploy Sandbox Capital</h3>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: '12px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '10px' }}>
                 <div>
                   <label style={{ display: 'block', fontSize: '0.62rem', color: 'var(--text-muted)', marginBottom: '6px' }}>ALLOCATE CAPITAL ($)</label>
                   <input 

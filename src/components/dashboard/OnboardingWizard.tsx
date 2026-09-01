@@ -113,7 +113,7 @@ export const OnboardingWizard: React.FC = () => {
       zIndex: 999,
       color: '#fff',
       fontFamily: 'var(--font-body)',
-      padding: '24px',
+      padding: 'clamp(12px, 3vw, 24px)',
       boxSizing: 'border-box',
       overflowY: 'auto'
     }}>
@@ -127,25 +127,27 @@ export const OnboardingWizard: React.FC = () => {
       <div className="auth-form-card" style={{
         width: '100%',
         maxWidth: step === 1 ? '480px' : (step === 7 ? '640px' : '580px'),
-        padding: 'var(--space-9)',
-        background: 'rgba(14, 19, 37, 0.85)',
+        padding: 'clamp(20px, 4vw, 36px)',
+        background: 'rgba(14, 19, 37, 0.9)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
         border: 'var(--border-thickness) solid var(--color-border)',
         borderRadius: 'var(--radius-lg)',
         boxShadow: 'var(--shadow-overlay)',
         boxSizing: 'border-box',
         display: 'flex',
         flexDirection: 'column',
-        gap: 'var(--space-6)',
+        gap: '20px',
         transition: 'max-width var(--motion-duration-slow) var(--motion-ease-in-out)'
       }}>
         
         {/* Progress Tracker (Only shown after Step 1) */}
         {step > 1 && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1.5)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <Sparkles size={14} style={{ color: 'var(--color-ai-accent)' }} />
-                <span style={{ fontFamily: 'monospace', fontSize: '0.68rem', fontWeight: 700, letterSpacing: '0.1em', color: 'var(--text-secondary)' }}>
+                <span style={{ fontFamily: 'monospace', fontSize: '0.68rem', fontWeight: 700, letterSpacing: '0.05em', color: 'var(--text-secondary)' }}>
                   Tailoring Araiven Workspace
                 </span>
               </div>
@@ -162,7 +164,7 @@ export const OnboardingWizard: React.FC = () => {
 
         {/* STEP 1: WELCOME SCREEN */}
         {step === 1 && (
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: '20px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: '18px' }}>
             <div style={{
               width: '48px',
               height: '48px',
@@ -180,14 +182,14 @@ export const OnboardingWizard: React.FC = () => {
               R
             </div>
             
-            <h1 style={{ fontFamily: 'var(--font-display)', fontSize: '1.8rem', fontWeight: 700, margin: 0 }}>
+            <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(1.4rem, 4vw, 1.8rem)', fontWeight: 700, margin: 0 }}>
               Welcome to Ravora
             </h1>
-            <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)', lineHeight: 1.5, margin: 0 }}>
+            <p style={{ fontSize: '0.86rem', color: 'var(--text-secondary)', lineHeight: 1.5, margin: 0 }}>
               Let's personalize your AI trading workspace.
             </p>
 
-            <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '12px' }}>
+            <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '8px' }}>
               <button 
                 onClick={handleNext}
                 className="btn btn-primary"
@@ -209,12 +211,12 @@ export const OnboardingWizard: React.FC = () => {
 
         {/* STEP 2: EXPERIENCE */}
         {step === 2 && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.35rem', fontWeight: 700, margin: 0 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(1.15rem, 3.5vw, 1.35rem)', fontWeight: 700, margin: 0 }}>
               What best describes your trading experience?
             </h2>
             
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '8px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '6px' }}>
               {[
                 { key: 'beginner', label: 'Beginner', desc: 'I am just getting started.' },
                 { key: 'active', label: 'Intermediate', desc: 'I already trade occasionally.' },
@@ -228,7 +230,7 @@ export const OnboardingWizard: React.FC = () => {
                   tabIndex={0}
                   onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setExperience(opt.key as any); } }}
                   style={{
-                    padding: '16px 20px',
+                    padding: '14px 18px',
                     borderRadius: '10px',
                     border: experience === opt.key ? '1px solid var(--ai-accent)' : '1px solid rgba(255,255,255,0.06)',
                     background: experience === opt.key ? 'rgba(124, 58, 237, 0.05)' : 'rgba(255, 255, 255, 0.01)',
@@ -240,10 +242,10 @@ export const OnboardingWizard: React.FC = () => {
                   }}
                 >
                   <div>
-                    <div style={{ fontWeight: 600, fontSize: '0.88rem', color: '#fff' }}>{opt.label}</div>
-                    <div style={{ fontSize: '0.76rem', color: 'var(--text-secondary)', marginTop: '4px' }}>{opt.desc}</div>
+                    <div style={{ fontWeight: 600, fontSize: '0.86rem', color: '#fff' }}>{opt.label}</div>
+                    <div style={{ fontSize: '0.74rem', color: 'var(--text-secondary)', marginTop: '2px' }}>{opt.desc}</div>
                   </div>
-                  {experience === opt.key && <CheckCircle2 size={16} style={{ color: 'var(--ai-accent)' }} />}
+                  {experience === opt.key && <CheckCircle2 size={16} style={{ color: 'var(--ai-accent)', flexShrink: 0 }} />}
                 </div>
               ))}
             </div>
@@ -252,12 +254,12 @@ export const OnboardingWizard: React.FC = () => {
 
         {/* STEP 3: MARKETS */}
         {step === 3 && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.35rem', fontWeight: 700, margin: 0 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(1.15rem, 3.5vw, 1.35rem)', fontWeight: 700, margin: 0 }}>
               What markets are you interested in?
             </h2>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginTop: '8px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '10px', marginTop: '6px' }}>
               {['Crypto', 'Stocks', 'Forex', 'Futures', 'Commodities', 'ETFs'].map((m) => {
                 const isSelected = markets.includes(m);
                 return (
@@ -269,7 +271,7 @@ export const OnboardingWizard: React.FC = () => {
                     tabIndex={0}
                     onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleMarket(m); } }}
                     style={{
-                      padding: '18px 16px',
+                      padding: '14px 14px',
                       borderRadius: '10px',
                       border: isSelected ? '1px solid var(--ai-accent)' : '1px solid rgba(255,255,255,0.06)',
                       background: isSelected ? 'rgba(124, 58, 237, 0.05)' : 'rgba(255, 255, 255, 0.01)',
@@ -281,7 +283,7 @@ export const OnboardingWizard: React.FC = () => {
                     }}
                   >
                     <span style={{ fontWeight: 600, fontSize: '0.85rem', color: isSelected ? '#fff' : 'var(--text-secondary)' }}>{m}</span>
-                    {isSelected && <CheckCircle2 size={14} style={{ color: 'var(--ai-accent)' }} />}
+                    {isSelected && <CheckCircle2 size={14} style={{ color: 'var(--ai-accent)', flexShrink: 0 }} />}
                   </div>
                 );
               })}
@@ -291,18 +293,18 @@ export const OnboardingWizard: React.FC = () => {
 
         {/* STEP 4: GOALS */}
         {step === 4 && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.35rem', fontWeight: 700, margin: 0 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(1.15rem, 3.5vw, 1.35rem)', fontWeight: 700, margin: 0 }}>
               What is your primary objective?
             </h2>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginTop: '8px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '10px', marginTop: '6px' }}>
               {[
-                { key: 'long_term', label: 'Long-term investing' },
+                { key: 'long_term', label: 'Long-term' },
                 { key: 'swing', label: 'Swing trading' },
                 { key: 'day', label: 'Day trading' },
-                { key: 'growth', label: 'Portfolio growth' },
-                { key: 'preservation', label: 'Capital preservation' },
+                { key: 'growth', label: 'Growth' },
+                { key: 'preservation', label: 'Preservation' },
                 { key: 'learning', label: 'Learning' }
               ].map((opt) => (
                 <div 
@@ -313,7 +315,7 @@ export const OnboardingWizard: React.FC = () => {
                   tabIndex={0}
                   onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setGoal(opt.key); } }}
                   style={{
-                    padding: '18px 16px',
+                    padding: '14px 14px',
                     borderRadius: '10px',
                     border: goal === opt.key ? '1px solid var(--ai-accent)' : '1px solid rgba(255,255,255,0.06)',
                     background: goal === opt.key ? 'rgba(124, 58, 237, 0.05)' : 'rgba(255, 255, 255, 0.01)',
@@ -324,8 +326,8 @@ export const OnboardingWizard: React.FC = () => {
                     justifyContent: 'space-between'
                   }}
                 >
-                  <span style={{ fontWeight: 600, fontSize: '0.85rem', color: goal === opt.key ? '#fff' : 'var(--text-secondary)' }}>{opt.label}</span>
-                  {goal === opt.key && <CheckCircle2 size={14} style={{ color: 'var(--ai-accent)' }} />}
+                  <span style={{ fontWeight: 600, fontSize: '0.82rem', color: goal === opt.key ? '#fff' : 'var(--text-secondary)' }}>{opt.label}</span>
+                  {goal === opt.key && <CheckCircle2 size={14} style={{ color: 'var(--ai-accent)', flexShrink: 0 }} />}
                 </div>
               ))}
             </div>
@@ -334,12 +336,12 @@ export const OnboardingWizard: React.FC = () => {
 
         {/* STEP 5: WORKSPACE PREFERENCES */}
         {step === 5 && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.35rem', fontWeight: 700, margin: 0 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(1.15rem, 3.5vw, 1.35rem)', fontWeight: 700, margin: 0 }}>
               How would you like your dashboard configured?
             </h2>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '8px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '6px' }}>
               {[
                 { key: 'simple', label: 'Simple', desc: 'Minimal information' },
                 { key: 'balanced', label: 'Balanced (Recommended)', desc: 'Optimal information layout' },
@@ -353,7 +355,7 @@ export const OnboardingWizard: React.FC = () => {
                   tabIndex={0}
                   onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setWorkspace(opt.key as any); } }}
                   style={{
-                    padding: '16px 20px',
+                    padding: '14px 18px',
                     borderRadius: '10px',
                     border: workspace === opt.key ? '1px solid var(--ai-accent)' : '1px solid rgba(255,255,255,0.06)',
                     background: workspace === opt.key ? 'rgba(124, 58, 237, 0.05)' : 'rgba(255, 255, 255, 0.01)',
@@ -365,10 +367,10 @@ export const OnboardingWizard: React.FC = () => {
                   }}
                 >
                   <div>
-                    <div style={{ fontWeight: 600, fontSize: '0.88rem', color: '#fff' }}>{opt.label}</div>
-                    <div style={{ fontSize: '0.76rem', color: 'var(--text-secondary)', marginTop: '4px' }}>{opt.desc}</div>
+                    <div style={{ fontWeight: 600, fontSize: '0.86rem', color: '#fff' }}>{opt.label}</div>
+                    <div style={{ fontSize: '0.74rem', color: 'var(--text-secondary)', marginTop: '2px' }}>{opt.desc}</div>
                   </div>
-                  {workspace === opt.key && <CheckCircle2 size={16} style={{ color: 'var(--ai-accent)' }} />}
+                  {workspace === opt.key && <CheckCircle2 size={16} style={{ color: 'var(--ai-accent)', flexShrink: 0 }} />}
                 </div>
               ))}
             </div>
@@ -377,15 +379,15 @@ export const OnboardingWizard: React.FC = () => {
 
         {/* STEP 6: ARAIVEN CONFIGURATION */}
         {step === 6 && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.35rem', fontWeight: 700, margin: 0 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(1.15rem, 3.5vw, 1.35rem)', fontWeight: 700, margin: 0 }}>
               How should Araiven assist you?
             </h2>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginTop: '8px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '10px', marginTop: '6px' }}>
               {[
                 { key: 'opportunities', label: 'Find opportunities' },
-                { key: 'trends', label: 'Explain market trends' },
+                { key: 'trends', label: 'Explain trends' },
                 { key: 'plans', label: 'Build trade plans' },
                 { key: 'insights', label: 'Portfolio insights' },
                 { key: 'risk', label: 'Risk management' },
@@ -401,7 +403,7 @@ export const OnboardingWizard: React.FC = () => {
                     tabIndex={0}
                     onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleAraiven(opt.key); } }}
                     style={{
-                      padding: '18px 16px',
+                      padding: '14px 14px',
                       borderRadius: '10px',
                       border: isSelected ? '1px solid var(--ai-accent)' : '1px solid rgba(255,255,255,0.06)',
                       background: isSelected ? 'rgba(124, 58, 237, 0.05)' : 'rgba(255, 255, 255, 0.01)',
@@ -412,8 +414,8 @@ export const OnboardingWizard: React.FC = () => {
                       justifyContent: 'space-between'
                     }}
                   >
-                    <span style={{ fontWeight: 600, fontSize: '0.85rem', color: isSelected ? '#fff' : 'var(--text-secondary)' }}>{opt.label}</span>
-                    {isSelected && <CheckCircle2 size={14} style={{ color: 'var(--ai-accent)' }} />}
+                    <span style={{ fontWeight: 600, fontSize: '0.82rem', color: isSelected ? '#fff' : 'var(--text-secondary)' }}>{opt.label}</span>
+                    {isSelected && <CheckCircle2 size={14} style={{ color: 'var(--ai-accent)', flexShrink: 0 }} />}
                   </div>
                 );
               })}
@@ -423,8 +425,8 @@ export const OnboardingWizard: React.FC = () => {
 
         {/* STEP 7: REVIEW */}
         {step === 7 && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.35rem', fontWeight: 700, margin: 0 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(1.15rem, 3.5vw, 1.35rem)', fontWeight: 700, margin: 0 }}>
               Confirm your workspace profile
             </h2>
             <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: 1.45, margin: 0 }}>
@@ -433,32 +435,32 @@ export const OnboardingWizard: React.FC = () => {
 
             <div style={{
               display: 'grid',
-              gridTemplateColumns: '1fr 1fr',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
               gap: '12px',
-              background: 'rgba(0,0,0,0.2)',
+              background: 'rgba(0,0,0,0.25)',
               border: '1px solid rgba(255,255,255,0.04)',
               borderRadius: '10px',
-              padding: '20px',
-              marginTop: '8px'
+              padding: '16px',
+              marginTop: '6px'
             }}>
               
               <div onClick={() => setStep(2)} style={{ cursor: 'pointer' }}>
-                <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)', display: 'block', fontWeight: 700, letterSpacing: '0.05em' }}>TRADING EXPERIENCE</span>
-                <span style={{ fontSize: '0.85rem', color: '#fff', fontWeight: 600, marginTop: '4px', display: 'block' }}>
+                <span style={{ fontSize: '0.66rem', color: 'var(--text-muted)', display: 'block', fontWeight: 700, letterSpacing: '0.05em' }}>TRADING EXPERIENCE</span>
+                <span style={{ fontSize: '0.84rem', color: '#fff', fontWeight: 600, marginTop: '2px', display: 'block' }}>
                   {experience === 'beginner' ? 'Beginner' : (experience === 'active' ? 'Intermediate' : 'Advanced')}
                 </span>
               </div>
 
               <div onClick={() => setStep(3)} style={{ cursor: 'pointer' }}>
-                <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)', display: 'block', fontWeight: 700, letterSpacing: '0.05em' }}>INTERESTED MARKETS</span>
-                <span style={{ fontSize: '0.85rem', color: '#fff', fontWeight: 600, marginTop: '4px', display: 'block' }}>
+                <span style={{ fontSize: '0.66rem', color: 'var(--text-muted)', display: 'block', fontWeight: 700, letterSpacing: '0.05em' }}>INTERESTED MARKETS</span>
+                <span style={{ fontSize: '0.84rem', color: '#fff', fontWeight: 600, marginTop: '2px', display: 'block' }}>
                   {markets.join(', ')}
                 </span>
               </div>
 
-              <div onClick={() => setStep(4)} style={{ cursor: 'pointer', marginTop: '12px' }}>
-                <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)', display: 'block', fontWeight: 700, letterSpacing: '0.05em' }}>PRIMARY OBJECTIVE</span>
-                <span style={{ fontSize: '0.85rem', color: '#fff', fontWeight: 600, marginTop: '4px', display: 'block' }}>
+              <div onClick={() => setStep(4)} style={{ cursor: 'pointer' }}>
+                <span style={{ fontSize: '0.66rem', color: 'var(--text-muted)', display: 'block', fontWeight: 700, letterSpacing: '0.05em' }}>PRIMARY OBJECTIVE</span>
+                <span style={{ fontSize: '0.84rem', color: '#fff', fontWeight: 600, marginTop: '2px', display: 'block' }}>
                   {{
                     long_term: 'Long-term investing',
                     swing: 'Swing trading',
@@ -470,16 +472,16 @@ export const OnboardingWizard: React.FC = () => {
                 </span>
               </div>
 
-              <div onClick={() => setStep(5)} style={{ cursor: 'pointer', marginTop: '12px' }}>
-                <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)', display: 'block', fontWeight: 700, letterSpacing: '0.05em' }}>DASHBOARD CONFIG</span>
-                <span style={{ fontSize: '0.85rem', color: '#fff', fontWeight: 600, marginTop: '4px', display: 'block' }}>
+              <div onClick={() => setStep(5)} style={{ cursor: 'pointer' }}>
+                <span style={{ fontSize: '0.66rem', color: 'var(--text-muted)', display: 'block', fontWeight: 700, letterSpacing: '0.05em' }}>DASHBOARD CONFIG</span>
+                <span style={{ fontSize: '0.84rem', color: '#fff', fontWeight: 600, marginTop: '2px', display: 'block' }}>
                   {workspace === 'simple' ? 'Simple' : (workspace === 'balanced' ? 'Balanced' : 'Professional')}
                 </span>
               </div>
 
-              <div onClick={() => setStep(6)} style={{ cursor: 'pointer', marginTop: '12px', gridColumn: 'span 2' }}>
-                <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)', display: 'block', fontWeight: 700, letterSpacing: '0.05em' }}>ARAIVEN ASSISTANCE MODEL</span>
-                <span style={{ fontSize: '0.85rem', color: '#fff', fontWeight: 600, marginTop: '4px', display: 'block' }}>
+              <div onClick={() => setStep(6)} style={{ cursor: 'pointer', gridColumn: '1 / -1' }}>
+                <span style={{ fontSize: '0.66rem', color: 'var(--text-muted)', display: 'block', fontWeight: 700, letterSpacing: '0.05em' }}>ARAIVEN ASSISTANCE MODEL</span>
+                <span style={{ fontSize: '0.84rem', color: '#fff', fontWeight: 600, marginTop: '2px', display: 'block' }}>
                   {araiven.map(a => ({
                     opportunities: 'Find opportunities',
                     trends: 'Explain market trends',
@@ -497,7 +499,7 @@ export const OnboardingWizard: React.FC = () => {
 
         {/* STEP CONTROLS (Only shown after Step 1) */}
         {step > 1 && (
-          <div style={{ display: 'flex', gap: '12px', marginTop: '10px' }}>
+          <div style={{ display: 'flex', gap: '10px', marginTop: '6px' }}>
             <button 
               onClick={handleBack}
               className="btn btn-secondary"

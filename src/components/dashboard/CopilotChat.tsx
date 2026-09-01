@@ -38,7 +38,7 @@ export const CopilotChat: React.FC = () => {
     <div className="card-glass" style={{
       display: 'flex',
       flexDirection: 'column',
-      height: 'calc(100vh - 140px)',
+      height: 'calc(100vh - clamp(140px, 18vh, 180px))',
       borderRadius: 'var(--radius-md)',
       border: 'var(--border-thickness) solid var(--color-border)',
       background: 'rgba(14, 19, 37, 0.45)',
@@ -47,15 +47,15 @@ export const CopilotChat: React.FC = () => {
       
       {/* Header */}
       <div style={{
-        padding: 'var(--space-4) var(--space-6)',
+        padding: '12px clamp(14px, 2.5vw, 24px)',
         borderBottom: 'var(--border-thickness) solid var(--color-border-divider)',
         display: 'flex',
         alignItems: 'center',
-        gap: 'var(--space-2.5)'
+        gap: '10px'
       }}>
-        <MessageSquareCode size={18} style={{ color: 'var(--color-ai-accent)' }} />
+        <MessageSquareCode size={18} style={{ color: 'var(--color-ai-accent)', flexShrink: 0 }} />
         <div>
-          <h2 style={{ fontSize: '0.9rem', fontWeight: 700, margin: 0 }}>Araiven Advisor Sandbox</h2>
+          <h2 style={{ fontSize: '0.88rem', fontWeight: 700, margin: 0 }}>Araiven Advisor Sandbox</h2>
           <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>Continuous Audit & Reasoning System</span>
         </div>
       </div>
@@ -63,25 +63,25 @@ export const CopilotChat: React.FC = () => {
       {/* Messages Scroll Area */}
       <div style={{
         flex: 1,
-        padding: 'var(--space-6)',
+        padding: 'clamp(12px, 2.5vw, 20px)',
         overflowY: 'auto',
         display: 'flex',
         flexDirection: 'column',
-        gap: 'var(--space-4)'
+        gap: '12px'
       }}>
         {copilotHistory.map((msg, idx) => (
           <div 
             key={idx}
             className={`msg-bubble ${msg.sender === 'user' ? 'user' : 'copilot'}`}
             style={{
-              maxWidth: '80%',
+              maxWidth: '88%',
               alignSelf: msg.sender === 'user' ? 'flex-end' : 'flex-start',
-              padding: 'var(--space-3) var(--space-4)',
-              borderRadius: 'var(--radius-md)',
+              padding: '10px 14px',
+              borderRadius: '8px',
               fontSize: '0.8rem',
               lineHeight: 1.45,
               background: msg.sender === 'user' ? 'rgba(37, 99, 235, 0.15)' : 'rgba(255, 255, 255, 0.02)',
-              border: msg.sender === 'user' ? 'var(--border-thickness) solid rgba(37,99,235,0.2)' : 'var(--border-thickness) solid var(--color-border-divider)',
+              border: msg.sender === 'user' ? '1px solid rgba(37,99,235,0.25)' : '1px solid rgba(255,255,255,0.04)',
               color: '#fff',
               boxSizing: 'border-box'
             }}
@@ -89,7 +89,7 @@ export const CopilotChat: React.FC = () => {
             <p style={{ margin: 0 }}>{msg.text}</p>
             {msg.actionHtml && (
               <div 
-                style={{ marginTop: 'var(--space-2.5)' }}
+                style={{ marginTop: '8px' }}
                 dangerouslySetInnerHTML={{ __html: msg.actionHtml }}
               />
             )}
@@ -100,14 +100,15 @@ export const CopilotChat: React.FC = () => {
  
       {/* Preset prompts & Input section */}
       <div style={{
-        padding: 'var(--space-4) var(--space-6)',
+        padding: '12px clamp(12px, 2.5vw, 20px)',
         borderTop: 'var(--border-thickness) solid var(--color-border-divider)',
         display: 'flex',
         flexDirection: 'column',
-        gap: 'var(--space-3)'
+        gap: '10px',
+        background: 'rgba(6, 9, 19, 0.4)'
       }}>
         {/* Preset prompts badges */}
-        <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
+        <div className="no-scrollbar" style={{ display: 'flex', gap: '8px', overflowX: 'auto', WebkitOverflowScrolling: 'touch', paddingBottom: '2px' }}>
           {presetPrompts.map((p) => (
             <button
               key={p.key}
@@ -116,14 +117,16 @@ export const CopilotChat: React.FC = () => {
               className="chat-suggest-btn"
               style={{
                 background: 'rgba(255,255,255,0.02)',
-                border: 'var(--border-thickness) solid rgba(255,255,255,0.06)',
-                borderRadius: 'var(--radius-sm)',
-                padding: 'var(--space-1.5) var(--space-3)',
+                border: '1px solid rgba(255,255,255,0.06)',
+                borderRadius: '6px',
+                padding: '6px 12px',
                 fontSize: '0.72rem',
                 color: 'var(--text-secondary)',
                 cursor: 'pointer',
                 fontWeight: 600,
-                transition: 'all var(--transition-hover)'
+                transition: 'all 0.15s ease',
+                whiteSpace: 'nowrap',
+                flexShrink: 0
               }}
             >
               {p.text}
@@ -132,17 +135,17 @@ export const CopilotChat: React.FC = () => {
         </div>
  
         {/* Input box */}
-        <form onSubmit={handleSubmit} style={{ display: 'flex', gap: 'var(--space-2.5)', width: '100%', position: 'relative' }}>
+        <form onSubmit={handleSubmit} style={{ display: 'flex', gap: '8px', width: '100%', position: 'relative' }}>
           <input
             type="text"
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
-            placeholder="Query Araiven strategy details or ask for rebalance audits..."
+            placeholder="Query Araiven strategy details..."
             style={{
               flex: 1,
-              padding: 'var(--space-3) var(--space-12) var(--space-3) var(--space-4)',
-              borderRadius: 'var(--radius-md)',
-              border: 'var(--border-thickness) solid var(--color-border)',
+              padding: '10px 42px 10px 14px',
+              borderRadius: '8px',
+              border: '1px solid var(--border)',
               background: 'rgba(255,255,255,0.03)',
               color: '#fff',
               fontSize: '0.82rem',
@@ -153,18 +156,20 @@ export const CopilotChat: React.FC = () => {
           <button 
             type="submit"
             disabled={sending || !inputText.trim()}
+            aria-label="Send message"
             style={{
               position: 'absolute',
-              right: 'var(--space-2)',
+              right: '8px',
               top: '50%',
               transform: 'translateY(-50%)',
               background: 'none',
               border: 'none',
-              color: 'var(--color-primary)',
-              cursor: 'pointer',
+              color: inputText.trim() ? 'var(--primary)' : 'var(--text-muted)',
+              cursor: inputText.trim() ? 'pointer' : 'default',
               display: 'flex',
               alignItems: 'center',
-              padding: 'var(--space-1.5)'
+              justifyContent: 'center',
+              padding: '6px'
             }}
           >
             <Send size={16} />
