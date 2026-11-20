@@ -106,33 +106,25 @@ export const OnboardingWizard: React.FC = () => {
       left: 0,
       width: '100vw',
       height: '100vh',
-      background: 'radial-gradient(circle at top right, rgba(99, 102, 241, 0.06) 0%, transparent 60%), #060913',
+      background: '#0b0e14',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
       zIndex: 999,
-      color: '#fff',
+      color: '#f8fafc',
       fontFamily: 'var(--font-body)',
       padding: 'clamp(12px, 3vw, 24px)',
       boxSizing: 'border-box',
       overflowY: 'auto'
     }}>
       
-      {/* Background glow blobs */}
-      <div className="ambient-glows" style={{ pointerEvents: 'none' }}>
-        <div className="glow-blob glow-1" style={{ top: '20%', left: '20%', opacity: 0.15 }}></div>
-        <div className="glow-blob glow-2" style={{ bottom: '20%', right: '20%', opacity: 0.15 }}></div>
-      </div>
-
       <div className="auth-form-card" style={{
         width: '100%',
         maxWidth: step === 1 ? '480px' : (step === 7 ? '640px' : '580px'),
         padding: 'clamp(20px, 4vw, 36px)',
-        background: 'rgba(14, 19, 37, 0.9)',
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
-        border: 'var(--border-thickness) solid var(--color-border)',
-        borderRadius: 'var(--radius-lg)',
+        background: '#151a26',
+        border: '1px solid var(--border)',
+        borderRadius: '12px',
         boxShadow: 'var(--shadow-overlay)',
         boxSizing: 'border-box',
         display: 'flex',
@@ -169,15 +161,15 @@ export const OnboardingWizard: React.FC = () => {
               width: '48px',
               height: '48px',
               borderRadius: '10px',
-              background: 'var(--gradient-interactive)',
+              background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: '#fff',
+              color: '#0b0e14',
               fontWeight: 800,
               fontSize: '1.6rem',
               fontFamily: 'var(--font-display)',
-              boxShadow: '0 8px 24px rgba(79, 124, 255, 0.3)'
+              boxShadow: '0 2px 10px rgba(245, 158, 11, 0.25)'
             }}>
               R
             </div>
@@ -232,8 +224,8 @@ export const OnboardingWizard: React.FC = () => {
                   style={{
                     padding: '14px 18px',
                     borderRadius: '10px',
-                    border: experience === opt.key ? '1px solid var(--ai-accent)' : '1px solid rgba(255,255,255,0.06)',
-                    background: experience === opt.key ? 'rgba(124, 58, 237, 0.05)' : 'rgba(255, 255, 255, 0.01)',
+                    border: experience === opt.key ? '1px solid rgba(245, 158, 11, 0.45)' : '1px solid rgba(255,255,255,0.06)',
+                    background: experience === opt.key ? 'rgba(245, 158, 11, 0.12)' : 'rgba(255, 255, 255, 0.01)',
                     cursor: 'pointer',
                     transition: 'all 0.2s',
                     display: 'flex',
@@ -245,7 +237,7 @@ export const OnboardingWizard: React.FC = () => {
                     <div style={{ fontWeight: 600, fontSize: '0.86rem', color: '#fff' }}>{opt.label}</div>
                     <div style={{ fontSize: '0.74rem', color: 'var(--text-secondary)', marginTop: '2px' }}>{opt.desc}</div>
                   </div>
-                  {experience === opt.key && <CheckCircle2 size={16} style={{ color: 'var(--ai-accent)', flexShrink: 0 }} />}
+                  {experience === opt.key && <CheckCircle2 size={16} style={{ color: '#f59e0b', flexShrink: 0 }} />}
                 </div>
               ))}
             </div>
@@ -273,8 +265,8 @@ export const OnboardingWizard: React.FC = () => {
                     style={{
                       padding: '14px 14px',
                       borderRadius: '10px',
-                      border: isSelected ? '1px solid var(--ai-accent)' : '1px solid rgba(255,255,255,0.06)',
-                      background: isSelected ? 'rgba(124, 58, 237, 0.05)' : 'rgba(255, 255, 255, 0.01)',
+                      border: isSelected ? '1px solid rgba(245, 158, 11, 0.45)' : '1px solid rgba(255,255,255,0.06)',
+                      background: isSelected ? 'rgba(245, 158, 11, 0.12)' : 'rgba(255, 255, 255, 0.01)',
                       cursor: 'pointer',
                       transition: 'all 0.2s',
                       display: 'flex',
@@ -283,7 +275,7 @@ export const OnboardingWizard: React.FC = () => {
                     }}
                   >
                     <span style={{ fontWeight: 600, fontSize: '0.85rem', color: isSelected ? '#fff' : 'var(--text-secondary)' }}>{m}</span>
-                    {isSelected && <CheckCircle2 size={14} style={{ color: 'var(--ai-accent)', flexShrink: 0 }} />}
+                    {isSelected && <CheckCircle2 size={14} style={{ color: '#f59e0b', flexShrink: 0 }} />}
                   </div>
                 );
               })}
@@ -317,8 +309,8 @@ export const OnboardingWizard: React.FC = () => {
                   style={{
                     padding: '14px 14px',
                     borderRadius: '10px',
-                    border: goal === opt.key ? '1px solid var(--ai-accent)' : '1px solid rgba(255,255,255,0.06)',
-                    background: goal === opt.key ? 'rgba(124, 58, 237, 0.05)' : 'rgba(255, 255, 255, 0.01)',
+                    border: goal === opt.key ? '1px solid rgba(245, 158, 11, 0.45)' : '1px solid rgba(255,255,255,0.06)',
+                    background: goal === opt.key ? 'rgba(245, 158, 11, 0.12)' : 'rgba(255, 255, 255, 0.01)',
                     cursor: 'pointer',
                     transition: 'all 0.2s',
                     display: 'flex',
@@ -327,7 +319,7 @@ export const OnboardingWizard: React.FC = () => {
                   }}
                 >
                   <span style={{ fontWeight: 600, fontSize: '0.82rem', color: goal === opt.key ? '#fff' : 'var(--text-secondary)' }}>{opt.label}</span>
-                  {goal === opt.key && <CheckCircle2 size={14} style={{ color: 'var(--ai-accent)', flexShrink: 0 }} />}
+                  {goal === opt.key && <CheckCircle2 size={14} style={{ color: '#f59e0b', flexShrink: 0 }} />}
                 </div>
               ))}
             </div>
@@ -357,8 +349,8 @@ export const OnboardingWizard: React.FC = () => {
                   style={{
                     padding: '14px 18px',
                     borderRadius: '10px',
-                    border: workspace === opt.key ? '1px solid var(--ai-accent)' : '1px solid rgba(255,255,255,0.06)',
-                    background: workspace === opt.key ? 'rgba(124, 58, 237, 0.05)' : 'rgba(255, 255, 255, 0.01)',
+                    border: workspace === opt.key ? '1px solid rgba(245, 158, 11, 0.45)' : '1px solid rgba(255,255,255,0.06)',
+                    background: workspace === opt.key ? 'rgba(245, 158, 11, 0.12)' : 'rgba(255, 255, 255, 0.01)',
                     cursor: 'pointer',
                     transition: 'all 0.2s',
                     display: 'flex',
@@ -370,7 +362,7 @@ export const OnboardingWizard: React.FC = () => {
                     <div style={{ fontWeight: 600, fontSize: '0.86rem', color: '#fff' }}>{opt.label}</div>
                     <div style={{ fontSize: '0.74rem', color: 'var(--text-secondary)', marginTop: '2px' }}>{opt.desc}</div>
                   </div>
-                  {workspace === opt.key && <CheckCircle2 size={16} style={{ color: 'var(--ai-accent)', flexShrink: 0 }} />}
+                  {workspace === opt.key && <CheckCircle2 size={16} style={{ color: '#f59e0b', flexShrink: 0 }} />}
                 </div>
               ))}
             </div>
@@ -405,8 +397,8 @@ export const OnboardingWizard: React.FC = () => {
                     style={{
                       padding: '14px 14px',
                       borderRadius: '10px',
-                      border: isSelected ? '1px solid var(--ai-accent)' : '1px solid rgba(255,255,255,0.06)',
-                      background: isSelected ? 'rgba(124, 58, 237, 0.05)' : 'rgba(255, 255, 255, 0.01)',
+                      border: isSelected ? '1px solid rgba(245, 158, 11, 0.45)' : '1px solid rgba(255,255,255,0.06)',
+                      background: isSelected ? 'rgba(245, 158, 11, 0.12)' : 'rgba(255, 255, 255, 0.01)',
                       cursor: 'pointer',
                       transition: 'all 0.2s',
                       display: 'flex',
@@ -415,7 +407,7 @@ export const OnboardingWizard: React.FC = () => {
                     }}
                   >
                     <span style={{ fontWeight: 600, fontSize: '0.82rem', color: isSelected ? '#fff' : 'var(--text-secondary)' }}>{opt.label}</span>
-                    {isSelected && <CheckCircle2 size={14} style={{ color: 'var(--ai-accent)', flexShrink: 0 }} />}
+                    {isSelected && <CheckCircle2 size={14} style={{ color: '#f59e0b', flexShrink: 0 }} />}
                   </div>
                 );
               })}

@@ -24,13 +24,13 @@
      User Authentication Overlay
      ========================================================================== -->
   <div class="onboarding-overlay" id="auth-container"
-    style="display: none !important; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #060913; z-index: 99999; align-items: stretch; justify-content: center; overflow-y: auto; padding: 0;">
+    style="display: none !important; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #0b0e14; z-index: 99999; align-items: stretch; justify-content: center; overflow-y: auto; padding: 0;">
     <div
       style="display: flex; width: 100%; min-height: 100vh; align-items: stretch; flex-direction: row; flex-wrap: wrap;">
 
       <!-- Left Side (45%): Brand Storytelling -->
       <div class="auth-left-story"
-        style="width: 45%; padding: 48px 60px; background: radial-gradient(circle at top left, rgba(99, 102, 241, 0.1) 0%, transparent 60%), #070b19; border-right: 1px solid rgba(255,255,255,0.06); display: flex; flex-direction: column; justify-content: center; box-sizing: border-box; position: relative; min-width: 320px;">
+        style="width: 45%; padding: 48px 60px; background: radial-gradient(circle at top left, rgba(245, 158, 11, 0.05) 0%, transparent 60%), #10141d; border-right: 1px solid rgba(203, 213, 225, 0.12); display: flex; flex-direction: column; justify-content: center; box-sizing: border-box; position: relative; min-width: 320px;">
         <!-- Logo -->
         <a href="#" class="logo"
           style="display: flex; align-items: center; gap: 10px; font-family: var(--font-display); font-size: 1.25rem; font-weight: 700; color: #fff; text-decoration: none; margin-bottom: 40px; pointer-events: none;">
@@ -676,7 +676,7 @@
 
         <div style="display: flex; justify-content: center; margin-bottom: 24px;">
           <div class="ai-core-sphere"
-            style="animation: pulse-dot 3s infinite ease-in-out; width: 110px; height: 110px; border-radius: 50%; background: radial-gradient(circle, rgba(99, 102, 241, 0.2) 0%, rgba(168, 85, 247, 0.05) 70%); border: 1px solid rgba(168, 85, 247, 0.35); box-shadow: 0 0 40px rgba(168, 85, 247, 0.15); display: flex; align-items: center; justify-content: center; position: relative;">
+            style="width: 110px; height: 110px; border-radius: 50%; background: #151a26; border: 1px solid rgba(245, 158, 11, 0.4); box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4); display: flex; align-items: center; justify-content: center; position: relative;">
             <svg viewBox="0 0 24 24" fill="none" stroke="url(#onboarding-primary-grad)" stroke-width="2"
               stroke-linecap="round" stroke-linejoin="round" style="width: 52px; height: 52px;">
               <polygon points="12 2 2 7 12 12 22 7 12 2" />
@@ -685,9 +685,8 @@
             </svg>
             <defs>
               <linearGradient id="onboarding-primary-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#2563EB" />
-                <stop offset="50%" stop-color="#4F46E5" />
-                <stop offset="100%" stop-color="#7C3AED" />
+                <stop offset="0%" stop-color="#f59e0b" />
+                <stop offset="100%" stop-color="#d97706" />
               </linearGradient>
             </defs>
           </div>
@@ -857,7 +856,7 @@
 
         <div style="display: flex; justify-content: center; margin-bottom: 32px;">
           <div class="ai-core-sphere"
-            style="animation: pulse-dot 4s infinite ease-in-out; width: 120px; height: 120px; border-radius: 50%; background: radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, rgba(6, 182, 212, 0.03) 70%); border: 1px solid rgba(16, 185, 129, 0.35); box-shadow: 0 0 40px rgba(16, 185, 129, 0.15); display: flex; align-items: center; justify-content: center; position: relative;">
+            style="width: 120px; height: 120px; border-radius: 50%; background: #151a26; border: 1px solid rgba(16, 185, 129, 0.4); box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4); display: flex; align-items: center; justify-content: center; position: relative;">
             <svg viewBox="0 0 24 24" fill="none" stroke="url(#onboarding-success-grad)" stroke-width="2"
               stroke-linecap="round" stroke-linejoin="round" style="width: 56px; height: 56px;">
               <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
@@ -911,7 +910,7 @@
         <a href="/" class="logo"
           style="display: flex; align-items: center; gap: 12px; text-decoration: none; width: 100%; box-sizing: border-box;">
           <div class="logo-icon"
-            style="width: 40px; height: 40px; min-width: 40px; min-height: 40px; border-radius: 8px; background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 1.3rem;">
+            style="width: 40px; height: 40px; min-width: 40px; min-height: 40px; border-radius: 8px; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); display: flex; align-items: center; justify-content: center; color: #0b0e14; font-weight: 700; font-size: 1.3rem;">
             R</div>
           <span style="font-size: 1rem; font-weight: 700; color: #fff; transition: opacity 120ms ease;">Ravora</span>
         </a>
@@ -923,7 +922,7 @@
       <!-- Quick Action: New AI Scan -->
       <div style="flex-shrink: 0; width: 100%; padding: 0 4px; box-sizing: border-box; margin-bottom: 16px;">
         <button class="btn btn-primary" id="btn-new-ai-scan" title="New AI Scan"
-          style="display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 10px; font-weight: 700; border-radius: 6px; font-size: 0.8rem; border: none; background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%); color: #fff; cursor: pointer; transition: all 120ms ease; box-sizing: border-box;">
+          style="display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 10px; font-weight: 700; border-radius: 6px; font-size: 0.8rem; border: none; background: #f59e0b; color: #0b0e14; cursor: pointer; transition: all 120ms ease; box-sizing: border-box;">
           <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"
             style="flex-shrink: 0;">
             <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -1070,7 +1069,7 @@
         style="padding: 12px 8px; border-top: 1px solid rgba(255,255,255,0.06); width: 100%; box-sizing: border-box; flex-shrink: 0; display: flex; flex-direction: column; gap: 8px;">
         <div style="display: flex; align-items: center; gap: 10px; width: 100%;">
           <div class="user-avatar"
-            style="width: 32px; height: 32px; min-width: 32px; min-height: 32px; border-radius: 50%; background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 0.75rem; flex-shrink: 0;">
+            style="width: 32px; height: 32px; min-width: 32px; min-height: 32px; border-radius: 50%; background: #1b2232; border: 1px solid rgba(245, 158, 11, 0.4); display: flex; align-items: center; justify-content: center; color: #fbbf24; font-weight: 700; font-size: 0.75rem; flex-shrink: 0;">
             RG</div>
           <div class="user-meta"
             style="display: flex; flex-direction: column; gap: 1px; transition: opacity 120ms ease;">
@@ -1450,7 +1449,7 @@
                           </div>
                           <div class="ai-summary-meta-item" style="border-left: 1px solid rgba(255,255,255,0.08); padding-left: 12px;">
                             <span class="ai-summary-meta-label">Opp Score</span>
-                            <span class="ai-summary-meta-value" id="terminal-opp-score" style="background: linear-gradient(135deg, #a5b4fc 0%, #6366f1 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">89</span>
+                            <span class="ai-summary-meta-value" id="terminal-opp-score" style="color: #fbbf24; font-weight: 700;">89</span>
                           </div>
                           <div class="ai-summary-meta-item" style="border-left: 1px solid rgba(255,255,255,0.08); padding-left: 12px;">
                             <span class="ai-summary-meta-label">Last Scan</span>
@@ -1651,10 +1650,10 @@
                               </div>
                             </div>
                             <!-- Entry Target -->
-                            <div class="ai-level-row" id="ladder-entry" style="border-left: 2px solid var(--accent, #7c3aed); background: rgba(124, 58, 237, 0.03);">
+                            <div class="ai-level-row" id="ladder-entry" style="border-left: 2px solid #f59e0b; background: rgba(245, 158, 11, 0.06);">
                               <span class="ai-level-label" style="font-weight: 700; color: #fff;">Suggested Entry Price</span>
                               <div style="text-align: right;">
-                                <span class="ai-level-value" id="ladder-entry-price" style="color: var(--accent, #7c3aed);">-</span>
+                                <span class="ai-level-value" id="ladder-entry-price" style="color: #fbbf24;">-</span>
                               </div>
                             </div>
                             <!-- Stop Loss Target -->
@@ -1744,7 +1743,7 @@
                             </div>
                           </div>
                           <div class="ai-progress-container" style="margin-top: 6px;">
-                            <div class="ai-progress-bar" id="risk-rr-progress" style="width: 50%; background: var(--gradient-primary, linear-gradient(135deg, #6366f1 0%, #a5b4fc 100%));"></div>
+                            <div class="ai-progress-bar" id="risk-rr-progress" style="width: 50%; background: #f59e0b;"></div>
                           </div>
                         </div>
                         <div class="ai-card-footer">
@@ -1913,7 +1912,7 @@
                   </div>
                   <div class="card-glass" style="flex: 1; padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.04); background: rgba(0,0,0,0.15);">
                     <span style="font-size: 0.65rem; color: var(--text-muted); display: block; text-transform: uppercase;">10x Buying Power</span>
-                    <strong id="paper-tab-buying-power" style="font-size: 1.15rem; color: #3b82f6; font-weight: 700; display: block; margin-top: 4px;">$1,000,000.00 USDC</strong>
+                    <strong id="paper-tab-buying-power" style="font-size: 1.15rem; color: #fbbf24; font-weight: 700; display: block; margin-top: 4px;">$1,000,000.00 USDC</strong>
                   </div>
                   <button class="btn btn-secondary" id="btn-paper-tab-reset" style="padding: 10px 16px; font-size: 0.75rem; border-color: rgba(239, 68, 68, 0.4); color: #f87171; border-radius: 8px;">Reset Sandbox</button>
                 </div>
@@ -2007,11 +2006,11 @@
                   </div>
                   <div style="background: rgba(255,255,255,0.015); border: 1px solid rgba(255,255,255,0.04); border-radius: 8px; padding: 12px; text-align: center;">
                     <span style="font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; display: block;">Profit Factor</span>
-                    <strong style="font-size: 1.15rem; color: #3b82f6; font-weight: 700; display: block; margin-top: 4px;">2.48</strong>
+                    <strong style="font-size: 1.15rem; color: #fbbf24; font-weight: 700; display: block; margin-top: 4px;">2.48</strong>
                   </div>
                   <div style="background: rgba(255,255,255,0.015); border: 1px solid rgba(255,255,255,0.04); border-radius: 8px; padding: 12px; text-align: center;">
                     <span style="font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; display: block;">Sharpe Ratio</span>
-                    <strong style="font-size: 1.15rem; color: #a5b4fc; font-weight: 700; display: block; margin-top: 4px;">2.15</strong>
+                    <strong style="font-size: 1.15rem; color: #cbd5e1; font-weight: 700; display: block; margin-top: 4px;">2.15</strong>
                   </div>
                 </div>
               </div>
@@ -2529,7 +2528,7 @@
                 <!-- AI Provider -->
                 <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); border-radius: 6px;">
                   <span style="font-size: 0.72rem; color: var(--text-secondary);">AI Provider</span>
-                  <strong id="copilot-context-provider" style="font-size: 0.82rem; color: #a78bfa;">Gemini 1.5 Pro</strong>
+                  <strong id="copilot-context-provider" style="font-size: 0.82rem; color: #fbbf24;">Gemini 1.5 Pro</strong>
                 </div>
                 <!-- Last Market Update -->
                 <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); border-radius: 6px;">
@@ -2702,7 +2701,7 @@
                   </div>
                   <div style="background: rgba(255,255,255,0.015); border: 1px solid rgba(255,255,255,0.04); border-radius: 8px; padding: 12px; text-align: center;">
                     <span style="font-size: 0.62rem; color: var(--text-muted); text-transform: uppercase; display: block;">Current Streak</span>
-                    <strong id="paper-stat-streak" style="font-size: 1.25rem; color: #3b82f6; font-weight: 700; display: block; margin-top: 4px;">0 Wins</strong>
+                    <strong id="paper-stat-streak" style="font-size: 1.25rem; color: #fbbf24; font-weight: 700; display: block; margin-top: 4px;">0 Wins</strong>
                   </div>
                 </div>
               </div>
@@ -3006,7 +3005,7 @@
                         style="font-size: 0.6rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; display: block; margin-bottom: 2px;">Profit
                         Factor</span>
                       <strong id="insight-winloss-ratio"
-                        style="font-size: 1.15rem; color: #3b82f6; font-weight: 700; display: block;">0.00</strong>
+                        style="font-size: 1.15rem; color: #fbbf24; font-weight: 700; display: block;">0.00</strong>
                     </div>
 
                     <div
@@ -3135,11 +3134,11 @@
                         <circle cx="100" cy="100" r="70" fill="none" stroke="rgba(255,255,255,0.02)"
                           stroke-width="20" />
                         <!-- SEGMENTS INJECTED BY JS OR SVG -->
-                        <circle cx="100" cy="100" r="70" class="donut-seg donut-eth" stroke="#2563eb" stroke-width="20"
+                        <circle cx="100" cy="100" r="70" class="donut-seg donut-eth" stroke="#f59e0b" stroke-width="20"
                           stroke-dasharray="197.9 439.8" stroke-dashoffset="109.9" />
                         <circle cx="100" cy="100" r="70" class="donut-seg donut-usdc" stroke="#10b981" stroke-width="20"
                           stroke-dasharray="131.9 439.8" stroke-dashoffset="-88" />
-                        <circle cx="100" cy="100" r="70" class="donut-seg donut-btc" stroke="#6366f1" stroke-width="20"
+                        <circle cx="100" cy="100" r="70" class="donut-seg donut-btc" stroke="#94a3b8" stroke-width="20"
                           stroke-dasharray="87.9 439.8" stroke-dashoffset="-219.9" />
                         <circle cx="100" cy="100" r="70" class="donut-seg donut-cash" stroke="#475569" stroke-width="20"
                           stroke-dasharray="22 439.8" stroke-dashoffset="-307.8" />
@@ -3219,19 +3218,19 @@
                   <div
                     style="width: 100%; height: 5px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 99px; overflow: hidden; position: relative; margin-top: 4px;">
                     <div id="portfolio-risk-meter-fill"
-                      style="height: 100%; width: 42%; background: linear-gradient(90deg, #10b981 0%, #3b82f6 50%, #ef4444 100%); border-radius: 99px;">
+                      style="height: 100%; width: 42%; background: linear-gradient(90deg, #10b981 0%, #f59e0b 50%, #ef4444 100%); border-radius: 99px;">
                     </div>
                   </div>
                 </div>
 
                 <!-- SECTION 5: AI INSIGHTS (Araiven Insights) -->
                 <div class="card-glass"
-                  style="padding: 20px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.06); display: flex; flex-direction: column; gap: 12px; background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(14, 19, 37, 0.8) 100%);">
+                  style="padding: 20px; border-radius: 16px; border: 1px solid rgba(203, 213, 225, 0.12); display: flex; flex-direction: column; gap: 12px; background: #151a26;">
                   <div style="display: flex; align-items: center; gap: 8px;">
                     <div
-                      style="background: rgba(139, 92, 246, 0.15); width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(139, 92, 246, 0.25);">
+                      style="background: rgba(245, 158, 11, 0.12); width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(245, 158, 11, 0.25);">
                       <span
-                        style="color: #c084fc; font-size: 0.72rem; font-weight: bold; font-family: var(--font-display);">A</span>
+                        style="color: #fbbf24; font-size: 0.72rem; font-weight: bold; font-family: var(--font-display);">A</span>
                     </div>
                     <h4
                       style="margin: 0; font-size: 1rem; font-weight: 700; color: #fff; font-family: var(--font-display);">
@@ -3258,8 +3257,8 @@
                       <strong class="swap-val" style="font-size: 0.78rem; color: #fff;">USDC Cash (8%)</strong>
                     </div>
                     <div class="swap-arrow" style="color: var(--text-muted); font-weight: bold;">&rarr;</div>
-                    <div class="swap-pill dest" style="flex: 1; padding: 8px; background: rgba(37, 99, 235, 0.1); border: 1px solid rgba(37, 99, 235, 0.2); border-radius: 6px; text-align: center;">
-                      <span class="swap-label" style="display: block; font-size: 0.55rem; color: #3b82f6; text-transform: uppercase;">TO</span>
+                    <div class="swap-pill dest" style="flex: 1; padding: 8px; background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 6px; text-align: center;">
+                      <span class="swap-label" style="display: block; font-size: 0.55rem; color: #fbbf24; text-transform: uppercase;">TO</span>
                       <strong class="swap-val" style="font-size: 0.78rem; color: #fff;">ETH Staking Alpha</strong>
                     </div>
                   </div>
@@ -4497,16 +4496,16 @@
             <!-- Categories Grid -->
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px;">
               <div class="card-glass" style="padding: 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.04); background: rgba(0,0,0,0.15);">
-                <div style="width: 32px; height: 32px; border-radius: 6px; background: rgba(139, 92, 246, 0.1); border: 1px solid rgba(139, 92, 246, 0.2); display: flex; align-items: center; justify-content: center; margin-bottom: 12px;">
-                  <svg viewBox="0 0 24 24" width="16" height="16" stroke="#a78bfa" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                <div style="width: 32px; height: 32px; border-radius: 6px; background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.25); display: flex; align-items: center; justify-content: center; margin-bottom: 12px;">
+                  <svg viewBox="0 0 24 24" width="16" height="16" stroke="#fbbf24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
                 </div>
                 <strong style="color: #fff; font-size: 0.9rem; display: block; margin-bottom: 6px;">Getting Started</strong>
                 <p style="color: var(--text-secondary); font-size: 0.74rem; margin: 0; line-height: 1.5;">Learn the basics of Ravora, setting up your keys, and deposit simulations.</p>
               </div>
               
               <div class="card-glass" style="padding: 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.04); background: rgba(0,0,0,0.15);">
-                <div style="width: 32px; height: 32px; border-radius: 6px; background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.2); display: flex; align-items: center; justify-content: center; margin-bottom: 12px;">
-                  <svg viewBox="0 0 24 24" width="16" height="16" stroke="#3b82f6" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="3" y1="9" x2="21" y2="9"/></svg>
+                <div style="width: 32px; height: 32px; border-radius: 6px; background: rgba(203, 213, 225, 0.1); border: 1px solid rgba(203, 213, 225, 0.2); display: flex; align-items: center; justify-content: center; margin-bottom: 12px;">
+                  <svg viewBox="0 0 24 24" width="16" height="16" stroke="#cbd5e1" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="3" y1="9" x2="21" y2="9"/></svg>
                 </div>
                 <strong style="color: #fff; font-size: 0.9rem; display: block; margin-bottom: 6px;">Trading Workspace</strong>
                 <p style="color: var(--text-secondary); font-size: 0.74rem; margin: 0; line-height: 1.5;">Master order placing, leverage settings, open positions monitoring, and charts.</p>

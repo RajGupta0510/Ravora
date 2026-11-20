@@ -82,8 +82,8 @@ export const AppDashboard: React.FC = () => {
     <div style={{
       display: 'flex',
       minHeight: '100vh',
-      background: '#060913',
-      color: '#fff',
+      background: '#0b0e14',
+      color: '#f8fafc',
       fontFamily: 'var(--font-body)',
       overflowX: 'hidden'
     }}>
@@ -92,8 +92,7 @@ export const AppDashboard: React.FC = () => {
       <aside className="app-sidebar" style={{
         width: '240px',
         borderRight: 'var(--border-thickness) solid var(--color-border)',
-        background: 'rgba(14, 19, 37, 0.6)',
-        backdropFilter: 'blur(16px)',
+        background: '#10141d',
         display: 'flex',
         flexDirection: 'column',
         position: 'fixed',
@@ -105,8 +104,8 @@ export const AppDashboard: React.FC = () => {
         {/* Brand Logo */}
         <div className="logo" style={{ padding: 'var(--space-6)', borderBottom: 'var(--border-thickness) solid var(--color-border-divider)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2.5)', fontFamily: 'var(--font-display)', fontWeight: 700 }}>
-            <div style={{ width: '32px', height: '32px', borderRadius: 'var(--radius-sm)', background: 'var(--gradient-interactive)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', flexShrink: 0 }}>R</div>
-            <span className="sidebar-logo-text">Ravora OS</span>
+            <div style={{ width: '32px', height: '32px', borderRadius: 'var(--radius-sm)', background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#0b0e14', fontWeight: 800, flexShrink: 0 }}>R</div>
+            <span className="sidebar-logo-text" style={{ color: '#f8fafc', letterSpacing: '-0.01em' }}>Ravora OS</span>
           </div>
         </div>
 
@@ -134,8 +133,9 @@ export const AppDashboard: React.FC = () => {
                   padding: 'var(--space-3) var(--space-4)',
                   borderRadius: 'var(--radius-md)',
                   border: 'none',
-                  background: isActive ? 'var(--gradient-primary)' : 'transparent',
-                  color: isActive ? '#fff' : 'var(--text-secondary)',
+                  borderLeft: isActive ? '3px solid #f59e0b' : '3px solid transparent',
+                  background: isActive ? 'rgba(245, 158, 11, 0.12)' : 'transparent',
+                  color: isActive ? '#fbbf24' : 'var(--text-secondary)',
                   cursor: 'pointer',
                   textAlign: 'left',
                   fontSize: '0.85rem',
@@ -143,7 +143,7 @@ export const AppDashboard: React.FC = () => {
                   transition: 'all var(--motion-duration-fast) var(--motion-ease-in-out)'
                 }}
               >
-                <Icon size={16} style={{ flexShrink: 0 }} />
+                <Icon size={16} style={{ flexShrink: 0, color: isActive ? '#f59e0b' : 'inherit' }} />
                 <span className="sidebar-nav-label">{tab.label}</span>
               </button>
             );
@@ -196,9 +196,7 @@ export const AppDashboard: React.FC = () => {
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          background: 'rgba(6, 9, 19, 0.85)',
-          backdropFilter: 'blur(16px)',
-          WebkitBackdropFilter: 'blur(16px)',
+          background: '#10141d',
           position: 'sticky',
           top: 0,
           zIndex: 90,
@@ -287,8 +285,8 @@ export const AppDashboard: React.FC = () => {
         {/* Recommendation Directive Banner */}
         {recommendations.length > 0 && (
           <div style={{
-            background: 'linear-gradient(90deg, rgba(124, 58, 237, 0.15) 0%, rgba(37, 99, 235, 0.05) 100%)',
-            borderBottom: 'var(--border-thickness) solid rgba(124, 58, 237, 0.2)',
+            background: 'rgba(245, 158, 11, 0.08)',
+            borderBottom: 'var(--border-thickness) solid rgba(245, 158, 11, 0.25)',
             padding: '10px clamp(12px, 3vw, 24px)',
             display: 'flex',
             justifyContent: 'space-between',
@@ -299,15 +297,15 @@ export const AppDashboard: React.FC = () => {
             gap: '8px'
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: '1 1 240px' }}>
-              <Sparkles size={14} style={{ color: 'var(--color-ai-accent)', flexShrink: 0 }} />
-              <span style={{ lineHeight: 1.35 }}>
-                <strong>Araiven Directive:</strong> Optimization plan drafted. Rebalance USDC reserves into market vectors.
+              <Sparkles size={14} style={{ color: '#f59e0b', flexShrink: 0 }} />
+              <span style={{ lineHeight: 1.35, color: '#f8fafc' }}>
+                <strong style={{ color: '#fbbf24' }}>Araiven Directive:</strong> Optimization plan drafted. Rebalance USDC reserves into market vectors.
               </span>
             </div>
             <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
               <button 
                 onClick={() => setActiveTab('opportunities')}
-                style={{ background: 'none', border: 'none', color: '#fff', textDecoration: 'underline', cursor: 'pointer', fontWeight: 600, fontSize: '0.75rem' }}
+                style={{ background: 'none', border: 'none', color: '#fbbf24', textDecoration: 'underline', cursor: 'pointer', fontWeight: 600, fontSize: '0.75rem' }}
               >
                 Inspect Plan
               </button>
@@ -338,9 +336,7 @@ export const AppDashboard: React.FC = () => {
             left: '16px',
             maxWidth: '360px',
             marginLeft: 'auto',
-            background: 'rgba(14, 19, 37, 0.98)',
-            backdropFilter: 'blur(20px)',
-            WebkitBackdropFilter: 'blur(20px)',
+            background: '#151a26',
             border: 'var(--border-thickness) solid var(--color-border)',
             borderRadius: 'var(--radius-md)',
             boxShadow: 'var(--shadow-overlay)',

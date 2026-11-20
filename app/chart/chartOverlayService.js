@@ -27,7 +27,7 @@ class ChartOverlayService {
     // 1. Draw Support and Resistance Levels
     if (toggles.sr) {
       if (opp.nearestSupport > 0) {
-        window.drawingEngine.drawPriceLine(opp.nearestSupport, '#3b82f6', `Support: $${opp.nearestSupport.toLocaleString()}`, false);
+        window.drawingEngine.drawPriceLine(opp.nearestSupport, '#94a3b8', `Support: $${opp.nearestSupport.toLocaleString()}`, false);
       }
       if (opp.nearestResistance > 0) {
         window.drawingEngine.drawPriceLine(opp.nearestResistance, '#f97316', `Resistance: $${opp.nearestResistance.toLocaleString()}`, false);
@@ -39,7 +39,7 @@ class ChartOverlayService {
       if (rec === 'LONG' || rec === 'SHORT') {
         // Entry Price
         if (opp.suggestedEntry > 0) {
-          window.drawingEngine.drawPriceLine(opp.suggestedEntry, '#2563eb', `Entry: $${opp.suggestedEntry.toLocaleString()}`, false);
+          window.drawingEngine.drawPriceLine(opp.suggestedEntry, '#f59e0b', `Entry: $${opp.suggestedEntry.toLocaleString()}`, false);
         }
 
         // Stop Loss
@@ -88,7 +88,7 @@ class ChartOverlayService {
     
     // Draw signal badge on top of the latest price position
     const text = rec === 'LONG' ? 'RAVORA AI BUY' : 'RAVORA AI SELL';
-    const color = rec === 'LONG' ? '#2563eb' : '#ef4444';
+    const color = rec === 'LONG' ? '#f59e0b' : '#ef4444';
     
     ctx.font = 'bold 9px sans-serif';
     const textWidth = ctx.measureText(text).width;

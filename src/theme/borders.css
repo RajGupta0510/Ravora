@@ -1,13 +1,13 @@
 :root {
-  /* Borders */
+  /* Borders - Stone & Amber */
   --border-thickness: 1px;
-  --border-color: rgba(255, 255, 255, 0.08);
-  --border-color-hover: rgba(255, 255, 255, 0.16);
-  --border-color-divider: rgba(255, 255, 255, 0.04);
+  --border-color: rgba(203, 213, 225, 0.12);
+  --border-color-hover: rgba(245, 158, 11, 0.35);
+  --border-color-divider: rgba(203, 213, 225, 0.08);
 }
 
-/* Accessibility Focus System */
+/* Accessibility Focus System - High contrast Amber ring */
 :focus-visible {
-  outline: 2px solid var(--color-primary) !important;
+  outline: 2px solid #f59e0b !important;
   outline-offset: 2px !important;
 }

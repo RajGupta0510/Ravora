@@ -7,20 +7,20 @@ interface AuthSwitchProps {
 
 export const AuthSwitch: React.FC<AuthSwitchProps> = ({ mode, onChange }) => {
   return (
-    <div className="relative flex p-1.5 bg-card/80 backdrop-blur-md border border-white/5 rounded-xl w-full max-w-[320px] mx-auto select-none">
+    <div className="relative flex p-1 bg-[#10141d] border border-stone-300/10 rounded-lg w-full max-w-[320px] mx-auto select-none">
       {/* Sliding background */}
       <div
-        className="absolute top-1.5 bottom-1.5 left-1.5 rounded-lg bg-gradient-to-r from-primary to-accent transition-all duration-300 ease-out shadow-[0_4px_20px_rgba(122,90,248,0.25)] pointer-events-none"
+        className="absolute top-1 bottom-1 left-1 rounded-md bg-gradient-to-r from-[#f59e0b] to-[#d97706] transition-all duration-200 ease-out shadow-[0_2px_8px_rgba(245,158,11,0.25)] pointer-events-none"
         style={{
-          width: 'calc(50% - 12px)',
-          transform: mode === 'login' ? 'translateX(0)' : 'translateX(calc(100% + 12px))',
+          width: 'calc(50% - 4px)',
+          transform: mode === 'login' ? 'translateX(0)' : 'translateX(calc(100% + 4px))',
         }}
       />
 
       <button
         type="button"
         onClick={() => onChange('login')}
-        className={`relative z-20 w-1/2 py-2 text-xs font-bold uppercase tracking-wider rounded-lg text-center transition-colors duration-200 cursor-pointer ${mode === 'login' ? 'text-white' : 'text-slate-400 hover:text-white'
+        className={`relative z-20 w-1/2 py-2 text-xs font-bold uppercase tracking-wider rounded-md text-center transition-colors duration-150 cursor-pointer ${mode === 'login' ? 'text-[#0b0e14]' : 'text-stone-400 hover:text-stone-200'
           }`}
       >
         Sign In
@@ -29,7 +29,7 @@ export const AuthSwitch: React.FC<AuthSwitchProps> = ({ mode, onChange }) => {
       <button
         type="button"
         onClick={() => onChange('register')}
-        className={`relative z-20 w-1/2 py-2 text-xs font-bold uppercase tracking-wider rounded-lg text-center transition-colors duration-200 cursor-pointer ${mode === 'register' ? 'text-white' : 'text-slate-400 hover:text-white'
+        className={`relative z-20 w-1/2 py-2 text-xs font-bold uppercase tracking-wider rounded-md text-center transition-colors duration-150 cursor-pointer ${mode === 'register' ? 'text-[#0b0e14]' : 'text-stone-400 hover:text-stone-200'
           }`}
       >
         Register

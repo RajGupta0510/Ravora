@@ -4,11 +4,15 @@
 
 @layer utilities {
   .card-glass {
-    background: rgba(15, 23, 42, 0.6);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+    background: #151a26;
+    border: 1px solid rgba(203, 213, 225, 0.12);
+    border-radius: 10px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+    transition: border-color 0.18s ease;
+  }
+
+  .card-glass:hover {
+    border-color: rgba(245, 158, 11, 0.30);
   }
   
   .safe-bottom {
@@ -16,7 +20,7 @@
   }
 }
 
-/* Custom scrollbars for mobile touch areas */
+/* Custom scrollbars for professional terminal feel */
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
@@ -25,3 +29,17 @@
   scrollbar-width: none;
 }
 
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0b0e14;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(203, 213, 225, 0.18);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(245, 158, 11, 0.4);
+}

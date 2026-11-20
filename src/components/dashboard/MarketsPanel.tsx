@@ -721,15 +721,15 @@ export const MarketsPanel: React.FC<MarketsPanelProps> = ({ onNavigateTab }) => 
                             transition: 'all 0.2s'
                           }}
                           onMouseOver={(e) => {
-                            e.currentTarget.style.borderColor = 'var(--color-ai-accent, #7c3aed)';
-                            e.currentTarget.style.background = 'rgba(124, 58, 237, 0.1)';
+                            e.currentTarget.style.borderColor = 'rgba(245, 158, 11, 0.4)';
+                            e.currentTarget.style.background = 'rgba(245, 158, 11, 0.12)';
                           }}
                           onMouseOut={(e) => {
                             e.currentTarget.style.borderColor = 'var(--border)';
                             e.currentTarget.style.background = 'rgba(255, 255, 255, 0.03)';
                           }}
                         >
-                          <Sparkles size={12} style={{ color: 'var(--color-ai-accent, #7c3aed)' }} />
+                          <Sparkles size={12} style={{ color: '#f59e0b' }} />
                           <span>Audit & Inspect</span>
                         </button>
                       </td>
@@ -911,8 +911,8 @@ export const MarketsPanel: React.FC<MarketsPanelProps> = ({ onNavigateTab }) => 
               gap: '10px' 
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Sparkles size={15} style={{ color: 'var(--color-ai-accent, #7c3aed)' }} />
-                <h5 style={{ color: '#fff', fontSize: '0.78rem', margin: 0, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                <Sparkles size={15} style={{ color: '#f59e0b' }} />
+                <h5 style={{ color: '#f8fafc', fontSize: '0.78rem', margin: 0, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                   Araiven Intelligence Audit
                 </h5>
               </div>
@@ -921,14 +921,14 @@ export const MarketsPanel: React.FC<MarketsPanelProps> = ({ onNavigateTab }) => 
                 fontSize: '0.75rem', 
                 lineHeight: 1.5, 
                 color: 'var(--text-secondary)', 
-                background: 'rgba(255, 255, 255, 0.02)', 
-                borderLeft: '2px solid var(--color-ai-accent, #7c3aed)', 
+                background: 'rgba(245, 158, 11, 0.06)', 
+                border: '1px solid rgba(245, 158, 11, 0.25)', 
                 padding: '10px 12px', 
-                borderRadius: '4px' 
+                borderRadius: '6px' 
               }}>
                 {aiLoading ? (
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <RefreshCw size={13} className="animate-spin" style={{ color: 'var(--color-ai-accent, #7c3aed)' }} />
+                    <RefreshCw size={13} className="animate-spin" style={{ color: '#f59e0b' }} />
                     <span>Auditing orderbook depth & technical structure...</span>
                   </div>
                 ) : (

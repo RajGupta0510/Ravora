@@ -221,10 +221,10 @@ export const LandingPage: React.FC = () => {
       reasoning: 'Araiven detected high institutional inflows via spot ETFs coinciding with long-term hodler lockups. Strong orderbook support at $64,000 indicates dynamic momentum.',
       confidence: '94%',
       strokeOffset: '15.0',
-      strokeColor: '#7c3aed',
+      strokeColor: '#f59e0b',
       return: '15.0% - 22.0%',
       risk: 'Medium',
-      riskClass: 'text-purple',
+      riskClass: 'text-amber',
       strategy: 'Spot Inflow Accumulation'
     },
     yield: {
@@ -234,7 +234,7 @@ export const LandingPage: React.FC = () => {
       reasoning: 'Following Fed volatility, lending pool rates on Aave and Uniswap spiked. Araiven recommends capturing arbitrage spreads by rotating low-yield reserves into our optimized Stablecoin Basket.',
       confidence: '91%',
       strokeOffset: '22.5',
-      strokeColor: '#3b82f6',
+      strokeColor: '#f59e0b',
       return: '6.5% - 9.2%',
       risk: 'Low',
       riskClass: 'text-green',
@@ -262,7 +262,7 @@ export const LandingPage: React.FC = () => {
       {/* Navbar */}
       <nav className={`navbar ${navbarScrolled ? 'scrolled' : ''}`} style={{
         borderBottom: '1px solid var(--border)',
-        background: navbarScrolled ? 'rgba(6, 9, 19, 0.92)' : 'rgba(6, 9, 19, 0.8)',
+        background: navbarScrolled ? 'rgba(16, 20, 29, 0.95)' : 'rgba(16, 20, 29, 0.85)',
         backdropFilter: 'blur(16px)',
         WebkitBackdropFilter: 'blur(16px)',
         position: 'fixed',
@@ -288,19 +288,19 @@ export const LandingPage: React.FC = () => {
             fontFamily: 'var(--font-display)',
             fontSize: '1.15rem',
             fontWeight: 700,
-            color: '#fff',
+            color: '#f8fafc',
             textDecoration: 'none'
           }}>
             <div className="logo-icon" style={{
               width: '32px',
               height: '32px',
               borderRadius: '6px',
-              background: 'var(--gradient-interactive)',
+              background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: '#fff',
-              fontWeight: 700,
+              color: '#0b0e14',
+              fontWeight: 800,
               fontSize: '1.1rem'
             }}>R</div>
             Ravora
@@ -805,7 +805,7 @@ export const LandingPage: React.FC = () => {
                 fontFamily: 'monospace',
                 fontSize: '0.75rem',
                 minHeight: '76px',
-                color: simInteractiveStep === 5 ? '#10b981' : (simInteractiveStep > 0 ? '#3b82f6' : '#94a3b8'),
+                color: simInteractiveStep === 5 ? '#10b981' : (simInteractiveStep > 0 ? '#f59e0b' : '#94a3b8'),
                 lineHeight: 1.45
               }}>{simStatusText}</div>
 

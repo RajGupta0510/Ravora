@@ -24,20 +24,20 @@ const PageSkeleton: React.FC = () => (
     justifyContent: 'center',
     width: '100vw',
     height: '100vh',
-    background: '#060B17',
-    color: '#fff',
-    fontFamily: 'sans-serif'
+    background: '#0B0E14',
+    color: '#F8FAFC',
+    fontFamily: 'var(--font-body)'
   }}>
     <div style={{
       width: '36px',
       height: '36px',
-      border: '3px solid rgba(255,255,255,0.1)',
+      border: '3px solid rgba(203,213,225,0.12)',
       borderRadius: '50%',
-      borderTopColor: '#4F7CFF',
+      borderTopColor: '#F59E0B',
       animation: 'spin-loader 0.8s linear infinite',
       marginBottom: '16px'
     }}></div>
-    <div style={{ fontSize: '0.78rem', letterSpacing: '0.08em', color: '#94a3b8', fontWeight: 600 }}>
+    <div style={{ fontSize: '0.78rem', letterSpacing: '0.08em', color: '#CBD5E1', fontWeight: 600 }}>
       LOADING...
     </div>
     <style>{`
@@ -111,20 +111,20 @@ const AppContent: React.FC = () => {
         justifyContent: 'center',
         width: '100vw',
         height: '100vh',
-        background: '#060B17',
-        color: '#fff',
-        fontFamily: 'sans-serif'
+        background: '#0B0E14',
+        color: '#F8FAFC',
+        fontFamily: 'var(--font-body)'
       }}>
         <div style={{
           width: '36px',
           height: '36px',
-          border: '3px solid rgba(255,255,255,0.1)',
+          border: '3px solid rgba(203,213,225,0.12)',
           borderRadius: '50%',
-          borderTopColor: '#4F7CFF',
+          borderTopColor: '#F59E0B',
           animation: 'spin-loader 0.8s linear infinite',
           marginBottom: '16px'
         }}></div>
-        <div style={{ fontSize: '0.78rem', letterSpacing: '0.08em', color: '#94a3b8', fontWeight: 600 }}>
+        <div style={{ fontSize: '0.78rem', letterSpacing: '0.08em', color: '#CBD5E1', fontWeight: 600 }}>
           SYNCHRONIZING ARAIVEN...
         </div>
         <style>{`
@@ -177,11 +177,11 @@ const AppContent: React.FC = () => {
         justifyContent: 'center',
         width: '100vw',
         height: '100vh',
-        background: '#060B17',
-        color: '#fff',
-        fontFamily: 'sans-serif'
+        background: '#0B0E14',
+        color: '#F8FAFC',
+        fontFamily: 'var(--font-body)'
       }}>
-        <div style={{ fontSize: '0.78rem', letterSpacing: '0.08em', color: '#94a3b8', fontWeight: 600 }}>
+        <div style={{ fontSize: '0.78rem', letterSpacing: '0.08em', color: '#CBD5E1', fontWeight: 600 }}>
           RELOADING WORKSPACE...
         </div>
       </div>

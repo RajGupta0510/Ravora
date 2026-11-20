@@ -74,9 +74,9 @@ export const SettingsPanel: React.FC = () => {
       <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
         
         {/* Execution Mode */}
-        <div className="card-glass" style={{ padding: 'clamp(16px, 2.5vw, 24px)', borderRadius: '12px', border: '1px solid var(--border)' }}>
-          <h3 style={{ fontSize: '0.88rem', fontWeight: 700, margin: '0 0 14px 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Radio size={16} style={{ color: 'var(--color-ai-accent)', flexShrink: 0 }} />
+        <div className="card-glass" style={{ padding: 'clamp(16px, 2.5vw, 24px)', borderRadius: '10px', border: '1px solid var(--border)', background: '#151a26' }}>
+          <h3 style={{ fontSize: '0.88rem', fontWeight: 700, margin: '0 0 14px 0', display: 'flex', alignItems: 'center', gap: '8px', color: '#f8fafc' }}>
+            <Radio size={16} style={{ color: '#f59e0b', flexShrink: 0 }} />
             SYSTEM EXECUTION MODE
           </h3>
 
@@ -92,13 +92,13 @@ export const SettingsPanel: React.FC = () => {
                 style={{
                   padding: '12px 14px',
                   borderRadius: '8px',
-                  border: settings?.execution_mode === mode.key ? '1px solid var(--color-ai-accent)' : '1px solid rgba(255,255,255,0.04)',
-                  background: settings?.execution_mode === mode.key ? 'rgba(124, 58, 237, 0.08)' : 'rgba(255,255,255,0.005)',
+                  border: settings?.execution_mode === mode.key ? '1px solid rgba(245, 158, 11, 0.4)' : '1px solid var(--border)',
+                  background: settings?.execution_mode === mode.key ? 'rgba(245, 158, 11, 0.12)' : 'transparent',
                   cursor: 'pointer',
                   transition: 'all 0.15s ease'
                 }}
               >
-                <div style={{ fontWeight: 600, fontSize: '0.84rem', color: settings?.execution_mode === mode.key ? '#fff' : 'var(--text-secondary)' }}>{mode.label}</div>
+                <div style={{ fontWeight: 600, fontSize: '0.84rem', color: settings?.execution_mode === mode.key ? '#fbbf24' : 'var(--text-secondary)' }}>{mode.label}</div>
                 <div style={{ fontSize: '0.73rem', color: 'var(--text-muted)', marginTop: '4px', lineHeight: 1.35 }}>{mode.desc}</div>
               </div>
             ))}
@@ -106,9 +106,9 @@ export const SettingsPanel: React.FC = () => {
         </div>
 
         {/* Safety & Alerts config */}
-        <div className="card-glass" style={{ padding: 'clamp(16px, 2.5vw, 24px)', borderRadius: '12px', border: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <h3 style={{ fontSize: '0.88rem', fontWeight: 700, margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Shield size={16} style={{ color: 'var(--ai-accent)', flexShrink: 0 }} />
+        <div className="card-glass" style={{ padding: 'clamp(16px, 2.5vw, 24px)', borderRadius: '10px', border: '1px solid var(--border)', background: '#151a26', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <h3 style={{ fontSize: '0.88rem', fontWeight: 700, margin: 0, display: 'flex', alignItems: 'center', gap: '8px', color: '#f8fafc' }}>
+            <Shield size={16} style={{ color: '#f59e0b', flexShrink: 0 }} />
             SAFETY & NOTIFICATION CONTEXT
           </h3>
 
@@ -141,9 +141,9 @@ export const SettingsPanel: React.FC = () => {
       <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
         
         {/* Connect Exchange */}
-        <div className="card-glass" style={{ padding: 'clamp(16px, 2.5vw, 24px)', borderRadius: '12px', border: '1px solid var(--border)' }}>
-          <h3 style={{ fontSize: '0.88rem', fontWeight: 700, margin: '0 0 14px 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Key size={16} style={{ color: 'var(--ai-accent)', flexShrink: 0 }} />
+        <div className="card-glass" style={{ padding: 'clamp(16px, 2.5vw, 24px)', borderRadius: '10px', border: '1px solid var(--border)', background: '#151a26' }}>
+          <h3 style={{ fontSize: '0.88rem', fontWeight: 700, margin: '0 0 14px 0', display: 'flex', alignItems: 'center', gap: '8px', color: '#f8fafc' }}>
+            <Key size={16} style={{ color: '#f59e0b', flexShrink: 0 }} />
             CONNECT EXCHANGE API
           </h3>
 
@@ -153,11 +153,11 @@ export const SettingsPanel: React.FC = () => {
               <select 
                 value={exchangeName} 
                 onChange={(e) => setExchangeName(e.target.value)}
-                style={{ width: '100%', padding: '10px 12px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.03)', color: '#fff', fontSize: '0.8rem', outline: 'none', boxSizing: 'border-box' }}
+                style={{ width: '100%', padding: '10px 12px', borderRadius: '6px', border: '1px solid var(--border)', background: '#0e121b', color: '#f8fafc', fontSize: '0.8rem', outline: 'none', boxSizing: 'border-box' }}
               >
-                <option value="binance" style={{ background: '#0e1325' }}>Binance Connection (Standard V1)</option>
-                <option value="kraken" style={{ background: '#0e1325' }}>Kraken Exchange</option>
-                <option value="coinbase" style={{ background: '#0e1325' }}>Coinbase Pro</option>
+                <option value="binance" style={{ background: '#151a26' }}>Binance Connection (Standard V1)</option>
+                <option value="kraken" style={{ background: '#151a26' }}>Kraken Exchange</option>
+                <option value="coinbase" style={{ background: '#151a26' }}>Coinbase Pro</option>
               </select>
             </div>
 
@@ -169,7 +169,7 @@ export const SettingsPanel: React.FC = () => {
                 value={apiKey}
                 onChange={(e) => setApiKey(e.target.value)}
                 placeholder="Paste API Key (Withdrawal Disabled)"
-                style={{ width: '100%', padding: '10px 12px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.03)', color: '#fff', fontSize: '0.8rem', outline: 'none', boxSizing: 'border-box' }}
+                style={{ width: '100%', padding: '10px 12px', borderRadius: '6px', border: '1px solid var(--border)', background: '#0e121b', color: '#f8fafc', fontSize: '0.8rem', outline: 'none', boxSizing: 'border-box' }}
               />
             </div>
 
@@ -181,7 +181,7 @@ export const SettingsPanel: React.FC = () => {
                 value={apiSecret}
                 onChange={(e) => setApiSecret(e.target.value)}
                 placeholder="Paste Secret Key Credentials"
-                style={{ width: '100%', padding: '10px 12px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.03)', color: '#fff', fontSize: '0.8rem', outline: 'none', boxSizing: 'border-box' }}
+                style={{ width: '100%', padding: '10px 12px', borderRadius: '6px', border: '1px solid var(--border)', background: '#0e121b', color: '#f8fafc', fontSize: '0.8rem', outline: 'none', boxSizing: 'border-box' }}
               />
             </div>
 

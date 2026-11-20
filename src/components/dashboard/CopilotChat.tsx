@@ -39,9 +39,9 @@ export const CopilotChat: React.FC = () => {
       display: 'flex',
       flexDirection: 'column',
       height: 'calc(100vh - clamp(140px, 18vh, 180px))',
-      borderRadius: 'var(--radius-md)',
+      borderRadius: '10px',
       border: 'var(--border-thickness) solid var(--color-border)',
-      background: 'rgba(14, 19, 37, 0.45)',
+      background: '#151a26',
       overflow: 'hidden'
     }}>
       
@@ -53,9 +53,9 @@ export const CopilotChat: React.FC = () => {
         alignItems: 'center',
         gap: '10px'
       }}>
-        <MessageSquareCode size={18} style={{ color: 'var(--color-ai-accent)', flexShrink: 0 }} />
+        <MessageSquareCode size={18} style={{ color: '#f59e0b', flexShrink: 0 }} />
         <div>
-          <h2 style={{ fontSize: '0.88rem', fontWeight: 700, margin: 0 }}>Araiven Advisor Sandbox</h2>
+          <h2 style={{ fontSize: '0.88rem', fontWeight: 700, margin: 0, color: '#f8fafc' }}>Araiven Advisor Sandbox</h2>
           <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>Continuous Audit & Reasoning System</span>
         </div>
       </div>
@@ -80,9 +80,9 @@ export const CopilotChat: React.FC = () => {
               borderRadius: '8px',
               fontSize: '0.8rem',
               lineHeight: 1.45,
-              background: msg.sender === 'user' ? 'rgba(37, 99, 235, 0.15)' : 'rgba(255, 255, 255, 0.02)',
-              border: msg.sender === 'user' ? '1px solid rgba(37,99,235,0.25)' : '1px solid rgba(255,255,255,0.04)',
-              color: '#fff',
+              background: msg.sender === 'user' ? 'rgba(245, 158, 11, 0.12)' : '#10141d',
+              border: msg.sender === 'user' ? '1px solid rgba(245, 158, 11, 0.28)' : '1px solid var(--border)',
+              color: msg.sender === 'user' ? '#f8fafc' : 'var(--text-secondary)',
               boxSizing: 'border-box'
             }}
           >
@@ -105,7 +105,7 @@ export const CopilotChat: React.FC = () => {
         display: 'flex',
         flexDirection: 'column',
         gap: '10px',
-        background: 'rgba(6, 9, 19, 0.4)'
+        background: '#10141d'
       }}>
         {/* Preset prompts badges */}
         <div className="no-scrollbar" style={{ display: 'flex', gap: '8px', overflowX: 'auto', WebkitOverflowScrolling: 'touch', paddingBottom: '2px' }}>
@@ -146,8 +146,8 @@ export const CopilotChat: React.FC = () => {
               padding: '10px 42px 10px 14px',
               borderRadius: '8px',
               border: '1px solid var(--border)',
-              background: 'rgba(255,255,255,0.03)',
-              color: '#fff',
+              background: '#0e121b',
+              color: '#f8fafc',
               fontSize: '0.82rem',
               outline: 'none',
               boxSizing: 'border-box'
@@ -164,7 +164,7 @@ export const CopilotChat: React.FC = () => {
               transform: 'translateY(-50%)',
               background: 'none',
               border: 'none',
-              color: inputText.trim() ? 'var(--primary)' : 'var(--text-muted)',
+              color: inputText.trim() ? '#f59e0b' : 'var(--text-muted)',
               cursor: inputText.trim() ? 'pointer' : 'default',
               display: 'flex',
               alignItems: 'center',

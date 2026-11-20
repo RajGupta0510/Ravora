@@ -88,7 +88,7 @@ export const OpportunitiesPanel: React.FC = () => {
       
       {/* Top Controls: Scan & Filter */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
-        <div className="filter-segmented" style={{ display: 'flex', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '6px', padding: '2px', flexWrap: 'wrap', gap: '2px' }}>
+        <div className="filter-segmented" style={{ display: 'flex', background: '#10141d', border: '1px solid var(--border)', borderRadius: '6px', padding: '2px', flexWrap: 'wrap', gap: '2px' }}>
           {(['ALL', 'LONG', 'SHORT'] as const).map((t) => (
             <button
               key={t}
@@ -97,9 +97,9 @@ export const OpportunitiesPanel: React.FC = () => {
               style={{
                 padding: '6px 14px',
                 fontSize: '0.72rem',
-                border: 'none',
-                background: filterType === t ? 'var(--gradient-primary)' : 'transparent',
-                color: filterType === t ? '#fff' : 'var(--text-secondary)',
+                border: filterType === t ? '1px solid rgba(245, 158, 11, 0.35)' : '1px solid transparent',
+                background: filterType === t ? 'rgba(245, 158, 11, 0.12)' : 'transparent',
+                color: filterType === t ? '#fbbf24' : 'var(--text-secondary)',
                 borderRadius: '4px',
                 cursor: 'pointer',
                 fontWeight: 600
@@ -124,7 +124,7 @@ export const OpportunitiesPanel: React.FC = () => {
             gap: '8px'
           }}
         >
-          <Sparkles size={14} style={{ color: 'var(--ai-accent)' }} />
+          <Sparkles size={14} style={{ color: '#f59e0b' }} />
           {scanning ? 'Ingesting Feeds...' : 'Force Market Scan'}
         </button>
       </div>
@@ -149,14 +149,14 @@ export const OpportunitiesPanel: React.FC = () => {
               className="card-glass"
               style={{
                 padding: '16px',
-                borderRadius: '12px',
+                borderRadius: '10px',
                 border: '1px solid var(--border)',
                 cursor: 'pointer',
                 transition: 'all 0.2s ease',
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '12px',
-                background: 'rgba(14, 19, 37, 0.3)'
+                background: '#151a26'
               }}
               onMouseOver={(e) => e.currentTarget.style.borderColor = 'var(--color-border-hover)'}
               onMouseOut={(e) => e.currentTarget.style.borderColor = 'var(--color-border)'}
@@ -314,7 +314,7 @@ export const OpportunitiesPanel: React.FC = () => {
                     style={{ width: '100%', padding: '10px 12px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.03)', color: '#fff', fontSize: '0.85rem', outline: 'none', cursor: 'pointer', boxSizing: 'border-box' }}
                   >
                     {[1, 2, 3, 5, 10].map(lev => (
-                      <option key={lev} value={lev} style={{ background: '#0e1325' }}>{lev}x</option>
+                      <option key={lev} value={lev} style={{ background: '#151a26', color: '#f8fafc' }}>{lev}x</option>
                     ))}
                   </select>
                 </div>
@@ -324,9 +324,9 @@ export const OpportunitiesPanel: React.FC = () => {
                 type="submit" 
                 disabled={deploying}
                 className="btn btn-primary"
-                style={{ width: '100%', height: '42px', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+                style={{ width: '100%', height: '42px', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
               >
-                <Play size={14} fill="#fff" />
+                <Play size={14} fill="#0b0e14" color="#0b0e14" />
                 <span>{deploying ? 'Deploying...' : 'Deploy to Sandbox'}</span>
               </button>
             </form>

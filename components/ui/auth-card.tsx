@@ -316,69 +316,63 @@ export const AuthCardPage: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 w-full h-full bg-[#060B17] text-white flex flex-col lg:flex-row overflow-y-auto lg:overflow-hidden font-body">
-      
-      {/* Background ambient lighting */}
-      <div className="absolute top-[20%] left-[10%] w-[350px] h-[350px] bg-[#4F7CFF]/5 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-[20%] right-[10%] w-[400px] h-[400px] bg-[#7A5AF8]/5 rounded-full blur-[120px] pointer-events-none" />
+    <div className="fixed inset-0 w-full h-full bg-[#0b0e14] text-[#f8fafc] flex flex-col lg:flex-row overflow-y-auto lg:overflow-hidden font-body">
 
       {/* LEFT STORY PANEL (Hidden on mobile/tablet) */}
-      <div className="hidden lg:flex w-[48%] h-full bg-gradient-to-br from-[#060B17] via-[#080E1E] to-[#0A142C] border-r border-white/5 flex-col justify-between p-12 relative overflow-hidden">
-        {/* Subtle grid pattern */}
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-[size:32px_32px] [mask-image:radial-gradient(ellipse_at_center,black_70%,transparent_100%)] pointer-events-none" />
+      <div className="hidden lg:flex w-[48%] h-full bg-[#10141d] border-r border-stone-300/10 flex-col justify-between p-12 relative overflow-hidden">
         
         {/* Branding header */}
         <div className="flex items-center gap-3 relative z-10">
-          <div className="w-9 h-9 rounded-lg bg-gradient-to-r from-primary to-accent flex items-center justify-center font-display font-bold text-lg shadow-[0_4px_20px_rgba(79,124,255,0.35)]">
+          <div className="w-9 h-9 rounded-lg bg-gradient-to-r from-[#f59e0b] to-[#d97706] text-[#0b0e14] flex items-center justify-center font-display font-bold text-lg shadow-[0_2px_10px_rgba(245,158,11,0.25)]">
             R
           </div>
-          <span className="font-display font-bold text-xl tracking-wide bg-gradient-to-r from-white via-white to-slate-400 bg-clip-text text-transparent">
+          <span className="font-display font-bold text-xl tracking-wide text-[#f8fafc]">
             Ravora OS
           </span>
         </div>
 
         {/* Dynamic AI Showcase visual */}
         <div className="my-auto relative z-10 max-w-lg">
-          <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/5 border border-white/10 rounded-full text-xs font-semibold text-accent-cyan mb-6 shadow-sm">
+          <div className="inline-flex items-center gap-2 px-3 py-1 bg-stone-300/5 border border-stone-300/15 rounded-full text-xs font-semibold text-[#f59e0b] mb-6 shadow-sm">
             <BrainCircuit className="w-3.5 h-3.5" />
             Araiven Intelligence Framework
           </div>
           
-          <h2 className="text-4xl font-display font-bold leading-tight tracking-tight">
+          <h2 className="text-4xl font-display font-bold leading-tight tracking-tight text-[#f8fafc]">
             Trade Smarter. <br />
-            <span className="bg-gradient-to-r from-primary via-accent to-accent-cyan bg-clip-text text-transparent">
+            <span className="text-[#f59e0b]">
               Let AI Do The Rest.
             </span>
           </h2>
           
-          <p className="text-slate-400 mt-4 leading-relaxed text-sm">
+          <p className="text-stone-300 mt-4 leading-relaxed text-sm">
             Ravora continuously scans global orderbooks, builds risk-audited execution target levels, and monitors drawdown limits autonomously to grow your capital without emotion.
           </p>
 
           {/* Simple floating trading dashboard mockup */}
-          <div className="mt-8 p-5 bg-[#0F172A]/60 border border-white/5 rounded-2xl backdrop-blur-md shadow-2xl relative overflow-hidden group">
-            <div className="flex items-center justify-between border-b border-white/5 pb-3">
+          <div className="mt-8 p-5 bg-[#151a26] border border-stone-300/10 rounded-xl shadow-xl relative overflow-hidden group">
+            <div className="flex items-center justify-between border-b border-stone-300/10 pb-3">
               <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="text-xs font-bold text-slate-300">Araiven Stance: Active Yield Staking</span>
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
+                <span className="text-xs font-bold text-stone-200">Araiven Stance: Active Yield Staking</span>
               </div>
-              <span className="text-[10px] font-mono text-slate-500">Confidence: 94%</span>
+              <span className="text-[10px] font-mono text-stone-400">Confidence: 94%</span>
             </div>
             
             <div className="mt-4 flex items-center justify-between">
               <div>
-                <span className="text-[10px] uppercase tracking-wider text-slate-500 font-semibold">Virtual Balance</span>
-                <h4 className="text-xl font-bold tracking-tight text-white mt-0.5">$132,194.10</h4>
+                <span className="text-[10px] uppercase tracking-wider text-stone-400 font-semibold">Virtual Balance</span>
+                <h4 className="text-xl font-bold tracking-tight text-[#f8fafc] mt-0.5">$132,194.10</h4>
               </div>
               <div className="text-right">
-                <span className="text-[10px] uppercase tracking-wider text-slate-500 font-semibold">24h Alpha Return</span>
+                <span className="text-[10px] uppercase tracking-wider text-stone-400 font-semibold">24h Alpha Return</span>
                 <h4 className="text-xs font-bold text-emerald-400 mt-0.5 font-mono">+12.0% (+$14,210)</h4>
               </div>
             </div>
 
             {/* Simple SVG Chart Line */}
             <div className="mt-4 h-16 w-full flex items-end">
-              <svg className="w-full h-full text-[#4F7CFF]" viewBox="0 0 100 30" preserveAspectRatio="none">
+              <svg className="w-full h-full text-[#f59e0b]" viewBox="0 0 100 30" preserveAspectRatio="none">
                 <path
                   d="M0,25 Q15,15 30,20 T60,5 T90,8 T100,2"
                   fill="none"
@@ -392,7 +386,7 @@ export const AuthCardPage: React.FC = () => {
         </div>
 
         {/* Footer info */}
-        <div className="text-xs text-slate-500 font-medium relative z-10 flex justify-between">
+        <div className="text-xs text-stone-400 font-medium relative z-10 flex justify-between">
           <span>Security Guard Core Active</span>
           <span>© 2026 Ravora</span>
         </div>
@@ -403,10 +397,10 @@ export const AuthCardPage: React.FC = () => {
         
         {/* Mobile Header Logo */}
         <div className="lg:hidden flex items-center gap-2.5 mb-8">
-          <div className="w-8.5 h-8.5 rounded-lg bg-gradient-to-r from-primary to-accent flex items-center justify-center font-display font-bold text-base shadow-[0_4px_16px_rgba(79,124,255,0.25)]">
+          <div className="w-8.5 h-8.5 rounded-lg bg-gradient-to-r from-[#f59e0b] to-[#d97706] text-[#0b0e14] flex items-center justify-center font-display font-bold text-base shadow-[0_2px_10px_rgba(245,158,11,0.25)]">
             R
           </div>
-          <span className="font-display font-bold text-lg tracking-wide">Ravora OS</span>
+          <span className="font-display font-bold text-lg tracking-wide text-[#f8fafc]">Ravora OS</span>
         </div>
 
         {/* Main Glassmorphic Wrapper */}
@@ -475,7 +469,7 @@ export const AuthCardPage: React.FC = () => {
                     placeholder="name@domain.com or +1234567890"
                     autoComplete="username"
                     {...loginForm.register('email')}
-                    className="w-full h-10 pl-11 pr-4 bg-white/[0.02] border border-white/10 rounded-xl focus:border-[#4F7CFF] focus:ring-1 focus:ring-[#4F7CFF] outline-none text-sm transition-all placeholder-slate-600"
+                    className="w-full h-10 pl-11 pr-4 bg-white/[0.02] border border-white/10 rounded-xl focus:border-[#f59e0b] focus:ring-1 focus:ring-[#f59e0b] outline-none text-sm transition-all placeholder-slate-600"
                   />
                 </div>
                 {loginForm.formState.errors.email && (
@@ -489,7 +483,7 @@ export const AuthCardPage: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => changeMode('forgot')}
-                    className="text-[10px] font-semibold text-[#4F7CFF] hover:underline"
+                    className="text-[10px] font-semibold text-[#f59e0b] hover:underline"
                   >
                     Forgot Password?
                   </button>
@@ -501,7 +495,7 @@ export const AuthCardPage: React.FC = () => {
                     placeholder="••••••••"
                     autoComplete="current-password"
                     {...loginForm.register('password')}
-                    className="w-full h-10 pl-11 pr-11 bg-white/[0.02] border border-white/10 rounded-xl focus:border-[#4F7CFF] focus:ring-1 focus:ring-[#4F7CFF] outline-none text-sm transition-all placeholder-slate-600"
+                    className="w-full h-10 pl-11 pr-11 bg-white/[0.02] border border-white/10 rounded-xl focus:border-[#f59e0b] focus:ring-1 focus:ring-[#f59e0b] outline-none text-sm transition-all placeholder-slate-600"
                   />
                   <button
                     type="button"
@@ -521,7 +515,7 @@ export const AuthCardPage: React.FC = () => {
                   type="checkbox"
                   id="rememberMe"
                   {...loginForm.register('rememberMe')}
-                  className="rounded border-white/10 text-[#4F7CFF] bg-[#0E1325] focus:ring-offset-0 focus:ring-[#4F7CFF] w-4 h-4"
+                  className="rounded border-stone-300/10 text-[#f59e0b] bg-[#10141d] focus:ring-offset-0 focus:ring-[#f59e0b] w-4 h-4"
                 />
                 <label htmlFor="rememberMe" className="ml-2.5 text-xs text-slate-400 font-semibold select-none cursor-pointer">
                   Remember terminal session
@@ -531,7 +525,7 @@ export const AuthCardPage: React.FC = () => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full h-10 bg-gradient-to-r from-primary to-accent hover:opacity-95 transition-all text-white font-bold rounded-xl text-sm flex items-center justify-center gap-2.5 shadow-[0_4px_20px_rgba(79,124,255,0.2)] disabled:opacity-50"
+                className="w-full h-10 bg-gradient-to-r from-[#f59e0b] to-[#d97706] hover:brightness-105 transition-all text-[#0b0e14] font-bold rounded-lg text-sm flex items-center justify-center gap-2.5 shadow-[0_2px_10px_rgba(245,158,11,0.25)] disabled:opacity-50"
               >
                 {isSubmitting ? (
                   <LoaderCircle className="w-4.5 h-4.5 animate-spin" />
@@ -545,7 +539,7 @@ export const AuthCardPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => changeMode('register')}
-                  className="text-[#4F7CFF] hover:underline font-semibold bg-transparent border-none p-0 cursor-pointer"
+                  className="text-[#f59e0b] hover:underline font-semibold bg-transparent border-none p-0 cursor-pointer"
                 >
                   Register here
                 </button>
@@ -565,7 +559,7 @@ export const AuthCardPage: React.FC = () => {
                     placeholder="John Doe"
                     autoComplete="name"
                     {...signupForm.register('fullName')}
-                    className="w-full h-10 pl-11 pr-4 bg-white/[0.02] border border-white/10 rounded-xl focus:border-[#4F7CFF] focus:ring-1 focus:ring-[#4F7CFF] outline-none text-sm transition-all placeholder-slate-600"
+                    className="w-full h-10 pl-11 pr-4 bg-white/[0.02] border border-white/10 rounded-xl focus:border-[#f59e0b] focus:ring-1 focus:ring-[#f59e0b] outline-none text-sm transition-all placeholder-slate-600"
                   />
                 </div>
                 {signupForm.formState.errors.fullName && (
@@ -582,7 +576,7 @@ export const AuthCardPage: React.FC = () => {
                     placeholder="name@domain.com or +1234567890"
                     autoComplete="email"
                     {...signupForm.register('email')}
-                    className="w-full h-10 pl-11 pr-4 bg-white/[0.02] border border-white/10 rounded-xl focus:border-[#4F7CFF] focus:ring-1 focus:ring-[#4F7CFF] outline-none text-sm transition-all placeholder-slate-600"
+                    className="w-full h-10 pl-11 pr-4 bg-white/[0.02] border border-white/10 rounded-xl focus:border-[#f59e0b] focus:ring-1 focus:ring-[#f59e0b] outline-none text-sm transition-all placeholder-slate-600"
                   />
                 </div>
                 {signupForm.formState.errors.email && (
@@ -599,7 +593,7 @@ export const AuthCardPage: React.FC = () => {
                     placeholder="••••••••"
                     autoComplete="new-password"
                     {...signupForm.register('password')}
-                    className="w-full h-10 pl-11 pr-11 bg-white/[0.02] border border-white/10 rounded-xl focus:border-[#4F7CFF] focus:ring-1 focus:ring-[#4F7CFF] outline-none text-sm transition-all placeholder-slate-600"
+                    className="w-full h-10 pl-11 pr-11 bg-white/[0.02] border border-white/10 rounded-xl focus:border-[#f59e0b] focus:ring-1 focus:ring-[#f59e0b] outline-none text-sm transition-all placeholder-slate-600"
                   />
                   <button
                     type="button"
@@ -645,7 +639,7 @@ export const AuthCardPage: React.FC = () => {
                     placeholder="••••••••"
                     autoComplete="new-password"
                     {...signupForm.register('confirmPassword')}
-                    className="w-full h-10 pl-11 pr-11 bg-white/[0.02] border border-white/10 rounded-xl focus:border-[#4F7CFF] focus:ring-1 focus:ring-[#4F7CFF] outline-none text-sm transition-all placeholder-slate-600"
+                    className="w-full h-10 pl-11 pr-11 bg-white/[0.02] border border-white/10 rounded-xl focus:border-[#f59e0b] focus:ring-1 focus:ring-[#f59e0b] outline-none text-sm transition-all placeholder-slate-600"
                   />
                   <button
                     type="button"
@@ -665,12 +659,12 @@ export const AuthCardPage: React.FC = () => {
                   type="checkbox"
                   id="acceptTerms"
                   {...signupForm.register('acceptTerms')}
-                  className="rounded border-white/10 text-[#4F7CFF] bg-[#0E1325] focus:ring-offset-0 focus:ring-[#4F7CFF] w-4 h-4 mt-0.5"
+                  className="rounded border-stone-300/10 text-[#f59e0b] bg-[#10141d] focus:ring-offset-0 focus:ring-[#f59e0b] w-4 h-4 mt-0.5"
                 />
                 <label htmlFor="acceptTerms" className="ml-2.5 text-[11px] text-slate-400 leading-normal select-none cursor-pointer">
                   I accept the Ravora{' '}
-                  <a href="#" className="text-[#4F7CFF] hover:underline">Terms of Service</a> and{' '}
-                  <a href="#" className="text-[#4F7CFF] hover:underline">Privacy Policy</a>
+                  <a href="#" className="text-[#f59e0b] hover:underline">Terms of Service</a> and{' '}
+                  <a href="#" className="text-[#f59e0b] hover:underline">Privacy Policy</a>
                 </label>
               </div>
               {signupForm.formState.errors.acceptTerms && (
@@ -680,7 +674,7 @@ export const AuthCardPage: React.FC = () => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full h-10 bg-gradient-to-r from-primary to-accent hover:opacity-95 transition-all text-white font-bold rounded-xl text-sm flex items-center justify-center gap-2.5 shadow-[0_4px_20px_rgba(79,124,255,0.2)] disabled:opacity-50 mt-1.5"
+                className="w-full h-10 bg-gradient-to-r from-[#f59e0b] to-[#d97706] hover:brightness-105 transition-all text-[#0b0e14] font-bold rounded-lg text-sm flex items-center justify-center gap-2.5 shadow-[0_2px_10px_rgba(245,158,11,0.25)] disabled:opacity-50 mt-1.5"
               >
                 {isSubmitting ? (
                   <LoaderCircle className="w-4.5 h-4.5 animate-spin" />
@@ -694,7 +688,7 @@ export const AuthCardPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => changeMode('login')}
-                  className="text-[#4F7CFF] hover:underline font-semibold bg-transparent border-none p-0 cursor-pointer"
+                  className="text-[#f59e0b] hover:underline font-semibold bg-transparent border-none p-0 cursor-pointer"
                 >
                   Sign In here
                 </button>
@@ -714,7 +708,7 @@ export const AuthCardPage: React.FC = () => {
                     placeholder="name@domain.com or +1234567890"
                     autoComplete="email"
                     {...forgotForm.register('email')}
-                    className="w-full h-10 pl-11 pr-4 bg-white/[0.02] border border-white/10 rounded-xl focus:border-[#4F7CFF] focus:ring-1 focus:ring-[#4F7CFF] outline-none text-sm transition-all placeholder-slate-600"
+                    className="w-full h-10 pl-11 pr-4 bg-white/[0.02] border border-white/10 rounded-xl focus:border-[#f59e0b] focus:ring-1 focus:ring-[#f59e0b] outline-none text-sm transition-all placeholder-slate-600"
                   />
                 </div>
                 {forgotForm.formState.errors.email && (
@@ -725,7 +719,7 @@ export const AuthCardPage: React.FC = () => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full h-10 bg-gradient-to-r from-primary to-accent hover:opacity-95 transition-all text-white font-bold rounded-xl text-sm flex items-center justify-center gap-2.5 shadow-[0_4px_20px_rgba(79,124,255,0.2)] disabled:opacity-50"
+                className="w-full h-10 bg-gradient-to-r from-[#f59e0b] to-[#d97706] hover:brightness-105 transition-all text-[#0b0e14] font-bold rounded-lg text-sm flex items-center justify-center gap-2.5 shadow-[0_2px_10px_rgba(245,158,11,0.25)] disabled:opacity-50"
               >
                 {isSubmitting ? (
                   <LoaderCircle className="w-4.5 h-4.5 animate-spin" />
@@ -756,7 +750,7 @@ export const AuthCardPage: React.FC = () => {
                     placeholder="••••••••"
                     autoComplete="new-password"
                     {...resetForm.register('password')}
-                    className="w-full h-10 pl-11 pr-11 bg-white/[0.02] border border-white/10 rounded-xl focus:border-[#4F7CFF] focus:ring-1 focus:ring-[#4F7CFF] outline-none text-sm transition-all placeholder-slate-600"
+                    className="w-full h-10 pl-11 pr-11 bg-white/[0.02] border border-white/10 rounded-xl focus:border-[#f59e0b] focus:ring-1 focus:ring-[#f59e0b] outline-none text-sm transition-all placeholder-slate-600"
                   />
                   <button
                     type="button"
@@ -780,7 +774,7 @@ export const AuthCardPage: React.FC = () => {
                     placeholder="••••••••"
                     autoComplete="new-password"
                     {...resetForm.register('confirmPassword')}
-                    className="w-full h-10 pl-11 pr-11 bg-white/[0.02] border border-white/10 rounded-xl focus:border-[#4F7CFF] focus:ring-1 focus:ring-[#4F7CFF] outline-none text-sm transition-all placeholder-slate-600"
+                    className="w-full h-10 pl-11 pr-11 bg-white/[0.02] border border-white/10 rounded-xl focus:border-[#f59e0b] focus:ring-1 focus:ring-[#f59e0b] outline-none text-sm transition-all placeholder-slate-600"
                   />
                   <button
                     type="button"
@@ -798,7 +792,7 @@ export const AuthCardPage: React.FC = () => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full h-10 bg-gradient-to-r from-primary to-accent hover:opacity-95 transition-all text-white font-bold rounded-xl text-sm flex items-center justify-center gap-2.5 shadow-[0_4px_20px_rgba(79,124,255,0.2)] disabled:opacity-50"
+                className="w-full h-10 bg-gradient-to-r from-[#f59e0b] to-[#d97706] hover:brightness-105 transition-all text-[#0b0e14] font-bold rounded-lg text-sm flex items-center justify-center gap-2.5 shadow-[0_2px_10px_rgba(245,158,11,0.25)] disabled:opacity-50"
               >
                 {isSubmitting ? (
                   <LoaderCircle className="w-4.5 h-4.5 animate-spin" />
@@ -822,7 +816,7 @@ export const AuthCardPage: React.FC = () => {
                     placeholder="••••••••"
                     value={otpCodeValue}
                     onChange={(e) => setOtpCodeValue(e.target.value.replace(/\D/g, ''))}
-                    className="w-full h-10 pl-11 pr-4 bg-[#0A0F1D] border border-white/10 rounded-xl focus:border-[#4F7CFF] focus:ring-1 focus:ring-[#4F7CFF] outline-none text-sm transition-all placeholder-slate-600 text-center font-mono text-lg tracking-[0.3em]"
+                    className="w-full h-10 pl-11 pr-4 bg-[#0A0F1D] border border-white/10 rounded-xl focus:border-[#f59e0b] focus:ring-1 focus:ring-[#f59e0b] outline-none text-sm transition-all placeholder-slate-600 text-center font-mono text-lg tracking-[0.3em]"
                   />
                 </div>
                 {sandboxOtp && (
@@ -839,7 +833,7 @@ export const AuthCardPage: React.FC = () => {
               <button
                 type="submit"
                 disabled={isSubmitting || otpCodeValue.length !== 8}
-                className="w-full h-10 bg-gradient-to-r from-primary to-accent hover:opacity-95 transition-all text-white font-bold rounded-xl text-sm flex items-center justify-center gap-2.5 shadow-[0_4px_20px_rgba(79,124,255,0.2)] disabled:opacity-50"
+                className="w-full h-10 bg-gradient-to-r from-[#f59e0b] to-[#d97706] hover:brightness-105 transition-all text-[#0b0e14] font-bold rounded-lg text-sm flex items-center justify-center gap-2.5 shadow-[0_2px_10px_rgba(245,158,11,0.25)] disabled:opacity-50"
               >
                 {isSubmitting ? (
                   <LoaderCircle className="w-4.5 h-4.5 animate-spin" />
@@ -872,7 +866,7 @@ export const AuthCardPage: React.FC = () => {
                   type="button"
                   onClick={() => handleSocialLogin('google')}
                   disabled={isSubmitting}
-                  className="flex h-10 items-center justify-center bg-white/[0.02] border border-white/10 hover:bg-white/[0.06] hover:border-[#4F7CFF]/50 transition-all rounded-xl disabled:opacity-50"
+                  className="flex h-10 items-center justify-center bg-white/[0.02] border border-white/10 hover:bg-white/[0.06] hover:border-[#f59e0b]/50 transition-all rounded-xl disabled:opacity-50"
                   title="Sign in with Google"
                 >
                   <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -886,7 +880,7 @@ export const AuthCardPage: React.FC = () => {
                   type="button"
                   onClick={() => handleSocialLogin('github')}
                   disabled={isSubmitting}
-                  className="flex h-10 items-center justify-center bg-white/[0.02] border border-white/10 hover:bg-white/[0.06] hover:border-[#4F7CFF]/50 transition-all rounded-xl disabled:opacity-50"
+                  className="flex h-10 items-center justify-center bg-white/[0.02] border border-white/10 hover:bg-white/[0.06] hover:border-[#f59e0b]/50 transition-all rounded-xl disabled:opacity-50"
                   title="Sign in with GitHub"
                 >
                   <svg className="w-5 h-5 fill-white" viewBox="0 0 24 24">
@@ -897,7 +891,7 @@ export const AuthCardPage: React.FC = () => {
                   type="button"
                   onClick={() => handleSocialLogin('twitter')}
                   disabled={isSubmitting}
-                  className="flex h-10 items-center justify-center bg-white/[0.02] border border-white/10 hover:bg-white/[0.06] hover:border-[#4F7CFF]/50 transition-all rounded-xl disabled:opacity-50"
+                  className="flex h-10 items-center justify-center bg-white/[0.02] border border-white/10 hover:bg-white/[0.06] hover:border-[#f59e0b]/50 transition-all rounded-xl disabled:opacity-50"
                   title="Sign in with X"
                 >
                   <svg className="w-5 h-5 fill-white" viewBox="0 0 24 24">

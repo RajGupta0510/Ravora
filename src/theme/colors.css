@@ -1,35 +1,51 @@
 :root {
-  /* Brand Palette base values */
-  --color-primary-hex: #2563eb;
-  --color-secondary-hex: #94a3b8;
-  --color-background-hex: #060913;
-  --color-surface-hex: #0e1325;
+  /* Brand Palette: Gunmetal Night, Stone, Amber */
+  --color-primary-hex: #f59e0b;         /* Amber 500 */
+  --color-primary-hover-hex: #fbbf24;   /* Amber 400 */
+  --color-primary-dark-hex: #d97706;    /* Amber 600 */
+  --color-secondary-hex: #cbd5e1;       /* Stone 300 */
+  --color-background-hex: #0b0e14;      /* Gunmetal Night 950 */
+  --color-surface-hex: #151a26;         /* Gunmetal Card 850 */
+  --color-surface-elevated-hex: #1b2232;/* Gunmetal Elevated 800 */
+  --color-surface-subtle-hex: #10141d;  /* Gunmetal Nav/Sidebar 900 */
   --color-success-hex: #10b981;
   --color-warning-hex: #f59e0b;
   --color-danger-hex: #ef4444;
-  --color-info-hex: #3b82f6;
-  --color-ai-accent-hex: #7c3aed;
+  --color-info-hex: #f59e0b;
+  --color-ai-accent-hex: #f59e0b;
 
   /* Color Design Tokens */
   --color-primary: var(--color-primary-hex);
+  --color-primary-hover: var(--color-primary-hover-hex);
+  --color-primary-dark: var(--color-primary-dark-hex);
   --color-secondary: var(--color-secondary-hex);
   --color-background: var(--color-background-hex);
   --color-surface: var(--color-surface-hex);
+  --color-surface-elevated: var(--color-surface-elevated-hex);
+  --color-surface-subtle: var(--color-surface-subtle-hex);
   --color-success: var(--color-success-hex);
   --color-warning: var(--color-warning-hex);
   --color-danger: var(--color-danger-hex);
   --color-info: var(--color-info-hex);
   --color-ai-accent: var(--color-ai-accent-hex);
 
-  /* Semantic UI States */
-  --color-text-primary: #ffffff;
-  --color-text-secondary: #94a3b8;
-  --color-text-muted: #8295b4;
-  --color-border: rgba(255, 255, 255, 0.08);
-  --color-border-hover: rgba(255, 255, 255, 0.16);
-  --color-border-divider: rgba(255, 255, 255, 0.04);
-  --color-glow-primary: rgba(37, 99, 235, 0.12);
-  --color-glow-secondary: rgba(124, 58, 237, 0.12);
+  /* Semantic UI States - Stone text and borders */
+  --color-text-primary: #f8fafc;
+  --color-text-secondary: #cbd5e1;
+  --color-text-muted: #94a3b8;
+  --color-text-faint: #64748b;
+  --color-border: rgba(203, 213, 225, 0.12);
+  --color-border-hover: rgba(245, 158, 11, 0.35);
+  --color-border-divider: rgba(203, 213, 225, 0.08);
+  --color-glow-primary: rgba(245, 158, 11, 0.06);
+  --color-glow-secondary: rgba(245, 158, 11, 0.03);
+
+  /* Amber accents */
+  --amber-primary: #f59e0b;
+  --amber-light: #fbbf24;
+  --amber-dark: #d97706;
+  --amber-subtle: rgba(245, 158, 11, 0.12);
+  --amber-border: rgba(245, 158, 11, 0.35);
 
   /* Legacy overrides/compat mappings for global stylesheet compatibility */
   --primary: var(--color-primary);
