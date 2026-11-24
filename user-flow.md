@@ -30,27 +30,27 @@ graph TD
 ## 2. Step-by-Step Flow Specifications
 
 ### 2.1 Post-Signup & Onboarding
-Immediately after registration, the user enters the **Product Onboarding Wizard** inside the web app. This wizard collects critical profiling parameters to initialize the Araiven Engine instance:
+Immediately after registration, the user enters the **7-Step Product Onboarding Wizard** inside the web app. This wizard collects critical profiling parameters to initialize the Araiven Engine instance:
 
-1. **Step 1: Experience Profiling**
-   * *Options:* Beginner, Active Investor, Professional.
-   * *Impact:* Determines the complexity of terminology in AI recommendations, explanations, and copilot dialogue.
-2. **Step 2: Capital Allocation Setup**
-   * *Options:* A slider from $5,000 to $500,000+.
-   * *Impact:* Establishes the virtual/real portfolio baseline weightings and scales exposure thresholds.
-3. **Step 3: Drawdown Tolerance (Risk Model)**
-   * *Options:*
-     * **Conservative:** Max 24h drawdown target: **1.5%**. Focuses on stablecoin lending and low-yield arbitrage.
-     * **Balanced Shield:** Max 24h drawdown target: **3.5%**. Balanced exposure to L1 blue-chips and stable lending.
-     * **Aggressive Swing:** Max 24h drawdown target: **8.5%**. Capture high-velocity momentum and liquidity staking.
-   * *Impact:* Programs the hard stop-loss buffers and rebalancing safety triggers.
-4. **Step 4: Financial Goal Stance**
-   * *Options:* Capital Preservation, Steady Staking Income, Maximum Compound Growth.
-   * *Impact:* Aligns Araiven’s opportunity ranking weights with user outcomes.
+1. **Step 1: Welcome & Overview** — Platform introduction and calibration objectives.
+2. **Step 2: Experience Profiling** — Beginner, Intermediate (Active), or Advanced (Professional). Determines terminology complexity in AI dialogue.
+3. **Step 3: Market Selection** — Interested sectors (Crypto, Stocks, Forex, Futures, Commodities, ETFs).
+4. **Step 4: Primary Objective** — Capital preservation, Income/Yield, Swing trading, Day trading, or Maximum compound growth.
+5. **Step 5: Dashboard Configuration** — Simple, Balanced (Recommended), or Professional.
+6. **Step 6: Araiven Assistance Model** — Select AI capabilities (Opportunities, Trends, Trade plans, Portfolio audits, Risk alerts).
+7. **Step 7: Profile Review & Confirmation** — Visual summary card with 1-click stage editing.
 
 ---
 
-### 2.2 Account Activation (Paper vs. Live)
+### 2.2 Drawdown Tolerance (Risk Model)
+The onboarding stance determines hard mathematical risk boundaries:
+* **Conservative:** Max 24h drawdown target: **1.5%**. Focuses on stablecoin lending and low-yield arbitrage.
+* **Balanced Shield:** Max 24h drawdown target: **3.5%**. Balanced exposure to L1 blue-chips and stable lending.
+* **Aggressive Swing:** Max 24h drawdown target: **8.5%**. Capture high-velocity momentum and liquidity staking.
+
+---
+
+### 2.3 Account Activation (Paper vs. Live)
 
 ```mermaid
 sequenceDiagram

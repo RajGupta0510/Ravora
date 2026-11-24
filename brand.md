@@ -53,23 +53,24 @@ Create the world's most trusted AI-powered wealth platform where users can grow 
 ## Design Direction
 
 Theme:
-Premium AI Fintech
+Premium Financial Terminal & AI Wealth Copilot
 
-Colors:
-- Blue
-- Purple
-- Deep Navy
+Colors (Design System V2.0):
+- **Gunmetal Night** (`#0b0e14`, `#10141d`, `#151a26`) - Deep canvas, primary surfaces, and focused dark atmosphere
+- **Stone** (`#cbd5e1`, `#94a3b8`, `rgba(203, 213, 225, 0.12)`) - Neutral text, secondary surfaces, borders, and crisp contrast
+- **Amber** (`#f59e0b`, `#fbbf24`, `#d97706`) - Signature accent for active intelligence, button CTAs, and key indicators
 
 Style:
-- Modern SaaS
-- Subtle Glassmorphism
-- AI Native
-- Clean Dashboard
+- Institutional Financial Terminal
+- Impeccable Clean UI (No AI slop, no glow halos, no generic gradients)
+- AI-Native Decision Architecture
+- Professional Market Precision
 
 Avoid:
 - Crypto casino look
-- TradingView clone
-- Binance clone
+- Saturated purple/blue AI gradient slop
+- Blurry radial glow blobs
+- Unreadable low-contrast text
 - Cyberpunk overload
 
 ---

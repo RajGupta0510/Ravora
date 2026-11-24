@@ -44,13 +44,16 @@ graph TD
 ---
 
 ## 2. Frontend Architecture
-The Ravora frontend is built as a lightweight, high-performance static shell optimized for fast loading and secure client-side routing.
+The Ravora frontend is built as a high-performance modern Single-Page Application (SPA) with React 18, TypeScript, and Vite, strictly following **Design System V2.0** (Gunmetal Night, Stone, Amber):
 
-* **Landing Page:** Static HTML utilizing vanilla CSS custom properties for theme styling and a responsive script for interactive simulations (e.g. Fed Rate volatility trigger).
-* **Dashboard SPA:** A single-page application structure ([app/index.html](file:///c:/Projects/Ravora/app/index.html)) loaded from a CDN. Client-side routing resolves routes dynamically using state storage.
-* **Araiven Copilot Widget:** An active WebSocket chat interface enabling real-time dialogue and directive authorizations.
-* **Portfolio & Analytics Cards:** High-DPI canvas/SVG renders that dynamically map assets (ETH, BTC, USDC) using responsive chart modules.
-* **Settings & Connections Panel:** Client-side credentials input form that passes raw API keys straight to encryption microservices without client logging.
+* **Landing Page (`/`):** High-converting marketing interface showcasing the terminal preview, Araiven intelligence pipeline, and transparent risk guard metrics.
+* **Authentication Suite (`/auth/:mode`):** Supabase Auth integration supporting Email, Phone OTP, and social providers with cryptographic JWT session management.
+* **Onboarding Wizard (`/onboarding`):** A 7-step profiling sequence that calibrates user risk parameters and initializes the portfolio workspace.
+* **Trading Terminal Module (`/dashboard` - Terminal):** Real-time dual-engine candlestick charting (TradingView Technical Analysis Widget + Araiven Native SVG Candlestick Engine), L2 orderbook depth ladders, timeframe selectors (`1m` to `1D`), and 1-click execution.
+* **Wealth Workspace (`/dashboard` - Portfolio):** Visual rendering of portfolio balances, safety health gauges (0–100), asset allocation breakdowns, and open paper positions.
+* **Global Markets Matrix (`/dashboard` - Markets):** Real-time market turnover leaders, top gainers, and deep asset inspection drawer.
+* **Araiven Copilot Widget (`/dashboard` - Copilot):** Conversational strategy auditing and natural-language risk queries.
+* **Design Tokens:** Strict implementation of Gunmetal Night (`#0b0e14`, `#10141d`, `#151a26`), Stone neutrals (`#cbd5e1`, `#94a3b8`), and Amber accents (`#f59e0b`). Zero AI gradient slop or radial glow halos.
 
 ---
 

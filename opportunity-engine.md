@@ -105,5 +105,5 @@ Opportunities are matched against the user's active settings:
 To maintain Ravora's premium design guidelines, opportunities must be rendered on-screen with the following treatments:
 
 1. **Stance Tags:** Pill badges displaying the profile match (e.g., `Balanced Shield` or `Aggressive Capture`).
-2. **Confidence Gauges:** Concentric SVG rings that draw the confidence score dynamically, styled in the accent colors (Success Green for low risk, Purple for medium risk, Amber for high risk).
-3. **Reasoning Block:** Clear, plain-text typography using the `Inter` font, avoiding dense technical charts or TradingView widgets to maintain simplicity and clarity.
+2. **Confidence Gauges:** Concentric SVG rings that draw the confidence score dynamically, styled in the Design System V2.0 palette (Emerald `#10b981` for low risk, Amber `#fbbf24` for medium risk, Rose `#ef4444` for high risk, with Stone `#cbd5e1` track rings).
+3. **Reasoning Block:** Clear, plain-text typography using the `Inter` font on Gunmetal Night surfaces, providing actionable mathematical rationales.

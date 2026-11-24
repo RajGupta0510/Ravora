@@ -34,9 +34,11 @@ This document outlines the phased delivery roadmap for Ravora, detailing timelin
 * **Dependencies:** None (Standalone static UI shell)
 
 #### Feature Deliverables
-* **Onboarding Wizard:** Profile setup capturing experience level, capital limits, risk stance (Conservative, Balanced, Aggressive), and primary goal.
-* **Paper Trading Engine:** Simulated sandbox utilizing real-time price feeds to run mock trades with a virtual $100k balance.
-* **Dashboard Shell:** Visual rendering of portfolio balances, safety health gauges, and static historical growth charts.
+* **Design System V2.0:** High-craft financial terminal aesthetic anchored strictly on Gunmetal Night (`#0b0e14`), Stone (`#cbd5e1`), and Amber (`#f59e0b`), eliminating generic AI gradient slop.
+* **Onboarding Wizard:** 7-step profile setup capturing experience level, capital limits, risk stance (Conservative 1.5%, Balanced 3.5%, Aggressive 8.5%), and primary goals.
+* **Market Trading Terminal:** Real-time dual-engine candlestick charting (TradingView + Araiven Native SVG Engine), timeframe selection (`1m` to `1D`), L2 orderbook depth, and live price tickers.
+* **Paper Trading Engine:** Simulated sandbox utilizing real-time price feeds to run mock trades with a virtual $100k balance and 1-click execution.
+* **Dashboard Shell:** Visual rendering of portfolio balances, safety health gauges, and historical growth charts.
 
 #### Scope Classification
 * **Must Have:** Onboarding setup, virtual wallet tracking, simulated 1-click execution.

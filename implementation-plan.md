@@ -51,20 +51,31 @@ This document defines the exact milestone-based build order, priorities, complex
 
 ---
 
-### Milestone 3: Portfolio Tracking
-* **Priority:** Critical (P0) - Primary workspace view
+### Milestone 3: Market Trading Terminal & Candlestick Engine
+* **Priority:** Critical (P0) - Core execution cockpit
 * **Dependencies:** Milestone 2
+* **Estimated Complexity:** Medium - High (TradingView widget + native SVG candlestick charts)
+* **Requirements:**
+  * *Frontend:* Dual-engine candlestick chart (TradingView & Native SVG), timeframe selectors (`1m` to `1D`), L2 orderbook depth, market radar watchlist, and rapid 1-click execution form.
+  * *Styling:* Design System V2.0 (Gunmetal Night `#0b0e14`, Stone `#cbd5e1`, Amber `#f59e0b`).
+  * *Backend:* `/market/assets/:symbol` and `/market/overview` candle endpoints.
+
+---
+
+### Milestone 4: Portfolio Tracking & Wealth Workspace
+* **Priority:** Critical (P0) - Primary portfolio view
+* **Dependencies:** Milestone 3
 * **Estimated Complexity:** Medium (Data calculations and SVG render)
 * **Requirements:**
-  * *Frontend:* Portfolio balance card, active safety score gauge, asset weights list.
+  * *Frontend:* Portfolio balance card, active safety score gauge (0–100), asset weights list, and historical equity curve.
   * *Backend:* `/portfolio` and `/portfolio/history` API aggregates.
   * *Database:* `portfolios` and `portfolio_assets` tables.
 
 ---
 
-### Milestone 4: Araiven Recommendations (Simulated Advisory)
+### Milestone 5: Araiven Recommendations (Simulated Advisory)
 * **Priority:** Critical (P0) - The core product experience
-* **Dependencies:** Milestone 3
+* **Dependencies:** Milestone 4
 * **Estimated Complexity:** High (Slippage calculations, paper execution logic)
 * **Requirements:**
   * *Frontend:* Active Directive panel on dashboard, execution click actions.
