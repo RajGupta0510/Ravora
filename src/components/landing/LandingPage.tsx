@@ -1,997 +1,865 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { HelpCircle, Menu, X } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
+import HeroTerminal from './HeroTerminal';
+import { useCountUp, useInView } from './hooks';
+import './landing.css';
 
-interface RiskConfig {
+/* ------------------------------------------------------------------ */
+/* Small building blocks                                               */
+/* ------------------------------------------------------------------ */
+
+const Reveal: React.FC<{
+  children: React.ReactNode;
+  delay?: number;
+  className?: string;
+  as?: 'div' | 'li' | 'section';
+}> = ({ children, delay = 0, className = '', as: Tag = 'div' }) => {
+  const { ref, inView } = useInView<HTMLDivElement>(0.15);
+  return (
+    <Tag
+      ref={ref as React.RefObject<never>}
+      className={`rv-reveal ${inView ? 'is-in rv-in' : ''} ${className}`}
+      style={{ ['--rv-delay' as string]: `${delay}ms` }}
+    >
+      {children}
+    </Tag>
+  );
+};
+
+const NAV = [
+  { id: 'how', label: 'How it works' },
+  { id: 'features', label: 'Platform' },
+  { id: 'risk', label: 'Risk guard' },
+  { id: 'security', label: 'Security' },
+  { id: 'faq', label: 'FAQ' },
+];
+
+/* ------------------------------------------------------------------ */
+/* Data                                                                */
+/* ------------------------------------------------------------------ */
+
+interface RiskProfile {
   label: string;
+  cap: string;
+  desc: string;
   balance: string;
-  growth: string;
-  chartD: string;
-  chartGradD: string;
-  chartPointerY: number;
-  goalOffset: string;
-  goalText: string;
-  healthText: string;
-  healthOffset: string;
-  riskText: string;
-  riskBarPct: string;
-  divETH: string;
-  divUSDC: string;
-  divBTC: string;
-  divCash: string;
+  gain: string;
+  line: string;
+  area: string;
+  tipY: number;
+  safety: string;
+  riskIndex: string;
+  alloc: { label: string; pct: number }[];
 }
+
+const RISK: RiskProfile[] = [
+  {
+    label: 'Conservative',
+    cap: '1.5',
+    desc: 'Capital preservation first. Stablecoin yield and low-volatility pools. High-beta altcoin setups are filtered out.',
+    balance: '$124,582.40',
+    gain: '+7.2%',
+    line: 'M 6 78 Q 60 74 120 58 T 234 40',
+    area: 'M 6 78 Q 60 74 120 58 T 234 40 L 234 110 L 6 110 Z',
+    tipY: 40,
+    safety: '98',
+    riskIndex: '18 / 100',
+    alloc: [
+      { label: 'ETH staking', pct: 25 },
+      { label: 'Stable yield', pct: 55 },
+      { label: 'BTC', pct: 10 },
+      { label: 'Cash reserve', pct: 10 },
+    ],
+  },
+  {
+    label: 'Balanced',
+    cap: '3.5',
+    desc: 'Blue-chip exposure with stable lending income. Moves only when confidence, structure and risk all agree.',
+    balance: '$132,194.10',
+    gain: '+12.0%',
+    line: 'M 6 84 Q 50 50 120 62 T 234 26',
+    area: 'M 6 84 Q 50 50 120 62 T 234 26 L 234 110 L 6 110 Z',
+    tipY: 26,
+    safety: '96',
+    riskIndex: '42 / 100',
+    alloc: [
+      { label: 'ETH staking', pct: 45 },
+      { label: 'Stable yield', pct: 30 },
+      { label: 'BTC', pct: 20 },
+      { label: 'Cash reserve', pct: 5 },
+    ],
+  },
+  {
+    label: 'Aggressive',
+    cap: '8.5',
+    desc: 'Maximum growth. Momentum breakouts and liquidity pairs are in scope, still bounded by a hard drawdown cap.',
+    balance: '$149,425.80',
+    gain: '+26.7%',
+    line: 'M 6 92 Q 40 20 112 70 T 234 12',
+    area: 'M 6 92 Q 40 20 112 70 T 234 12 L 234 110 L 6 110 Z',
+    tipY: 12,
+    safety: '91',
+    riskIndex: '78 / 100',
+    alloc: [
+      { label: 'ETH staking', pct: 55 },
+      { label: 'Stable yield', pct: 10 },
+      { label: 'BTC', pct: 30 },
+      { label: 'Cash reserve', pct: 5 },
+    ],
+  },
+];
+
+const PIPELINE = [
+  { t: 'Ingest', d: 'Prices, orderbook depth, volume and news sentiment from every supported market.' },
+  { t: 'Read the structure', d: 'Trend, momentum, volatility and support and resistance, computed with fixed rules.' },
+  { t: 'Score', d: 'Every setup gets a transparent confidence score. No score is shown without a calculation behind it.' },
+  { t: 'Check the risk', d: 'Leverage limits and your drawdown cap can veto a setup before you ever see it.' },
+  { t: 'Plan the trade', d: 'Entry, stop and target come from market structure, not round-number guesses.' },
+  { t: 'Explain it', d: 'The plan arrives with a plain-English reason, and one click to approve or reject.' },
+];
+
+const FAQ = [
+  {
+    q: 'Can Ravora move or withdraw my money?',
+    a: 'No. Ravora never takes custody of funds. When you connect an exchange, API keys that have withdrawal permission enabled are rejected. Araiven can only work with read and trade permissions.',
+  },
+  {
+    q: 'What is Araiven?',
+    a: 'Araiven is the decision engine behind Ravora. It is not a chatbot. It reads market data, applies fixed scoring and risk rules, and produces a trade plan with the reasoning attached. The Copilot chat lets you question those decisions.',
+  },
+  {
+    q: 'Do I need trading experience?',
+    a: 'No. Onboarding asks about your experience, goals and risk stance, then adjusts how much detail Araiven gives you. Beginners get plain language. Professionals get the full indicator breakdown.',
+  },
+  {
+    q: 'How does paper trading work?',
+    a: 'Every account starts with a $100,000 virtual balance that trades against real price feeds. You can test any recommendation, watch it play out, and review the result before connecting a live exchange.',
+  },
+  {
+    q: 'Is this financial advice?',
+    a: 'No. Ravora provides analysis and trade planning tools. Trading crypto involves substantial risk of loss. Past or simulated results do not guarantee future performance, and every trade is your decision.',
+  },
+];
+
+const MARKETS = ['BTC', 'ETH', 'SOL', 'BNB', 'XRP', 'ADA', 'AVAX', 'USDC'];
+const VENUES = ['Binance', 'Bybit', 'Coinbase', 'Kraken', 'OKX'];
+
+/* ------------------------------------------------------------------ */
+/* Sections                                                            */
+/* ------------------------------------------------------------------ */
+
+const PipelineSection: React.FC = () => {
+  const [lit, setLit] = useState<boolean[]>(() => PIPELINE.map(() => false));
+  const refs = useRef<(HTMLLIElement | null)[]>([]);
+
+  useEffect(() => {
+    if (typeof IntersectionObserver === 'undefined') {
+      setLit(PIPELINE.map(() => true));
+      return;
+    }
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            const i = Number((e.target as HTMLElement).dataset.i);
+            setLit((prev) => (prev[i] ? prev : prev.map((v, k) => (k <= i ? true : v))));
+          }
+        });
+      },
+      { rootMargin: '0px 0px -38% 0px', threshold: 0.2 }
+    );
+    refs.current.forEach((el) => el && io.observe(el));
+    return () => io.disconnect();
+  }, []);
+
+  const litCount = lit.filter(Boolean).length;
+  const fill = litCount <= 1 ? 0 : ((litCount - 1) / (PIPELINE.length - 1)) * 100;
+
+  return (
+    <section id="how" className="rv-section is-alt">
+      <div className="rv-wrap rv-split">
+        <div className="rv-sticky">
+          <Reveal>
+            <span className="rv-kicker">How Araiven decides</span>
+            <h2 className="rv-h2">Six checks before any trade reaches you.</h2>
+            <p className="rv-lead">
+              Araiven is a rules-based engine, not a text generator. The same inputs always give the same score, and
+              every step can be traced.
+            </p>
+          </Reveal>
+          <Reveal delay={120}>
+            <div className="rv-formula">
+              <div className="rv-formula-label">Confidence score</div>
+              <div className="rv-formula-eq">
+                <b>C<sub>s</sub></b> = 0.4 · Macro + 0.4 · Liquidity + 0.2 · Sentiment
+              </div>
+              <p className="rv-formula-note">
+                Setups scoring below 75% are filtered out and never shown. Weights adjust with market volatility.
+              </p>
+            </div>
+          </Reveal>
+        </div>
+
+        <ol className="rv-steps" style={{ position: 'relative' }}>
+          <span className="rv-steps-fill" style={{ height: `calc(${fill}% - 8px)` }} aria-hidden="true" />
+          {PIPELINE.map((s, i) => (
+            <li
+              key={s.t}
+              data-i={i}
+              ref={(el) => {
+                refs.current[i] = el;
+              }}
+              className={`rv-step ${lit[i] ? 'is-lit' : ''}`}
+            >
+              <span className="rv-step-dot">{i + 1}</span>
+              <div>
+                <h3>{s.t}</h3>
+                <p>{s.d}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </section>
+  );
+};
+
+const Bento: React.FC = () => {
+  const safety = useInView<HTMLDivElement>(0.4);
+  const safetyNum = useCountUp(96, safety.inView, 1200);
+  const paper = useInView<HTMLDivElement>(0.4);
+  const paperNum = useCountUp(100000, paper.inView, 1300);
+
+  const asks = [
+    ['64,168', '0.42', '34%'],
+    ['64,152', '0.88', '58%'],
+    ['64,131', '1.21', '82%'],
+  ];
+  const bids = [
+    ['64,108', '1.64', '88%'],
+    ['64,090', '0.97', '61%'],
+    ['64,071', '0.51', '38%'],
+  ];
+
+  return (
+    <section id="features" className="rv-section">
+      <div className="rv-wrap">
+        <Reveal>
+          <span className="rv-kicker">The platform</span>
+          <h2 className="rv-h2">One workspace, from signal to execution.</h2>
+          <p className="rv-lead">
+            Everything you need to find a trade, size it safely and understand it, without juggling six tabs.
+          </p>
+        </Reveal>
+
+        <div className="rv-bento">
+          <Reveal className="rv-tile s-4" delay={0}>
+            <div>
+              <h3>Trading terminal</h3>
+              <p>
+                Candlestick charts with Araiven's support, entry, stop and target drawn on top. Switch timeframes from
+                1m to 1D and place a trade in one click.
+              </p>
+            </div>
+            <div className="rv-tile-viz rv-book" aria-hidden="true">
+              {asks.map(([p, s, w], i) => (
+                <div key={p} className="rv-book-row ask" style={{ ['--w' as string]: w, ['--d' as string]: `${i * 90}ms` }}>
+                  <i />
+                  <span>{p}</span>
+                  <span>{s}</span>
+                </div>
+              ))}
+              <div className="rv-book-mid">64,120.00</div>
+              {bids.map(([p, s, w], i) => (
+                <div key={p} className="rv-book-row bid" style={{ ['--w' as string]: w, ['--d' as string]: `${(i + 3) * 90}ms` }}>
+                  <i />
+                  <span>{p}</span>
+                  <span>{s}</span>
+                </div>
+              ))}
+            </div>
+          </Reveal>
+
+          <Reveal className="rv-tile s-2" delay={80}>
+            <div>
+              <h3>Opportunities</h3>
+              <p>Ranked by confidence, filtered by your stance.</p>
+            </div>
+            <div className="rv-tile-viz rv-opps" aria-hidden="true">
+              {[
+                ['Bitcoin ETF inflow', 'Momentum', '94'],
+                ['Stablecoin hedge', 'Yield spread', '91'],
+                ['Ethereum staking', 'Yield premium', '89'],
+              ].map(([n, t, s]) => (
+                <div key={n} className="rv-opp">
+                  <b>{n}</b>
+                  <small>{t}</small>
+                  <span className="rv-opp-score">{s}</span>
+                </div>
+              ))}
+            </div>
+          </Reveal>
+
+          <Reveal className="rv-tile s-2" delay={0}>
+            <div>
+              <h3>Safety score</h3>
+              <p>A 0 to 100 read on how much room your portfolio has before your drawdown cap.</p>
+            </div>
+            <div className="rv-tile-viz" ref={safety.ref} aria-hidden="true">
+              <div className="rv-gauge">
+                <span className="rv-gauge-num">{safetyNum}</span>
+                <span className="rv-gauge-meta">Safe</span>
+              </div>
+              <div className="rv-meter">
+                <i style={{ ['--w' as string]: '96%' }} />
+              </div>
+            </div>
+          </Reveal>
+
+          <Reveal className="rv-tile s-2" delay={80}>
+            <div>
+              <h3>Araiven Copilot</h3>
+              <p>Ask why. Get the evidence.</p>
+            </div>
+            <div className="rv-tile-viz rv-chat" aria-hidden="true">
+              <div className="rv-bubble you">Why not buy SOL right now?</div>
+              <div className="rv-bubble ai">
+                Confidence is <b>71%</b>, below the 75% filter. Volume is not confirming the breakout yet.
+              </div>
+            </div>
+          </Reveal>
+
+          <Reveal className="rv-tile s-2" delay={160}>
+            <div>
+              <h3>Paper trading</h3>
+              <p>Practise with real prices and no real money.</p>
+            </div>
+            <div className="rv-tile-viz" ref={paper.ref} aria-hidden="true">
+              <div className="rv-paper-num">${paperNum.toLocaleString('en-US')}</div>
+              <div className="rv-paper-row">
+                <span>BTC long · 0.5</span>
+                <span className="pos">+2.8%</span>
+              </div>
+            </div>
+          </Reveal>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+const RiskSection: React.FC = () => {
+  const [sel, setSel] = useState(1);
+  const r = RISK[sel];
+  return (
+    <section id="risk" className="rv-section is-alt">
+      <div className="rv-wrap">
+        <Reveal>
+          <span className="rv-kicker">Risk guard</span>
+          <h2 className="rv-h2">Set your limit. Araiven works inside it.</h2>
+          <p className="rv-lead">
+            Pick a stance and see how the drawdown cap, allocation and projected curve change. These are illustrative
+            figures.
+          </p>
+        </Reveal>
+
+        <Reveal className="rv-risk" delay={80}>
+          <div className="rv-panel">
+            <div className="rv-seg" role="group" aria-label="Risk stance">
+              {RISK.map((p, i) => (
+                <button key={p.label} aria-pressed={sel === i} onClick={() => setSel(i)}>
+                  {p.label}
+                </button>
+              ))}
+            </div>
+            <div className="rv-cap">
+              <div className="rv-cap-label">Max 24h drawdown</div>
+              <div className="rv-cap-num">
+                {r.cap}
+                <span>%</span>
+              </div>
+              <p className="rv-cap-desc">{r.desc}</p>
+            </div>
+            <dl className="rv-rows">
+              <div>
+                <dt>Safety score</dt>
+                <dd>{r.safety}%</dd>
+              </div>
+              <div>
+                <dt>Risk index</dt>
+                <dd>{r.riskIndex}</dd>
+              </div>
+            </dl>
+          </div>
+
+          <div className="rv-panel">
+            <div className="rv-equity-head">
+              <div>
+                <div className="rv-cap-label">Illustrative portfolio</div>
+                <div className="rv-equity-bal">{r.balance}</div>
+              </div>
+              <div className="rv-equity-gain">{r.gain}</div>
+            </div>
+            <svg className="rv-equity-svg" viewBox="0 0 240 110" preserveAspectRatio="none" aria-hidden="true">
+              <path className="area" d={r.area} />
+              <path className="line" d={r.line} vectorEffect="non-scaling-stroke" />
+              <circle cx="234" cy={r.tipY} r="3.5" />
+            </svg>
+            <div className="rv-alloc">
+              {r.alloc.map((a) => (
+                <div key={a.label} className="rv-alloc-row">
+                  <span>{a.label}</span>
+                  <div className="rv-alloc-bar">
+                    <i style={{ width: `${a.pct}%` }} />
+                  </div>
+                  <span>{a.pct}%</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </Reveal>
+      </div>
+    </section>
+  );
+};
+
+const SIM_STEPS = [
+  'Intercept the rate announcement',
+  'Analyse DeFi liquidity depth',
+  'Recalculate the drawdown cushion',
+  'Optimise target yield swaps',
+  'Push the rebalance recommendation',
+];
+const SIM_LOG = [
+  'Standby. Run the scenario to watch Araiven respond to a macro event.',
+  '[Macro] CPI prints +3.4% against +3.1% expected. Volatility is rising.',
+  '[Liquidity] Depth check complete. Spreads are widening on Aave and Uniswap pools.',
+  '[Risk] Volatility limit exceeded. Tightening the safety cushion target to 98%.',
+  '[Yield] Hedge triggered. Moving volatile L1 exposure toward USDC yield.',
+  '[Advisory] Rotate 15% of volatile assets into hedged stable pools. Ready for your review.',
+];
+
+const SimulatorSection: React.FC = () => {
+  const [step, setStep] = useState(0);
+  const timer = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(
+    () => () => {
+      if (timer.current) clearInterval(timer.current);
+    },
+    []
+  );
+
+  const run = () => {
+    if (timer.current) clearInterval(timer.current);
+    setStep(1);
+    let s = 1;
+    timer.current = setInterval(() => {
+      s += 1;
+      setStep(s);
+      if (s >= 5 && timer.current) {
+        clearInterval(timer.current);
+        timer.current = null;
+      }
+    }, 1500);
+  };
+
+  const running = step > 0 && step < 5;
+  const done = step === 5;
+
+  return (
+    <section className="rv-section">
+      <div className="rv-wrap">
+        <Reveal>
+          <span className="rv-kicker">Try it</span>
+          <h2 className="rv-h2">Watch Araiven react to a Fed surprise.</h2>
+          <p className="rv-lead">
+            A short simulation of how a macro event flows through the engine and ends in a recommendation you can
+            approve or reject.
+          </p>
+        </Reveal>
+
+        <Reveal className="rv-sim" delay={80}>
+          <div className="rv-panel">
+            <div className="rv-cap-label">Engine log</div>
+            <div className={`rv-log ${done ? 'is-done' : step > 0 ? 'is-run' : ''}`} aria-live="polite">
+              {SIM_LOG[step]}
+            </div>
+            <button
+              className="rv-btn rv-btn-primary"
+              style={{ marginTop: 18, width: '100%' }}
+              onClick={run}
+              disabled={running}
+            >
+              {running ? 'Analysing…' : done ? 'Run it again' : 'Simulate CPI announcement'}
+            </button>
+          </div>
+          <div className="rv-panel">
+            <ul className="rv-sim-list">
+              {SIM_STEPS.map((label, i) => {
+                const n = i + 1;
+                const cls = step > n || (done && n === 5) ? 'is-done' : step === n ? 'is-now' : '';
+                return (
+                  <li key={label} className={cls}>
+                    <span className="rv-sim-tick">{cls === 'is-done' ? '✓' : n}</span>
+                    <span>{label}</span>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        </Reveal>
+      </div>
+    </section>
+  );
+};
+
+/* ------------------------------------------------------------------ */
+/* Page                                                                */
+/* ------------------------------------------------------------------ */
 
 export const LandingPage: React.FC = () => {
   const navigate = useNavigate();
+  const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [active, setActive] = useState('');
 
-  // UI states
-  const [activeNav, setActiveNav] = useState('problem-section');
-  const [navbarScrolled, setNavbarScrolled] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [selectedRisk, setSelectedRisk] = useState<0 | 1 | 2>(1); // 0=Cons, 1=Mod, 2=Agg
-
-  // 3D Parallax Mouse States
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-  const [isHovered3D, setIsHovered3D] = useState(false);
-  const [tilt3D, setTilt3D] = useState({ x: 15, y: -10 });
-
-  // Looping Simulation States
-  const [simState, setSimState] = useState<'scanning' | 'scanner-active' | 'chart-drawn' | 'plan-active' | 'deployed'>('scanning');
-  const [pipelineStep, setPipelineStep] = useState(1);
-  const [simInteractiveStep, setSimInteractiveStep] = useState(0); // 0=idle, 1-5=running
-  const [simStatusText, setSimStatusText] = useState('Standby. Inject Fed event to start analysis.');
-
-  // Opportunity asset preview state
-  const [selectedAssetTab, setSelectedAssetTab] = useState<'eth' | 'btc' | 'yield'>('eth');
-
-  // References
-  const simulationTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-
-  // Navbar Scroll Trigger
   useEffect(() => {
-    const handleScroll = () => {
-      setNavbarScrolled(window.scrollY > 50);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    const onScroll = () => setScrolled(window.scrollY > 24);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  // Close mobile menu on resize
   useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth > 900) {
-        setMobileMenuOpen(false);
-      }
-    };
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    const onResize = () => window.innerWidth > 860 && setMenuOpen(false);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
   }, []);
 
-  // 3D scene continuous lerp tilt (reduced on mobile)
+  // Highlight the nav link for the section in view.
   useEffect(() => {
-    if (!isHovered3D) {
-      setTilt3D(prev => ({
-        x: prev.x + (15 - prev.x) * 0.08,
-        y: prev.y + (-10 - prev.y) * 0.08
-      }));
-      return;
-    }
-    const targetX = 15 - mousePos.y * 25;
-    const targetY = -10 + mousePos.x * 25;
-    setTilt3D(prev => ({
-      x: prev.x + (targetX - prev.x) * 0.08,
-      y: prev.y + (targetY - prev.y) * 0.08
-    }));
-  }, [mousePos, isHovered3D]);
-
-  // Loop through Simulator States (Scanning to Deployed)
-  useEffect(() => {
-    const states: ('scanning' | 'scanner-active' | 'chart-drawn' | 'plan-active' | 'deployed')[] = [
-      'scanning', 'scanner-active', 'chart-drawn', 'plan-active', 'deployed'
-    ];
-    let idx = 0;
-    const interval = setInterval(() => {
-      idx = (idx + 1) % states.length;
-      setSimState(states[idx]);
-    }, 3000);
-    return () => clearInterval(interval);
+    if (typeof IntersectionObserver === 'undefined') return;
+    const io = new IntersectionObserver(
+      (entries) => entries.forEach((e) => e.isIntersecting && setActive(e.target.id)),
+      { rootMargin: '-45% 0px -50% 0px' }
+    );
+    NAV.forEach((n) => {
+      const el = document.getElementById(n.id);
+      if (el) io.observe(el);
+    });
+    return () => io.disconnect();
   }, []);
 
-  // Loop through AI pipeline step highlights
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setPipelineStep(prev => (prev < 6 ? prev + 1 : 1));
-    }, 4000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const runInteractiveSimulation = () => {
-    if (simulationTimerRef.current) {
-      clearInterval(simulationTimerRef.current);
-    }
-    setSimInteractiveStep(1);
-    setSimStatusText('[Fed Alert] Intercepting CPI inflation print (+3.4% vs +3.1% expected)...');
-
-    let currentStep = 1;
-    const interval = setInterval(() => {
-      currentStep += 1;
-      setSimInteractiveStep(currentStep);
-
-      if (currentStep === 2) {
-        setSimStatusText('[DeFi Analyzer] Volume depth checking completed. Spreads widening on Aave/Uniswap pools...');
-      } else if (currentStep === 3) {
-        setSimStatusText('[Risk Guardian] Volatility limits exceeded. Tightening safety cushion targets to 98%...');
-      } else if (currentStep === 4) {
-        setSimStatusText('[Yield Optimizer] Safety hedge triggered. Re-allocating L1 risk layers to USDC stable yield...');
-      } else if (currentStep === 5) {
-        setSimStatusText('[Dispatcher] Advisory generated: Rotate 15% volatile assets into Hedged Stable Pools. Ready for review.');
-        clearInterval(interval);
-        simulationTimerRef.current = null;
-      }
-    }, 1500);
-
-    simulationTimerRef.current = interval;
-  };
-
-  useEffect(() => {
-    return () => {
-      if (simulationTimerRef.current) {
-        clearInterval(simulationTimerRef.current);
-      }
-    };
-  }, []);
-
-  const riskProfiles: Record<0 | 1 | 2, RiskConfig> = {
-    0: {
-      label: 'Conservative',
-      balance: '$124,582.40',
-      growth: '+$8,340.20 (+7.2%)',
-      chartD: 'M 10 35 Q 55 32 105 25 T 190 20',
-      chartGradD: 'M 10 35 Q 55 32 105 25 T 190 20 L 190 50 L 10 50 Z',
-      chartPointerY: 20,
-      goalOffset: '75',
-      goalText: '50%',
-      healthText: '98%',
-      healthOffset: '2.5',
-      riskText: '18/100',
-      riskBarPct: '18%',
-      divETH: '25%',
-      divUSDC: '55%',
-      divBTC: '10%',
-      divCash: '10%'
-    },
-    1: {
-      label: 'Moderate',
-      balance: '$132,194.10',
-      growth: '+$14,210.60 (+12.0%)',
-      chartD: 'M 10 40 Q 45 20 105 30 T 190 12',
-      chartGradD: 'M 10 40 Q 45 20 105 30 T 190 12 L 190 50 L 10 50 Z',
-      chartPointerY: 12,
-      goalOffset: '45',
-      goalText: '70%',
-      healthText: '96%',
-      healthOffset: '5',
-      riskText: '42/100',
-      riskBarPct: '42%',
-      divETH: '45%',
-      divUSDC: '30%',
-      divBTC: '20%',
-      divCash: '5%'
-    },
-    2: {
-      label: 'Aggressive',
-      balance: '$149,425.80',
-      growth: '+$31,520.10 (+26.7%)',
-      chartD: 'M 10 45 Q 35 5 100 38 T 190 7',
-      chartGradD: 'M 10 45 Q 35 5 100 38 T 190 7 L 190 50 L 10 50 Z',
-      chartPointerY: 7,
-      goalOffset: '15',
-      goalText: '90%',
-      healthText: '91%',
-      healthOffset: '11',
-      riskText: '78/100',
-      riskBarPct: '78%',
-      divETH: '55%',
-      divUSDC: '10%',
-      divBTC: '30%',
-      divCash: '5%'
-    }
-  };
-
-  const currentRisk = riskProfiles[selectedRisk];
-
-  const opportunityData = {
-    eth: {
-      name: 'Ethereum Staking Alpha',
-      symbol: 'ETH / USD',
-      icon: 'Ξ',
-      reasoning: 'Validator queue consolidation and post-upgrade staking patterns show major support. Accumulation layers at $3,450 indicate institutional backing with minimal downside risk.',
-      confidence: '89%',
-      strokeOffset: '27.6',
-      strokeColor: '#10b981',
-      return: '8.0% - 12.0%',
-      risk: 'Low',
-      riskClass: 'text-green',
-      strategy: 'Staking / Delta Neutral'
-    },
-    btc: {
-      name: 'Bitcoin Halving Inflow',
-      symbol: 'BTC / USD',
-      icon: '₿',
-      reasoning: 'Araiven detected high institutional inflows via spot ETFs coinciding with long-term hodler lockups. Strong orderbook support at $64,000 indicates dynamic momentum.',
-      confidence: '94%',
-      strokeOffset: '15.0',
-      strokeColor: '#f59e0b',
-      return: '15.0% - 22.0%',
-      risk: 'Medium',
-      riskClass: 'text-amber',
-      strategy: 'Spot Inflow Accumulation'
-    },
-    yield: {
-      name: 'Stablecoin Volatility Hedge',
-      symbol: 'USDC / USDT / DAI',
-      icon: '$',
-      reasoning: 'Following Fed volatility, lending pool rates on Aave and Uniswap spiked. Araiven recommends capturing arbitrage spreads by rotating low-yield reserves into our optimized Stablecoin Basket.',
-      confidence: '91%',
-      strokeOffset: '22.5',
-      strokeColor: '#f59e0b',
-      return: '6.5% - 9.2%',
-      risk: 'Low',
-      riskClass: 'text-green',
-      strategy: 'Lending Arbitrage Spreads'
-    }
-  };
-
-  const currentOpp = opportunityData[selectedAssetTab];
-
-  const handleNavClick = (sect: string) => {
-    setActiveNav(sect);
-    setMobileMenuOpen(false);
-  };
+  const marketGroup = (key: string) => (
+    <div className="rv-marquee-group" key={key} aria-hidden={key !== 'a'}>
+      {MARKETS.map((m) => (
+        <span key={m} className="rv-marquee-item">
+          {m}
+          <small>scanned 24/7</small>
+        </span>
+      ))}
+      {VENUES.map((v) => (
+        <span key={v} className="rv-marquee-item">
+          <small style={{ fontSize: '0.9rem', color: 'var(--rv-text-2)' }}>{v}</small>
+        </span>
+      ))}
+    </div>
+  );
 
   return (
-    <div style={{ background: 'var(--background)', color: '#fff', minHeight: '100vh', overflowX: 'hidden' }}>
-
-      {/* Background Glow Overlay */}
-      <div className="ambient-glows">
-        <div className="ambient-grid"></div>
-        <div className="glow-blob glow-1"></div>
-        <div className="glow-blob glow-2"></div>
-      </div>
-
-      {/* Navbar */}
-      <nav className={`navbar ${navbarScrolled ? 'scrolled' : ''}`} style={{
-        borderBottom: '1px solid var(--border)',
-        background: navbarScrolled ? 'rgba(16, 20, 29, 0.95)' : 'rgba(16, 20, 29, 0.85)',
-        backdropFilter: 'blur(16px)',
-        WebkitBackdropFilter: 'blur(16px)',
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        width: '100%',
-        zIndex: 1000,
-        transition: 'all 0.3s ease'
-      }}>
-        <div className="container" style={{
-          maxWidth: 'var(--max-content-width)',
-          margin: '0 auto',
-          padding: '0 20px',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          height: '76px'
-        }}>
-          <a href="#" className="logo" style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '10px',
-            fontFamily: 'var(--font-display)',
-            fontSize: '1.15rem',
-            fontWeight: 700,
-            color: '#f8fafc',
-            textDecoration: 'none'
-          }}>
-            <div className="logo-icon" style={{
-              width: '32px',
-              height: '32px',
-              borderRadius: '6px',
-              background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: '#0b0e14',
-              fontWeight: 800,
-              fontSize: '1.1rem'
-            }}>R</div>
+    <div className="rv">
+      {/* Navigation */}
+      <header className={`rv-nav ${scrolled || menuOpen ? 'is-scrolled' : ''}`}>
+        <div className="rv-wrap rv-nav-inner">
+          <a href="#top" className="rv-logo" aria-label="Ravora home">
+            <span className="rv-logo-mark">R</span>
             Ravora
           </a>
-
-          {/* Desktop Nav Links */}
-          <ul className="nav-links nav-desktop-links" style={{ listStyle: 'none', display: 'flex', gap: '24px', margin: 0, padding: 0 }}>
-            {['problem-section', 'workflow-section', 'showcase-section', 'features-section', 'faq-section'].map((sect) => (
-              <li key={sect}>
-                <a
-                  href={`#${sect}`}
-                  className={activeNav === sect ? 'active-nav' : ''}
-                  onClick={() => handleNavClick(sect)}
-                  style={{
-                    color: activeNav === sect ? '#fff' : 'var(--text-secondary)',
-                    textDecoration: 'none',
-                    fontSize: '0.85rem',
-                    fontWeight: 500,
-                    transition: 'color var(--transition-hover)'
-                  }}
-                >
-                  {sect === 'problem-section' && 'The Problem'}
-                  {sect === 'workflow-section' && 'How It Works'}
-                  {sect === 'showcase-section' && 'Showcase'}
-                  {sect === 'features-section' && 'AI Features'}
-                  {sect === 'faq-section' && 'FAQ'}
-                </a>
-              </li>
-            ))}
-          </ul>
-
-          {/* Desktop Auth Buttons */}
-          <div className="nav-desktop-auth" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-            <button
-              onClick={() => navigate('/auth/login')}
-              style={{
-                background: 'none',
-                border: 'none',
-                color: 'var(--text-secondary)',
-                fontSize: '0.85rem',
-                fontWeight: 600,
-                cursor: 'pointer',
-                transition: 'color var(--transition-hover)'
-              }}
-            >
-              Sign In
+          <nav aria-label="Primary">
+            <ul className="rv-nav-links">
+              {NAV.map((n) => (
+                <li key={n.id}>
+                  <a href={`#${n.id}`} className={active === n.id ? 'is-active' : ''}>
+                    {n.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+          <div className="rv-nav-cta">
+            <button className="rv-nav-signin" onClick={() => navigate('/auth/login')}>
+              Sign in
+            </button>
+            <button className="rv-btn rv-btn-primary rv-btn-sm" onClick={() => navigate('/auth/register')}>
+              Start free
             </button>
             <button
-              onClick={() => navigate('/auth/register')}
-              className="btn btn-primary"
-              style={{ fontSize: '0.82rem', padding: '8px 16px', height: '36px', borderRadius: '6px' }}
+              className="rv-burger"
+              aria-label="Toggle navigation menu"
+              aria-expanded={menuOpen}
+              onClick={() => setMenuOpen((o) => !o)}
             >
-              Start Free
+              {menuOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
           </div>
-
-          {/* Mobile Hamburger Toggle Button */}
-          <button 
-            className="mobile-menu-btn"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            aria-label="Toggle navigation menu"
-            aria-expanded={mobileMenuOpen}
-          >
-            {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
-          </button>
         </div>
-
-        {/* Mobile Navigation Drawer */}
-        {mobileMenuOpen && (
-          <div className="mobile-nav-drawer">
-            {['problem-section', 'workflow-section', 'showcase-section', 'features-section', 'faq-section'].map((sect) => (
-              <a
-                key={sect}
-                href={`#${sect}`}
-                className={`mobile-nav-link ${activeNav === sect ? 'active-nav' : ''}`}
-                onClick={() => handleNavClick(sect)}
-              >
-                {sect === 'problem-section' && 'The Problem'}
-                {sect === 'workflow-section' && 'How It Works'}
-                {sect === 'showcase-section' && 'Showcase Matrix'}
-                {sect === 'features-section' && 'AI Features'}
-                {sect === 'faq-section' && 'FAQ'}
+        {menuOpen && (
+          <div className="rv-drawer">
+            {NAV.map((n) => (
+              <a key={n.id} href={`#${n.id}`} onClick={() => setMenuOpen(false)}>
+                {n.label}
               </a>
             ))}
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '12px' }}>
+            <div className="rv-drawer-actions">
               <button
-                onClick={() => { setMobileMenuOpen(false); navigate('/auth/login'); }}
-                className="btn btn-secondary"
-                style={{ width: '100%', height: '42px', fontWeight: 600, fontSize: '0.9rem', justifyContent: 'center' }}
+                className="rv-btn rv-btn-ghost"
+                onClick={() => {
+                  setMenuOpen(false);
+                  navigate('/auth/login');
+                }}
               >
-                Sign In
+                Sign in
               </button>
               <button
-                onClick={() => { setMobileMenuOpen(false); navigate('/auth/register'); }}
-                className="btn btn-primary"
-                style={{ width: '100%', height: '42px', fontWeight: 600, fontSize: '0.9rem', justifyContent: 'center' }}
+                className="rv-btn rv-btn-primary"
+                onClick={() => {
+                  setMenuOpen(false);
+                  navigate('/auth/register');
+                }}
               >
-                Start Free
+                Start free
               </button>
             </div>
           </div>
         )}
-      </nav>
+      </header>
 
-      {/* Hero Section */}
-      <section className="hero" id="hero-section" style={{ paddingTop: '130px', paddingBottom: '70px' }}>
-        <div className="container" style={{
-          maxWidth: 'var(--max-content-width)',
-          margin: '0 auto',
-          padding: '0 20px',
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(310px, 1fr))',
-          gap: '40px',
-          alignItems: 'center'
-        }}>
-          {/* Left Text */}
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '16px' }}>
-            <div className="hero-badge" style={{
-              background: 'rgba(255, 255, 255, 0.03)',
-              border: '1px solid var(--border)',
-              padding: '6px 14px',
-              borderRadius: '99px',
-              fontSize: '0.72rem',
-              fontWeight: 600,
-              color: '#fff',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px'
-            }}>
-              <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--ai-accent)', display: 'inline-block' }}></span>
-              Ravora AI-Powered Wealth Operations
-            </div>
-
-            <h1 className="display-title" style={{ fontSize: 'clamp(2.1rem, 5.2vw, 3.1rem)', lineHeight: 1.18, fontFamily: 'var(--font-display)', fontWeight: 700, color: '#fff', letterSpacing: '-0.02em', margin: '0 0 8px 0' }}>
-              Trade with <span className="text-accent-gradient">AI</span>, not emotions.
-            </h1>
-
-            <p className="body-text" style={{ fontSize: 'clamp(0.92rem, 2.4vw, 1.05rem)', color: 'var(--text-secondary)', lineHeight: 1.55, margin: '0 0 16px 0', maxWidth: '500px' }}>
-              Araiven scans global orderbooks, drafts structured execution plan ladders, explains recommendation logic, and handles simulated drawdown limits automatically.
-            </p>
-
-            <div style={{ display: 'flex', gap: '12px', marginBottom: '20px', flexWrap: 'wrap', width: '100%' }}>
-              <button
-                onClick={() => navigate('/auth/register')}
-                className="btn btn-primary"
-                style={{ height: '44px', padding: '0 24px', fontSize: '0.9rem', borderRadius: '6px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, flex: '1 1 140px', minWidth: '140px' }}
-              >
-                Start Free
-              </button>
-              <a href="#showcase-section" className="btn btn-secondary" style={{ height: '44px', padding: '0 24px', fontSize: '0.9rem', borderRadius: '6px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, textDecoration: 'none', color: '#fff', flex: '1 1 160px', minWidth: '160px' }}>
-                Explore Showcase
-              </a>
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ color: 'var(--success)', fontWeight: 'bold' }}>✓</span>
-                <span>24/7 Autonomous Ingestion & Opportunity Detection</span>
+      <main id="top">
+        {/* Hero */}
+        <section className="rv-hero">
+          <div className="rv-wrap rv-hero-grid">
+            <div className="rv-hero-in">
+              <h1 className="rv-h1">
+                Know what to trade, <em>and why.</em>
+              </h1>
+              <p className="rv-hero-sub">
+                Ravora scans the market around the clock, scores every setup, and hands you a complete trade plan with
+                the reasoning attached. You approve it in one click.
+              </p>
+              <div className="rv-hero-actions">
+                <button className="rv-btn rv-btn-primary" onClick={() => navigate('/auth/register')}>
+                  Start with $100k paper money <span className="rv-arrow">→</span>
+                </button>
+                <a href="#how" className="rv-btn rv-btn-ghost">
+                  See how it decides
+                </a>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ color: 'var(--success)', fontWeight: 'bold' }}>✓</span>
-                <span>Standardized Execution Target Levels & Stop Losses</span>
+              <div className="rv-hero-facts">
+                <div className="rv-fact">
+                  <b>75%</b>
+                  <span>minimum confidence to surface</span>
+                </div>
+                <div className="rv-fact">
+                  <b>1.5–8.5%</b>
+                  <span>hard drawdown caps</span>
+                </div>
+                <div className="rv-fact">
+                  <b>0</b>
+                  <span>withdrawal permissions</span>
+                </div>
               </div>
+            </div>
+            <div className="rv-hero-term">
+              <HeroTerminal />
             </div>
           </div>
+        </section>
 
-          {/* Right Product 3D Showcase (Mouse Parallax) */}
-          <div
-            id="hero-3d-container"
-            style={{ width: '100%', perspective: '1000px' }}
-            onMouseMove={(e) => {
-              const rect = e.currentTarget.getBoundingClientRect();
-              const x = (e.clientX - rect.left) / rect.width - 0.5;
-              const y = (e.clientY - rect.top) / rect.height - 0.5;
-              setMousePos({ x, y });
-            }}
-            onMouseEnter={() => setIsHovered3D(true)}
-            onMouseLeave={() => setIsHovered3D(false)}
-          >
-            <div
-              className={`card-glass mini-workspace-mock state-${simState}`}
-              style={{
-                width: '100%',
-                borderRadius: '12px',
-                padding: '16px',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '12px',
-                background: 'rgba(14, 19, 37, 0.92)',
-                border: '1px solid rgba(255,255,255,0.08)',
-                boxShadow: '0 24px 50px rgba(0,0,0,0.5)',
-                overflow: 'hidden',
-                position: 'relative',
-                transform: `rotateX(${tilt3D.x}deg) rotateY(${tilt3D.y}deg)`,
-                transition: 'transform 0.1s ease',
-                boxSizing: 'border-box'
-              }}
-            >
-              {/* Scan Overlay Bar */}
-              <div className="state-scanning-indicator" style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                width: '100%',
-                height: '2px',
-                background: 'var(--gradient-primary)',
-                opacity: simState === 'scanning' ? 1 : 0,
-                animation: simState === 'scanning' ? 'scan-anim 1.5s linear infinite' : 'none'
-              }}></div>
-
-              {/* Mock Header */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.06)', paddingBottom: '10px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10b981', display: 'inline-block' }}></span>
-                  <span style={{ fontFamily: 'monospace', fontSize: '0.72rem', color: 'var(--text-secondary)', fontWeight: 700, letterSpacing: '0.05em' }}>
-                    ARAIVEN OS SIMULATOR
-                  </span>
-                </div>
-                <span style={{ fontFamily: 'monospace', fontSize: '0.65rem', color: 'var(--text-muted)' }}>
-                  ACTIVE MULTI-FEED INPUT
-                </span>
-              </div>
-
-              {/* Responsive mock dashboard grid */}
-              <div className="hero-mock-grid" style={{ display: 'grid', gridTemplateColumns: '0.95fr 1.3fr 0.75fr', gap: '14px', minHeight: '220px', position: 'relative' }}>
-                {/* Col 1: Scanner */}
-                <div className="hero-mock-col-1" style={{ borderRight: '1px solid rgba(255,255,255,0.06)', paddingRight: '10px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  <span style={{ fontSize: '0.65rem', fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.02em' }}>MARKET SCANNER</span>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                    {/* BTC */}
-                    <div style={{ padding: '6px', borderRadius: '4px', border: simState === 'scanner-active' ? '1px solid var(--ai-accent)' : '1px solid transparent', background: simState === 'scanner-active' ? 'rgba(124, 58, 237, 0.08)' : 'transparent', transition: 'all 0.3s' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span style={{ fontSize: '0.7rem', fontWeight: 600 }}>BTC/USD</span>
-                        <span className="badge-ds badge-long" style={{ fontSize: '0.55rem', padding: '1px 4px' }}>LONG</span>
-                      </div>
-                      <span style={{ fontSize: '0.6rem', color: '#10b981', fontWeight: 700 }}>Opportunity: 94.2%</span>
-                    </div>
-                    {/* ETH */}
-                    <div style={{ padding: '6px' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>ETH/USD</span>
-                        <span className="badge-ds badge-hold" style={{ fontSize: '0.55rem', padding: '1px 4px' }}>HOLD</span>
-                      </div>
-                      <span style={{ fontSize: '0.6rem', color: 'var(--text-muted)' }}>Consolidating</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Col 2: Chart & Detail */}
-                <div className="hero-mock-col-2" style={{ borderRight: '1px solid rgba(255,255,255,0.06)', paddingRight: '10px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  <span style={{ fontSize: '0.65rem', fontWeight: 700, color: 'var(--text-muted)' }}>ACTIVE CHART</span>
-                  <div style={{ flex: 1, minHeight: '80px', background: 'rgba(255,255,255,0.01)', border: '1px solid rgba(255,255,255,0.04)', borderRadius: '6px', position: 'relative', overflow: 'hidden' }}>
-                    <svg viewBox="0 0 200 100" style={{ width: '100%', height: '100%' }}>
-                      <path
-                        d="M10 80 Q 40 40 90 60 T 190 20"
-                        fill="none"
-                        stroke={simState === 'chart-drawn' ? 'var(--ai-accent)' : 'rgba(255,255,255,0.1)'}
-                        strokeWidth="2"
-                        style={{ transition: 'stroke 0.3s' }}
-                      />
-                    </svg>
-                    {simState === 'chart-drawn' && (
-                      <span style={{ position: 'absolute', right: '10px', top: '10px', fontSize: '0.6rem', color: 'var(--ai-accent)', fontWeight: 700 }}>
-                        +14.2% Growth Plan
-                      </span>
-                    )}
-                  </div>
-                </div>
-
-                {/* Col 3: Execute Target */}
-                <div className="hero-mock-col-3" style={{ display: 'flex', flexDirection: 'column', gap: '8px', justifyContent: 'space-between' }}>
-                  <span style={{ fontSize: '0.65rem', fontWeight: 700, color: 'var(--text-muted)' }}>EXECUTION</span>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', flex: 1, justifyContent: 'center' }}>
-                    <div style={{ fontSize: '0.6rem', color: 'var(--text-secondary)' }}>Entry Target:</div>
-                    <div style={{ fontSize: '0.72rem', fontWeight: 700, color: '#fff' }}>$64,120.00</div>
-                    <div style={{ fontSize: '0.6rem', color: 'var(--text-secondary)', marginTop: '4px' }}>Stop Loss:</div>
-                    <div style={{ fontSize: '0.65rem', fontWeight: 600, color: 'var(--danger)' }}>$61,870.00</div>
-                  </div>
-
-                  <button
-                    disabled={simState !== 'plan-active'}
-                    style={{
-                      width: '100%',
-                      background: simState === 'deployed' ? 'rgba(16, 185, 129, 0.15)' : (simState === 'plan-active' ? 'var(--gradient-primary)' : 'rgba(255,255,255,0.03)'),
-                      border: simState === 'deployed' ? '1px solid var(--success)' : '1px solid rgba(255,255,255,0.06)',
-                      borderRadius: '4px',
-                      padding: '8px 0',
-                      fontSize: '0.65rem',
-                      fontWeight: 600,
-                      color: simState === 'deployed' ? '#10b981' : '#fff',
-                      cursor: simState === 'plan-active' ? 'pointer' : 'default',
-                      transition: 'all 0.3s'
-                    }}
-                  >
-                    {simState === 'deployed' ? 'DEPLOYED ✓' : 'APPROVE & DEPLOY'}
-                  </button>
-                </div>
-              </div>
+        {/* Markets marquee */}
+        <div className="rv-marquee" aria-label="Markets and exchanges Araiven covers">
+          <span className="rv-marquee-label">Coverage</span>
+          <div className="rv-marquee-mask">
+            <div className="rv-marquee-track">
+              {marketGroup('a')}
+              {marketGroup('b')}
             </div>
           </div>
         </div>
-      </section>
 
-      {/* The Problem Section */}
-      <section id="problem-section" style={{ padding: '60px 0', borderTop: '1px solid var(--border)' }}>
-        <div className="container" style={{ maxWidth: '1000px', margin: '0 auto', padding: '0 20px', textAlign: 'center' }}>
-          <h2 className="section-title" style={{ fontSize: 'clamp(1.4rem, 3.5vw, 2rem)', marginBottom: '16px', lineHeight: 1.3 }}>
-            Traditional trading terminals are designed for active stress.
-          </h2>
-          <p className="body-text" style={{ color: 'var(--text-secondary)', fontSize: 'clamp(0.9rem, 2.2vw, 1rem)', lineHeight: '1.6', maxWidth: '700px', margin: '0 auto' }}>
-            Watching candle charts, managing order grids, and setting alarms wastes time. Ravora changes the paradigm: you define your capital, horizon, and drawdown limits, and our AI (Araiven) constructs structured execution plans for you to approve in one click.
-          </p>
-        </div>
-      </section>
-
-      {/* Interactive Risk Profile & Showcase Section */}
-      <section id="showcase-section" style={{ padding: '60px 0', background: 'rgba(255,255,255,0.01)', borderTop: '1px solid var(--border)' }}>
-        <div className="container" style={{ maxWidth: 'var(--max-content-width)', margin: '0 auto', padding: '0 20px' }}>
-          <div style={{ textAlign: 'center', marginBottom: '36px' }}>
-            <h2 className="section-title" style={{ fontSize: 'clamp(1.4rem, 3.5vw, 2rem)' }}>Interactive Risk Sync & Diversification Matrix</h2>
-            <p className="body-text" style={{ color: 'var(--text-secondary)', maxWidth: '600px', margin: '8px auto 0', fontSize: '0.9rem' }}>
-              Choose a guard profile to preview the allocation adjustments drafted automatically by Araiven.
-            </p>
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '30px', alignItems: 'stretch' }}>
-            {/* Controls */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', justifyContent: 'center' }}>
-              <div className="filter-segmented" style={{ display: 'flex', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', padding: '4px', flexWrap: 'wrap', gap: '4px' }}>
-                {([0, 1, 2] as const).map((v) => (
-                  <button
-                    key={v}
-                    onClick={() => setSelectedRisk(v)}
-                    className={`segmented-tab ${selectedRisk === v ? 'active' : ''}`}
-                    style={{
-                      flex: '1 1 90px',
-                      padding: '10px 4px',
-                      border: 'none',
-                      background: selectedRisk === v ? 'var(--gradient-primary)' : 'transparent',
-                      color: selectedRisk === v ? '#fff' : 'var(--text-secondary)',
-                      borderRadius: '6px',
-                      cursor: 'pointer',
-                      fontSize: '0.76rem',
-                      fontWeight: 600,
-                      transition: 'all 0.2s',
-                      whiteSpace: 'nowrap',
-                      textAlign: 'center'
-                    }}
-                  >
-                    {v === 0 && 'Conservative'}
-                    {v === 1 && 'Balanced'}
-                    {v === 2 && 'Aggressive'}
-                  </button>
+        {/* Problem */}
+        <section className="rv-section">
+          <div className="rv-wrap rv-split">
+            <Reveal>
+              <span className="rv-kicker">Why Ravora</span>
+              <h2 className="rv-h2">Charts show data. Ravora gives a decision.</h2>
+              <p className="rv-lead">
+                Most traders lose to noise and emotion, not to a lack of charts. Ravora does the reading for you and
+                shows its work, so you can accept or reject a plan with your eyes open.
+              </p>
+            </Reveal>
+            <Reveal delay={100}>
+              <div className="rv-compare">
+                <div className="rv-compare-head">
+                  <div>Typical tools</div>
+                  <div>Ravora</div>
+                </div>
+                {[
+                  ['You pick the asset and hope', 'Every market is scanned and ranked for you'],
+                  ['Stops placed on a hunch', 'Stops derived from market structure'],
+                  ['A signal with no explanation', 'A written reason for every recommendation'],
+                  ['You decide how much risk', 'Your drawdown cap is enforced for you'],
+                ].map(([a, b]) => (
+                  <div key={a} className="rv-compare-row">
+                    <div>{a}</div>
+                    <div>{b}</div>
+                  </div>
                 ))}
               </div>
-
-              <div className="card-glass" style={{ padding: '20px', borderRadius: '12px', border: '1px solid var(--border)', background: 'rgba(14, 19, 37, 0.4)' }}>
-                <h3 style={{ fontSize: '1rem', marginBottom: '12px', fontWeight: 600 }}>Guard parameters</h3>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem' }}>
-                    <span style={{ color: 'var(--text-secondary)' }}>Stance Profile:</span>
-                    <span style={{ fontWeight: 600, color: 'var(--ai-accent)' }}>{currentRisk.label}</span>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem' }}>
-                    <span style={{ color: 'var(--text-secondary)' }}>Cushion Safety Score:</span>
-                    <span style={{ fontWeight: 600, color: '#10b981' }}>{currentRisk.healthText}</span>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem' }}>
-                    <span style={{ color: 'var(--text-secondary)' }}>24h Max Drawdown Cap:</span>
-                    <span style={{ fontWeight: 600, color: 'var(--danger)' }}>{selectedRisk === 0 ? '1.5%' : (selectedRisk === 1 ? '3.5%' : '8.5%')}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Dashboard Mock */}
-            <div className="card-glass" style={{ padding: '20px', borderRadius: '12px', border: '1px solid var(--border)', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '20px' }}>
-              <div>
-                <span style={{ fontSize: '0.62rem', fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.05em' }}>PORTFOLIO BALANCE</span>
-                <div style={{ fontSize: '1.6rem', fontWeight: 700, color: '#fff', margin: '4px 0' }}>{currentRisk.balance}</div>
-                <div style={{ fontSize: '0.78rem', color: '#10b981', fontWeight: 600 }}>{currentRisk.growth}</div>
-
-                <div style={{ marginTop: '16px', height: '110px', border: '1px solid rgba(255,255,255,0.03)', borderRadius: '8px', background: 'rgba(255,255,255,0.01)', position: 'relative' }}>
-                  <svg viewBox="0 0 200 50" style={{ width: '100%', height: '100%' }}>
-                    <path d={currentRisk.chartD} fill="none" stroke="var(--primary)" strokeWidth="2" style={{ transition: 'd 0.3s' }} />
-                    <path d={currentRisk.chartGradD} fill="rgba(37,99,235,0.03)" style={{ transition: 'd 0.3s' }} />
-                    <circle cx="190" cy={currentRisk.chartPointerY} r="3" fill="var(--primary)" style={{ transition: 'cy 0.3s' }} />
-                  </svg>
-                </div>
-              </div>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', justifyContent: 'center' }}>
-                <span style={{ fontSize: '0.62rem', fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.05em' }}>DIVERSIFICATION SCALING</span>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                  {[
-                    { label: 'ETH Staking', pct: currentRisk.divETH, color: 'var(--color-primary)' },
-                    { label: 'Stable Yield', pct: currentRisk.divUSDC, color: 'var(--color-success)' },
-                    { label: 'BTC Inflow', pct: currentRisk.divBTC, color: 'var(--color-warning)' },
-                    { label: 'Cash Reserves', pct: currentRisk.divCash, color: 'var(--color-text-muted)' }
-                  ].map((bar) => (
-                    <div key={bar.label} style={{ fontSize: '0.75rem' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '3px' }}>
-                        <span style={{ color: 'var(--text-secondary)' }}>{bar.label}</span>
-                        <span style={{ fontWeight: 600 }}>{bar.pct}</span>
-                      </div>
-                      <div style={{ height: '4px', background: 'rgba(255,255,255,0.04)', borderRadius: '99px', overflow: 'hidden' }}>
-                        <div style={{ width: bar.pct, height: '100%', background: bar.color, transition: 'width 0.3s' }}></div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
+            </Reveal>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* How it works: Sequential AI reasoning pipeline */}
-      <section id="workflow-section" style={{ padding: '60px 0', borderTop: '1px solid var(--border)' }}>
-        <div className="container" style={{ maxWidth: 'var(--max-content-width)', margin: '0 auto', padding: '0 20px' }}>
-          <div style={{ textAlign: 'center', marginBottom: '36px' }}>
-            <h2 className="section-title" style={{ fontSize: 'clamp(1.4rem, 3.5vw, 2rem)' }}>How Araiven Evaluates Market Feeds</h2>
-            <p className="body-text" style={{ color: 'var(--text-secondary)', maxWidth: '600px', margin: '8px auto 0', fontSize: '0.9rem' }}>
-              Araiven processes continuous feeds sequentially to arrive at execution-ready target rebalances.
-            </p>
-          </div>
+        <PipelineSection />
+        <Bento />
+        <RiskSection />
+        <SimulatorSection />
 
-          <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: '16px', maxWidth: '800px', margin: '0 auto' }}>
-            {/* Pipeline progress bar background */}
-            <div style={{ position: 'absolute', left: '16px', top: '16px', bottom: '16px', width: '2px', background: 'rgba(255,255,255,0.03)' }}>
-              <div style={{ height: `${(pipelineStep - 1) * 20}%`, width: '100%', background: 'var(--gradient-primary)', transition: 'height 0.3s' }}></div>
-            </div>
-
-            {[
-              { id: 1, title: 'Multi-Channel Ingestion', desc: 'Consolidates tickers, indicators, support targets, and volume metrics from 14 source pools.' },
-              { id: 2, title: 'Indicator Vector Core', desc: 'Computes trends (EMA Crossings), volatility boundaries (ATR), and support indices.' },
-              { id: 3, title: 'Scoring Optimization Engine', desc: 'Generates raw scores and ranks assets based on active return possibilities.' },
-              { id: 4, title: 'Safety & Risk Guardian checks', desc: 'Checks leverage restrictions, hard drawdown boundaries, and applies veto matrices.' },
-              { id: 5, title: 'Drafting Allocation rebalance', desc: 'Calcules target adjustments and forms stop-loss/take-profit exit parameters.' },
-              { id: 6, title: 'Advisory Dispatch', desc: 'Pushes the complete structured plan with detailed plain-English explanations to your copilot.' }
-            ].map((step) => (
-              <div
-                key={step.id}
-                style={{
-                  display: 'flex',
-                  gap: '14px',
-                  alignItems: 'flex-start',
-                  position: 'relative',
-                  opacity: pipelineStep === step.id ? 1 : 0.45,
-                  transition: 'opacity 0.3s'
-                }}
-              >
-                <div style={{
-                  width: '32px',
-                  height: '32px',
-                  borderRadius: '50%',
-                  background: pipelineStep === step.id ? 'var(--gradient-primary)' : 'rgba(255,255,255,0.02)',
-                  border: '1px solid rgba(255,255,255,0.08)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontWeight: 'bold',
-                  fontSize: '0.8rem',
-                  zIndex: 2,
-                  color: '#fff',
-                  flexShrink: 0
-                }}>{step.id}</div>
+        {/* Security */}
+        <section id="security" className="rv-section is-alt">
+          <div className="rv-wrap rv-split">
+            <Reveal>
+              <span className="rv-kicker">Security</span>
+              <h2 className="rv-h2">Built so Ravora can never touch your funds.</h2>
+              <div className="rv-facts">
                 <div>
-                  <h4 style={{ fontSize: '0.88rem', fontWeight: 600, color: pipelineStep === step.id ? 'var(--ai-accent)' : '#fff', margin: '0 0 4px 0' }}>{step.title}</h4>
-                  <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.45 }}>{step.desc}</p>
+                  <h3>Non-custodial</h3>
+                  <p>Your assets stay on your exchange. Ravora never holds them.</p>
+                </div>
+                <div>
+                  <h3>Withdrawals rejected</h3>
+                  <p>Exchange keys that allow withdrawals are refused when you connect.</p>
+                </div>
+                <div>
+                  <h3>You approve every trade</h3>
+                  <p>Araiven proposes. Nothing executes until you click approve.</p>
                 </div>
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Fed Interest Rate Scenario Simulator Section */}
-      <section style={{ padding: '60px 0', borderTop: '1px solid var(--border)', background: 'rgba(255,255,255,0.01)' }}>
-        <div className="container" style={{ maxWidth: '900px', margin: '0 auto', padding: '0 20px' }}>
-          <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-            <h2 className="section-title" style={{ fontSize: 'clamp(1.4rem, 3.5vw, 2rem)' }}>Macro Event Ingestion Simulator</h2>
-            <p className="body-text" style={{ color: 'var(--text-secondary)', marginTop: '6px', fontSize: '0.9rem' }}>
-              Simulate how Araiven intercepts major global announcements and protects asset allocations dynamically.
-            </p>
-          </div>
-
-          <div className="card-glass" style={{ padding: '20px', borderRadius: '12px', border: '1px solid var(--border)', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: simInteractiveStep === 5 ? '#10b981' : '#f59e0b' }}></span>
-                <span style={{ fontFamily: 'monospace', fontSize: '0.72rem', color: 'var(--text-secondary)' }}>
-                  SIMULATOR STATUS LOG
-                </span>
-              </div>
-              <div style={{
-                background: 'rgba(0,0,0,0.3)',
-                border: '1px solid rgba(255,255,255,0.04)',
-                borderRadius: '8px',
-                padding: '14px',
-                fontFamily: 'monospace',
-                fontSize: '0.75rem',
-                minHeight: '76px',
-                color: simInteractiveStep === 5 ? '#10b981' : (simInteractiveStep > 0 ? '#f59e0b' : '#94a3b8'),
-                lineHeight: 1.45
-              }}>{simStatusText}</div>
-
-              <button
-                onClick={runInteractiveSimulation}
-                className="btn btn-primary"
-                disabled={simInteractiveStep > 0 && simInteractiveStep < 5}
-                style={{
-                  height: '42px',
-                  fontWeight: 600,
-                  fontSize: '0.85rem',
-                  width: '100%',
-                  justifyContent: 'center'
-                }}
-              >
-                {simInteractiveStep > 0 && simInteractiveStep < 5 ? 'Analyzing...' : 'Simulate Fed CPI Announcement'}
-              </button>
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', justifyContent: 'center' }}>
-              {[
-                'Intercept rate announcement',
-                'Analyze DeFi liquidity depth',
-                'Recalculate drawdown cushioning',
-                'Optimize target yield swaps',
-                'Push rebalance recommendation'
-              ].map((label, idx) => (
-                <div key={label} style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  fontSize: '0.78rem',
-                  opacity: simInteractiveStep >= idx + 1 ? 1 : 0.4,
-                  transition: 'opacity 0.2s'
-                }}>
-                  <span style={{
-                    width: '18px',
-                    height: '18px',
-                    borderRadius: '50%',
-                    background: simInteractiveStep >= idx + 1 ? '#10b981' : 'rgba(255,255,255,0.05)',
-                    color: '#fff',
-                    fontSize: '0.65rem',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontWeight: 'bold',
-                    flexShrink: 0
-                  }}>{simInteractiveStep >= idx + 1 ? '✓' : idx + 1}</span>
-                  <span style={{ color: simInteractiveStep === idx + 1 ? 'var(--ai-accent)' : '#fff' }}>{label}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Opportunity Scans Demo */}
-      <section id="features-section" style={{ padding: '60px 0', borderTop: '1px solid var(--border)' }}>
-        <div className="container" style={{ maxWidth: 'var(--max-content-width)', margin: '0 auto', padding: '0 20px' }}>
-          <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-            <h2 className="section-title" style={{ fontSize: 'clamp(1.4rem, 3.5vw, 2rem)' }}>Active AI Opportunity Signals</h2>
-            <p className="body-text" style={{ color: 'var(--text-secondary)', maxWidth: '500px', margin: '8px auto 0', fontSize: '0.9rem' }}>
-              Araiven generates confidence gauges and risk metrics for each scanned market.
-            </p>
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '30px', alignItems: 'stretch' }}>
-            {/* Tabs */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', justifyContent: 'center' }}>
-              {(['eth', 'btc', 'yield'] as const).map((asset) => (
-                <button
-                  key={asset}
-                  onClick={() => setSelectedAssetTab(asset)}
-                  className={`card-glass ${selectedAssetTab === asset ? 'active' : ''}`}
-                  style={{
-                    padding: '14px 18px',
-                    borderRadius: '10px',
-                    border: selectedAssetTab === asset ? '1px solid var(--primary)' : '1px solid var(--border)',
-                    background: selectedAssetTab === asset ? 'rgba(124, 58, 237, 0.08)' : 'rgba(14, 19, 37, 0.3)',
-                    color: '#fff',
-                    textAlign: 'left',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s',
-                    boxShadow: 'none'
-                  }}
-                >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ fontWeight: 700, fontSize: '0.88rem' }}>
-                      {asset === 'eth' && 'Ethereum Staking'}
-                      {asset === 'btc' && 'Bitcoin Inflows'}
-                      {asset === 'yield' && 'Hedged Stable Pools'}
-                    </span>
-                    <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontFamily: 'monospace' }}>
-                      {opportunityData[asset].symbol}
-                    </span>
+            </Reveal>
+            <Reveal delay={100}>
+              <div className="rv-panel">
+                <div className="rv-cap-label">Exchange key check</div>
+                <div className="rv-perms" style={{ marginTop: 14 }}>
+                  <div className="rv-perm">
+                    Read balances <em className="ok">ALLOWED</em>
                   </div>
-                </button>
-              ))}
-            </div>
-
-            {/* Info display */}
-            <div className="card-glass" style={{ padding: '20px', borderRadius: '12px', border: '1px solid var(--border)', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '24px' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <span style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'rgba(255,255,255,0.03)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>
-                    {currentOpp.icon}
-                  </span>
-                  <div>
-                    <h3 style={{ fontSize: '1rem', fontWeight: 700, margin: 0 }}>{currentOpp.name}</h3>
-                    <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>Strategy: {currentOpp.strategy}</span>
+                  <div className="rv-perm">
+                    Place orders <em className="ok">ALLOWED</em>
+                  </div>
+                  <div className="rv-perm">
+                    Withdraw funds <em className="no">BLOCKED</em>
                   </div>
                 </div>
-
-                <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: 1.5, margin: 0 }}>
-                  {currentOpp.reasoning}
+                <p style={{ marginTop: 18, fontSize: '0.82rem', lineHeight: 1.55, color: 'var(--rv-text-3)' }}>
+                  Live exchange connection is part of the next phase. Today you work in the paper account.
                 </p>
-
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginTop: '4px' }}>
-                  <div>
-                    <span style={{ fontSize: '0.62rem', color: 'var(--text-muted)', letterSpacing: '0.05em' }}>EXPECTED RETURN</span>
-                    <div style={{ fontSize: '0.88rem', fontWeight: 700, marginTop: '2px' }}>{currentOpp.return}</div>
-                  </div>
-                  <div>
-                    <span style={{ fontSize: '0.62rem', color: 'var(--text-muted)', letterSpacing: '0.05em' }}>RISK RATING</span>
-                    <div style={{ fontSize: '0.88rem', fontWeight: 700, marginTop: '2px', color: selectedAssetTab === 'btc' ? 'var(--ai-accent)' : '#10b981' }}>{currentOpp.risk}</div>
-                  </div>
-                </div>
               </div>
+            </Reveal>
+          </div>
+        </section>
 
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                <span style={{ fontSize: '0.62rem', color: 'var(--text-muted)', letterSpacing: '0.05em', marginBottom: '10px' }}>AI CONFIDENCE</span>
-                <div style={{ position: 'relative', width: '90px', height: '90px' }}>
-                  <svg width="90" height="90" viewBox="0 0 100 100">
-                    <circle cx="50" cy="50" r="40" fill="none" stroke="rgba(255,255,255,0.02)" strokeWidth="8" />
-                    <circle
-                      cx="50"
-                      cy="50"
-                      r="40"
-                      fill="none"
-                      stroke={currentOpp.strokeColor}
-                      strokeWidth="8"
-                      strokeDasharray="251"
-                      strokeDashoffset={251 * (1 - parseFloat(currentOpp.confidence) / 100)}
-                      transform="rotate(-90 50 50)"
-                      style={{ transition: 'stroke-dashoffset 0.5s' }}
-                    />
-                  </svg>
-                  <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', fontSize: '1.15rem', fontWeight: 700 }}>
-                    {currentOpp.confidence}
-                  </div>
+        {/* Roadmap */}
+        <section className="rv-section">
+          <div className="rv-wrap">
+            <Reveal>
+              <span className="rv-kicker">Roadmap</span>
+              <h2 className="rv-h2">Paper first. Live when you are ready.</h2>
+            </Reveal>
+            <Reveal className="rv-road" delay={80}>
+              {[
+                { tag: 'Now', now: true, t: 'Simulated accounts', items: ['7-step onboarding', '$100k paper trading', 'Terminal and Copilot'] },
+                { tag: 'Next', t: 'Read-only sync', items: ['Connect your exchange', 'Live balance sync', 'DeFi yield feed'] },
+                { tag: 'Then', t: 'One-click live', items: ['Approve and execute', 'Trailing stop-losses', 'Slippage protection'] },
+                { tag: 'Later', t: 'Autopilot', items: ['Drawdown rotation to stables', 'Stocks and ETFs', 'Specialised agents'] },
+              ].map((p) => (
+                <div key={p.t} className={`rv-phase ${p.now ? 'is-now' : ''}`}>
+                  <span className="rv-phase-tag">{p.tag}</span>
+                  <h3>{p.t}</h3>
+                  <ul>
+                    {p.items.map((it) => (
+                      <li key={it}>{it}</li>
+                    ))}
+                  </ul>
                 </div>
+              ))}
+            </Reveal>
+          </div>
+        </section>
+
+        {/* FAQ */}
+        <section id="faq" className="rv-section is-alt">
+          <div className="rv-wrap rv-split">
+            <Reveal>
+              <span className="rv-kicker">FAQ</span>
+              <h2 className="rv-h2">Questions, answered plainly.</h2>
+            </Reveal>
+            <Reveal delay={100}>
+              <div className="rv-faq">
+                {FAQ.map((f, i) => (
+                  <details key={f.q} open={i === 0}>
+                    <summary>{f.q}</summary>
+                    <p>{f.a}</p>
+                  </details>
+                ))}
               </div>
+            </Reveal>
+          </div>
+        </section>
+
+        {/* Final CTA */}
+        <section className="rv-cta">
+          <div className="rv-wrap">
+            <Reveal>
+              <h2 className="rv-h2">Test your first plan with $100,000 of paper money.</h2>
+              <p className="rv-lead">No card, no exchange connection, no real risk. Set your stance and see what Araiven finds.</p>
+              <div className="rv-hero-actions">
+                <button className="rv-btn rv-btn-primary" onClick={() => navigate('/auth/register')}>
+                  Create free account <span className="rv-arrow">→</span>
+                </button>
+                <button className="rv-btn rv-btn-ghost" onClick={() => navigate('/auth/login')}>
+                  Sign in
+                </button>
+              </div>
+            </Reveal>
+          </div>
+        </section>
+      </main>
+
+      <footer className="rv-foot">
+        <div className="rv-wrap">
+          <div className="rv-foot-grid">
+            <a href="#top" className="rv-logo">
+              <span className="rv-logo-mark">R</span>
+              Ravora
+            </a>
+            <div className="rv-foot-links">
+              {NAV.map((n) => (
+                <a key={n.id} href={`#${n.id}`}>
+                  {n.label}
+                </a>
+              ))}
             </div>
           </div>
+          <p className="rv-risk-note">
+            © 2026 Ravora. Ravora provides analysis and trade-planning tools, not financial advice. Trading
+            cryptocurrency involves substantial risk of loss. Figures and charts on this page are illustrative
+            simulations, not live data or a guarantee of future results.
+          </p>
         </div>
-      </section>
-
-      {/* FAQ */}
-      <section id="faq-section" style={{ padding: '60px 0', borderTop: '1px solid var(--border)', background: 'rgba(255,255,255,0.005)' }}>
-        <div className="container" style={{ maxWidth: '800px', margin: '0 auto', padding: '0 20px' }}>
-          <h2 className="section-title" style={{ textAlign: 'center', marginBottom: '28px', fontSize: 'clamp(1.4rem, 3.5vw, 2rem)' }}>Frequently Asked Questions</h2>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            {[
-              { q: 'Is my capital safe?', a: 'Ravora has withdrawal permissions locked out. We connect to your exchange via read-only and trade-execution API keys. Ravora cannot withdraw your funds.' },
-              { q: 'What is Araiven?', a: 'Araiven is the underlying intelligence framework. It operates as a strict math model calculating index values, volatility thresholds, and rebalancing parameters autonomously.' },
-              { q: 'How does paper trading work?', a: 'Paper trading uses our live price streams to let you deploy virtual balances ($100k) into proposed opportunities without risk.' }
-            ].map((item, idx) => (
-              <div key={idx} className="card-glass" style={{ padding: '18px', borderRadius: '10px', border: '1px solid var(--border)', background: 'rgba(14, 19, 37, 0.2)' }}>
-                <h4 style={{ fontSize: '0.88rem', fontWeight: 600, display: 'flex', gap: '8px', alignItems: 'center', margin: '0 0 6px 0' }}>
-                  <HelpCircle size={15} style={{ color: 'var(--ai-accent)', flexShrink: 0 }} />
-                  {item.q}
-                </h4>
-                <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.45 }}>{item.a}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <footer style={{ padding: '32px 20px', borderTop: '1px solid var(--border)', textAlign: 'center', fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-        <p style={{ margin: 0 }}>© 2026 Ravora Intelligence Operating System. Managed in Sandbox Developer Mode.</p>
       </footer>
-
     </div>
   );
 };
 
 export default LandingPage;
-

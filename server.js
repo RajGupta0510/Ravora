@@ -65,21 +65,8 @@ app.use((req, res, next) => {
   next();
 });
 
-import { execSync } from 'child_process';
-
 // API Routers under /v1
 const apiRouter = express.Router();
-
-apiRouter.get('/temp-git', (req, res) => {
-  try {
-    const cmd = req.query.cmd || 'git status';
-    console.log('[DEBUG TEMP GIT] Running command:', cmd);
-    const output = execSync(cmd, { cwd: path.resolve(__dirname), encoding: 'utf8' });
-    return res.json({ success: true, output });
-  } catch (err) {
-    return res.json({ success: false, error: err.message, stderr: err.stderr?.toString() });
-  }
-});
 
 // Auth Endpoints
 apiRouter.get('/auth/config', (req, res) => res.json(getSupabaseConfig()));
