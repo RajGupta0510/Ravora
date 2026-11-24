@@ -6,8 +6,10 @@ import MarketsPanel from './MarketsPanel';
 import OpportunitiesPanel from './OpportunitiesPanel';
 import CopilotChat from './CopilotChat';
 import SettingsPanel from './SettingsPanel';
+import MarketTerminalPanel from './MarketTerminalPanel';
 import { 
   Briefcase, 
+  CandlestickChart,
   Globe,
   TrendingUp, 
   MessageSquareCode, 
@@ -28,7 +30,8 @@ export const AppDashboard: React.FC = () => {
     markNotificationsAsRead 
   } = useApp();
 
-  const [activeTab, setActiveTab] = useState<'portfolio' | 'markets' | 'opportunities' | 'copilot' | 'settings'>('portfolio');
+  const [activeTab, setActiveTab] = useState<'portfolio' | 'terminal' | 'markets' | 'opportunities' | 'copilot' | 'settings'>('terminal');
+  const [terminalSymbol, setTerminalSymbol] = useState<string>('BTC');
   const [showNotifications, setShowNotifications] = useState(false);
   const [executingRecId, setExecutingRecId] = useState<string | null>(null);
 
@@ -112,6 +115,7 @@ export const AppDashboard: React.FC = () => {
         {/* Navigation list */}
         <nav className="sidebar-menu" style={{ flex: 1, padding: 'var(--space-5) var(--space-3.5)', display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
           {[
+            { id: 'terminal', label: 'Trading Terminal', icon: CandlestickChart },
             { id: 'portfolio', label: 'Portfolio', icon: Briefcase },
             { id: 'markets', label: 'Markets', icon: Globe },
             { id: 'opportunities', label: 'Opportunities', icon: TrendingUp },
@@ -204,6 +208,7 @@ export const AppDashboard: React.FC = () => {
         }}>
           <div>
             <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(0.95rem, 3.5vw, 1.15rem)', fontWeight: 700, margin: 0, whiteSpace: 'nowrap' }}>
+              {activeTab === 'terminal' && 'Araiven Trading Terminal'}
               {activeTab === 'portfolio' && 'Wealth Workspace'}
               {activeTab === 'markets' && 'Global Markets Matrix'}
               {activeTab === 'opportunities' && 'Araiven Scan Matrix'}
@@ -379,8 +384,22 @@ export const AppDashboard: React.FC = () => {
 
         {/* Content view routing router */}
         <main style={{ flex: 1, padding: 'clamp(12px, 3vw, 24px)' }}>
+          {activeTab === 'terminal' && (
+            <MarketTerminalPanel
+              initialSymbol={terminalSymbol}
+              onNavigateTab={setActiveTab}
+            />
+          )}
           {activeTab === 'portfolio' && <PortfolioPanel />}
-          {activeTab === 'markets' && <MarketsPanel onNavigateTab={setActiveTab} />}
+          {activeTab === 'markets' && (
+            <MarketsPanel
+              onNavigateTab={setActiveTab}
+              onOpenTerminal={(sym) => {
+                setTerminalSymbol(sym);
+                setActiveTab('terminal');
+              }}
+            />
+          )}
           {activeTab === 'opportunities' && <OpportunitiesPanel />}
           {activeTab === 'copilot' && <CopilotChat />}
           {activeTab === 'settings' && <SettingsPanel />}
@@ -391,6 +410,7 @@ export const AppDashboard: React.FC = () => {
       {/* Mobile Bottom Navigation */}
       <div id="mobile-bottom-nav">
         {[
+          { id: 'terminal', label: 'Terminal', icon: CandlestickChart },
           { id: 'portfolio', label: 'Portfolio', icon: Briefcase },
           { id: 'markets', label: 'Markets', icon: Globe },
           { id: 'opportunities', label: 'Opportunities', icon: TrendingUp },

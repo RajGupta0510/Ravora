@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
   Globe, 
@@ -15,7 +15,9 @@ import {
   BarChart3, 
   ShieldCheck, 
   Zap,
-  Activity
+  Activity,
+  Monitor,
+  CandlestickChart
 } from 'lucide-react';
 
 interface MarketItem {
@@ -48,10 +50,11 @@ interface AssetDetails {
 }
 
 interface MarketsPanelProps {
-  onNavigateTab?: (tab: 'portfolio' | 'markets' | 'opportunities' | 'copilot' | 'settings') => void;
+  onNavigateTab?: (tab: 'portfolio' | 'terminal' | 'markets' | 'opportunities' | 'copilot' | 'settings') => void;
+  onOpenTerminal?: (symbol: string) => void;
 }
 
-export const MarketsPanel: React.FC<MarketsPanelProps> = ({ onNavigateTab }) => {
+export const MarketsPanel: React.FC<MarketsPanelProps> = ({ onNavigateTab, onOpenTerminal }) => {
   const { marketOverview: initialOverview } = useApp();
   
   const [overview, setOverview] = useState<MarketItem[]>(initialOverview || []);
@@ -69,6 +72,181 @@ export const MarketsPanel: React.FC<MarketsPanelProps> = ({ onNavigateTab }) => 
   const [aiAnalysis, setAiAnalysis] = useState<string | null>(null);
   const [aiLoading, setAiLoading] = useState<boolean>(false);
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
+
+  // Market Terminal state
+  const [activeView, setActiveView] = useState<'matrix' | 'terminal'>('matrix');
+  const [terminalSymbol, setTerminalSymbol] = useState<string>('BTC');
+  const [terminalInterval, setTerminalInterval] = useState<string>('1h');
+  const [terminalCandles, setTerminalCandles] = useState<AssetDetails['candles']>([]);
+  const [terminalDetails, setTerminalDetails] = useState<AssetDetails | null>(null);
+  const [terminalLoading, setTerminalLoading] = useState<boolean>(false);
+
+  // Terminal: fetch candles for selected symbol+interval
+  const fetchTerminalCandles = useCallback(async (sym: string, interval: string) => {
+    setTerminalLoading(true);
+    try {
+      const res = await fetch(`/v1/market/assets/${sym}`).catch(() => null);
+      if (res && res.ok) {
+        const data: AssetDetails = await res.json();
+        setTerminalDetails(data);
+        setTerminalCandles(data.candles || []);
+      }
+    } catch (err) {
+      console.error('[Terminal] Failed to load candles:', err);
+    } finally {
+      setTerminalLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (activeView === 'terminal') {
+      fetchTerminalCandles(terminalSymbol, terminalInterval);
+    }
+  }, [activeView, terminalSymbol, terminalInterval, fetchTerminalCandles]);
+
+  // Candlestick SVG chart renderer
+  const renderCandlestickChart = (candles: AssetDetails['candles']) => {
+    if (!candles || candles.length < 5) {
+      // Generate synthetic fallback candles for demo display
+      const base = terminalDetails?.price || 63000;
+      const synthCandles = Array.from({ length: 48 }, (_, i) => {
+        const drift = (Math.random() - 0.48) * base * 0.012;
+        const open = base + (Math.random() - 0.5) * base * 0.02;
+        const close = open + drift;
+        const high = Math.max(open, close) + Math.random() * base * 0.008;
+        const low = Math.min(open, close) - Math.random() * base * 0.008;
+        const volume = Math.random() * 1e9;
+        return { timestamp: Date.now() - (48 - i) * 3600000, open, high, low, close, volume };
+      });
+      candles = synthCandles;
+    }
+
+    const displayCandles = candles.slice(-48);
+    const W = 900;
+    const H = 320;
+    const PAD_LEFT = 70;
+    const PAD_RIGHT = 10;
+    const PAD_TOP = 20;
+    const PAD_BOTTOM = 60;
+    const chartW = W - PAD_LEFT - PAD_RIGHT;
+    const chartH = H - PAD_TOP - PAD_BOTTOM;
+
+    const allHighs = displayCandles.map(c => c.high);
+    const allLows = displayCandles.map(c => c.low);
+    const priceMax = Math.max(...allHighs) * 1.001;
+    const priceMin = Math.min(...allLows) * 0.999;
+    const priceRange = priceMax - priceMin || 1;
+
+    const candleW = Math.max(6, (chartW / displayCandles.length) - 2);
+    const candleGap = (chartW / displayCandles.length);
+
+    const toY = (price: number) => PAD_TOP + ((priceMax - price) / priceRange) * chartH;
+    const toX = (i: number) => PAD_LEFT + i * candleGap + candleGap / 2;
+
+    // Price grid lines
+    const gridLevels = 5;
+    const gridLines = Array.from({ length: gridLevels + 1 }, (_, i) => {
+      const price = priceMin + (priceRange * i) / gridLevels;
+      const y = toY(price);
+      return { price, y };
+    });
+
+    // Format price labels
+    const fmtLabel = (v: number) => {
+      if (v >= 1000) return '$' + (v / 1000).toFixed(1) + 'k';
+      if (v >= 1) return '$' + v.toFixed(2);
+      return '$' + v.toFixed(4);
+    };
+
+    // Time labels (every 8 candles)
+    const timeLabels = displayCandles
+      .map((c, i) => ({ i, ts: c.timestamp }))
+      .filter((_, i) => i % 8 === 0);
+
+    return (
+      <svg
+        width="100%"
+        viewBox={`0 0 ${W} ${H}`}
+        style={{ display: 'block', overflow: 'visible' }}
+        aria-label={`${terminalSymbol} candlestick chart`}
+      >
+        {/* Grid lines */}
+        {gridLines.map(({ price, y }) => (
+          <g key={price}>
+            <line
+              x1={PAD_LEFT} y1={y} x2={W - PAD_RIGHT} y2={y}
+              stroke="rgba(203,213,225,0.07)" strokeWidth="1" strokeDasharray="4,4"
+            />
+            <text
+              x={PAD_LEFT - 6} y={y + 4}
+              fill="#94a3b8" fontSize="10" textAnchor="end"
+              fontFamily="monospace"
+            >
+              {fmtLabel(price)}
+            </text>
+          </g>
+        ))}
+
+        {/* Time labels */}
+        {timeLabels.map(({ i, ts }) => (
+          <text
+            key={i}
+            x={toX(i)} y={H - PAD_BOTTOM + 18}
+            fill="#64748b" fontSize="10" textAnchor="middle"
+            fontFamily="monospace"
+          >
+            {new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+          </text>
+        ))}
+
+        {/* Candles */}
+        {displayCandles.map((c, i) => {
+          const isGreen = c.close >= c.open;
+          const color = isGreen ? '#10b981' : '#ef4444';
+          const bodyTop = toY(Math.max(c.open, c.close));
+          const bodyBot = toY(Math.min(c.open, c.close));
+          const bodyH = Math.max(1, bodyBot - bodyTop);
+          const cx = toX(i);
+          const halfW = candleW / 2;
+
+          return (
+            <g key={i}>
+              {/* Wick */}
+              <line
+                x1={cx} y1={toY(c.high)} x2={cx} y2={toY(c.low)}
+                stroke={color} strokeWidth="1.5" opacity="0.9"
+              />
+              {/* Body */}
+              <rect
+                x={cx - halfW} y={bodyTop}
+                width={candleW} height={bodyH}
+                fill={isGreen ? 'rgba(16,185,129,0.85)' : 'rgba(239,68,68,0.85)'}
+                stroke={color} strokeWidth="0.5"
+                rx="1"
+              />
+            </g>
+          );
+        })}
+
+        {/* Current price line */}
+        {terminalDetails?.price && (() => {
+          const y = toY(terminalDetails.price);
+          return (
+            <g>
+              <line
+                x1={PAD_LEFT} y1={y} x2={W - PAD_RIGHT} y2={y}
+                stroke="#f59e0b" strokeWidth="1.5" strokeDasharray="6,3" opacity="0.9"
+              />
+              <rect x={W - PAD_RIGHT - 2} y={y - 9} width={62} height={18} fill="#f59e0b" rx="3" />
+              <text x={W - PAD_RIGHT + 1} y={y + 4} fill="#0b0e14" fontSize="10" fontWeight="700" fontFamily="monospace">
+                {fmtLabel(terminalDetails.price)}
+              </text>
+            </g>
+          );
+        })()}
+      </svg>
+    );
+  };
 
   // Fetch all primary market data feeds
   const fetchMarketData = useCallback(async () => {
@@ -298,29 +476,51 @@ export const MarketsPanel: React.FC<MarketsPanelProps> = ({ onNavigateTab }) => 
           </span>
         </div>
 
-        <button
-          onClick={fetchMarketData}
-          disabled={loading}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px',
-            background: 'rgba(255, 255, 255, 0.03)',
-            border: '1px solid var(--border)',
-            color: 'var(--text-secondary)',
-            padding: '6px 12px',
-            borderRadius: '6px',
-            fontSize: '0.75rem',
-            fontWeight: 600,
-            cursor: loading ? 'not-allowed' : 'pointer',
-            transition: 'all 0.2s'
-          }}
-          onMouseOver={(e) => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)'}
-          onMouseOut={(e) => e.currentTarget.style.borderColor = 'var(--border)'}
-        >
-          <RefreshCw size={13} className={loading ? 'animate-spin' : ''} />
-          <span>{loading ? 'Syncing...' : 'Refresh Matrix'}</span>
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          {onOpenTerminal && (
+            <button
+              onClick={() => onOpenTerminal('BTC')}
+              className="btn btn-primary"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                height: '32px',
+                padding: '0 12px',
+                fontSize: '0.74rem',
+                fontWeight: 700,
+                borderRadius: '6px'
+              }}
+            >
+              <CandlestickChart size={14} />
+              <span>Open Candlestick Terminal</span>
+            </button>
+          )}
+
+          <button
+            onClick={fetchMarketData}
+            disabled={loading}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              background: 'rgba(255, 255, 255, 0.03)',
+              border: '1px solid var(--border)',
+              color: 'var(--text-secondary)',
+              padding: '6px 12px',
+              borderRadius: '6px',
+              fontSize: '0.75rem',
+              fontWeight: 600,
+              cursor: loading ? 'not-allowed' : 'pointer',
+              transition: 'all 0.2s'
+            }}
+            onMouseOver={(e) => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)'}
+            onMouseOut={(e) => e.currentTarget.style.borderColor = 'var(--border)'}
+          >
+            <RefreshCw size={13} className={loading ? 'animate-spin' : ''} />
+            <span>{loading ? 'Syncing...' : 'Refresh Matrix'}</span>
+          </button>
+        </div>
       </div>
 
       {/* Top 3 Market Movers Cards (Trending, Gainers, Losers) */}
@@ -939,6 +1139,31 @@ export const MarketsPanel: React.FC<MarketsPanelProps> = ({ onNavigateTab }) => 
 
             {/* Navigation CTA to Opportunities or Terminal */}
             <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: '8px', paddingTop: '12px' }}>
+              {onOpenTerminal && selectedSymbol && (
+                <button
+                  onClick={() => {
+                    const sym = selectedSymbol;
+                    setSelectedSymbol(null);
+                    onOpenTerminal(sym);
+                  }}
+                  className="btn btn-primary"
+                  style={{
+                    padding: '12px',
+                    fontWeight: 700,
+                    borderRadius: '8px',
+                    fontSize: '0.85rem',
+                    width: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px'
+                  }}
+                >
+                  <CandlestickChart size={16} />
+                  <span>Open {selectedSymbol} in Candlestick Terminal</span>
+                </button>
+              )}
+
               <button
                 onClick={() => {
                   setSelectedSymbol(null);
@@ -946,21 +1171,17 @@ export const MarketsPanel: React.FC<MarketsPanelProps> = ({ onNavigateTab }) => 
                     onNavigateTab('opportunities');
                   }
                 }}
+                className="btn btn-secondary"
                 style={{
-                  padding: '12px',
-                  fontWeight: 700,
+                  padding: '10px',
+                  fontWeight: 600,
                   borderRadius: '8px',
-                  cursor: 'pointer',
-                  border: 'none',
-                  fontSize: '0.85rem',
+                  fontSize: '0.82rem',
                   width: '100%',
-                  background: 'var(--gradient-interactive)',
-                  color: '#fff',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  gap: '8px',
-                  boxShadow: '0 4px 15px rgba(37, 99, 235, 0.3)'
+                  gap: '8px'
                 }}
               >
                 <span>Deploy Setups in Araiven Scanner</span>
