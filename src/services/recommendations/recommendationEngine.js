@@ -4,6 +4,16 @@ import { MarketDataService } from '../marketDataService.js';
 import { runOpportunityEngine } from '../opportunity/opportunityEngine.js';
 import { ASSETS_TO_TRACK } from '../../config/marketConfig.js';
 
+// The scorer stores its reasoning as a JSON document; recommendations should carry readable text.
+const plainReasoning = (raw) => {
+  try {
+    const parsed = JSON.parse(raw);
+    return (parsed && parsed.summary) || String(raw);
+  } catch {
+    return String(raw);
+  }
+};
+
 export const RecommendationEngine = {
   /**
    * Scans real market data, runs scoring, updates opportunities, and generates rebalance recommendations
@@ -220,7 +230,7 @@ export const RecommendationEngine = {
         if (isInitialStable || Math.abs(deviation) >= 5.0) {
           const scored = scoredAssets[target.symbol];
           const explanation = scored 
-            ? `Araiven recommends allocating ${target.targetPct}% reserves to ${target.symbol} because: ` + scored.scores.reasoningText
+            ? `Araiven recommends allocating ${target.targetPct}% reserves to ${target.symbol} because: ` + plainReasoning(scored.scores.reasoningText)
             : `Allocate ${target.targetPct}% reserves to ${target.symbol} based on portfolio stance.`;
 
           await dbRun(

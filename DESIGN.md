@@ -51,6 +51,31 @@ typography:
     lineHeight: 1.4
     letterSpacing: "-0.01em"
     fontFeature: "tnum"
+  dense-caption:
+    fontFamily: "Hanken Grotesk, system-ui, sans-serif"
+    fontSize: "0.72rem"
+    fontWeight: 600
+    lineHeight: 1.4
+  dense-body:
+    fontFamily: "Hanken Grotesk, system-ui, sans-serif"
+    fontSize: "0.8rem"
+    fontWeight: 400
+    lineHeight: 1.5
+  dense-value:
+    fontFamily: "Hanken Grotesk, system-ui, sans-serif"
+    fontSize: "0.88rem"
+    fontWeight: 600
+    lineHeight: 1.4
+  dense-metric:
+    fontFamily: "Bricolage Grotesque, Hanken Grotesk, system-ui, sans-serif"
+    fontSize: "1.15rem"
+    fontWeight: 700
+    lineHeight: 1.2
+  dense-figure:
+    fontFamily: "Bricolage Grotesque, Hanken Grotesk, system-ui, sans-serif"
+    fontSize: "1.6rem"
+    fontWeight: 700
+    lineHeight: 1.15
 rounded:
   xs: "4px"
   sm: "7px"
@@ -229,3 +254,17 @@ Entrances use one easing, `cubic-bezier(0.16, 1, 0.3, 1)`: scroll reveal (opacit
 - **Don't** apply these `--rv-*` tokens to the app dashboard; its older tokens in `src/theme` and `styles.css` are separate until a migration is decided.
 - **Don't** invent testimonials, logos, user counts or performance claims; none exist (PRODUCT.md).
 - **Don't** replace the hairline separation with drop shadows on rows or cards.
+
+## Auth pages (extension of this world)
+
+Sign-in, registration, forgot, reset and code verification live in `components/ui/auth-card.tsx`, styled by `components/ui/auth-card.css` under the `.ra` scope with the same `--rv-*` values. They use the landing fonts via `src/theme/ravora-fonts.css`.
+
+- **Layout:** a 46/54 split on desktop: a Gunmetal Raised story panel (logo, headline that changes with sign-in or register, a five-row ruled Araiven tape in Red Hat Mono labelled "Illustrative sequence, not live data") beside a 400px form column anchored near the top so the mode switch never moves. Under 1000px the story panel is hidden.
+- **Mode switch:** two `aria-pressed` buttons with a shared tonal pill (Gunmetal Card 2 with a 1px Amber-alpha edge, springing via motion `layoutId`). The submit button stays the single Amber mass on the page.
+- **Fields:** visible sentence-case labels, 48px Gunmetal Inset inputs with an 8px radius and a 1px Stone border at about 0.46 alpha (control-level contrast), one soft Amber ring on focus, inline errors with an icon in loss red and `aria-invalid`. No icons inside inputs, no uppercase micro-labels.
+- **Motion:** forms and the story headline cross-fade on mode change (0.3s, the world's easing); the tape plays once per visit, outside the keyed block; reduced motion removes it.
+- **Do not** reintroduce frosted glass, gradient buttons or icons-in-inputs on these pages.
+
+## Dashboard (Operate extension)
+
+The dashboard under `src/components/dashboard/` is an Operate surface in the same world: Gunmetal ground, Stone rules and text, one flat Amber action colour, Bricolage for headings and metrics, Hanken Grotesk for everything else. Density is higher than the landing page, so it runs on a dense ramp: 0.72rem captions (the floor), 0.8rem body, 0.88rem values, 1rem, 1.15rem metrics and 1.6rem figures. Labels are sentence case, never uppercase and never widely tracked. Active navigation is a tonal Gunmetal Card 2 step with an inset Amber-alpha ring, not a side stripe. All legacy `--gradient-*` tokens now resolve to solid colours (`src/theme/gradients.css`), `.btn-primary` is flat Amber (`src/theme/app.css`), and radii snap to 4, 7, 8, 12, 14 and 99px. The global font tokens in `src/theme/typography.css` now point at the shared self-hosted fonts.

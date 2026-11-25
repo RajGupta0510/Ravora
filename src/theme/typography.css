@@ -1,7 +1,8 @@
 :root {
   /* Typography Scale */
-  --font-display: 'Outfit', sans-serif;
-  --font-body: 'Inter', sans-serif;
+  --font-display: 'Bricolage Grotesque', 'Hanken Grotesk', system-ui, sans-serif;
+  --font-body: 'Hanken Grotesk', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'Red Hat Mono', ui-monospace, 'Cascadia Mono', Consolas, monospace;
 
   --font-size-display: 4.00rem; /* 64px */
   --font-size-page: 2.50rem; /* 40px */

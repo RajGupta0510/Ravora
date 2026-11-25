@@ -76,7 +76,7 @@ export const AppDashboard: React.FC = () => {
   const getRiskStanceColor = useCallback(() => {
     if (!profile) return '#10b981';
     const stance = profile.risk_stance;
-    if (stance === 'conservative') return '#3b82f6';
+    if (stance === 'conservative') return '#cbd5e1';
     if (stance === 'aggressive') return '#f59e0b';
     return '#10b981';
   }, [profile]);
@@ -107,8 +107,8 @@ export const AppDashboard: React.FC = () => {
         {/* Brand Logo */}
         <div className="logo" style={{ padding: 'var(--space-6)', borderBottom: 'var(--border-thickness) solid var(--color-border-divider)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2.5)', fontFamily: 'var(--font-display)', fontWeight: 700 }}>
-            <div style={{ width: '32px', height: '32px', borderRadius: 'var(--radius-sm)', background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#0b0e14', fontWeight: 800, flexShrink: 0 }}>R</div>
-            <span className="sidebar-logo-text" style={{ color: '#f8fafc', letterSpacing: '-0.01em' }}>Ravora OS</span>
+            <div style={{ width: '32px', height: '32px', borderRadius: 'var(--radius-sm)', background: '#f59e0b', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#0b0e14', fontWeight: 800, flexShrink: 0 }}>R</div>
+            <span className="sidebar-logo-text" style={{ color: '#f8fafc', letterSpacing: '-0.02em', fontSize: '1.15rem' }}>Ravora</span>
           </div>
         </div>
 
@@ -135,14 +135,14 @@ export const AppDashboard: React.FC = () => {
                   gap: 'var(--space-3)',
                   width: '100%',
                   padding: 'var(--space-3) var(--space-4)',
-                  borderRadius: 'var(--radius-md)',
+                  borderRadius: '8px',
                   border: 'none',
-                  borderLeft: isActive ? '3px solid #f59e0b' : '3px solid transparent',
-                  background: isActive ? 'rgba(245, 158, 11, 0.12)' : 'transparent',
-                  color: isActive ? '#fbbf24' : 'var(--text-secondary)',
+                  boxShadow: isActive ? 'inset 0 0 0 1px rgba(245, 158, 11, 0.45)' : 'none',
+                  background: isActive ? '#1b2232' : 'transparent',
+                  color: isActive ? '#f8fafc' : 'var(--text-secondary)',
                   cursor: 'pointer',
                   textAlign: 'left',
-                  fontSize: '0.85rem',
+                  fontSize: '0.88rem',
                   fontWeight: 600,
                   transition: 'all var(--motion-duration-fast) var(--motion-ease-in-out)'
                 }}
@@ -158,7 +158,7 @@ export const AppDashboard: React.FC = () => {
         <div style={{ padding: 'var(--space-5)', borderTop: 'var(--border-thickness) solid var(--color-border-divider)', display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
           <div className="user-meta" style={{ display: 'flex', flexDirection: 'column' }}>
             <span style={{ fontSize: '0.8rem', fontWeight: 600, color: '#fff' }}>{user?.fullName}</span>
-            <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.email}</span>
+            <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.email}</span>
           </div>
           <div id="btn-logout-wrapper">
             <button 
@@ -174,7 +174,7 @@ export const AppDashboard: React.FC = () => {
                 background: 'rgba(255,255,255,0.01)',
                 color: 'var(--text-secondary)',
                 cursor: 'pointer',
-                fontSize: '0.78rem',
+                fontSize: '0.8rem',
                 fontWeight: 600,
                 justifyContent: 'center',
                 transition: 'background var(--motion-duration-fast) var(--motion-ease-in-out)'
@@ -224,7 +224,7 @@ export const AppDashboard: React.FC = () => {
               border: 'var(--border-thickness) solid var(--color-border)',
               padding: '4px 10px',
               borderRadius: 'var(--radius-pill)',
-              fontSize: '0.68rem',
+              fontSize: '0.72rem',
               fontWeight: 600,
               display: 'flex',
               alignItems: 'center',
@@ -296,7 +296,7 @@ export const AppDashboard: React.FC = () => {
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            fontSize: '0.78rem',
+            fontSize: '0.8rem',
             animation: 'fadeIn var(--motion-duration-slow) var(--motion-ease-out)',
             flexWrap: 'wrap',
             gap: '8px'
@@ -310,7 +310,7 @@ export const AppDashboard: React.FC = () => {
             <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
               <button 
                 onClick={() => setActiveTab('opportunities')}
-                style={{ background: 'none', border: 'none', color: '#fbbf24', textDecoration: 'underline', cursor: 'pointer', fontWeight: 600, fontSize: '0.75rem' }}
+                style={{ background: 'none', border: 'none', color: '#fbbf24', textDecoration: 'underline', cursor: 'pointer', fontWeight: 600, fontSize: '0.72rem' }}
               >
                 Inspect Plan
               </button>
@@ -322,7 +322,7 @@ export const AppDashboard: React.FC = () => {
                   height: '28px',
                   padding: '0 12px',
                   borderRadius: 'var(--radius-sm)',
-                  fontSize: '0.7rem',
+                  fontSize: '0.72rem',
                   fontWeight: 700
                 }}
               >
@@ -352,11 +352,11 @@ export const AppDashboard: React.FC = () => {
             boxSizing: 'border-box'
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', borderBottom: 'var(--border-thickness) solid var(--color-border-divider)', paddingBottom: '8px' }}>
-              <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-secondary)' }}>NOTIFICATIONS LOG</span>
+              <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-secondary)' }}>Notifications</span>
               <button 
                 onClick={() => setShowNotifications(false)} 
                 aria-label="Close Notifications Log"
-                style={{ background: 'none', border: 'none', fontSize: '0.75rem', cursor: 'pointer', color: 'var(--text-muted)', padding: '2px 6px' }}
+                style={{ background: 'none', border: 'none', fontSize: '0.72rem', cursor: 'pointer', color: 'var(--text-muted)', padding: '2px 6px' }}
               >
                 Close
               </button>
@@ -364,12 +364,12 @@ export const AppDashboard: React.FC = () => {
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               {notifications.length === 0 ? (
-                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textAlign: 'center', padding: '16px 0' }}>
+                <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textAlign: 'center', padding: '16px 0' }}>
                   No notifications recorded.
                 </div>
               ) : (
                 notifications.map((notif) => (
-                  <div key={notif.id} style={{ display: 'flex', gap: '10px', fontSize: '0.76rem' }}>
+                  <div key={notif.id} style={{ display: 'flex', gap: '10px', fontSize: '0.72rem' }}>
                     <ShieldAlert size={14} aria-hidden="true" style={{ color: notif.priority === 'high' ? 'var(--color-danger)' : 'var(--color-ai-accent)', flexShrink: 0, marginTop: '2px' }} />
                     <div>
                       <div style={{ fontWeight: 600, color: '#fff' }}>{notif.title}</div>

@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { useApp, Opportunity } from '../../context/AppContext';
 import { Sparkles, Play } from 'lucide-react';
+import { parseReasoning } from '../../utils/reasoning';
 
 export const OpportunitiesPanel: React.FC = () => {
   const { 
@@ -88,7 +89,7 @@ export const OpportunitiesPanel: React.FC = () => {
       
       {/* Top Controls: Scan & Filter */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
-        <div className="filter-segmented" style={{ display: 'flex', background: '#10141d', border: '1px solid var(--border)', borderRadius: '6px', padding: '2px', flexWrap: 'wrap', gap: '2px' }}>
+        <div className="filter-segmented" style={{ display: 'flex', background: '#10141d', border: '1px solid var(--border)', borderRadius: '7px', padding: '2px', flexWrap: 'wrap', gap: '2px' }}>
           {(['ALL', 'LONG', 'SHORT'] as const).map((t) => (
             <button
               key={t}
@@ -149,7 +150,7 @@ export const OpportunitiesPanel: React.FC = () => {
               className="card-glass"
               style={{
                 padding: '16px',
-                borderRadius: '10px',
+                borderRadius: '12px',
                 border: '1px solid var(--border)',
                 cursor: 'pointer',
                 transition: 'all 0.2s ease',
@@ -163,25 +164,25 @@ export const OpportunitiesPanel: React.FC = () => {
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'rgba(255,255,255,0.03)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '0.85rem' }}>
+                  <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'rgba(255,255,255,0.03)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '0.88rem' }}>
                     {opp.icon}
                   </div>
                   <div>
                     <h3 style={{ fontSize: '0.88rem', fontWeight: 700, margin: 0 }}>{opp.symbol}</h3>
-                    <span style={{ fontSize: '0.68rem', color: 'var(--text-secondary)' }}>{opp.name}</span>
+                    <span style={{ fontSize: '0.72rem', color: 'var(--text-secondary)' }}>{opp.name}</span>
                   </div>
                 </div>
                 
-                <span className={`badge-ds ${opp.type === 'LONG' ? 'badge-long' : (opp.type === 'SHORT' ? 'badge-short' : 'badge-hold')}`} style={{ fontSize: '0.62rem', padding: '2px 6px' }}>
+                <span className={`badge-ds ${opp.type === 'LONG' ? 'badge-long' : (opp.type === 'SHORT' ? 'badge-short' : 'badge-hold')}`} style={{ fontSize: '0.72rem', padding: '2px 6px' }}>
                   {opp.type}
                 </span>
               </div>
 
-              <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', lineHeight: 1.4, height: '42px', overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', margin: 0 }}>
-                {opp.reasoningText}
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: 1.4, height: '42px', overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', margin: 0 }}>
+                {parseReasoning(opp.reasoningText).summary}
               </p>
 
-              <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px dashed rgba(255,255,255,0.04)', paddingTop: '10px', fontSize: '0.75rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px dashed rgba(255,255,255,0.04)', paddingTop: '10px', fontSize: '0.72rem' }}>
                 <div>
                   <span style={{ color: 'var(--text-muted)' }}>Confidence:</span>
                   <span style={{ fontWeight: 700, marginLeft: '4px', color: 'var(--success)' }}>{opp.confidenceScore}%</span>
@@ -205,7 +206,7 @@ export const OpportunitiesPanel: React.FC = () => {
           bottom: 0,
           width: '100%',
           maxWidth: '460px',
-          background: 'rgba(14, 19, 37, 0.98)',
+          background: 'rgba(21, 26, 38, 0.98)',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
           borderLeft: '1px solid var(--border)',
@@ -221,13 +222,13 @@ export const OpportunitiesPanel: React.FC = () => {
           {/* Header */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.04)', paddingBottom: '14px' }}>
             <div>
-              <h2 style={{ fontSize: '1.1rem', fontWeight: 700, margin: 0 }}>{selectedOpp.symbol} Plan Details</h2>
+              <h2 style={{ fontSize: '1.15rem', fontWeight: 700, margin: 0 }}>{selectedOpp.symbol} Plan Details</h2>
               <span style={{ fontSize: '0.72rem', color: 'var(--text-secondary)' }}>Scanned by Araiven Core</span>
             </div>
             <button 
               onClick={() => setSelectedOpp(null)}
               aria-label="Close Details Dialog"
-              style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: '1.3rem', padding: '4px 8px' }}
+              style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: '1.15rem', padding: '4px 8px' }}
             >
               ✕
             </button>
@@ -238,12 +239,12 @@ export const OpportunitiesPanel: React.FC = () => {
             {/* Confidence & Risk Level row */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '10px' }}>
               <div className="card-glass" style={{ padding: '12px 14px', borderRadius: '8px', border: '1px solid var(--border)', background: 'rgba(255,255,255,0.01)' }}>
-                <span style={{ fontSize: '0.62rem', color: 'var(--text-muted)' }}>CONFIDENCE INDEX</span>
-                <div style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--success)', marginTop: '2px' }}>{selectedOpp.confidenceScore}%</div>
+                <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Confidence index</span>
+                <div style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--success)', marginTop: '2px' }}>{selectedOpp.confidenceScore}%</div>
               </div>
               <div className="card-glass" style={{ padding: '12px 14px', borderRadius: '8px', border: '1px solid var(--border)', background: 'rgba(255,255,255,0.01)' }}>
-                <span style={{ fontSize: '0.62rem', color: 'var(--text-muted)' }}>RISK LEVEL</span>
-                <div style={{ fontSize: '1.1rem', fontWeight: 700, color: selectedOpp.riskLevel === 'low' ? '#10b981' : 'var(--danger)', marginTop: '2px', textTransform: 'capitalize' }}>
+                <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Risk level</span>
+                <div style={{ fontSize: '1.15rem', fontWeight: 700, color: selectedOpp.riskLevel === 'low' ? '#10b981' : 'var(--danger)', marginTop: '2px', textTransform: 'capitalize' }}>
                   {selectedOpp.riskLevel}
                 </div>
               </div>
@@ -251,7 +252,7 @@ export const OpportunitiesPanel: React.FC = () => {
 
             {/* Exit parameters */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              <span style={{ fontSize: '0.62rem', fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.05em' }}>PROPOSED ORDER LADDER</span>
+              <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0' }}>Proposed order ladder</span>
               <div style={{
                 background: 'rgba(0,0,0,0.25)',
                 border: '1px solid rgba(255,255,255,0.03)',
@@ -260,7 +261,7 @@ export const OpportunitiesPanel: React.FC = () => {
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '10px',
-                fontSize: '0.78rem'
+                fontSize: '0.8rem'
               }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                   <span style={{ color: 'var(--text-secondary)' }}>Suggested Entry Limit:</span>
@@ -279,9 +280,9 @@ export const OpportunitiesPanel: React.FC = () => {
 
             {/* AI Text explanation */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              <span style={{ fontSize: '0.62rem', fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.05em' }}>QUANT REASONING STATEMENT</span>
+              <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0' }}>Quant reasoning statement</span>
               <p style={{
-                fontSize: '0.78rem',
+                fontSize: '0.8rem',
                 color: 'var(--text-secondary)',
                 lineHeight: 1.5,
                 background: 'rgba(255,255,255,0.005)',
@@ -289,29 +290,49 @@ export const OpportunitiesPanel: React.FC = () => {
                 padding: '12px',
                 borderRadius: '8px',
                 margin: 0
-              }}>{selectedOpp.reasoningText}</p>
+              }}>{parseReasoning(selectedOpp.reasoningText).summary}</p>
+              {parseReasoning(selectedOpp.reasoningText).sections.length > 0 && (
+                <dl style={{ margin: '4px 0 0', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  {parseReasoning(selectedOpp.reasoningText).sections.map((sec) => (
+                    <div key={sec.label}>
+                      <dt style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-muted)' }}>{sec.label}</dt>
+                      <dd style={{ margin: '4px 0 0', fontSize: '0.8rem', lineHeight: 1.5, color: 'var(--text-secondary)' }}>
+                        {sec.items ? (
+                          <ul style={{ margin: 0, paddingLeft: '16px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                            {sec.items.map((it) => (
+                              <li key={it}>{it}</li>
+                            ))}
+                          </ul>
+                        ) : (
+                          sec.text
+                        )}
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
+              )}
             </div>
 
             {/* Order execution form */}
             <form onSubmit={handleDeploy} style={{ borderTop: '1px solid rgba(255,255,255,0.04)', paddingTop: '16px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
-              <h3 style={{ fontSize: '0.85rem', fontWeight: 700, margin: 0 }}>Deploy Sandbox Capital</h3>
+              <h3 style={{ fontSize: '0.88rem', fontWeight: 700, margin: 0 }}>Deploy Sandbox Capital</h3>
 
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '10px' }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.62rem', color: 'var(--text-muted)', marginBottom: '6px' }}>ALLOCATE CAPITAL ($)</label>
+                  <label style={{ display: 'block', fontSize: '0.72rem', color: 'var(--text-muted)', marginBottom: '6px' }}>ALLOCATE CAPITAL ($)</label>
                   <input 
                     type="number"
                     value={deployAmount}
                     onChange={(e) => setDeployAmount(parseInt(e.target.value))}
-                    style={{ width: '100%', padding: '10px 12px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.03)', color: '#fff', fontSize: '0.85rem', outline: 'none', boxSizing: 'border-box' }}
+                    style={{ width: '100%', padding: '10px 12px', borderRadius: '7px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.03)', color: '#fff', fontSize: '0.88rem', outline: 'none', boxSizing: 'border-box' }}
                   />
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.62rem', color: 'var(--text-muted)', marginBottom: '6px' }}>LEVERAGE</label>
+                  <label style={{ display: 'block', fontSize: '0.72rem', color: 'var(--text-muted)', marginBottom: '6px' }}>LEVERAGE</label>
                   <select 
                     value={deployLeverage}
                     onChange={(e) => setDeployLeverage(parseInt(e.target.value))}
-                    style={{ width: '100%', padding: '10px 12px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.03)', color: '#fff', fontSize: '0.85rem', outline: 'none', cursor: 'pointer', boxSizing: 'border-box' }}
+                    style={{ width: '100%', padding: '10px 12px', borderRadius: '7px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.03)', color: '#fff', fontSize: '0.88rem', outline: 'none', cursor: 'pointer', boxSizing: 'border-box' }}
                   >
                     {[1, 2, 3, 5, 10].map(lev => (
                       <option key={lev} value={lev} style={{ background: '#151a26', color: '#f8fafc' }}>{lev}x</option>

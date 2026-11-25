@@ -1,3 +1,4 @@
+@import './ravora-fonts.css';
 @import './colors.css';
 @import './gradients.css';
 @import './typography.css';
@@ -6,3 +7,4 @@
 @import './borders.css';
 @import './radius.css';
 @import './motion.css';
+@import './app.css';

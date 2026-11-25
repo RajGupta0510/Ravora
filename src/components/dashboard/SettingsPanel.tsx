@@ -74,10 +74,10 @@ export const SettingsPanel: React.FC = () => {
       <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
         
         {/* Execution Mode */}
-        <div className="card-glass" style={{ padding: 'clamp(16px, 2.5vw, 24px)', borderRadius: '10px', border: '1px solid var(--border)', background: '#151a26' }}>
+        <div className="card-glass" style={{ padding: 'clamp(16px, 2.5vw, 24px)', borderRadius: '12px', border: '1px solid var(--border)', background: '#151a26' }}>
           <h3 style={{ fontSize: '0.88rem', fontWeight: 700, margin: '0 0 14px 0', display: 'flex', alignItems: 'center', gap: '8px', color: '#f8fafc' }}>
             <Radio size={16} style={{ color: '#f59e0b', flexShrink: 0 }} />
-            SYSTEM EXECUTION MODE
+            System execution mode
           </h3>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
@@ -98,22 +98,22 @@ export const SettingsPanel: React.FC = () => {
                   transition: 'all 0.15s ease'
                 }}
               >
-                <div style={{ fontWeight: 600, fontSize: '0.84rem', color: settings?.execution_mode === mode.key ? '#fbbf24' : 'var(--text-secondary)' }}>{mode.label}</div>
-                <div style={{ fontSize: '0.73rem', color: 'var(--text-muted)', marginTop: '4px', lineHeight: 1.35 }}>{mode.desc}</div>
+                <div style={{ fontWeight: 600, fontSize: '0.8rem', color: settings?.execution_mode === mode.key ? '#fbbf24' : 'var(--text-secondary)' }}>{mode.label}</div>
+                <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '4px', lineHeight: 1.35 }}>{mode.desc}</div>
               </div>
             ))}
           </div>
         </div>
 
         {/* Safety & Alerts config */}
-        <div className="card-glass" style={{ padding: 'clamp(16px, 2.5vw, 24px)', borderRadius: '10px', border: '1px solid var(--border)', background: '#151a26', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <div className="card-glass" style={{ padding: 'clamp(16px, 2.5vw, 24px)', borderRadius: '12px', border: '1px solid var(--border)', background: '#151a26', display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <h3 style={{ fontSize: '0.88rem', fontWeight: 700, margin: 0, display: 'flex', alignItems: 'center', gap: '8px', color: '#f8fafc' }}>
             <Shield size={16} style={{ color: '#f59e0b', flexShrink: 0 }} />
             SAFETY & NOTIFICATION CONTEXT
           </h3>
 
           {/* Auto Hedge */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.82rem', gap: '12px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.8rem', gap: '12px' }}>
             <div>
               <div style={{ fontWeight: 600, color: '#fff' }}>Automated Portfolio Hedging</div>
               <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', lineHeight: 1.3, display: 'block', marginTop: '2px' }}>Rotate to USDC pools during high-drawdown macro spikes</span>
@@ -124,7 +124,7 @@ export const SettingsPanel: React.FC = () => {
           </div>
 
           {/* Notifications */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.82rem', borderTop: '1px solid rgba(255,255,255,0.04)', paddingTop: '14px', gap: '12px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.8rem', borderTop: '1px solid rgba(255,255,255,0.04)', paddingTop: '14px', gap: '12px' }}>
             <div>
               <div style={{ fontWeight: 600, color: '#fff' }}>Email / SMS Safety Reports</div>
               <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', lineHeight: 1.3, display: 'block', marginTop: '2px' }}>Receive summaries when opportunities are found</span>
@@ -141,19 +141,19 @@ export const SettingsPanel: React.FC = () => {
       <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
         
         {/* Connect Exchange */}
-        <div className="card-glass" style={{ padding: 'clamp(16px, 2.5vw, 24px)', borderRadius: '10px', border: '1px solid var(--border)', background: '#151a26' }}>
+        <div className="card-glass" style={{ padding: 'clamp(16px, 2.5vw, 24px)', borderRadius: '12px', border: '1px solid var(--border)', background: '#151a26' }}>
           <h3 style={{ fontSize: '0.88rem', fontWeight: 700, margin: '0 0 14px 0', display: 'flex', alignItems: 'center', gap: '8px', color: '#f8fafc' }}>
             <Key size={16} style={{ color: '#f59e0b', flexShrink: 0 }} />
-            CONNECT EXCHANGE API
+            Connect exchange API
           </h3>
 
           <form onSubmit={handleConnectExchange} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             <div>
-              <label style={{ display: 'block', fontSize: '0.66rem', color: 'var(--text-muted)', marginBottom: '6px' }}>EXCHANGE PROVIDER</label>
+              <label style={{ display: 'block', fontSize: '0.72rem', color: 'var(--text-muted)', marginBottom: '6px' }}>Exchange provider</label>
               <select 
                 value={exchangeName} 
                 onChange={(e) => setExchangeName(e.target.value)}
-                style={{ width: '100%', padding: '10px 12px', borderRadius: '6px', border: '1px solid var(--border)', background: '#0e121b', color: '#f8fafc', fontSize: '0.8rem', outline: 'none', boxSizing: 'border-box' }}
+                style={{ width: '100%', padding: '10px 12px', borderRadius: '7px', border: '1px solid var(--border)', background: '#0e121b', color: '#f8fafc', fontSize: '0.8rem', outline: 'none', boxSizing: 'border-box' }}
               >
                 <option value="binance" style={{ background: '#151a26' }}>Binance Connection (Standard V1)</option>
                 <option value="kraken" style={{ background: '#151a26' }}>Kraken Exchange</option>
@@ -162,37 +162,37 @@ export const SettingsPanel: React.FC = () => {
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: '0.66rem', color: 'var(--text-muted)', marginBottom: '6px' }}>API KEY</label>
+              <label style={{ display: 'block', fontSize: '0.72rem', color: 'var(--text-muted)', marginBottom: '6px' }}>API key</label>
               <input 
                 type="text" 
                 required
                 value={apiKey}
                 onChange={(e) => setApiKey(e.target.value)}
                 placeholder="Paste API Key (Withdrawal Disabled)"
-                style={{ width: '100%', padding: '10px 12px', borderRadius: '6px', border: '1px solid var(--border)', background: '#0e121b', color: '#f8fafc', fontSize: '0.8rem', outline: 'none', boxSizing: 'border-box' }}
+                style={{ width: '100%', padding: '10px 12px', borderRadius: '7px', border: '1px solid var(--border)', background: '#0e121b', color: '#f8fafc', fontSize: '0.8rem', outline: 'none', boxSizing: 'border-box' }}
               />
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: '0.66rem', color: 'var(--text-muted)', marginBottom: '6px' }}>API SECRET</label>
+              <label style={{ display: 'block', fontSize: '0.72rem', color: 'var(--text-muted)', marginBottom: '6px' }}>API secret</label>
               <input 
                 type="password" 
                 required
                 value={apiSecret}
                 onChange={(e) => setApiSecret(e.target.value)}
                 placeholder="Paste Secret Key Credentials"
-                style={{ width: '100%', padding: '10px 12px', borderRadius: '6px', border: '1px solid var(--border)', background: '#0e121b', color: '#f8fafc', fontSize: '0.8rem', outline: 'none', boxSizing: 'border-box' }}
+                style={{ width: '100%', padding: '10px 12px', borderRadius: '7px', border: '1px solid var(--border)', background: '#0e121b', color: '#f8fafc', fontSize: '0.8rem', outline: 'none', boxSizing: 'border-box' }}
               />
             </div>
 
             {exchangeError && (
-              <div style={{ color: '#f87171', fontSize: '0.76rem', background: 'rgba(248, 113, 113, 0.08)', padding: '10px', borderRadius: '6px', border: '1px solid rgba(248, 113, 113, 0.15)' }}>
+              <div style={{ color: '#f87171', fontSize: '0.72rem', background: 'rgba(248, 113, 113, 0.08)', padding: '10px', borderRadius: '7px', border: '1px solid rgba(248, 113, 113, 0.15)' }}>
                 {exchangeError}
               </div>
             )}
 
             {exchangeSuccess && (
-              <div style={{ color: '#10b981', fontSize: '0.76rem', background: 'rgba(16, 185, 129, 0.08)', padding: '10px', borderRadius: '6px', border: '1px solid rgba(16, 185, 129, 0.15)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <div style={{ color: '#10b981', fontSize: '0.72rem', background: 'rgba(16, 185, 129, 0.08)', padding: '10px', borderRadius: '7px', border: '1px solid rgba(16, 185, 129, 0.15)', display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <CheckCircle2 size={14} />
                 Connection established. Withdrawal lock active.
               </div>
@@ -210,7 +210,7 @@ export const SettingsPanel: React.FC = () => {
         </div>
 
         {/* KMS encryption banner */}
-        <div style={{ padding: '14px 16px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.02)', background: 'rgba(255,255,255,0.003)', display: 'flex', gap: '10px', fontSize: '0.74rem', color: 'var(--text-secondary)', lineHeight: 1.4 }}>
+        <div style={{ padding: '14px 16px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.02)', background: 'rgba(255,255,255,0.003)', display: 'flex', gap: '10px', fontSize: '0.72rem', color: 'var(--text-secondary)', lineHeight: 1.4 }}>
           <Server size={22} style={{ color: 'var(--primary)', flexShrink: 0 }} />
           <span>
             API credentials are encrypted in transmission and sealed dynamically within AWS KMS key vaults. Ravora does not cache secret keys in plain text.

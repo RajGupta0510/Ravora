@@ -1,0 +1,23 @@
+/* App-wide overrides that bring legacy global classes onto the Ravora world:
+   flat Amber action colour, no gradient fills, no glow shadows. */
+.btn.btn-primary {
+  background: #f59e0b !important;
+  border-color: #f59e0b !important;
+  box-shadow: none !important;
+  color: #0b0e14 !important;
+}
+.btn.btn-primary:hover:not(:disabled) {
+  background: #fbbf24 !important;
+  border-color: #fbbf24 !important;
+}
+.btn.btn-primary:disabled {
+  opacity: 0.55;
+}
+body {
+  font-family: var(--font-body);
+  font-feature-settings: 'tnum' 0;
+}
+/* Prices, scores and tickers read as data */
+[class*='mono'], .font-mono {
+  font-family: var(--font-mono);
+}

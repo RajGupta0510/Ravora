@@ -39,7 +39,7 @@ export const CopilotChat: React.FC = () => {
       display: 'flex',
       flexDirection: 'column',
       height: 'calc(100vh - clamp(140px, 18vh, 180px))',
-      borderRadius: '10px',
+      borderRadius: '12px',
       border: 'var(--border-thickness) solid var(--color-border)',
       background: '#151a26',
       overflow: 'hidden'
@@ -56,7 +56,7 @@ export const CopilotChat: React.FC = () => {
         <MessageSquareCode size={18} style={{ color: '#f59e0b', flexShrink: 0 }} />
         <div>
           <h2 style={{ fontSize: '0.88rem', fontWeight: 700, margin: 0, color: '#f8fafc' }}>Araiven Advisor Sandbox</h2>
-          <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>Continuous Audit & Reasoning System</span>
+          <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Continuous Audit & Reasoning System</span>
         </div>
       </div>
  
@@ -118,7 +118,7 @@ export const CopilotChat: React.FC = () => {
               style={{
                 background: 'rgba(255,255,255,0.02)',
                 border: '1px solid rgba(255,255,255,0.06)',
-                borderRadius: '6px',
+                borderRadius: '7px',
                 padding: '6px 12px',
                 fontSize: '0.72rem',
                 color: 'var(--text-secondary)',
@@ -148,7 +148,7 @@ export const CopilotChat: React.FC = () => {
               border: '1px solid var(--border)',
               background: '#0e121b',
               color: '#f8fafc',
-              fontSize: '0.82rem',
+              fontSize: '0.8rem',
               outline: 'none',
               boxSizing: 'border-box'
             }}

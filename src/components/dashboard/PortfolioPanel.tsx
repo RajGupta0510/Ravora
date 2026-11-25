@@ -11,8 +11,10 @@ export const PortfolioPanel: React.FC = () => {
     paperPositions,
     paperHistory,
     closePaperPosition,
-    closeAllPaperPositions
+    closeAllPaperPositions,
+    opportunities
   } = useApp();
+  const passingCount = opportunities.filter((o) => o.confidenceScore >= 75).length;
 
   const [closingAll, setClosingAll] = useState(false);
   const [closingPosId, setClosingPosId] = useState<string | null>(null);
@@ -92,14 +94,14 @@ export const PortfolioPanel: React.FC = () => {
       <div className="terminal-layout-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '16px' }}>
         
         {/* Card 1: Balance & SVG Trend */}
-        <div className="card-glass" style={{ padding: 'clamp(16px, 2.5vw, 24px)', borderRadius: '10px', border: '1px solid var(--border)', background: '#151a26' }}>
+        <div className="card-glass" style={{ padding: 'clamp(16px, 2.5vw, 24px)', borderRadius: '12px', border: '1px solid var(--border)', background: '#151a26' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
             <div>
-              <span style={{ fontSize: '0.62rem', fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.05em' }}>PORTFOLIO NET BALANCE</span>
+              <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0' }}>Portfolio net balance</span>
               <div style={{ fontSize: 'clamp(1.5rem, 4vw, 1.9rem)', fontWeight: 700, color: '#f8fafc', margin: '4px 0' }}>
                 {formatCurrency(portfolioBalance)}
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.78rem', color: '#10b981', fontWeight: 600 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.8rem', color: '#10b981', fontWeight: 600 }}>
                 <TrendingUp size={14} />
                 <span>+4.2% Growth Index</span>
               </div>
@@ -115,9 +117,9 @@ export const PortfolioPanel: React.FC = () => {
         </div>
 
         {/* Card 2: AI Safety Index */}
-        <div className="card-glass" style={{ padding: 'clamp(16px, 2.5vw, 24px)', borderRadius: '10px', border: '1px solid var(--border)', background: '#151a26', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div className="card-glass" style={{ padding: 'clamp(16px, 2.5vw, 24px)', borderRadius: '12px', border: '1px solid var(--border)', background: '#151a26', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
-            <span style={{ fontSize: '0.62rem', fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.05em' }}>ACTIVE SAFETY SHIELD</span>
+            <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0' }}>Active safety shield</span>
             <div style={{ fontSize: 'clamp(1.5rem, 4vw, 1.9rem)', fontWeight: 700, color: getSafetyScoreColor(safetyScore), margin: '4px 0' }}>
               {safetyScore}%
             </div>
@@ -149,26 +151,35 @@ export const PortfolioPanel: React.FC = () => {
         </div>
 
         {/* Card 3: Market Volatility Index */}
-        <div className="card-glass" style={{ padding: 'clamp(16px, 2.5vw, 24px)', borderRadius: '10px', border: '1px solid var(--border)', background: '#151a26', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-          <span style={{ fontSize: '0.62rem', fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.05em' }}>GLOBAL SCAN CORE</span>
+        <div className="card-glass" style={{ padding: 'clamp(16px, 2.5vw, 24px)', borderRadius: '12px', border: '1px solid var(--border)', background: '#151a26', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+          <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0' }}>Araiven scan</span>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '6px', flexWrap: 'wrap', gap: '8px' }}>
             <div>
-              <div style={{ fontSize: '1.2rem', fontWeight: 700, color: '#f8fafc' }}>24,410 feeds</div>
-              <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>Ingested events / sec</span>
+              <div style={{ fontSize: '1.15rem', fontWeight: 700, color: '#f8fafc' }}>
+                {opportunities.length} {opportunities.length === 1 ? 'market' : 'markets'} scanned
+              </div>
+              <span style={{ fontSize: '0.72rem', color: 'var(--text-secondary)' }}>Setups at or above the 75% confidence filter</span>
             </div>
-            <div style={{ background: 'rgba(16, 185, 129, 0.08)', border: '1px solid rgba(16, 185, 129, 0.2)', color: '#10b981', padding: '4px 8px', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 700 }}>
-              99.8% Active
+            <div style={{
+              background: passingCount > 0 ? 'rgba(16, 185, 129, 0.08)' : 'rgba(203, 213, 225, 0.06)',
+              border: passingCount > 0 ? '1px solid rgba(16, 185, 129, 0.2)' : '1px solid var(--border)',
+              color: passingCount > 0 ? '#10b981' : 'var(--text-secondary)',
+              padding: '4px 8px',
+              borderRadius: '7px',
+              fontSize: '0.72rem',
+              fontWeight: 700
+            }}>
+              {passingCount} shown
             </div>
           </div>
         </div>
-
       </div>
 
       {/* Asset Allocations Breakdown & Diversification */}
-      <div className="card-glass" style={{ padding: 'clamp(16px, 2.5vw, 24px)', borderRadius: '10px', border: '1px solid var(--border)', background: '#151a26' }}>
-        <h2 style={{ fontSize: '0.88rem', fontWeight: 700, letterSpacing: '0.03em', borderBottom: '1px solid var(--color-border-divider)', paddingBottom: '10px', margin: '0 0 14px 0', display: 'flex', alignItems: 'center', gap: '8px', color: '#f8fafc' }}>
+      <div className="card-glass" style={{ padding: 'clamp(16px, 2.5vw, 24px)', borderRadius: '12px', border: '1px solid var(--border)', background: '#151a26' }}>
+        <h2 style={{ fontSize: '0.88rem', fontWeight: 700, letterSpacing: '0', borderBottom: '1px solid var(--color-border-divider)', paddingBottom: '10px', margin: '0 0 14px 0', display: 'flex', alignItems: 'center', gap: '8px', color: '#f8fafc' }}>
           <Activity size={15} style={{ color: '#f59e0b' }} />
-          ASSET DIVERSIFICATION TARGETS
+          Asset diversification targets
         </h2>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '14px' }}>
@@ -184,18 +195,18 @@ export const PortfolioPanel: React.FC = () => {
             }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span style={{ fontSize: '0.88rem', fontWeight: 700, color: '#f8fafc' }}>{asset.asset_symbol}</span>
-                <span style={{ fontSize: '0.78rem', color: '#f59e0b', fontWeight: 700 }}>{asset.allocation_pct.toFixed(1)}%</span>
+                <span style={{ fontSize: '0.8rem', color: '#f59e0b', fontWeight: 700 }}>{asset.allocation_pct.toFixed(1)}%</span>
               </div>
 
               <div style={{ height: '4px', background: 'rgba(203,213,225,0.08)', borderRadius: '99px', overflow: 'hidden' }}>
-                <div style={{ width: `${asset.allocation_pct}%`, height: '100%', background: 'linear-gradient(90deg, #f59e0b 0%, #d97706 100%)' }}></div>
+                <div style={{ width: `${asset.allocation_pct}%`, height: '100%', background: '#f59e0b' }}></div>
               </div>
 
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.74rem', color: 'var(--text-secondary)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.72rem', color: 'var(--text-secondary)' }}>
                 <span>Balance:</span>
                 <span style={{ fontWeight: 600, color: '#f8fafc' }}>{asset.balance_amount.toLocaleString(undefined, { maximumFractionDigits: 4 })} {asset.asset_symbol}</span>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.74rem', color: 'var(--text-secondary)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.72rem', color: 'var(--text-secondary)' }}>
                 <span>Entry cost:</span>
                 <span style={{ fontWeight: 600, color: '#f8fafc' }}>{formatCurrency(asset.average_entry_price)}</span>
               </div>
@@ -207,9 +218,9 @@ export const PortfolioPanel: React.FC = () => {
       {/* Active Paper Trading Positions */}
       <div className="card-glass" style={{ padding: 'clamp(16px, 2.5vw, 24px)', borderRadius: '12px', border: '1px solid var(--border)' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.03)', paddingBottom: '10px', marginBottom: '14px', flexWrap: 'wrap', gap: '10px' }}>
-          <h2 style={{ fontSize: '0.88rem', fontWeight: 700, letterSpacing: '0.03em', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <h2 style={{ fontSize: '0.88rem', fontWeight: 700, letterSpacing: '0', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
             <Activity size={15} style={{ color: '#f59e0b' }} />
-            SANDBOX ACTIVE PAPER POSITIONS
+            Sandbox active paper positions
           </h2>
           {paperPositions.length > 0 && (
             <button 
@@ -220,7 +231,7 @@ export const PortfolioPanel: React.FC = () => {
                 border: '1px solid rgba(239, 68, 68, 0.15)',
                 color: 'var(--danger)',
                 padding: '6px 12px',
-                borderRadius: '6px',
+                borderRadius: '7px',
                 fontSize: '0.72rem',
                 fontWeight: 600,
                 cursor: 'pointer',
@@ -241,7 +252,7 @@ export const PortfolioPanel: React.FC = () => {
           </div>
         ) : (
           <div className="responsive-table-container">
-            <table style={{ width: '100%', minWidth: '580px', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.78rem' }}>
+            <table style={{ width: '100%', minWidth: '580px', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.8rem' }}>
               <thead>
                 <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.04)', color: 'var(--text-muted)' }}>
                   <th style={{ padding: '8px 10px' }}>SYMBOL</th>
@@ -249,7 +260,7 @@ export const PortfolioPanel: React.FC = () => {
                   <th style={{ padding: '8px 10px' }}>SIZE</th>
                   <th style={{ padding: '8px 10px' }}>ENTRY</th>
                   <th style={{ padding: '8px 10px' }}>CURRENT</th>
-                  <th style={{ padding: '8px 10px' }}>UNREALIZED PNL</th>
+                  <th style={{ padding: '8px 10px' }}>Unrealized P&L</th>
                   <th style={{ padding: '8px 10px', textAlign: 'right' }}>ACTION</th>
                 </tr>
               </thead>
@@ -258,7 +269,7 @@ export const PortfolioPanel: React.FC = () => {
                   <tr key={pos.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.02)' }}>
                     <td style={{ padding: '10px', fontWeight: 700 }}>{pos.symbol}</td>
                     <td style={{ padding: '10px' }}>
-                      <span className={`badge-ds ${pos.side === 'LONG' ? 'badge-long' : 'badge-short'}`} style={{ fontSize: '0.62rem', padding: '2px 6px' }}>
+                      <span className={`badge-ds ${pos.side === 'LONG' ? 'badge-long' : 'badge-short'}`} style={{ fontSize: '0.72rem', padding: '2px 6px' }}>
                         {pos.side}
                       </span>
                     </td>
@@ -280,7 +291,7 @@ export const PortfolioPanel: React.FC = () => {
                           borderRadius: '4px',
                           color: '#fff',
                           padding: '4px 10px',
-                          fontSize: '0.7rem',
+                          fontSize: '0.72rem',
                           fontWeight: 600,
                           cursor: 'pointer'
                         }}
@@ -298,9 +309,9 @@ export const PortfolioPanel: React.FC = () => {
 
       {/* Transaction History Log */}
       <div className="card-glass" style={{ padding: 'clamp(16px, 2.5vw, 24px)', borderRadius: '12px', border: '1px solid var(--border)' }}>
-        <h2 style={{ fontSize: '0.88rem', fontWeight: 700, letterSpacing: '0.03em', borderBottom: '1px solid rgba(255,255,255,0.03)', paddingBottom: '10px', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <h2 style={{ fontSize: '0.88rem', fontWeight: 700, letterSpacing: '0', borderBottom: '1px solid rgba(255,255,255,0.03)', paddingBottom: '10px', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
           <FileText size={15} style={{ color: '#f59e0b' }} />
-          SANDBOX TRANSACTION HISTORY
+          Sandbox transaction history
         </h2>
 
         {paperHistory.length === 0 ? (
@@ -318,7 +329,7 @@ export const PortfolioPanel: React.FC = () => {
                 borderRadius: '8px',
                 background: 'rgba(255,255,255,0.005)',
                 border: '1px solid rgba(255,255,255,0.03)',
-                fontSize: '0.78rem',
+                fontSize: '0.8rem',
                 flexWrap: 'wrap',
                 gap: '8px'
               }}>
@@ -334,7 +345,7 @@ export const PortfolioPanel: React.FC = () => {
                   )}
                   <div>
                     <div style={{ fontWeight: 600, color: '#fff' }}>Closed {hist.symbol} {hist.side}</div>
-                    <span style={{ fontSize: '0.66rem', color: 'var(--text-muted)' }}>{new Date(hist.closedAt || hist.createdAt).toLocaleString()}</span>
+                    <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>{new Date(hist.closedAt || hist.createdAt).toLocaleString()}</span>
                   </div>
                 </div>
 
@@ -342,7 +353,7 @@ export const PortfolioPanel: React.FC = () => {
                   <div style={{ ...getPnlStyle(hist.realizedPnl), fontSize: '0.8rem' }}>
                     {hist.realizedPnl >= 0 ? '+' : ''}{formatCurrency(hist.realizedPnl)} Net
                   </div>
-                  <span style={{ fontSize: '0.66rem', color: 'var(--text-muted)' }}>Size: {hist.quantity.toFixed(3)} units</span>
+                  <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Size: {hist.quantity.toFixed(3)} units</span>
                 </div>
               </div>
             ))}

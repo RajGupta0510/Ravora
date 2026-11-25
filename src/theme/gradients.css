@@ -1,11 +1,12 @@
 :root {
-  /* Ravora Signature Surface & Gradient System - Amber & Gunmetal */
-  --gradient-primary: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-  --gradient-amber: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%);
-  --gradient-success: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  --gradient-warning: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-  --gradient-danger: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-  --gradient-interactive: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-  --gradient-text: linear-gradient(180deg, #f8fafc 40%, #cbd5e1 100%);
-  --gradient-hero: radial-gradient(circle at top right, rgba(245, 158, 11, 0.04) 0%, transparent 60%);
+  /* Ravora surfaces are flat. Legacy gradient tokens now resolve to solid colours
+     so any remaining var(--gradient-*) usage matches the Gunmetal / Stone / Amber world. */
+  --gradient-primary: #f59e0b;
+  --gradient-amber: #f59e0b;
+  --gradient-success: #10b981;
+  --gradient-warning: #f59e0b;
+  --gradient-danger: #ef4444;
+  --gradient-interactive: #f59e0b;
+  --gradient-text: #f8fafc;
+  --gradient-hero: transparent;
 }

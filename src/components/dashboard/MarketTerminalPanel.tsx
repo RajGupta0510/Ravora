@@ -321,13 +321,13 @@ export const MarketTerminalPanel: React.FC<MarketTerminalPanelProps> = ({
                 width: '36px',
                 height: '36px',
                 borderRadius: '8px',
-                background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+                background: '#f59e0b',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 color: '#0b0e14',
                 fontWeight: 800,
-                fontSize: '0.95rem'
+                fontSize: '1rem'
               }}
             >
               {activeSymbol.slice(0, 3)}
@@ -360,11 +360,11 @@ export const MarketTerminalPanel: React.FC<MarketTerminalPanelProps> = ({
           {/* Quick Metrics */}
           <div style={{ display: 'flex', gap: '16px', fontSize: '0.72rem' }}>
             <div>
-              <span style={{ color: 'var(--text-muted)', display: 'block', fontSize: '0.62rem', textTransform: 'uppercase' }}>24h Vol</span>
+              <span style={{ color: 'var(--text-muted)', display: 'block', fontSize: '0.72rem', }}>24h Vol</span>
               <span style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>{formatVolume(activeAsset.volume24h)}</span>
             </div>
             <div>
-              <span style={{ color: 'var(--text-muted)', display: 'block', fontSize: '0.62rem', textTransform: 'uppercase' }}>Engine</span>
+              <span style={{ color: 'var(--text-muted)', display: 'block', fontSize: '0.72rem', }}>Engine</span>
               <span style={{ color: '#10b981', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '4px' }}>
                 <span style={{ width: '5px', height: '5px', borderRadius: '50%', background: '#10b981' }}></span>
                 Continuous Stream
@@ -381,7 +381,7 @@ export const MarketTerminalPanel: React.FC<MarketTerminalPanelProps> = ({
               display: 'flex',
               background: 'rgba(255, 255, 255, 0.02)',
               border: '1px solid var(--border)',
-              borderRadius: '6px',
+              borderRadius: '7px',
               padding: '2px',
               gap: '2px'
             }}
@@ -392,7 +392,7 @@ export const MarketTerminalPanel: React.FC<MarketTerminalPanelProps> = ({
                 onClick={() => setActiveTimeframe(tf)}
                 style={{
                   padding: '4px 8px',
-                  fontSize: '0.7rem',
+                  fontSize: '0.72rem',
                   fontWeight: 600,
                   border: 'none',
                   borderRadius: '4px',
@@ -412,7 +412,7 @@ export const MarketTerminalPanel: React.FC<MarketTerminalPanelProps> = ({
               display: 'flex',
               background: 'rgba(255, 255, 255, 0.02)',
               border: '1px solid var(--border)',
-              borderRadius: '6px',
+              borderRadius: '7px',
               padding: '2px',
               gap: '2px'
             }}
@@ -421,7 +421,7 @@ export const MarketTerminalPanel: React.FC<MarketTerminalPanelProps> = ({
               onClick={() => setChartEngine('tradingview')}
               style={{
                 padding: '4px 10px',
-                fontSize: '0.7rem',
+                fontSize: '0.72rem',
                 fontWeight: 600,
                 border: 'none',
                 borderRadius: '4px',
@@ -436,7 +436,7 @@ export const MarketTerminalPanel: React.FC<MarketTerminalPanelProps> = ({
               onClick={() => setChartEngine('native')}
               style={{
                 padding: '4px 10px',
-                fontSize: '0.7rem',
+                fontSize: '0.72rem',
                 fontWeight: 600,
                 border: 'none',
                 borderRadius: '4px',
@@ -455,7 +455,7 @@ export const MarketTerminalPanel: React.FC<MarketTerminalPanelProps> = ({
               display: 'flex',
               background: 'rgba(255, 255, 255, 0.02)',
               border: '1px solid var(--border)',
-              borderRadius: '6px',
+              borderRadius: '7px',
               padding: '2px'
             }}
           >
@@ -463,7 +463,7 @@ export const MarketTerminalPanel: React.FC<MarketTerminalPanelProps> = ({
               onClick={() => setTradingMode('paper')}
               style={{
                 padding: '4px 10px',
-                fontSize: '0.7rem',
+                fontSize: '0.72rem',
                 fontWeight: 700,
                 border: 'none',
                 borderRadius: '4px',
@@ -478,7 +478,7 @@ export const MarketTerminalPanel: React.FC<MarketTerminalPanelProps> = ({
               onClick={() => setTradingMode('live')}
               style={{
                 padding: '4px 10px',
-                fontSize: '0.7rem',
+                fontSize: '0.72rem',
                 fontWeight: 700,
                 border: 'none',
                 borderRadius: '4px',
@@ -518,10 +518,10 @@ export const MarketTerminalPanel: React.FC<MarketTerminalPanelProps> = ({
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-secondary)', letterSpacing: '0.04em' }}>
-              MARKET RADAR
+            <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-secondary)', letterSpacing: '0' }}>
+              Market radar
             </span>
-            <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>{watchlist.length} Assets</span>
+            <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>{watchlist.length} Assets</span>
           </div>
 
           {/* Search Box */}
@@ -537,9 +537,9 @@ export const MarketTerminalPanel: React.FC<MarketTerminalPanelProps> = ({
                 padding: '6px 8px 6px 28px',
                 background: 'rgba(255, 255, 255, 0.03)',
                 border: '1px solid var(--border)',
-                borderRadius: '6px',
+                borderRadius: '7px',
                 color: '#fff',
-                fontSize: '0.75rem',
+                fontSize: '0.72rem',
                 outline: 'none',
                 boxSizing: 'border-box'
               }}
@@ -584,22 +584,22 @@ export const MarketTerminalPanel: React.FC<MarketTerminalPanelProps> = ({
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        fontSize: '0.7rem',
+                        fontSize: '0.72rem',
                         fontWeight: 700
                       }}
                     >
                       {item.symbol.slice(0, 2)}
                     </div>
                     <div>
-                      <div style={{ fontWeight: 700, fontSize: '0.78rem', color: isSelected ? '#fbbf24' : '#fff' }}>
+                      <div style={{ fontWeight: 700, fontSize: '0.8rem', color: isSelected ? '#fbbf24' : '#fff' }}>
                         {item.symbol}
                       </div>
-                      <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>{item.name}</div>
+                      <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>{item.name}</div>
                     </div>
                   </div>
                   <div style={{ textAlign: 'right' }}>
-                    <div style={{ fontWeight: 600, fontSize: '0.78rem', color: '#fff' }}>{formatPrice(item.price)}</div>
-                    <div style={{ fontSize: '0.68rem', fontWeight: 700, color: isGreen ? '#10b981' : '#ef4444' }}>
+                    <div style={{ fontWeight: 600, fontSize: '0.8rem', color: '#fff' }}>{formatPrice(item.price)}</div>
+                    <div style={{ fontSize: '0.72rem', fontWeight: 700, color: isGreen ? '#10b981' : '#ef4444' }}>
                       {isGreen ? '+' : ''}
                       {(item.change24h || 0).toFixed(2)}%
                     </div>
@@ -630,9 +630,9 @@ export const MarketTerminalPanel: React.FC<MarketTerminalPanelProps> = ({
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <Activity size={15} style={{ color: '#f59e0b' }} />
               <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#fff' }}>
-                {activeSymbol} CANDLESTICK RADAR
+                {activeSymbol} candlestick radar
               </span>
-              <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>({activeTimeframe})</span>
+              <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>({activeTimeframe})</span>
             </div>
 
             {/* AI Overlay Toggles */}
@@ -640,7 +640,7 @@ export const MarketTerminalPanel: React.FC<MarketTerminalPanelProps> = ({
               <button
                 onClick={() => setShowTargets(!showTargets)}
                 style={{
-                  fontSize: '0.66rem',
+                  fontSize: '0.72rem',
                   fontWeight: 600,
                   padding: '3px 8px',
                   borderRadius: '4px',
@@ -655,7 +655,7 @@ export const MarketTerminalPanel: React.FC<MarketTerminalPanelProps> = ({
               <button
                 onClick={() => setShowSupportResistance(!showSupportResistance)}
                 style={{
-                  fontSize: '0.66rem',
+                  fontSize: '0.72rem',
                   fontWeight: 600,
                   padding: '3px 8px',
                   borderRadius: '4px',
@@ -861,7 +861,7 @@ export const MarketTerminalPanel: React.FC<MarketTerminalPanelProps> = ({
               border: '1px solid rgba(245, 158, 11, 0.25)',
               borderRadius: '8px',
               padding: '8px 12px',
-              fontSize: '0.74rem'
+              fontSize: '0.72rem'
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -906,10 +906,10 @@ export const MarketTerminalPanel: React.FC<MarketTerminalPanelProps> = ({
             }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-secondary)' }}>
-                ORDERBOOK DEPTH
+              <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-secondary)' }}>
+                Orderbook depth
               </span>
-              <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>L2 Realtime</span>
+              <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>L2 Realtime</span>
             </div>
 
             {/* Asks (Red) */}
@@ -938,7 +938,7 @@ export const MarketTerminalPanel: React.FC<MarketTerminalPanelProps> = ({
               }}
             >
               <span>{formatPrice(activeAsset.price)}</span>
-              <span style={{ fontSize: '0.65rem', color: '#10b981', fontWeight: 600 }}>Spread 0.01%</span>
+              <span style={{ fontSize: '0.72rem', color: '#10b981', fontWeight: 600 }}>Spread 0.01%</span>
             </div>
 
             {/* Bids (Green) */}
@@ -965,12 +965,12 @@ export const MarketTerminalPanel: React.FC<MarketTerminalPanelProps> = ({
             }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontSize: '0.78rem', fontWeight: 700, color: '#fff' }}>
-                RAPID EXECUTION
+              <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#fff' }}>
+                Rapid execution
               </span>
               <span
                 style={{
-                  fontSize: '0.64rem',
+                  fontSize: '0.72rem',
                   fontWeight: 700,
                   color: tradingMode === 'paper' ? '#10b981' : '#f59e0b',
                   background: tradingMode === 'paper' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(245, 158, 11, 0.1)',
@@ -988,8 +988,8 @@ export const MarketTerminalPanel: React.FC<MarketTerminalPanelProps> = ({
                 onClick={() => setOrderSide('LONG')}
                 style={{
                   padding: '8px',
-                  borderRadius: '6px',
-                  fontSize: '0.78rem',
+                  borderRadius: '7px',
+                  fontSize: '0.8rem',
                   fontWeight: 700,
                   cursor: 'pointer',
                   border: orderSide === 'LONG' ? '1px solid #10b981' : '1px solid var(--border)',
@@ -1003,8 +1003,8 @@ export const MarketTerminalPanel: React.FC<MarketTerminalPanelProps> = ({
                 onClick={() => setOrderSide('SHORT')}
                 style={{
                   padding: '8px',
-                  borderRadius: '6px',
-                  fontSize: '0.78rem',
+                  borderRadius: '7px',
+                  fontSize: '0.8rem',
                   fontWeight: 700,
                   cursor: 'pointer',
                   border: orderSide === 'SHORT' ? '1px solid #ef4444' : '1px solid var(--border)',
@@ -1019,7 +1019,7 @@ export const MarketTerminalPanel: React.FC<MarketTerminalPanelProps> = ({
             {/* Order Amount Input */}
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>Position Size (USDT)</span>
+                <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Position Size (USDT)</span>
               </div>
               <input
                 type="number"
@@ -1028,11 +1028,11 @@ export const MarketTerminalPanel: React.FC<MarketTerminalPanelProps> = ({
                 style={{
                   width: '100%',
                   padding: '8px 10px',
-                  borderRadius: '6px',
+                  borderRadius: '7px',
                   border: '1px solid var(--border)',
                   background: 'rgba(255, 255, 255, 0.02)',
                   color: '#fff',
-                  fontSize: '0.85rem',
+                  fontSize: '0.88rem',
                   fontWeight: 600,
                   boxSizing: 'border-box'
                 }}
@@ -1045,7 +1045,7 @@ export const MarketTerminalPanel: React.FC<MarketTerminalPanelProps> = ({
                     style={{
                       flex: 1,
                       padding: '3px',
-                      fontSize: '0.65rem',
+                      fontSize: '0.72rem',
                       fontWeight: 600,
                       background: 'rgba(255, 255, 255, 0.03)',
                       border: '1px solid var(--border)',
@@ -1063,7 +1063,7 @@ export const MarketTerminalPanel: React.FC<MarketTerminalPanelProps> = ({
             {/* Leverage Slider */}
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>Leverage</span>
+                <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Leverage</span>
                 <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#f59e0b' }}>{orderLeverage}x</span>
               </div>
               <input
@@ -1086,7 +1086,7 @@ export const MarketTerminalPanel: React.FC<MarketTerminalPanelProps> = ({
                 width: '100%',
                 height: '42px',
                 fontWeight: 700,
-                fontSize: '0.85rem',
+                fontSize: '0.88rem',
                 borderRadius: '8px',
                 marginTop: '4px'
               }}
@@ -1099,7 +1099,7 @@ export const MarketTerminalPanel: React.FC<MarketTerminalPanelProps> = ({
               <div
                 style={{
                   padding: '8px 10px',
-                  borderRadius: '6px',
+                  borderRadius: '7px',
                   fontSize: '0.72rem',
                   fontWeight: 600,
                   background: executionMessage.type === 'success' ? 'rgba(16, 185, 129, 0.12)' : 'rgba(239, 68, 68, 0.12)',

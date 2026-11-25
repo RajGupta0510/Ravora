@@ -457,7 +457,7 @@ export const MarketsPanel: React.FC<MarketsPanelProps> = ({ onNavigateTab, onOpe
             background: 'rgba(16, 185, 129, 0.1)',
             border: '1px solid rgba(16, 185, 129, 0.25)',
             padding: '4px 10px',
-            borderRadius: '999px',
+            borderRadius: '99px',
             fontSize: '0.72rem',
             color: '#10b981',
             fontWeight: 600
@@ -469,7 +469,7 @@ export const MarketsPanel: React.FC<MarketsPanelProps> = ({ onNavigateTab, onOpe
               background: '#10b981',
               boxShadow: '0 0 8px #10b981'
             }}></span>
-            LIVE ORDERBOOK STREAM
+            Live orderbook stream
           </div>
           <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
             Updated: {lastUpdated.toLocaleTimeString()}
@@ -487,9 +487,9 @@ export const MarketsPanel: React.FC<MarketsPanelProps> = ({ onNavigateTab, onOpe
                 gap: '6px',
                 height: '32px',
                 padding: '0 12px',
-                fontSize: '0.74rem',
+                fontSize: '0.72rem',
                 fontWeight: 700,
-                borderRadius: '6px'
+                borderRadius: '7px'
               }}
             >
               <CandlestickChart size={14} />
@@ -508,8 +508,8 @@ export const MarketsPanel: React.FC<MarketsPanelProps> = ({ onNavigateTab, onOpe
               border: '1px solid var(--border)',
               color: 'var(--text-secondary)',
               padding: '6px 12px',
-              borderRadius: '6px',
-              fontSize: '0.75rem',
+              borderRadius: '7px',
+              fontSize: '0.72rem',
               fontWeight: 600,
               cursor: loading ? 'not-allowed' : 'pointer',
               transition: 'all 0.2s'
@@ -535,21 +535,21 @@ export const MarketsPanel: React.FC<MarketsPanelProps> = ({ onNavigateTab, onOpe
           padding: '16px 20px', 
           borderRadius: '12px', 
           border: '1px solid rgba(255,255,255,0.06)',
-          background: 'rgba(14, 19, 37, 0.45)'
+          background: 'rgba(21, 26, 38, 0.6)'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <Flame size={16} style={{ color: '#f59e0b' }} />
-              <span style={{ fontSize: '0.74rem', fontWeight: 700, color: '#f59e0b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#f59e0b', letterSpacing: '0' }}>
                 Trending (24h Vol)
               </span>
             </div>
-            <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>Top Turnover</span>
+            <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Top Turnover</span>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             {trending.length === 0 ? (
-              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Scanning volume metrics...</span>
+              <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Scanning volume metrics...</span>
             ) : (
               trending.slice(0, 3).map((item) => (
                 <div 
@@ -559,7 +559,7 @@ export const MarketsPanel: React.FC<MarketsPanelProps> = ({ onNavigateTab, onOpe
                     display: 'flex', 
                     justifyContent: 'space-between', 
                     alignItems: 'center', 
-                    fontSize: '0.75rem',
+                    fontSize: '0.72rem',
                     padding: '4px 6px',
                     borderRadius: '4px',
                     cursor: 'pointer',
@@ -570,11 +570,11 @@ export const MarketsPanel: React.FC<MarketsPanelProps> = ({ onNavigateTab, onOpe
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <span style={{ fontWeight: 700, color: '#fff' }}>{item.symbol}</span>
-                    <span style={{ color: 'var(--text-secondary)', fontSize: '0.68rem' }}>{item.name}</span>
+                    <span style={{ color: 'var(--text-secondary)', fontSize: '0.72rem' }}>{item.name}</span>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <span style={{ fontWeight: 600, color: '#fff' }}>{formatPrice(item.price)}</span>
-                    <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>{formatVolume(item.volume24h)}</span>
+                    <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>{formatVolume(item.volume24h)}</span>
                   </div>
                 </div>
               ))
@@ -587,21 +587,21 @@ export const MarketsPanel: React.FC<MarketsPanelProps> = ({ onNavigateTab, onOpe
           padding: '16px 20px', 
           borderRadius: '12px', 
           border: '1px solid rgba(255,255,255,0.06)',
-          background: 'rgba(14, 19, 37, 0.45)'
+          background: 'rgba(21, 26, 38, 0.6)'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <TrendingUp size={16} style={{ color: '#10b981' }} />
-              <span style={{ fontSize: '0.74rem', fontWeight: 700, color: '#10b981', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#10b981', letterSpacing: '0' }}>
                 Top Gainers
               </span>
             </div>
-            <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>24h Surge</span>
+            <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>24h Surge</span>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             {gainers.length === 0 ? (
-              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Calculating daily leaders...</span>
+              <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Calculating daily leaders...</span>
             ) : (
               gainers.slice(0, 3).map((item) => (
                 <div 
@@ -611,7 +611,7 @@ export const MarketsPanel: React.FC<MarketsPanelProps> = ({ onNavigateTab, onOpe
                     display: 'flex', 
                     justifyContent: 'space-between', 
                     alignItems: 'center', 
-                    fontSize: '0.75rem',
+                    fontSize: '0.72rem',
                     padding: '4px 6px',
                     borderRadius: '4px',
                     cursor: 'pointer',
@@ -622,7 +622,7 @@ export const MarketsPanel: React.FC<MarketsPanelProps> = ({ onNavigateTab, onOpe
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <span style={{ fontWeight: 700, color: '#fff' }}>{item.symbol}</span>
-                    <span style={{ color: 'var(--text-secondary)', fontSize: '0.68rem' }}>{item.name}</span>
+                    <span style={{ color: 'var(--text-secondary)', fontSize: '0.72rem' }}>{item.name}</span>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <span style={{ fontWeight: 600, color: '#fff' }}>{formatPrice(item.price)}</span>
@@ -641,21 +641,21 @@ export const MarketsPanel: React.FC<MarketsPanelProps> = ({ onNavigateTab, onOpe
           padding: '16px 20px', 
           borderRadius: '12px', 
           border: '1px solid rgba(255,255,255,0.06)',
-          background: 'rgba(14, 19, 37, 0.45)'
+          background: 'rgba(21, 26, 38, 0.6)'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <TrendingDown size={16} style={{ color: '#ef4444' }} />
-              <span style={{ fontSize: '0.74rem', fontWeight: 700, color: '#ef4444', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#ef4444', letterSpacing: '0' }}>
                 Top Losers
               </span>
             </div>
-            <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>Pullbacks</span>
+            <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Pullbacks</span>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             {losers.length === 0 ? (
-              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Calculating daily pullbacks...</span>
+              <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Calculating daily pullbacks...</span>
             ) : (
               losers.slice(0, 3).map((item) => (
                 <div 
@@ -665,7 +665,7 @@ export const MarketsPanel: React.FC<MarketsPanelProps> = ({ onNavigateTab, onOpe
                     display: 'flex', 
                     justifyContent: 'space-between', 
                     alignItems: 'center', 
-                    fontSize: '0.75rem',
+                    fontSize: '0.72rem',
                     padding: '4px 6px',
                     borderRadius: '4px',
                     cursor: 'pointer',
@@ -676,7 +676,7 @@ export const MarketsPanel: React.FC<MarketsPanelProps> = ({ onNavigateTab, onOpe
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <span style={{ fontWeight: 700, color: '#fff' }}>{item.symbol}</span>
-                    <span style={{ color: 'var(--text-secondary)', fontSize: '0.68rem' }}>{item.name}</span>
+                    <span style={{ color: 'var(--text-secondary)', fontSize: '0.72rem' }}>{item.name}</span>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <span style={{ fontWeight: 600, color: '#fff' }}>{formatPrice(item.price)}</span>
@@ -716,9 +716,9 @@ export const MarketsPanel: React.FC<MarketsPanelProps> = ({ onNavigateTab, onOpe
               padding: '8px 12px 8px 34px',
               background: 'rgba(255, 255, 255, 0.03)',
               border: '1px solid var(--border)',
-              borderRadius: '6px',
+              borderRadius: '7px',
               color: '#fff',
-              fontSize: '0.78rem',
+              fontSize: '0.8rem',
               outline: 'none',
               boxSizing: 'border-box'
             }}
@@ -771,8 +771,8 @@ export const MarketsPanel: React.FC<MarketsPanelProps> = ({ onNavigateTab, onOpe
                   fontWeight: 600,
                   cursor: 'pointer',
                   border: 'none',
-                  borderRadius: '6px',
-                  background: isActive ? 'var(--gradient-primary)' : 'transparent',
+                  borderRadius: '7px',
+                  background: isActive ? '#f59e0b' : 'transparent',
                   color: isActive ? '#fff' : 'var(--text-secondary)',
                   whiteSpace: 'nowrap',
                   transition: 'all 0.15s'
@@ -800,8 +800,7 @@ export const MarketsPanel: React.FC<MarketsPanelProps> = ({ onNavigateTab, onOpe
                 color: 'var(--text-muted)', 
                 fontWeight: 700,
                 fontSize: '0.72rem',
-                textTransform: 'uppercase',
-                letterSpacing: '0.05em',
+                letterSpacing: '0',
                 background: 'rgba(255, 255, 255, 0.015)'
               }}>
                 <th style={{ padding: '14px 20px' }}>Asset</th>
@@ -849,17 +848,17 @@ export const MarketsPanel: React.FC<MarketsPanelProps> = ({ onNavigateTab, onOpe
                             alignItems: 'center', 
                             justifyContent: 'center',
                             fontWeight: 700,
-                            fontSize: '0.75rem',
+                            fontSize: '0.72rem',
                             color: '#fff',
                             flexShrink: 0
                           }}>
                             {asset.symbol.slice(0, 3)}
                           </div>
                           <div>
-                            <div style={{ fontWeight: 700, color: '#fff', fontSize: '0.82rem' }}>
+                            <div style={{ fontWeight: 700, color: '#fff', fontSize: '0.8rem' }}>
                               {asset.symbol}
                             </div>
-                            <div style={{ color: 'var(--text-secondary)', fontSize: '0.7rem' }}>
+                            <div style={{ color: 'var(--text-secondary)', fontSize: '0.72rem' }}>
                               {asset.name || asset.symbol}
                             </div>
                           </div>
@@ -879,7 +878,7 @@ export const MarketsPanel: React.FC<MarketsPanelProps> = ({ onNavigateTab, onOpe
                           gap: '2px',
                           color: pnlColor, 
                           fontWeight: 700,
-                          fontSize: '0.78rem',
+                          fontSize: '0.8rem',
                           background: isPositive ? 'rgba(16, 185, 129, 0.08)' : 'rgba(239, 68, 68, 0.08)',
                           padding: '3px 8px',
                           borderRadius: '4px'
@@ -910,7 +909,7 @@ export const MarketsPanel: React.FC<MarketsPanelProps> = ({ onNavigateTab, onOpe
                             padding: '6px 14px',
                             background: 'rgba(255, 255, 255, 0.03)',
                             border: '1px solid var(--border)',
-                            borderRadius: '6px',
+                            borderRadius: '7px',
                             color: '#fff',
                             fontSize: '0.72rem',
                             fontWeight: 600,
@@ -989,18 +988,18 @@ export const MarketsPanel: React.FC<MarketsPanelProps> = ({ onNavigateTab, onOpe
                   width: '36px', 
                   height: '36px', 
                   borderRadius: '50%', 
-                  background: 'var(--gradient-interactive)', 
+                  background: '#f59e0b', 
                   display: 'flex', 
                   alignItems: 'center', 
                   justifyContent: 'center',
                   fontWeight: 800,
-                  fontSize: '0.85rem',
+                  fontSize: '0.88rem',
                   color: '#fff'
                 }}>
                   {selectedSymbol.slice(0, 3)}
                 </div>
                 <div>
-                  <h3 style={{ margin: 0, fontSize: '1.1rem', color: '#fff', fontWeight: 700 }}>
+                  <h3 style={{ margin: 0, fontSize: '1.15rem', color: '#fff', fontWeight: 700 }}>
                     {assetDetails?.name || selectedSymbol}
                   </h3>
                   <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: 600 }}>
@@ -1017,7 +1016,7 @@ export const MarketsPanel: React.FC<MarketsPanelProps> = ({ onNavigateTab, onOpe
                   color: 'var(--text-muted)',
                   cursor: 'pointer',
                   padding: '6px',
-                  borderRadius: '6px'
+                  borderRadius: '7px'
                 }}
                 onMouseOver={(e) => e.currentTarget.style.color = '#fff'}
                 onMouseOut={(e) => e.currentTarget.style.color = 'var(--text-muted)'}
@@ -1029,7 +1028,7 @@ export const MarketsPanel: React.FC<MarketsPanelProps> = ({ onNavigateTab, onOpe
             {/* Price & Primary Delta */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
               <div>
-                <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', letterSpacing: '0' }}>
                   Spot Reference Price
                 </span>
                 <div style={{ fontSize: '1.6rem', fontWeight: 700, color: '#fff' }}>
@@ -1043,10 +1042,10 @@ export const MarketsPanel: React.FC<MarketsPanelProps> = ({ onNavigateTab, onOpe
                   gap: '2px',
                   color: ((assetDetails?.change24h || overview.find(a => a.symbol === selectedSymbol)?.change24h || 0) >= 0) ? '#10b981' : '#ef4444', 
                   fontWeight: 700,
-                  fontSize: '0.85rem',
+                  fontSize: '0.88rem',
                   background: ((assetDetails?.change24h || overview.find(a => a.symbol === selectedSymbol)?.change24h || 0) >= 0) ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
                   padding: '4px 10px',
-                  borderRadius: '6px'
+                  borderRadius: '7px'
                 }}>
                   {formatPercent(assetDetails?.change24h || overview.find(a => a.symbol === selectedSymbol)?.change24h)}
                 </span>
@@ -1054,9 +1053,9 @@ export const MarketsPanel: React.FC<MarketsPanelProps> = ({ onNavigateTab, onOpe
             </div>
 
             {/* Price Sparkline Chart */}
-            <div className="card-glass" style={{ padding: '14px', borderRadius: '10px', border: '1px solid var(--border)' }}>
+            <div className="card-glass" style={{ padding: '14px', borderRadius: '12px', border: '1px solid var(--border)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                <span style={{ fontSize: '0.68rem', fontWeight: 600, color: 'var(--text-muted)' }}>24-HOUR PRICE TRAJECTORY</span>
+                <span style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--text-muted)' }}>24-HOUR PRICE TRAJECTORY</span>
                 <BarChart3 size={13} style={{ color: 'var(--text-muted)' }} />
               </div>
               {assetDetailsLoading ? (
@@ -1075,26 +1074,26 @@ export const MarketsPanel: React.FC<MarketsPanelProps> = ({ onNavigateTab, onOpe
             {/* KPI Statistics 2x2 Grid */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
               <div className="card-glass" style={{ padding: '12px', borderRadius: '8px', border: '1px solid var(--border)' }}>
-                <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', display: 'block' }}>24h High</span>
-                <strong style={{ fontSize: '0.85rem', color: '#fff' }}>
+                <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', display: 'block' }}>24h High</span>
+                <strong style={{ fontSize: '0.88rem', color: '#fff' }}>
                   {formatPrice(assetDetails?.highPrice || assetDetails?.price)}
                 </strong>
               </div>
               <div className="card-glass" style={{ padding: '12px', borderRadius: '8px', border: '1px solid var(--border)' }}>
-                <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', display: 'block' }}>24h Low</span>
-                <strong style={{ fontSize: '0.85rem', color: '#fff' }}>
+                <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', display: 'block' }}>24h Low</span>
+                <strong style={{ fontSize: '0.88rem', color: '#fff' }}>
                   {formatPrice(assetDetails?.lowPrice || assetDetails?.price)}
                 </strong>
               </div>
               <div className="card-glass" style={{ padding: '12px', borderRadius: '8px', border: '1px solid var(--border)' }}>
-                <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', display: 'block' }}>24h Turnover</span>
-                <strong style={{ fontSize: '0.85rem', color: '#fff' }}>
+                <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', display: 'block' }}>24h Turnover</span>
+                <strong style={{ fontSize: '0.88rem', color: '#fff' }}>
                   {formatVolume(assetDetails?.volume24h)}
                 </strong>
               </div>
               <div className="card-glass" style={{ padding: '12px', borderRadius: '8px', border: '1px solid var(--border)' }}>
-                <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', display: 'block' }}>Market Cap</span>
-                <strong style={{ fontSize: '0.85rem', color: '#fff' }}>
+                <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', display: 'block' }}>Market Cap</span>
+                <strong style={{ fontSize: '0.88rem', color: '#fff' }}>
                   {formatVolume(assetDetails?.marketCap || 0)}
                 </strong>
               </div>
@@ -1104,7 +1103,7 @@ export const MarketsPanel: React.FC<MarketsPanelProps> = ({ onNavigateTab, onOpe
             <div className="card-glass" style={{ 
               padding: '16px', 
               borderRadius: '12px', 
-              border: '1px solid rgba(124, 58, 237, 0.25)', 
+              border: '1px solid rgba(245, 158, 11, 0.25)', 
               background: 'rgba(124, 58, 237, 0.04)',
               display: 'flex', 
               flexDirection: 'column', 
@@ -1112,19 +1111,19 @@ export const MarketsPanel: React.FC<MarketsPanelProps> = ({ onNavigateTab, onOpe
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <Sparkles size={15} style={{ color: '#f59e0b' }} />
-                <h5 style={{ color: '#f8fafc', fontSize: '0.78rem', margin: 0, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                <h5 style={{ color: '#f8fafc', fontSize: '0.8rem', margin: 0, fontWeight: 700, letterSpacing: '0' }}>
                   Araiven Intelligence Audit
                 </h5>
               </div>
 
               <div style={{ 
-                fontSize: '0.75rem', 
+                fontSize: '0.72rem', 
                 lineHeight: 1.5, 
                 color: 'var(--text-secondary)', 
                 background: 'rgba(245, 158, 11, 0.06)', 
                 border: '1px solid rgba(245, 158, 11, 0.25)', 
                 padding: '10px 12px', 
-                borderRadius: '6px' 
+                borderRadius: '7px' 
               }}>
                 {aiLoading ? (
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -1151,7 +1150,7 @@ export const MarketsPanel: React.FC<MarketsPanelProps> = ({ onNavigateTab, onOpe
                     padding: '12px',
                     fontWeight: 700,
                     borderRadius: '8px',
-                    fontSize: '0.85rem',
+                    fontSize: '0.88rem',
                     width: '100%',
                     display: 'flex',
                     alignItems: 'center',
@@ -1176,7 +1175,7 @@ export const MarketsPanel: React.FC<MarketsPanelProps> = ({ onNavigateTab, onOpe
                   padding: '10px',
                   fontWeight: 600,
                   borderRadius: '8px',
-                  fontSize: '0.82rem',
+                  fontSize: '0.8rem',
                   width: '100%',
                   display: 'flex',
                   alignItems: 'center',
@@ -1187,7 +1186,7 @@ export const MarketsPanel: React.FC<MarketsPanelProps> = ({ onNavigateTab, onOpe
                 <span>Deploy Setups in Araiven Scanner</span>
                 <ChevronRight size={15} />
               </button>
-              <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)', textAlign: 'center' }}>
+              <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textAlign: 'center' }}>
                 Examines risk parameters and execution ladders for {selectedSymbol}
               </span>
             </div>
