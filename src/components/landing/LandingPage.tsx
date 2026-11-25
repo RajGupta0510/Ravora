@@ -2,9 +2,11 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'motion/react';
 import { ArrowRight, Check, Menu, X } from 'lucide-react';
-import HeroTerminal from './HeroTerminal';
+import HeroInstrument from './HeroInstrument';
 import AskAraiven from './AskAraiven';
 import PlatformTabs from './PlatformTabs';
+import Movement from './Movement';
+import Dial from './Dial';
 import { useCountUp, useInView, usePrefersReducedMotion } from './hooks';
 import './landing.css';
 
@@ -12,25 +14,27 @@ import './landing.css';
 /* Helpers                                                             */
 /* ------------------------------------------------------------------ */
 
-const Reveal: React.FC<{ children: React.ReactNode; delay?: number; className?: string; rise?: boolean }> = ({
+const Reveal: React.FC<{ children: React.ReactNode; delay?: number; className?: string; as?: 'div' | 'li'; kind?: 'rise' | 'wipe' | 'pop' }> = ({
   children,
   delay = 0,
   className = '',
-  rise = false,
+  as: Tag = 'div',
+  kind = 'rise',
 }) => {
   const { ref, inView } = useInView<HTMLDivElement>(0.12);
   return (
-    <div
-      ref={ref}
-      className={`rv-reveal ${rise ? 'is-rise' : ''} ${inView ? 'is-in' : ''} ${className}`}
+    <Tag
+      ref={ref as React.RefObject<never>}
+      className={`rv-reveal k-${kind} ${inView ? 'is-in' : ''} ${className}`}
       style={{ ['--rv-delay' as string]: `${delay}ms` }}
     >
       {children}
-    </div>
+    </Tag>
   );
 };
 
 const NAV = [
+  { id: 'ask', label: 'Ask Araiven' },
   { id: 'how', label: 'How it works' },
   { id: 'features', label: 'Platform' },
   { id: 'risk', label: 'Risk guard' },
@@ -165,13 +169,53 @@ const SIM = [
   { label: 'Push the recommendation', detail: 'Rotate 15% of volatile assets into hedged stable pools. Ready for your review.' },
 ];
 
+const ROAD = [
+  { now: true, t: 'Simulated accounts', items: ['7-step onboarding', '$100k paper trading', 'Terminal and Copilot'] },
+  { t: 'Read-only sync', items: ['Connect your exchange', 'Live balance sync', 'DeFi yield feed'] },
+  { t: 'One-click live', items: ['Approve and execute', 'Trailing stop-losses', 'Slippage protection'] },
+  { t: 'Autopilot', items: ['Drawdown rotation to stables', 'Stocks and ETFs', 'Specialised agents'] },
+];
+
 /* ------------------------------------------------------------------ */
 /* Sections                                                            */
 /* ------------------------------------------------------------------ */
 
+const Arrow: React.FC = () => (
+  <span className="rv-arrow">
+    <ArrowRight size={18} strokeWidth={2} aria-hidden="true" />
+  </span>
+);
+
 const GatesSection: React.FC = () => {
   const [lit, setLit] = useState<boolean[]>(() => GATES.map(() => false));
   const refs = useRef<(HTMLLIElement | null)[]>([]);
+  const sectionRef = useRef<HTMLElement | null>(null);
+  const listRef = useRef<HTMLOListElement | null>(null);
+
+  // Scroll-linked gear rotation: --p runs 0 to 1 as the gate list passes through the viewport.
+  useEffect(() => {
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      const el = listRef.current;
+      const sec = sectionRef.current;
+      if (!el || !sec) return;
+      const r = el.getBoundingClientRect();
+      const p = Math.min(1, Math.max(0, (window.innerHeight * 0.6 - r.top) / (r.height + window.innerHeight * 0.2)));
+      sec.style.setProperty('--p', p.toFixed(4));
+    };
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(update);
+    };
+    update();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, []);
 
   useEffect(() => {
     if (typeof IntersectionObserver === 'undefined') {
@@ -202,18 +246,23 @@ const GatesSection: React.FC = () => {
   ];
 
   return (
-    <section id="how" className="rv-section is-alt">
-      <div className="rv-wrap rv-split">
+    <section id="how" className="rv-section" ref={sectionRef}>
+      <div className="rv-wrap">
+        <Reveal kind="wipe">
+          <h2 className="rv-h2">Six gates engage before any trade reaches you.</h2>
+          <p className="rv-lead">
+            Araiven is a rules-based engine, not a text generator. The same inputs always give the same score, and you can read the
+            working.
+          </p>
+        </Reveal>
+      </div>
+      <div className="rv-wrap rv-split rv-split--gates" style={{ marginTop: 'clamp(40px, 5vw, 72px)' }}>
         <div className="rv-sticky">
-          <Reveal>
-            <h2 className="rv-h2">Six gates before any trade reaches you.</h2>
-            <p className="rv-lead">
-              Araiven is a rules-based engine, not a text generator. The same inputs always give the same score, and
-              you can read the working.
-            </p>
+          <Reveal kind="pop" delay={60}>
+            <Movement count={count} />
           </Reveal>
-          <Reveal delay={100} rise>
-            <div className="rv-receipt" aria-label="Example confidence score receipt for the BTC plan">
+          <Reveal kind="pop" delay={140}>
+            <div className="rv-cert rv-receipt" aria-label="Example confidence score receipt for the BTC plan">
               <div className="rv-receipt-title">Receipt for the BTC plan</div>
               {rows.map(([l, v, w], i) => (
                 <div key={l} className={`rv-receipt-row ${count >= i + 1 ? 'is-on' : ''}`}>
@@ -231,7 +280,7 @@ const GatesSection: React.FC = () => {
           </Reveal>
         </div>
 
-        <ol className="rv-gates">
+        <ol className="rv-gates" ref={listRef}>
           {GATES.map((g, i) => (
             <li
               key={g.t}
@@ -241,7 +290,9 @@ const GatesSection: React.FC = () => {
               }}
               className={`rv-gate ${lit[i] ? 'is-lit' : ''}`}
             >
-              <span className="rv-gate-n">{String(i + 1).padStart(2, '0')}</span>
+              <span className="rv-gate-n" aria-hidden="true">
+                {String(i + 1).padStart(2, '0')}
+              </span>
               <div>
                 <h3>{g.t}</h3>
                 <p>{g.d}</p>
@@ -254,72 +305,126 @@ const GatesSection: React.FC = () => {
   );
 };
 
+const GAUGE_C = { x: 150, y: 150 };
+const gp = (r: number, d: number) => {
+  const a = (d * Math.PI) / 180;
+  return { x: GAUGE_C.x + r * Math.sin(a), y: GAUGE_C.y - r * Math.cos(a) };
+};
+const CapGauge: React.FC<{ cap: number }> = ({ cap }) => {
+  const a = (cap / 10) * 180 - 90;
+  const s0 = gp(120, -90);
+  const e0 = gp(120, 90);
+  const arc = `M ${s0.x} ${s0.y} A 120 120 0 0 1 ${e0.x} ${e0.y}`;
+  const ticks = Array.from({ length: 21 }, (_, i) => {
+    const v = i * 0.5;
+    const deg = (v / 10) * 180 - 90;
+    const major = i % 5 === 0;
+    const p1 = gp(major ? 100 : 106, deg);
+    const p2 = gp(114, deg);
+    return { i, major, v, p1, p2 };
+  });
+  return (
+    <div className="rv-gauge" aria-hidden="true">
+      <svg viewBox="0 0 300 176">
+        <path d={arc} className="rv-gauge-track" pathLength={100} />
+        <path d={arc} className="rv-gauge-fill" pathLength={100} style={{ strokeDasharray: `${cap * 10} 100` }} />
+        {ticks.map((t) => (
+          <line key={t.i} x1={t.p1.x} y1={t.p1.y} x2={t.p2.x} y2={t.p2.y} className={`rv-gauge-tick ${t.major ? 'is-major' : ''}`} />
+        ))}
+        {[1.5, 3.5, 8.5].map((v) => {
+          const q = gp(132, (v / 10) * 180 - 90);
+          return <circle key={v} cx={q.x} cy={q.y} r={Math.abs(v - cap) < 0.01 ? 6 : 3.5} className="rv-gauge-stance" />;
+        })}
+        {[0, 5, 10].map((v) => {
+          const q = gp(142, (v / 10) * 180 - 90);
+          return (
+            <text key={v} x={q.x + (v === 0 ? -6 : v === 10 ? 6 : 0)} y={q.y + (v === 5 ? -2 : 14)} textAnchor="middle" className="rv-gauge-num">
+              {v}%
+            </text>
+          );
+        })}
+        <g className="rv-gauge-hand" style={{ transform: `rotate(${a}deg)`, transformOrigin: `${GAUGE_C.x}px ${GAUGE_C.y}px` }}>
+          <line x1={GAUGE_C.x} y1={GAUGE_C.y} x2={GAUGE_C.x} y2={GAUGE_C.y - 98} />
+        </g>
+        <circle cx={GAUGE_C.x} cy={GAUGE_C.y} r="8" className="rv-gauge-hub" />
+      </svg>
+    </div>
+  );
+};
+
 const RiskSection: React.FC = () => {
   const [sel, setSel] = useState(1);
   const r = RISK[sel];
   return (
-    <section id="risk" className="rv-section rv-risk">
-      <div className="rv-wrap">
-        <Reveal>
-          <h2 className="rv-h2">Set your limit. Araiven works inside it.</h2>
-          <p className="rv-lead">
-            Pick a stance and watch the drawdown cap, allocation and projected curve change. Figures are illustrative.
-          </p>
-        </Reveal>
-
-        <div className="rv-risk-grid">
-          <Reveal rise>
-            <div className="rv-seg" role="group" aria-label="Risk stance">
-              {RISK.map((p, i) => (
-                <button key={p.label} aria-pressed={sel === i} onClick={() => setSel(i)}>
-                  {p.label}
-                </button>
-              ))}
-            </div>
-            <div className="rv-cap-num" aria-live="polite">
-              {r.cap}
-              <span>%</span>
-            </div>
-            <div className="rv-cap-label">Maximum 24h drawdown</div>
-            <p className="rv-cap-desc">{r.desc}</p>
-          </Reveal>
-
-          <Reveal delay={100} rise>
-            <div className="rv-equity">
-              <div className="rv-equity-head">
-                <div className="rv-equity-bal">{r.balance}</div>
-                <div className="rv-equity-gain">{r.gain} illustrative</div>
-              </div>
-              <div className="rv-equity-plot">
-                <svg className="rv-equity-svg" viewBox="0 0 234 110" preserveAspectRatio="none" aria-hidden="true">
-                  <path className="area" d={r.area} />
-                  <path className="line" d={r.line} vectorEffect="non-scaling-stroke" />
-                </svg>
-                <span className="rv-equity-dot" style={{ top: `${(r.tipY / 110) * 100}%` }} aria-hidden="true" />
-              </div>
-              <div className="rv-alloc">
-                {r.alloc.map((a) => (
-                  <div key={a.label} className="rv-alloc-row">
-                    <span>{a.label}</span>
-                    <div className="rv-alloc-bar">
-                      <i style={{ width: `${a.pct}%` }} />
-                    </div>
-                    <span>{a.pct}%</span>
-                  </div>
+    <section id="risk" className="rv-frame">
+      <div className="rv-amber rv-panel">
+        <div className="rv-wrap">
+          <div className="rv-risk-head">
+            <Reveal kind="wipe">
+              <h2 className="rv-h2">Set your limit. Araiven works inside it.</h2>
+              <p className="rv-lead">
+                Pick a stance and watch the drawdown cap, allocation and projected curve change. Figures are illustrative.
+              </p>
+            </Reveal>
+            <Reveal delay={120}>
+              <div className="rv-seg" role="group" aria-label="Risk stance">
+                {RISK.map((p, i) => (
+                  <button key={p.label} aria-pressed={sel === i} onClick={() => setSel(i)}>
+                    {p.label}
+                  </button>
                 ))}
               </div>
-              <dl className="rv-risk-rows">
-                <div>
-                  <dt>Safety score</dt>
-                  <dd>{r.safety}</dd>
+            </Reveal>
+          </div>
+
+          <div className="rv-risk-grid">
+            <Reveal>
+              <div className="rv-cap-num" aria-live="polite">
+                {r.cap}
+                <span>%</span>
+              </div>
+              <div className="rv-cap-label">Maximum 24h drawdown</div>
+              <p className="rv-cap-desc">{r.desc}</p>
+              <CapGauge cap={parseFloat(r.cap)} />
+            </Reveal>
+
+            <Reveal kind="pop" delay={120}>
+              <div className="rv-equity">
+                <div className="rv-equity-head">
+                  <div className="rv-equity-bal">{r.balance}</div>
+                  <div className="rv-equity-gain">{r.gain} illustrative</div>
                 </div>
-                <div>
-                  <dt>Risk index</dt>
-                  <dd>{r.riskIndex}</dd>
+                <div className="rv-equity-plot">
+                  <svg className="rv-equity-svg" viewBox="0 0 234 110" preserveAspectRatio="none" aria-hidden="true">
+                    <path className="area" d={r.area} />
+                    <path className="line" d={r.line} vectorEffect="non-scaling-stroke" />
+                  </svg>
+                  <span className="rv-equity-dot" style={{ top: `${(r.tipY / 110) * 100}%` }} aria-hidden="true" />
                 </div>
-              </dl>
-            </div>
-          </Reveal>
+                <div className="rv-alloc">
+                  {r.alloc.map((a) => (
+                    <div key={a.label} className="rv-alloc-row">
+                      <span>{a.label}</span>
+                      <div className="rv-alloc-bar">
+                        <i style={{ width: `${a.pct}%` }} />
+                      </div>
+                      <span>{a.pct}%</span>
+                    </div>
+                  ))}
+                </div>
+                <dl className="rv-risk-rows">
+                  <div>
+                    <dt>Safety score</dt>
+                    <dd>{r.safety}</dd>
+                  </div>
+                  <div>
+                    <dt>Risk index</dt>
+                    <dd>{r.riskIndex}</dd>
+                  </div>
+                </dl>
+              </div>
+            </Reveal>
+          </div>
         </div>
       </div>
     </section>
@@ -329,6 +434,8 @@ const RiskSection: React.FC = () => {
 const EventTape: React.FC = () => {
   const [step, setStep] = useState(0);
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
+  const started = useRef(false);
+  const sec = useInView<HTMLElement>(0.35);
 
   useEffect(
     () => () => {
@@ -354,23 +461,34 @@ const EventTape: React.FC = () => {
   const running = step > 0 && step < 5;
   const done = step === 5;
 
+  // Play the scenario once when the section scrolls into view; the button replays it.
+  useEffect(() => {
+    if (sec.inView && !started.current) {
+      started.current = true;
+      const t = window.setTimeout(run, 500);
+      return () => window.clearTimeout(t);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sec.inView]);
+
   return (
-    <section className="rv-section">
+    <section className="rv-section" ref={sec.ref as React.RefObject<HTMLElement>}>
       <div className="rv-wrap">
         <div className="rv-sim-head">
-          <Reveal>
+          <Reveal kind="wipe">
             <h2 className="rv-h2">Watch Araiven react to a Fed surprise.</h2>
-            <p className="rv-lead">
-              A macro event enters the engine and leaves as a recommendation you can approve or reject.
-            </p>
+            <p className="rv-lead">A macro event enters the engine and leaves as a recommendation you can approve or reject.</p>
           </Reveal>
           <Reveal delay={100}>
             <button className="rv-btn rv-btn-primary" onClick={run} disabled={running}>
-              {running ? 'Analysing…' : done ? 'Run it again' : 'Simulate CPI announcement'}
+              {running ? 'Analysing…' : done ? 'Replay the scenario' : 'Simulate CPI announcement'}
             </button>
           </Reveal>
         </div>
 
+        <div className="rv-events-rail" aria-hidden="true">
+          <i style={{ transform: `scaleX(${step / 5})` }} />
+        </div>
         <ol className="rv-events" aria-live="polite">
           {SIM.map((s, i) => {
             const n = i + 1;
@@ -390,13 +508,7 @@ const EventTape: React.FC = () => {
   );
 };
 
-const FaqItem: React.FC<{ q: string; a: string; open: boolean; onToggle: () => void; reduced: boolean }> = ({
-  q,
-  a,
-  open,
-  onToggle,
-  reduced,
-}) => (
+const FaqItem: React.FC<{ q: string; a: string; open: boolean; onToggle: () => void; reduced: boolean }> = ({ q, a, open, onToggle, reduced }) => (
   <div className="rv-faq-item">
     <button className="rv-faq-q" aria-expanded={open} onClick={onToggle}>
       <span>{q}</span>
@@ -409,7 +521,7 @@ const FaqItem: React.FC<{ q: string; a: string; open: boolean; onToggle: () => v
           initial={reduced ? false : { height: 0, opacity: 0 }}
           animate={{ height: 'auto', opacity: 1 }}
           exit={reduced ? { opacity: 0 } : { height: 0, opacity: 0 }}
-          transition={{ duration: reduced ? 0 : 0.4, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: reduced ? 0 : 0.4, ease: [0.22, 0.61, 0.36, 1] }}
         >
           <p>{a}</p>
         </motion.div>
@@ -429,6 +541,9 @@ export const LandingPage: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [active, setActive] = useState('');
   const [openFaq, setOpenFaq] = useState<number | null>(0);
+  const road = useInView<HTMLDivElement>(0.3);
+  const factsView = useInView<HTMLDivElement>(0.2);
+  const faqView = useInView<HTMLDivElement>(0.2);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -438,7 +553,7 @@ export const LandingPage: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    const onResize = () => window.innerWidth > 860 && setMenuOpen(false);
+    const onResize = () => window.innerWidth > 960 && setMenuOpen(false);
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
   }, []);
@@ -456,16 +571,11 @@ export const LandingPage: React.FC = () => {
     return () => io.disconnect();
   }, []);
 
-  const coverage = (key: string) => (
-    <div className="rv-marquee-group" key={key} aria-hidden={key !== 'a'}>
-      {MARKETS.map((m) => (
-        <span key={m} className="rv-marquee-item">
+  const row = (items: string[], key: string, venue = false) => (
+    <div className="rv-marq-group" key={key} aria-hidden={key.endsWith('b')}>
+      {items.map((m) => (
+        <span key={m} className={`rv-marq-item ${venue ? 'is-venue' : ''}`}>
           {m}
-        </span>
-      ))}
-      {VENUES.map((v) => (
-        <span key={v} className="rv-marquee-item is-venue">
-          {v}
         </span>
       ))}
     </div>
@@ -497,12 +607,7 @@ export const LandingPage: React.FC = () => {
             <button className="rv-btn rv-btn-primary rv-btn-sm" onClick={() => navigate('/auth/register')}>
               Start free
             </button>
-            <button
-              className="rv-burger"
-              aria-label="Toggle navigation menu"
-              aria-expanded={menuOpen}
-              onClick={() => setMenuOpen((o) => !o)}
-            >
+            <button className="rv-burger" aria-label="Toggle navigation menu" aria-expanded={menuOpen} onClick={() => setMenuOpen((o) => !o)}>
               {menuOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
           </div>
@@ -539,19 +644,20 @@ export const LandingPage: React.FC = () => {
       </header>
 
       <main id="top">
+        {/* Hero */}
         <section className="rv-hero">
           <div className="rv-wrap rv-hero-grid">
             <div className="rv-hero-copy">
               <h1 className="rv-h1">
-                The AI trading copilot that <em>shows its work.</em>
+                Every trade, <span className="rv-mark">with proof attached.</span>
               </h1>
               <p className="rv-hero-sub">
-                Ravora scans the market around the clock, scores every setup, and hands you a complete trade plan with
-                the reasoning attached. You approve it in one click.
+                Ravora scans the market around the clock, scores every setup, and hands you a complete trade plan with the reasoning
+                attached. You approve it in one click.
               </p>
               <div className="rv-hero-actions">
                 <button className="rv-btn rv-btn-primary" onClick={() => navigate('/auth/register')}>
-                  Start with $100k paper money <span className="rv-arrow"><ArrowRight size={18} strokeWidth={2} aria-hidden="true" /></span>
+                  Start with $100k paper money <Arrow />
                 </button>
                 <a href="#how" className="rv-btn rv-btn-ghost">
                   See how it decides
@@ -559,38 +665,48 @@ export const LandingPage: React.FC = () => {
               </div>
               <p className="rv-hero-note">No card. No exchange connection. Simulated capital only.</p>
             </div>
-            <div className="rv-hero-win">
-              <HeroTerminal />
+            <div className="rv-hero-inst">
+              <HeroInstrument />
             </div>
           </div>
         </section>
 
-        <div className="rv-marquee" aria-label="Markets and exchanges Araiven covers">
-          <div className="rv-marquee-mask">
-            <div className="rv-marquee-track">
-              {coverage('a')}
-              {coverage('b')}
+        {/* Coverage: two counter-scrolling rows */}
+        <div className="rv-marq" aria-label="Markets and exchanges Araiven covers">
+          <div className="rv-marq-mask">
+            <div className="rv-marq-track">
+              {row(MARKETS, 'a')}
+              {row(MARKETS, 'ab')}
+            </div>
+          </div>
+          <div className="rv-marq-mask is-reverse">
+            <div className="rv-marq-track">
+              {row(VENUES, 'c', true)}
+              {row(VENUES, 'cb', true)}
+              {row(VENUES, 'd', true)}
+              {row(VENUES, 'db', true)}
             </div>
           </div>
         </div>
 
-        <section className="rv-section" style={{ borderTop: 0 }}>
-          <div className="rv-wrap">
-            <AskAraiven />
+        {/* Ask Araiven, inside a case */}
+        <section id="ask" className="rv-frame">
+          <div className="rv-case rv-panel">
+            <div className="rv-wrap">
+              <AskAraiven />
+            </div>
           </div>
         </section>
 
         <GatesSection />
 
-        <section id="features" className="rv-section">
+        <section id="features" className="rv-section rv-section--tight">
           <div className="rv-wrap">
-            <Reveal>
+            <Reveal kind="wipe">
               <h2 className="rv-h2">One workspace, from signal to execution.</h2>
-              <p className="rv-lead">
-                Everything you need to find a trade, size it safely and understand it, without juggling six tabs.
-              </p>
+              <p className="rv-lead">Everything you need to find a trade, size it safely and understand it, without juggling six tabs.</p>
             </Reveal>
-            <Reveal delay={80} rise>
+            <Reveal kind="pop" delay={80}>
               <PlatformTabs />
             </Reveal>
           </div>
@@ -599,11 +715,12 @@ export const LandingPage: React.FC = () => {
         <RiskSection />
         <EventTape />
 
-        <section id="security" className="rv-section is-alt">
+        {/* Security */}
+        <section id="security" className="rv-section rv-section--tight">
           <div className="rv-wrap rv-split">
-            <Reveal>
+            <Reveal kind="wipe">
               <h2 className="rv-h2">Built so Ravora can never touch your funds.</h2>
-              <div className="rv-facts">
+              <div className={`rv-facts ${factsView.inView ? 'is-in' : ''}`} ref={factsView.ref}>
                 <div>
                   <h3>Non-custodial</h3>
                   <p>Your assets stay on your exchange. Ravora never holds them.</p>
@@ -618,8 +735,8 @@ export const LandingPage: React.FC = () => {
                 </div>
               </div>
             </Reveal>
-            <Reveal delay={100} rise>
-              <div className="rv-keycheck">
+            <Reveal kind="pop" delay={120}>
+              <div className="rv-cert rv-keycheck">
                 <h3>Exchange key check</h3>
                 <div className="rv-perms">
                   <div className="rv-perm">
@@ -638,70 +755,70 @@ export const LandingPage: React.FC = () => {
           </div>
         </section>
 
-        <section className="rv-section">
-          <div className="rv-wrap">
-            <Reveal>
-              <h2 className="rv-h2">Paper first. Live when you are ready.</h2>
-            </Reveal>
-            <Reveal className="rv-road" delay={80} rise>
-              {[
-                { tag: 'Now', now: true, t: 'Simulated accounts', items: ['7-step onboarding', '$100k paper trading', 'Terminal and Copilot'] },
-                { tag: 'Next', t: 'Read-only sync', items: ['Connect your exchange', 'Live balance sync', 'DeFi yield feed'] },
-                { tag: 'Then', t: 'One-click live', items: ['Approve and execute', 'Trailing stop-losses', 'Slippage protection'] },
-                { tag: 'Later', t: 'Autopilot', items: ['Drawdown rotation to stables', 'Stocks and ETFs', 'Specialised agents'] },
-              ].map((p) => (
-                <div key={p.t} className={`rv-phase ${p.now ? 'is-now' : ''}`}>
-                  <h3>
-                    {p.t}
-                    {p.now && <span className="rv-sr"> (available now)</span>}
-                  </h3>
-                  <ul>
-                    {p.items.map((it) => (
-                      <li key={it}>{it}</li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-            </Reveal>
+        {/* Roadmap: a calibration track that draws itself */}
+        <section className="rv-frame">
+          <div className="rv-case rv-panel">
+            <div className="rv-wrap">
+              <Reveal kind="wipe">
+                <h2 className="rv-h2">Paper first. Live when you are ready.</h2>
+              </Reveal>
+              <div ref={road.ref} className={`rv-road ${road.inView ? 'is-drawn' : ''}`}>
+                {ROAD.map((p, i) => (
+                  <div key={p.t} className={`rv-phase ${p.now ? 'is-now' : ''}`} style={{ ['--i' as string]: i }}>
+                    <span className="rv-phase-n" aria-hidden="true">
+                      {String(i + 1).padStart(2, '0')}
+                    </span>
+                    <h3>
+                      {p.t}
+                      {p.now && <span className="rv-sr"> (available now)</span>}
+                    </h3>
+                    <ul>
+                      {p.items.map((it) => (
+                        <li key={it}>{it}</li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </section>
 
-        <section id="faq" className="rv-section is-alt">
-          <div className="rv-wrap rv-split">
-            <Reveal>
+        {/* FAQ */}
+        <section id="faq" className="rv-section">
+          <div className="rv-wrap rv-split rv-split--faq">
+            <Reveal kind="wipe">
               <h2 className="rv-h2">Questions, answered plainly.</h2>
+              <p className="rv-lead">Anything else, ask Araiven in the Copilot once you have an account. It shows its working.</p>
             </Reveal>
             <Reveal delay={100}>
-              <div className="rv-faq">
+              <div className={`rv-faq ${faqView.inView ? 'is-in' : ''}`} ref={faqView.ref}>
                 {FAQ.map((f, i) => (
-                  <FaqItem
-                    key={f.q}
-                    q={f.q}
-                    a={f.a}
-                    open={openFaq === i}
-                    reduced={reduced}
-                    onToggle={() => setOpenFaq(openFaq === i ? null : i)}
-                  />
+                  <FaqItem key={f.q} q={f.q} a={f.a} open={openFaq === i} reduced={reduced} onToggle={() => setOpenFaq(openFaq === i ? null : i)} />
                 ))}
               </div>
             </Reveal>
           </div>
         </section>
 
-        <section className="rv-cta">
-          <div className="rv-wrap">
-            <Reveal>
-              <h2 className="rv-h2">Test your first plan with $100,000 of paper money.</h2>
-              <p className="rv-lead">No card, no exchange connection, no real risk. Set your stance and see what Araiven finds.</p>
-              <div className="rv-hero-actions">
-                <button className="rv-btn rv-btn-primary" onClick={() => navigate('/auth/register')}>
-                  Create free account <span className="rv-arrow"><ArrowRight size={18} strokeWidth={2} aria-hidden="true" /></span>
-                </button>
-                <button className="rv-btn rv-btn-ghost" onClick={() => navigate('/auth/login')}>
-                  Sign in
-                </button>
-              </div>
-            </Reveal>
+        {/* Close */}
+        <section className="rv-frame rv-frame--last">
+          <div className="rv-case rv-panel rv-cta">
+            <Dial className="rv-cta-dial" value={82} />
+            <div className="rv-wrap">
+              <Reveal kind="wipe">
+                <h2 className="rv-h2">Test your first plan with $100,000 of paper money.</h2>
+                <p className="rv-lead">No card, no exchange connection, no real risk. Set your stance and see what Araiven finds.</p>
+                <div className="rv-hero-actions">
+                  <button className="rv-btn rv-btn-primary" onClick={() => navigate('/auth/register')}>
+                    Create free account <Arrow />
+                  </button>
+                  <button className="rv-btn rv-btn-ghost" onClick={() => navigate('/auth/login')}>
+                    Sign in
+                  </button>
+                </div>
+              </Reveal>
+            </div>
           </div>
         </section>
       </main>
@@ -722,9 +839,9 @@ export const LandingPage: React.FC = () => {
             </div>
           </div>
           <p className="rv-risk-note">
-            © 2026 Ravora. Ravora provides analysis and trade-planning tools, not financial advice. Trading
-            cryptocurrency involves substantial risk of loss. Figures and charts on this page are illustrative
-            simulations, not live data or a guarantee of future results.
+            © 2026 Ravora. Ravora provides analysis and trade-planning tools, not financial advice. Trading cryptocurrency involves
+            substantial risk of loss. Figures and charts on this page are illustrative simulations, not live data or a guarantee of future
+            results.
           </p>
         </div>
       </footer>

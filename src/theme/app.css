@@ -21,3 +21,9 @@ body {
 [class*='mono'], .font-mono {
   font-family: var(--font-mono);
 }
+
+/* The toast region is a <section>; the legacy global `section { padding: 100px 0 }` gave it
+   a 200px footprint under every page. */
+section[aria-label^='Notifications'] {
+  padding: 0 !important;
+}

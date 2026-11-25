@@ -3,9 +3,8 @@ import { AnimatePresence, motion } from 'motion/react';
 import { usePrefersReducedMotion } from './hooks';
 
 /*
- * Tab strip adapted from Watermelon UI "Fluid Tabs": a single shared indicator
- * (motion layoutId) springs between tabs. Restyled flat in Amber, no gradient,
- * and the panel crossfades with AnimatePresence.
+ * Index list with a sticky showcase. The shared marker (motion layoutId) springs between
+ * entries, the pattern from Watermelon UI's Fluid Tabs, restyled as a flat paper row.
  */
 
 const TABS = [
@@ -224,61 +223,78 @@ export const PlatformTabs: React.FC = () => {
   const c = COPY[active];
 
   const onKey = (e: React.KeyboardEvent, i: number) => {
-    if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
-    const next = (i + (e.key === 'ArrowRight' ? 1 : TABS.length - 1)) % TABS.length;
+    if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
+    e.preventDefault();
+    const next = (i + (e.key === 'ArrowDown' ? 1 : TABS.length - 1)) % TABS.length;
     setActive(TABS[next].id);
-    (e.currentTarget.parentElement?.children[next] as HTMLElement | undefined)?.focus();
+    (e.currentTarget.parentElement?.parentElement?.children[next]?.firstElementChild as HTMLElement | undefined)?.focus();
   };
 
   return (
-    <>
-      <div className="rv-tabs" role="tablist" aria-label="Platform areas">
-        {TABS.map((t, i) => (
-          <button
-            key={t.id}
-            role="tab"
-            aria-selected={active === t.id}
-            tabIndex={active === t.id ? 0 : -1}
-            className="rv-tab"
-            onClick={() => setActive(t.id)}
-            onKeyDown={(e) => onKey(e, i)}
-          >
-            {active === t.id && (
-              <motion.span
-                layoutId="rv-tab-pill"
-                className="rv-tab-pill"
-                transition={reduced ? { duration: 0 } : { type: 'spring', stiffness: 320, damping: 30, mass: 0.8 }}
-              />
-            )}
-            <span>{t.label}</span>
-          </button>
-        ))}
-      </div>
+    <div className="rv-index">
+      <ul className="rv-index-list" role="tablist" aria-orientation="vertical" aria-label="Platform areas">
+        {TABS.map((t, i) => {
+          const on = active === t.id;
+          const item = COPY[t.id];
+          return (
+            <li key={t.id}>
+              <button
+                role="tab"
+                aria-selected={on}
+                tabIndex={on ? 0 : -1}
+                className={`rv-index-item ${on ? 'is-active' : ''}`}
+                onClick={() => setActive(t.id)}
+                onKeyDown={(e) => onKey(e, i)}
+              >
+                {on && (
+                  <motion.span
+                    layoutId="rv-index-mark"
+                    className="rv-index-mark"
+                    transition={reduced ? { duration: 0 } : { type: 'spring', stiffness: 300, damping: 32, mass: 0.9 }}
+                  />
+                )}
+                <span className="rv-index-label">{t.label}</span>
+                <AnimatePresence initial={false}>
+                  {on && (
+                    <motion.span
+                      className="rv-index-body"
+                      initial={reduced ? false : { height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={reduced ? { opacity: 0 } : { height: 0, opacity: 0 }}
+                      transition={{ duration: reduced ? 0 : 0.4, ease: [0.22, 0.61, 0.36, 1] }}
+                    >
+                      <span className="rv-index-h">{item.h}</span>
+                      <span className="rv-index-p">{item.p}</span>
+                      <span className="rv-index-ul">
+                        {item.items.map((it) => (
+                          <span key={it}>{it}</span>
+                        ))}
+                      </span>
+                    </motion.span>
+                  )}
+                </AnimatePresence>
+              </button>
+            </li>
+          );
+        })}
+      </ul>
 
-      <AnimatePresence mode="wait" initial={false}>
-        <motion.div
-          key={active}
-          role="tabpanel"
-          className="rv-pane"
-          initial={reduced ? false : { opacity: 0, y: 14 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={reduced ? { opacity: 0 } : { opacity: 0, y: -8 }}
-          transition={{ duration: reduced ? 0 : 0.35, ease: [0.16, 1, 0.3, 1] }}
-        >
-          <div>
-            <h3>{c.h}</h3>
-            <p>{c.p}</p>
-            <ul>
-              {c.items.map((it) => (
-                <li key={it}>{it}</li>
-              ))}
-            </ul>
-          </div>
-          {c.mock}
-          <p className="rv-pane-note">Illustrative data for demonstration. Not live market data.</p>
-        </motion.div>
-      </AnimatePresence>
-    </>
+      <div className="rv-case rv-showcase">
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div
+            key={active}
+            role="tabpanel"
+            initial={reduced ? false : { opacity: 0, y: 16, scale: 0.985 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={reduced ? { opacity: 0 } : { opacity: 0, y: -10 }}
+            transition={{ duration: reduced ? 0 : 0.4, ease: [0.22, 0.61, 0.36, 1] }}
+          >
+            {c.mock}
+            <p className="rv-pane-note">Illustrative data for demonstration. Not live market data.</p>
+          </motion.div>
+        </AnimatePresence>
+      </div>
+    </div>
   );
 };
 
