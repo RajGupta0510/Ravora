@@ -106,12 +106,12 @@ export const OnboardingWizard: React.FC = () => {
       left: 0,
       width: '100vw',
       height: '100vh',
-      background: '#0b0e14',
+      background: '#eef1f5',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
       zIndex: 999,
-      color: '#f8fafc',
+      color: '#0b0e14',
       fontFamily: 'var(--font-body)',
       padding: 'clamp(12px, 3vw, 24px)',
       boxSizing: 'border-box',
@@ -122,10 +122,10 @@ export const OnboardingWizard: React.FC = () => {
         width: '100%',
         maxWidth: step === 1 ? '480px' : (step === 7 ? '640px' : '580px'),
         padding: 'clamp(20px, 4vw, 36px)',
-        background: '#151a26',
-        border: '1px solid var(--border)',
-        borderRadius: '12px',
-        boxShadow: 'var(--shadow-overlay)',
+        background: '#10141d',
+        border: '0',
+        borderRadius: '32px',
+        boxShadow: '0 40px 80px -30px rgba(11, 14, 20, 0.5)',
         boxSizing: 'border-box',
         display: 'flex',
         flexDirection: 'column',
@@ -139,11 +139,11 @@ export const OnboardingWizard: React.FC = () => {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <Sparkles size={14} style={{ color: 'var(--color-ai-accent)' }} />
-                <span style={{ fontFamily: 'monospace', fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0', color: 'var(--text-secondary)' }}>
+                <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0', color: 'var(--text-secondary)' }}>
                   Tailoring Araiven Workspace
                 </span>
               </div>
-              <span style={{ fontFamily: 'monospace', fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'var(--text-muted)' }}>
                 Step {step} of 7
               </span>
             </div>

@@ -74,19 +74,19 @@ export const AppDashboard: React.FC = () => {
   }, [profile]);
 
   const getRiskStanceColor = useCallback(() => {
-    if (!profile) return '#10b981';
+    if (!profile) return '#047857';
     const stance = profile.risk_stance;
-    if (stance === 'conservative') return '#cbd5e1';
-    if (stance === 'aggressive') return '#f59e0b';
-    return '#10b981';
+    if (stance === 'conservative') return '#5a6578';
+    if (stance === 'aggressive') return '#b45309';
+    return '#047857';
   }, [profile]);
 
   return (
     <div style={{
       display: 'flex',
       minHeight: '100vh',
-      background: '#0b0e14',
-      color: '#f8fafc',
+      background: '#eef1f5',
+      color: '#0b0e14',
       fontFamily: 'var(--font-body)',
       overflowX: 'hidden'
     }}>
@@ -195,19 +195,19 @@ export const AppDashboard: React.FC = () => {
         {/* Header Bar */}
         <header className="app-header-bar" style={{
           minHeight: '60px',
-          borderBottom: 'var(--border-thickness) solid var(--color-border)',
+          borderBottom: '1px solid rgba(11, 14, 20, 0.12)',
           padding: '0 clamp(12px, 3vw, 24px)',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          background: '#10141d',
+          background: 'rgba(238, 241, 245, 0.94)',
           position: 'sticky',
           top: 0,
           zIndex: 90,
           gap: '12px'
         }}>
           <div>
-            <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(0.95rem, 3.5vw, 1.15rem)', fontWeight: 700, margin: 0, whiteSpace: 'nowrap' }}>
+            <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(1.05rem, 3.5vw, 1.4rem)', fontWeight: 650, letterSpacing: '-0.025em', color: '#0b0e14', margin: 0, whiteSpace: 'nowrap' }}>
               {activeTab === 'terminal' && 'Araiven Trading Terminal'}
               {activeTab === 'portfolio' && 'Wealth Workspace'}
               {activeTab === 'markets' && 'Global Markets Matrix'}
@@ -220,9 +220,10 @@ export const AppDashboard: React.FC = () => {
           <div style={{ display: 'flex', alignItems: 'center', gap: 'clamp(8px, 2vw, 16px)' }}>
             {/* Active Risk Guard tag */}
             <div style={{
-              background: 'rgba(255,255,255,0.02)',
-              border: 'var(--border-thickness) solid var(--color-border)',
-              padding: '4px 10px',
+              background: '#f8fafc',
+              color: '#0b0e14',
+              border: '1px solid rgba(11, 14, 20, 0.2)',
+              padding: '5px 12px',
               borderRadius: 'var(--radius-pill)',
               fontSize: '0.72rem',
               fontWeight: 600,
@@ -243,7 +244,7 @@ export const AppDashboard: React.FC = () => {
               style={{
                 background: 'none',
                 border: 'none',
-                color: showNotifications ? '#fff' : 'var(--text-secondary)',
+                color: showNotifications ? '#0b0e14' : '#394456',
                 cursor: 'pointer',
                 position: 'relative',
                 display: 'flex',
@@ -275,7 +276,7 @@ export const AppDashboard: React.FC = () => {
               style={{
                 background: 'none',
                 border: 'none',
-                color: 'var(--text-muted)',
+                color: '#5a6578',
                 cursor: 'pointer',
                 display: 'none',
                 alignItems: 'center',
@@ -290,43 +291,49 @@ export const AppDashboard: React.FC = () => {
         {/* Recommendation Directive Banner */}
         {recommendations.length > 0 && (
           <div style={{
-            background: 'rgba(245, 158, 11, 0.08)',
-            borderBottom: 'var(--border-thickness) solid rgba(245, 158, 11, 0.25)',
-            padding: '10px clamp(12px, 3vw, 24px)',
+            background: '#f59e0b',
+            color: '#0b0e14',
+            margin: '14px clamp(12px, 3vw, 24px) 0',
+            borderRadius: '20px',
+            padding: '12px 18px',
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            fontSize: '0.8rem',
+            fontSize: '0.88rem',
             animation: 'fadeIn var(--motion-duration-slow) var(--motion-ease-out)',
             flexWrap: 'wrap',
             gap: '8px'
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: '1 1 240px' }}>
-              <Sparkles size={14} style={{ color: '#f59e0b', flexShrink: 0 }} />
-              <span style={{ lineHeight: 1.35, color: '#f8fafc' }}>
-                <strong style={{ color: '#fbbf24' }}>Araiven Directive:</strong> Optimization plan drafted. Rebalance USDC reserves into market vectors.
+              <Sparkles size={15} style={{ color: '#0b0e14', flexShrink: 0 }} />
+              <span style={{ lineHeight: 1.35 }}>
+                <strong>Araiven directive:</strong> Optimization plan drafted. Rebalance USDC reserves into market vectors.
               </span>
             </div>
-            <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-              <button 
+            <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+              <button
                 onClick={() => setActiveTab('opportunities')}
-                style={{ background: 'none', border: 'none', color: '#fbbf24', textDecoration: 'underline', cursor: 'pointer', fontWeight: 600, fontSize: '0.72rem' }}
+                style={{ background: 'none', border: 'none', color: '#0b0e14', textDecoration: 'underline', cursor: 'pointer', fontWeight: 650, fontSize: '0.88rem' }}
               >
-                Inspect Plan
+                Inspect plan
               </button>
-              <button 
+              <button
                 onClick={() => handleExecuteRec(recommendations[0].id)}
                 disabled={executingRecId !== null}
-                className="btn btn-primary"
+                className="btn"
                 style={{
-                  height: '28px',
-                  padding: '0 12px',
-                  borderRadius: 'var(--radius-sm)',
-                  fontSize: '0.72rem',
-                  fontWeight: 700
+                  height: '34px',
+                  padding: '0 14px',
+                  borderRadius: '10px',
+                  fontSize: '0.88rem',
+                  fontWeight: 700,
+                  background: '#0b0e14',
+                  color: '#fbbf24',
+                  border: 'none',
+                  cursor: 'pointer'
                 }}
               >
-                {executingRecId === recommendations[0].id ? 'Deploying...' : '1-Click Execute'}
+                {executingRecId === recommendations[0].id ? 'Deploying...' : '1-Click execute'}
               </button>
             </div>
           </div>

@@ -27,3 +27,76 @@ body {
 section[aria-label^='Notifications'] {
   padding: 0 !important;
 }
+
+
+/* ==========================================================================
+   Dashboard in the chronometer world: Stone paper ground, a floating Gunmetal rail,
+   and Gunmetal case panels holding the work. Paper-side text variables are dark;
+   inside a case they flip back to the light values the panels were written for.
+   ========================================================================== */
+body:has(.app-main-window) { background-color: #eef1f5; }
+
+.app-main-window {
+  --text-primary: #0b0e14;
+  --text-secondary: #394456;
+  --text-muted: #5a6578;
+  --border: rgba(11, 14, 20, 0.15);
+  --border-default: rgba(11, 14, 20, 0.15);
+  --color-border: rgba(11, 14, 20, 0.15);
+  color: #0b0e14;
+  background: transparent !important;
+}
+.app-main-window .card-glass,
+.app-main-window .filter-segmented,
+.app-main-window .rd-case,
+.app-main-window [role='dialog'],
+.app-main-window [style*='position: fixed'] {
+  --text-primary: #f8fafc;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
+  --border: rgba(203, 213, 225, 0.14);
+  --border-default: rgba(203, 213, 225, 0.14);
+  --color-border: rgba(203, 213, 225, 0.14);
+  color: #f8fafc;
+}
+.app-main-window main .card-glass {
+  background: #10141d !important;
+  border-color: rgba(203, 213, 225, 0.1) !important;
+  border-radius: 28px !important;
+}
+
+/* floating rail */
+.app-sidebar {
+  left: 12px !important;
+  top: 12px !important;
+  bottom: 12px !important;
+  height: auto !important;
+  border-radius: 28px !important;
+  background: #10141d !important;
+  border: 0 !important;
+  overflow: hidden !important;
+}
+.app-sidebar .menu-tab-btn { border-left: 0 !important; border-radius: 14px !important; }
+.app-sidebar .menu-tab-btn.active {
+  background: #1b2232 !important;
+  box-shadow: inset 0 0 0 1px rgba(245, 158, 11, 0.5) !important;
+  color: #f8fafc !important;
+}
+.app-sidebar .menu-tab-btn:hover { background: rgba(203, 213, 225, 0.07) !important; }
+@media (min-width: 769px) {
+  .app-main-window { margin-left: 100px !important; width: calc(100% - 100px) !important; }
+}
+#mobile-bottom-nav {
+  background: #10141d !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border-top: 0 !important;
+  border-radius: 24px 24px 0 0;
+}
+
+/* themed scrollbar on paper */
+html:has(.app-main-window) { scrollbar-color: #5a6578 #eef1f5; scrollbar-width: thin; }
+html:has(.app-main-window)::-webkit-scrollbar { width: 11px; }
+html:has(.app-main-window)::-webkit-scrollbar-track { background: #eef1f5; }
+html:has(.app-main-window)::-webkit-scrollbar-thumb { background: rgba(11, 14, 20, 0.32); border-radius: 8px; border: 2px solid #eef1f5; }
+html:has(.app-main-window)::-webkit-scrollbar-thumb:hover { background: #b45309; }

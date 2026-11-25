@@ -109,7 +109,7 @@ export const SettingsPanel: React.FC = () => {
         <div className="card-glass" style={{ padding: 'clamp(16px, 2.5vw, 24px)', borderRadius: '12px', border: '1px solid var(--border)', background: '#151a26', display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <h3 style={{ fontSize: '0.88rem', fontWeight: 700, margin: 0, display: 'flex', alignItems: 'center', gap: '8px', color: '#f8fafc' }}>
             <Shield size={16} style={{ color: '#f59e0b', flexShrink: 0 }} />
-            SAFETY & NOTIFICATION CONTEXT
+            Safety and notification context
           </h3>
 
           {/* Auto Hedge */}
