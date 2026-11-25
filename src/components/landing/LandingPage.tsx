@@ -1,29 +1,32 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Menu, X } from 'lucide-react';
+import { AnimatePresence, motion } from 'motion/react';
+import { ArrowRight, Check, Menu, X } from 'lucide-react';
 import HeroTerminal from './HeroTerminal';
-import { useCountUp, useInView } from './hooks';
+import AskAraiven from './AskAraiven';
+import PlatformTabs from './PlatformTabs';
+import { useCountUp, useInView, usePrefersReducedMotion } from './hooks';
 import './landing.css';
 
 /* ------------------------------------------------------------------ */
-/* Small building blocks                                               */
+/* Helpers                                                             */
 /* ------------------------------------------------------------------ */
 
-const Reveal: React.FC<{
-  children: React.ReactNode;
-  delay?: number;
-  className?: string;
-  as?: 'div' | 'li' | 'section';
-}> = ({ children, delay = 0, className = '', as: Tag = 'div' }) => {
-  const { ref, inView } = useInView<HTMLDivElement>(0.15);
+const Reveal: React.FC<{ children: React.ReactNode; delay?: number; className?: string; rise?: boolean }> = ({
+  children,
+  delay = 0,
+  className = '',
+  rise = false,
+}) => {
+  const { ref, inView } = useInView<HTMLDivElement>(0.12);
   return (
-    <Tag
-      ref={ref as React.RefObject<never>}
-      className={`rv-reveal ${inView ? 'is-in rv-in' : ''} ${className}`}
+    <div
+      ref={ref}
+      className={`rv-reveal ${rise ? 'is-rise' : ''} ${inView ? 'is-in' : ''} ${className}`}
       style={{ ['--rv-delay' as string]: `${delay}ms` }}
     >
       {children}
-    </Tag>
+    </div>
   );
 };
 
@@ -64,7 +67,7 @@ const RISK: RiskProfile[] = [
     area: 'M 6 78 Q 60 74 120 58 T 234 40 L 234 110 L 6 110 Z',
     tipY: 40,
     safety: '98',
-    riskIndex: '18 / 100',
+    riskIndex: '18',
     alloc: [
       { label: 'ETH staking', pct: 25 },
       { label: 'Stable yield', pct: 55 },
@@ -75,14 +78,14 @@ const RISK: RiskProfile[] = [
   {
     label: 'Balanced',
     cap: '3.5',
-    desc: 'Blue-chip exposure with stable lending income. Moves only when confidence, structure and risk all agree.',
+    desc: 'Blue-chip exposure with stable lending income. Araiven moves only when confidence, structure and risk all agree.',
     balance: '$132,194.10',
     gain: '+12.0%',
     line: 'M 6 84 Q 50 50 120 62 T 234 26',
     area: 'M 6 84 Q 50 50 120 62 T 234 26 L 234 110 L 6 110 Z',
     tipY: 26,
     safety: '96',
-    riskIndex: '42 / 100',
+    riskIndex: '42',
     alloc: [
       { label: 'ETH staking', pct: 45 },
       { label: 'Stable yield', pct: 30 },
@@ -100,7 +103,7 @@ const RISK: RiskProfile[] = [
     area: 'M 6 92 Q 40 20 112 70 T 234 12 L 234 110 L 6 110 Z',
     tipY: 12,
     safety: '91',
-    riskIndex: '78 / 100',
+    riskIndex: '78',
     alloc: [
       { label: 'ETH staking', pct: 55 },
       { label: 'Stable yield', pct: 10 },
@@ -110,13 +113,22 @@ const RISK: RiskProfile[] = [
   },
 ];
 
-const PIPELINE = [
+const GATES = [
   { t: 'Ingest', d: 'Prices, orderbook depth, volume and news sentiment from every supported market.' },
   { t: 'Read the structure', d: 'Trend, momentum, volatility and support and resistance, computed with fixed rules.' },
   { t: 'Score', d: 'Every setup gets a transparent confidence score. No score is shown without a calculation behind it.' },
   { t: 'Check the risk', d: 'Leverage limits and your drawdown cap can veto a setup before you ever see it.' },
   { t: 'Plan the trade', d: 'Entry, stop and target come from market structure, not round-number guesses.' },
   { t: 'Explain it', d: 'The plan arrives with a plain-English reason, and one click to approve or reject.' },
+];
+
+const VERDICT = [
+  'Waiting for market data…',
+  'Reading the market structure…',
+  'Scoring the setup…',
+  'Within your 3.5% drawdown cap. No veto.',
+  'Trade plan drafted: entry, stop, target.',
+  'Passed the 75% filter. Shown to you with its reason.',
 ];
 
 const FAQ = [
@@ -138,24 +150,32 @@ const FAQ = [
   },
   {
     q: 'Is this financial advice?',
-    a: 'No. Ravora provides analysis and trade planning tools. Trading crypto involves substantial risk of loss. Past or simulated results do not guarantee future performance, and every trade is your decision.',
+    a: 'No. Ravora provides analysis and trade-planning tools. Trading crypto involves substantial risk of loss. Past or simulated results do not guarantee future performance, and every trade is your decision.',
   },
 ];
 
 const MARKETS = ['BTC', 'ETH', 'SOL', 'BNB', 'XRP', 'ADA', 'AVAX', 'USDC'];
 const VENUES = ['Binance', 'Bybit', 'Coinbase', 'Kraken', 'OKX'];
 
+const SIM = [
+  { label: 'Intercept the announcement', detail: 'CPI prints +3.4% against +3.1% expected. Volatility is rising.' },
+  { label: 'Read DeFi liquidity', detail: 'Depth check complete. Spreads are widening on Aave and Uniswap pools.' },
+  { label: 'Recalculate the cushion', detail: 'Volatility limit exceeded. Safety cushion target tightened to 98%.' },
+  { label: 'Optimise the hedge', detail: 'Hedge triggered. Volatile L1 exposure moved toward USDC yield.' },
+  { label: 'Push the recommendation', detail: 'Rotate 15% of volatile assets into hedged stable pools. Ready for your review.' },
+];
+
 /* ------------------------------------------------------------------ */
 /* Sections                                                            */
 /* ------------------------------------------------------------------ */
 
-const PipelineSection: React.FC = () => {
-  const [lit, setLit] = useState<boolean[]>(() => PIPELINE.map(() => false));
+const GatesSection: React.FC = () => {
+  const [lit, setLit] = useState<boolean[]>(() => GATES.map(() => false));
   const refs = useRef<(HTMLLIElement | null)[]>([]);
 
   useEffect(() => {
     if (typeof IntersectionObserver === 'undefined') {
-      setLit(PIPELINE.map(() => true));
+      setLit(GATES.map(() => true));
       return;
     }
     const io = new IntersectionObserver(
@@ -167,55 +187,64 @@ const PipelineSection: React.FC = () => {
           }
         });
       },
-      { rootMargin: '0px 0px -38% 0px', threshold: 0.2 }
+      { rootMargin: '0px 0px -40% 0px', threshold: 0.2 }
     );
     refs.current.forEach((el) => el && io.observe(el));
     return () => io.disconnect();
   }, []);
 
-  const litCount = lit.filter(Boolean).length;
-  const fill = litCount <= 1 ? 0 : ((litCount - 1) / (PIPELINE.length - 1)) * 100;
+  const count = lit.filter(Boolean).length;
+  const total = useCountUp(82, count >= 3, 1000);
+  const rows: [string, string, string][] = [
+    ['Macro confluence', '0.88', 'x 0.4'],
+    ['Liquidity depth', '0.80', 'x 0.4'],
+    ['Sentiment inflow', '0.74', 'x 0.2'],
+  ];
 
   return (
     <section id="how" className="rv-section is-alt">
       <div className="rv-wrap rv-split">
         <div className="rv-sticky">
           <Reveal>
-            <span className="rv-kicker">How Araiven decides</span>
-            <h2 className="rv-h2">Six checks before any trade reaches you.</h2>
+            <h2 className="rv-h2">Six gates before any trade reaches you.</h2>
             <p className="rv-lead">
               Araiven is a rules-based engine, not a text generator. The same inputs always give the same score, and
-              every step can be traced.
+              you can read the working.
             </p>
           </Reveal>
-          <Reveal delay={120}>
-            <div className="rv-formula">
-              <div className="rv-formula-label">Confidence score</div>
-              <div className="rv-formula-eq">
-                <b>C<sub>s</sub></b> = 0.4 · Macro + 0.4 · Liquidity + 0.2 · Sentiment
+          <Reveal delay={100} rise>
+            <div className="rv-receipt" aria-label="Example confidence score receipt for the BTC plan">
+              <div className="rv-receipt-title">Receipt for the BTC plan</div>
+              {rows.map(([l, v, w], i) => (
+                <div key={l} className={`rv-receipt-row ${count >= i + 1 ? 'is-on' : ''}`}>
+                  <span>{l}</span>
+                  <span className="w">{w}</span>
+                  <span className="rv-data">{v}</span>
+                </div>
+              ))}
+              <div className="rv-receipt-total">
+                <span>Confidence score</span>
+                <b className={`rv-data ${count >= 3 ? 'is-pass' : ''}`}>{count >= 3 ? total : '--'}%</b>
               </div>
-              <p className="rv-formula-note">
-                Setups scoring below 75% are filtered out and never shown. Weights adjust with market volatility.
-              </p>
+              <p className={`rv-receipt-verdict ${count >= 6 ? 'is-pass' : ''}`}>{VERDICT[Math.min(count, 5)]}</p>
             </div>
           </Reveal>
         </div>
 
-        <ol className="rv-steps" style={{ position: 'relative' }}>
-          <span className="rv-steps-fill" style={{ height: `calc(${fill}% - 8px)` }} aria-hidden="true" />
-          {PIPELINE.map((s, i) => (
+        <ol className="rv-gates">
+          {GATES.map((g, i) => (
             <li
-              key={s.t}
+              key={g.t}
               data-i={i}
               ref={(el) => {
                 refs.current[i] = el;
               }}
-              className={`rv-step ${lit[i] ? 'is-lit' : ''}`}
+              className={`rv-gate ${lit[i] ? 'is-lit' : ''}`}
             >
-              <span className="rv-step-dot">{i + 1}</span>
+              <span className="rv-gate-n">{String(i + 1).padStart(2, '0')}</span>
               <div>
-                <h3>{s.t}</h3>
-                <p>{s.d}</p>
+                <h3>{g.t}</h3>
+                <p>{g.d}</p>
               </div>
             </li>
           ))}
@@ -225,122 +254,70 @@ const PipelineSection: React.FC = () => {
   );
 };
 
-const Bento: React.FC = () => {
-  const safety = useInView<HTMLDivElement>(0.4);
-  const safetyNum = useCountUp(96, safety.inView, 1200);
-  const paper = useInView<HTMLDivElement>(0.4);
-  const paperNum = useCountUp(100000, paper.inView, 1300);
-
-  const asks = [
-    ['64,168', '0.42', '34%'],
-    ['64,152', '0.88', '58%'],
-    ['64,131', '1.21', '82%'],
-  ];
-  const bids = [
-    ['64,108', '1.64', '88%'],
-    ['64,090', '0.97', '61%'],
-    ['64,071', '0.51', '38%'],
-  ];
-
+const RiskSection: React.FC = () => {
+  const [sel, setSel] = useState(1);
+  const r = RISK[sel];
   return (
-    <section id="features" className="rv-section">
+    <section id="risk" className="rv-section rv-risk">
       <div className="rv-wrap">
         <Reveal>
-          <span className="rv-kicker">The platform</span>
-          <h2 className="rv-h2">One workspace, from signal to execution.</h2>
+          <h2 className="rv-h2">Set your limit. Araiven works inside it.</h2>
           <p className="rv-lead">
-            Everything you need to find a trade, size it safely and understand it, without juggling six tabs.
+            Pick a stance and watch the drawdown cap, allocation and projected curve change. Figures are illustrative.
           </p>
         </Reveal>
 
-        <div className="rv-bento">
-          <Reveal className="rv-tile s-4" delay={0}>
-            <div>
-              <h3>Trading terminal</h3>
-              <p>
-                Candlestick charts with Araiven's support, entry, stop and target drawn on top. Switch timeframes from
-                1m to 1D and place a trade in one click.
-              </p>
-            </div>
-            <div className="rv-tile-viz rv-book" aria-hidden="true">
-              {asks.map(([p, s, w], i) => (
-                <div key={p} className="rv-book-row ask" style={{ ['--w' as string]: w, ['--d' as string]: `${i * 90}ms` }}>
-                  <i />
-                  <span>{p}</span>
-                  <span>{s}</span>
-                </div>
-              ))}
-              <div className="rv-book-mid">64,120.00</div>
-              {bids.map(([p, s, w], i) => (
-                <div key={p} className="rv-book-row bid" style={{ ['--w' as string]: w, ['--d' as string]: `${(i + 3) * 90}ms` }}>
-                  <i />
-                  <span>{p}</span>
-                  <span>{s}</span>
-                </div>
+        <div className="rv-risk-grid">
+          <Reveal rise>
+            <div className="rv-seg" role="group" aria-label="Risk stance">
+              {RISK.map((p, i) => (
+                <button key={p.label} aria-pressed={sel === i} onClick={() => setSel(i)}>
+                  {p.label}
+                </button>
               ))}
             </div>
+            <div className="rv-cap-num" aria-live="polite">
+              {r.cap}
+              <span>%</span>
+            </div>
+            <div className="rv-cap-label">Maximum 24h drawdown</div>
+            <p className="rv-cap-desc">{r.desc}</p>
           </Reveal>
 
-          <Reveal className="rv-tile s-2" delay={80}>
-            <div>
-              <h3>Opportunities</h3>
-              <p>Ranked by confidence, filtered by your stance.</p>
-            </div>
-            <div className="rv-tile-viz rv-opps" aria-hidden="true">
-              {[
-                ['Bitcoin ETF inflow', 'Momentum', '94'],
-                ['Stablecoin hedge', 'Yield spread', '91'],
-                ['Ethereum staking', 'Yield premium', '89'],
-              ].map(([n, t, s]) => (
-                <div key={n} className="rv-opp">
-                  <b>{n}</b>
-                  <small>{t}</small>
-                  <span className="rv-opp-score">{s}</span>
+          <Reveal delay={100} rise>
+            <div className="rv-equity">
+              <div className="rv-equity-head">
+                <div className="rv-equity-bal">{r.balance}</div>
+                <div className="rv-equity-gain">{r.gain} illustrative</div>
+              </div>
+              <div className="rv-equity-plot">
+                <svg className="rv-equity-svg" viewBox="0 0 234 110" preserveAspectRatio="none" aria-hidden="true">
+                  <path className="area" d={r.area} />
+                  <path className="line" d={r.line} vectorEffect="non-scaling-stroke" />
+                </svg>
+                <span className="rv-equity-dot" style={{ top: `${(r.tipY / 110) * 100}%` }} aria-hidden="true" />
+              </div>
+              <div className="rv-alloc">
+                {r.alloc.map((a) => (
+                  <div key={a.label} className="rv-alloc-row">
+                    <span>{a.label}</span>
+                    <div className="rv-alloc-bar">
+                      <i style={{ width: `${a.pct}%` }} />
+                    </div>
+                    <span>{a.pct}%</span>
+                  </div>
+                ))}
+              </div>
+              <dl className="rv-risk-rows">
+                <div>
+                  <dt>Safety score</dt>
+                  <dd>{r.safety}</dd>
                 </div>
-              ))}
-            </div>
-          </Reveal>
-
-          <Reveal className="rv-tile s-2" delay={0}>
-            <div>
-              <h3>Safety score</h3>
-              <p>A 0 to 100 read on how much room your portfolio has before your drawdown cap.</p>
-            </div>
-            <div className="rv-tile-viz" ref={safety.ref} aria-hidden="true">
-              <div className="rv-gauge">
-                <span className="rv-gauge-num">{safetyNum}</span>
-                <span className="rv-gauge-meta">Safe</span>
-              </div>
-              <div className="rv-meter">
-                <i style={{ ['--w' as string]: '96%' }} />
-              </div>
-            </div>
-          </Reveal>
-
-          <Reveal className="rv-tile s-2" delay={80}>
-            <div>
-              <h3>Araiven Copilot</h3>
-              <p>Ask why. Get the evidence.</p>
-            </div>
-            <div className="rv-tile-viz rv-chat" aria-hidden="true">
-              <div className="rv-bubble you">Why not buy SOL right now?</div>
-              <div className="rv-bubble ai">
-                Confidence is <b>71%</b>, below the 75% filter. Volume is not confirming the breakout yet.
-              </div>
-            </div>
-          </Reveal>
-
-          <Reveal className="rv-tile s-2" delay={160}>
-            <div>
-              <h3>Paper trading</h3>
-              <p>Practise with real prices and no real money.</p>
-            </div>
-            <div className="rv-tile-viz" ref={paper.ref} aria-hidden="true">
-              <div className="rv-paper-num">${paperNum.toLocaleString('en-US')}</div>
-              <div className="rv-paper-row">
-                <span>BTC long · 0.5</span>
-                <span className="pos">+2.8%</span>
-              </div>
+                <div>
+                  <dt>Risk index</dt>
+                  <dd>{r.riskIndex}</dd>
+                </div>
+              </dl>
             </div>
           </Reveal>
         </div>
@@ -349,98 +326,7 @@ const Bento: React.FC = () => {
   );
 };
 
-const RiskSection: React.FC = () => {
-  const [sel, setSel] = useState(1);
-  const r = RISK[sel];
-  return (
-    <section id="risk" className="rv-section is-alt">
-      <div className="rv-wrap">
-        <Reveal>
-          <span className="rv-kicker">Risk guard</span>
-          <h2 className="rv-h2">Set your limit. Araiven works inside it.</h2>
-          <p className="rv-lead">
-            Pick a stance and see how the drawdown cap, allocation and projected curve change. These are illustrative
-            figures.
-          </p>
-        </Reveal>
-
-        <Reveal className="rv-risk" delay={80}>
-          <div className="rv-panel">
-            <div className="rv-seg" role="group" aria-label="Risk stance">
-              {RISK.map((p, i) => (
-                <button key={p.label} aria-pressed={sel === i} onClick={() => setSel(i)}>
-                  {p.label}
-                </button>
-              ))}
-            </div>
-            <div className="rv-cap">
-              <div className="rv-cap-label">Max 24h drawdown</div>
-              <div className="rv-cap-num">
-                {r.cap}
-                <span>%</span>
-              </div>
-              <p className="rv-cap-desc">{r.desc}</p>
-            </div>
-            <dl className="rv-rows">
-              <div>
-                <dt>Safety score</dt>
-                <dd>{r.safety}%</dd>
-              </div>
-              <div>
-                <dt>Risk index</dt>
-                <dd>{r.riskIndex}</dd>
-              </div>
-            </dl>
-          </div>
-
-          <div className="rv-panel">
-            <div className="rv-equity-head">
-              <div>
-                <div className="rv-cap-label">Illustrative portfolio</div>
-                <div className="rv-equity-bal">{r.balance}</div>
-              </div>
-              <div className="rv-equity-gain">{r.gain}</div>
-            </div>
-            <svg className="rv-equity-svg" viewBox="0 0 240 110" preserveAspectRatio="none" aria-hidden="true">
-              <path className="area" d={r.area} />
-              <path className="line" d={r.line} vectorEffect="non-scaling-stroke" />
-              <circle cx="234" cy={r.tipY} r="3.5" />
-            </svg>
-            <div className="rv-alloc">
-              {r.alloc.map((a) => (
-                <div key={a.label} className="rv-alloc-row">
-                  <span>{a.label}</span>
-                  <div className="rv-alloc-bar">
-                    <i style={{ width: `${a.pct}%` }} />
-                  </div>
-                  <span>{a.pct}%</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </Reveal>
-      </div>
-    </section>
-  );
-};
-
-const SIM_STEPS = [
-  'Intercept the rate announcement',
-  'Analyse DeFi liquidity depth',
-  'Recalculate the drawdown cushion',
-  'Optimise target yield swaps',
-  'Push the rebalance recommendation',
-];
-const SIM_LOG = [
-  'Standby. Run the scenario to watch Araiven respond to a macro event.',
-  '[Macro] CPI prints +3.4% against +3.1% expected. Volatility is rising.',
-  '[Liquidity] Depth check complete. Spreads are widening on Aave and Uniswap pools.',
-  '[Risk] Volatility limit exceeded. Tightening the safety cushion target to 98%.',
-  '[Yield] Hedge triggered. Moving volatile L1 exposure toward USDC yield.',
-  '[Advisory] Rotate 15% of volatile assets into hedged stable pools. Ready for your review.',
-];
-
-const SimulatorSection: React.FC = () => {
+const EventTape: React.FC = () => {
   const [step, setStep] = useState(0);
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -462,7 +348,7 @@ const SimulatorSection: React.FC = () => {
         clearInterval(timer.current);
         timer.current = null;
       }
-    }, 1500);
+    }, 1400);
   };
 
   const running = step > 0 && step < 5;
@@ -471,49 +357,66 @@ const SimulatorSection: React.FC = () => {
   return (
     <section className="rv-section">
       <div className="rv-wrap">
-        <Reveal>
-          <span className="rv-kicker">Try it</span>
-          <h2 className="rv-h2">Watch Araiven react to a Fed surprise.</h2>
-          <p className="rv-lead">
-            A short simulation of how a macro event flows through the engine and ends in a recommendation you can
-            approve or reject.
-          </p>
-        </Reveal>
-
-        <Reveal className="rv-sim" delay={80}>
-          <div className="rv-panel">
-            <div className="rv-cap-label">Engine log</div>
-            <div className={`rv-log ${done ? 'is-done' : step > 0 ? 'is-run' : ''}`} aria-live="polite">
-              {SIM_LOG[step]}
-            </div>
-            <button
-              className="rv-btn rv-btn-primary"
-              style={{ marginTop: 18, width: '100%' }}
-              onClick={run}
-              disabled={running}
-            >
+        <div className="rv-sim-head">
+          <Reveal>
+            <h2 className="rv-h2">Watch Araiven react to a Fed surprise.</h2>
+            <p className="rv-lead">
+              A macro event enters the engine and leaves as a recommendation you can approve or reject.
+            </p>
+          </Reveal>
+          <Reveal delay={100}>
+            <button className="rv-btn rv-btn-primary" onClick={run} disabled={running}>
               {running ? 'Analysing…' : done ? 'Run it again' : 'Simulate CPI announcement'}
             </button>
-          </div>
-          <div className="rv-panel">
-            <ul className="rv-sim-list">
-              {SIM_STEPS.map((label, i) => {
-                const n = i + 1;
-                const cls = step > n || (done && n === 5) ? 'is-done' : step === n ? 'is-now' : '';
-                return (
-                  <li key={label} className={cls}>
-                    <span className="rv-sim-tick">{cls === 'is-done' ? '✓' : n}</span>
-                    <span>{label}</span>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-        </Reveal>
+          </Reveal>
+        </div>
+
+        <ol className="rv-events" aria-live="polite">
+          {SIM.map((s, i) => {
+            const n = i + 1;
+            const state = step > n || (done && n === 5) ? 'is-done' : step === n ? 'is-now' : '';
+            return (
+              <li key={s.label} className={`rv-event ${state}`}>
+                <span className="t">T+{(i * 1.4).toFixed(1)}s</span>
+                <span className="label">{s.label}</span>
+                <span className="detail">{step >= n ? <span key={`${step >= n}`}>{s.detail}</span> : ''}</span>
+                <span className="tick">{state === 'is-done' ? <Check size={14} strokeWidth={2.5} aria-hidden="true" /> : null}</span>
+              </li>
+            );
+          })}
+        </ol>
       </div>
     </section>
   );
 };
+
+const FaqItem: React.FC<{ q: string; a: string; open: boolean; onToggle: () => void; reduced: boolean }> = ({
+  q,
+  a,
+  open,
+  onToggle,
+  reduced,
+}) => (
+  <div className="rv-faq-item">
+    <button className="rv-faq-q" aria-expanded={open} onClick={onToggle}>
+      <span>{q}</span>
+      <span className="plus" aria-hidden="true" />
+    </button>
+    <AnimatePresence initial={false}>
+      {open && (
+        <motion.div
+          className="rv-faq-a"
+          initial={reduced ? false : { height: 0, opacity: 0 }}
+          animate={{ height: 'auto', opacity: 1 }}
+          exit={reduced ? { opacity: 0 } : { height: 0, opacity: 0 }}
+          transition={{ duration: reduced ? 0 : 0.4, ease: [0.16, 1, 0.3, 1] }}
+        >
+          <p>{a}</p>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  </div>
+);
 
 /* ------------------------------------------------------------------ */
 /* Page                                                                */
@@ -521,9 +424,11 @@ const SimulatorSection: React.FC = () => {
 
 export const LandingPage: React.FC = () => {
   const navigate = useNavigate();
+  const reduced = usePrefersReducedMotion();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [active, setActive] = useState('');
+  const [openFaq, setOpenFaq] = useState<number | null>(0);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -538,7 +443,6 @@ export const LandingPage: React.FC = () => {
     return () => window.removeEventListener('resize', onResize);
   }, []);
 
-  // Highlight the nav link for the section in view.
   useEffect(() => {
     if (typeof IntersectionObserver === 'undefined') return;
     const io = new IntersectionObserver(
@@ -552,17 +456,16 @@ export const LandingPage: React.FC = () => {
     return () => io.disconnect();
   }, []);
 
-  const marketGroup = (key: string) => (
+  const coverage = (key: string) => (
     <div className="rv-marquee-group" key={key} aria-hidden={key !== 'a'}>
       {MARKETS.map((m) => (
         <span key={m} className="rv-marquee-item">
           {m}
-          <small>scanned 24/7</small>
         </span>
       ))}
       {VENUES.map((v) => (
-        <span key={v} className="rv-marquee-item">
-          <small style={{ fontSize: '0.9rem', color: 'var(--rv-text-2)' }}>{v}</small>
+        <span key={v} className="rv-marquee-item is-venue">
+          {v}
         </span>
       ))}
     </div>
@@ -570,7 +473,6 @@ export const LandingPage: React.FC = () => {
 
   return (
     <div className="rv">
-      {/* Navigation */}
       <header className={`rv-nav ${scrolled || menuOpen ? 'is-scrolled' : ''}`}>
         <div className="rv-wrap rv-nav-inner">
           <a href="#top" className="rv-logo" aria-label="Ravora home">
@@ -637,12 +539,11 @@ export const LandingPage: React.FC = () => {
       </header>
 
       <main id="top">
-        {/* Hero */}
         <section className="rv-hero">
           <div className="rv-wrap rv-hero-grid">
-            <div className="rv-hero-in">
+            <div className="rv-hero-copy">
               <h1 className="rv-h1">
-                Know what to trade, <em>and why.</em>
+                The AI trading copilot that <em>shows its work.</em>
               </h1>
               <p className="rv-hero-sub">
                 Ravora scans the market around the clock, scores every setup, and hands you a complete trade plan with
@@ -650,87 +551,57 @@ export const LandingPage: React.FC = () => {
               </p>
               <div className="rv-hero-actions">
                 <button className="rv-btn rv-btn-primary" onClick={() => navigate('/auth/register')}>
-                  Start with $100k paper money <span className="rv-arrow">→</span>
+                  Start with $100k paper money <span className="rv-arrow"><ArrowRight size={18} strokeWidth={2} aria-hidden="true" /></span>
                 </button>
                 <a href="#how" className="rv-btn rv-btn-ghost">
                   See how it decides
                 </a>
               </div>
-              <div className="rv-hero-facts">
-                <div className="rv-fact">
-                  <b>75%</b>
-                  <span>minimum confidence to surface</span>
-                </div>
-                <div className="rv-fact">
-                  <b>1.5–8.5%</b>
-                  <span>hard drawdown caps</span>
-                </div>
-                <div className="rv-fact">
-                  <b>0</b>
-                  <span>withdrawal permissions</span>
-                </div>
-              </div>
+              <p className="rv-hero-note">No card. No exchange connection. Simulated capital only.</p>
             </div>
-            <div className="rv-hero-term">
+            <div className="rv-hero-win">
               <HeroTerminal />
             </div>
           </div>
         </section>
 
-        {/* Markets marquee */}
         <div className="rv-marquee" aria-label="Markets and exchanges Araiven covers">
-          <span className="rv-marquee-label">Coverage</span>
           <div className="rv-marquee-mask">
             <div className="rv-marquee-track">
-              {marketGroup('a')}
-              {marketGroup('b')}
+              {coverage('a')}
+              {coverage('b')}
             </div>
           </div>
         </div>
 
-        {/* Problem */}
-        <section className="rv-section">
-          <div className="rv-wrap rv-split">
+        <section className="rv-section" style={{ borderTop: 0 }}>
+          <div className="rv-wrap">
+            <AskAraiven />
+          </div>
+        </section>
+
+        <GatesSection />
+
+        <section id="features" className="rv-section">
+          <div className="rv-wrap">
             <Reveal>
-              <span className="rv-kicker">Why Ravora</span>
-              <h2 className="rv-h2">Charts show data. Ravora gives a decision.</h2>
+              <h2 className="rv-h2">One workspace, from signal to execution.</h2>
               <p className="rv-lead">
-                Most traders lose to noise and emotion, not to a lack of charts. Ravora does the reading for you and
-                shows its work, so you can accept or reject a plan with your eyes open.
+                Everything you need to find a trade, size it safely and understand it, without juggling six tabs.
               </p>
             </Reveal>
-            <Reveal delay={100}>
-              <div className="rv-compare">
-                <div className="rv-compare-head">
-                  <div>Typical tools</div>
-                  <div>Ravora</div>
-                </div>
-                {[
-                  ['You pick the asset and hope', 'Every market is scanned and ranked for you'],
-                  ['Stops placed on a hunch', 'Stops derived from market structure'],
-                  ['A signal with no explanation', 'A written reason for every recommendation'],
-                  ['You decide how much risk', 'Your drawdown cap is enforced for you'],
-                ].map(([a, b]) => (
-                  <div key={a} className="rv-compare-row">
-                    <div>{a}</div>
-                    <div>{b}</div>
-                  </div>
-                ))}
-              </div>
+            <Reveal delay={80} rise>
+              <PlatformTabs />
             </Reveal>
           </div>
         </section>
 
-        <PipelineSection />
-        <Bento />
         <RiskSection />
-        <SimulatorSection />
+        <EventTape />
 
-        {/* Security */}
         <section id="security" className="rv-section is-alt">
           <div className="rv-wrap rv-split">
             <Reveal>
-              <span className="rv-kicker">Security</span>
               <h2 className="rv-h2">Built so Ravora can never touch your funds.</h2>
               <div className="rv-facts">
                 <div>
@@ -747,10 +618,10 @@ export const LandingPage: React.FC = () => {
                 </div>
               </div>
             </Reveal>
-            <Reveal delay={100}>
-              <div className="rv-panel">
-                <div className="rv-cap-label">Exchange key check</div>
-                <div className="rv-perms" style={{ marginTop: 14 }}>
+            <Reveal delay={100} rise>
+              <div className="rv-keycheck">
+                <h3>Exchange key check</h3>
+                <div className="rv-perms">
                   <div className="rv-perm">
                     Read balances <em className="ok">ALLOWED</em>
                   </div>
@@ -761,22 +632,18 @@ export const LandingPage: React.FC = () => {
                     Withdraw funds <em className="no">BLOCKED</em>
                   </div>
                 </div>
-                <p style={{ marginTop: 18, fontSize: '0.82rem', lineHeight: 1.55, color: 'var(--rv-text-3)' }}>
-                  Live exchange connection is part of the next phase. Today you work in the paper account.
-                </p>
+                <p>Live exchange connection is part of the next phase. Today you work in the paper account.</p>
               </div>
             </Reveal>
           </div>
         </section>
 
-        {/* Roadmap */}
         <section className="rv-section">
           <div className="rv-wrap">
             <Reveal>
-              <span className="rv-kicker">Roadmap</span>
               <h2 className="rv-h2">Paper first. Live when you are ready.</h2>
             </Reveal>
-            <Reveal className="rv-road" delay={80}>
+            <Reveal className="rv-road" delay={80} rise>
               {[
                 { tag: 'Now', now: true, t: 'Simulated accounts', items: ['7-step onboarding', '$100k paper trading', 'Terminal and Copilot'] },
                 { tag: 'Next', t: 'Read-only sync', items: ['Connect your exchange', 'Live balance sync', 'DeFi yield feed'] },
@@ -784,8 +651,10 @@ export const LandingPage: React.FC = () => {
                 { tag: 'Later', t: 'Autopilot', items: ['Drawdown rotation to stables', 'Stocks and ETFs', 'Specialised agents'] },
               ].map((p) => (
                 <div key={p.t} className={`rv-phase ${p.now ? 'is-now' : ''}`}>
-                  <span className="rv-phase-tag">{p.tag}</span>
-                  <h3>{p.t}</h3>
+                  <h3>
+                    {p.t}
+                    {p.now && <span className="rv-sr"> (available now)</span>}
+                  </h3>
                   <ul>
                     {p.items.map((it) => (
                       <li key={it}>{it}</li>
@@ -797,27 +666,28 @@ export const LandingPage: React.FC = () => {
           </div>
         </section>
 
-        {/* FAQ */}
         <section id="faq" className="rv-section is-alt">
           <div className="rv-wrap rv-split">
             <Reveal>
-              <span className="rv-kicker">FAQ</span>
               <h2 className="rv-h2">Questions, answered plainly.</h2>
             </Reveal>
             <Reveal delay={100}>
               <div className="rv-faq">
                 {FAQ.map((f, i) => (
-                  <details key={f.q} open={i === 0}>
-                    <summary>{f.q}</summary>
-                    <p>{f.a}</p>
-                  </details>
+                  <FaqItem
+                    key={f.q}
+                    q={f.q}
+                    a={f.a}
+                    open={openFaq === i}
+                    reduced={reduced}
+                    onToggle={() => setOpenFaq(openFaq === i ? null : i)}
+                  />
                 ))}
               </div>
             </Reveal>
           </div>
         </section>
 
-        {/* Final CTA */}
         <section className="rv-cta">
           <div className="rv-wrap">
             <Reveal>
@@ -825,7 +695,7 @@ export const LandingPage: React.FC = () => {
               <p className="rv-lead">No card, no exchange connection, no real risk. Set your stance and see what Araiven finds.</p>
               <div className="rv-hero-actions">
                 <button className="rv-btn rv-btn-primary" onClick={() => navigate('/auth/register')}>
-                  Create free account <span className="rv-arrow">→</span>
+                  Create free account <span className="rv-arrow"><ArrowRight size={18} strokeWidth={2} aria-hidden="true" /></span>
                 </button>
                 <button className="rv-btn rv-btn-ghost" onClick={() => navigate('/auth/login')}>
                   Sign in

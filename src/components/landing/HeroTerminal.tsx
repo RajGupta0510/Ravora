@@ -1,12 +1,12 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useCountUp, usePrefersReducedMotion } from './hooks';
+import { useCountUp, usePrefersReducedMotion, useTyped } from './hooks';
 
 type Stage = 0 | 1 | 2 | 3;
 
 interface Setup {
   symbol: string;
   pair: string;
-  side: 'LONG';
+  note: string;
   confidence: number;
   rr: string;
   reasoning: string;
@@ -15,15 +15,15 @@ interface Setup {
   prices: { entry: string; stop: string; target: string };
 }
 
-const SETUPS: Setup[] = [
+export const SETUPS: Setup[] = [
   {
     symbol: 'BTC',
     pair: 'BTC / USD',
-    side: 'LONG',
+    note: 'Support held',
     confidence: 82,
     rr: '1 : 2.4',
     reasoning:
-      'Price holds structural support. Momentum is rising and orderbook depth backs the entry. Stop sits below the last swing low.',
+      'Price holds structural support and momentum is rising. Orderbook depth backs the entry, and the stop sits below the last swing low.',
     seed: 7,
     drift: 0.55,
     prices: { entry: '64,120', stop: '61,870', target: '69,480' },
@@ -31,11 +31,11 @@ const SETUPS: Setup[] = [
   {
     symbol: 'ETH',
     pair: 'ETH / USD',
-    side: 'LONG',
+    note: 'Range breakout',
     confidence: 79,
     rr: '1 : 2.1',
     reasoning:
-      'Consolidation resolved above the 50 EMA. Volume confirms the break and the risk cushion fits a Balanced stance.',
+      'Consolidation resolved above the 50 EMA on rising volume. The risk cushion fits a Balanced stance with room to spare.',
     seed: 19,
     drift: 0.4,
     prices: { entry: '3,462', stop: '3,318', target: '3,790' },
@@ -43,11 +43,11 @@ const SETUPS: Setup[] = [
   {
     symbol: 'SOL',
     pair: 'SOL / USD',
-    side: 'LONG',
+    note: 'Higher low',
     confidence: 76,
     rr: '1 : 2.6',
     reasoning:
-      'Higher low formed on rising volume. Passes the 75% confidence filter, so it is shown. Sizing is capped by your drawdown limit.',
+      'A higher low formed on rising volume. It clears the 75% confidence filter, so it is shown. Size is capped by your drawdown limit.',
     seed: 41,
     drift: 0.62,
     prices: { entry: '168.40', stop: '159.10', target: '192.70' },
@@ -73,7 +73,7 @@ interface Candle {
   c: number;
 }
 
-function buildCandles(seed: number, drift: number, count = 30): Candle[] {
+function buildCandles(seed: number, drift: number, count = 32): Candle[] {
   const rand = mulberry32(seed);
   const out: Candle[] = [];
   let price = 0.52;
@@ -91,12 +91,11 @@ function buildCandles(seed: number, drift: number, count = 30): Candle[] {
   return out;
 }
 
-const W = 420;
-const H = 330;
-const PAD_R = 62;
+const W = 440;
+const H = 340;
+const PAD_R = 58;
 const PAD_T = 12;
 const PAD_B = 12;
-
 const yFor = (v: number) => PAD_T + (1 - v) * (H - PAD_T - PAD_B);
 
 export const HeroTerminal: React.FC = () => {
@@ -121,7 +120,7 @@ export const HeroTerminal: React.FC = () => {
     return { candles: norm, levels: { support, entry, stop, target } };
   }, [setup]);
 
-  // Stage machine: scan -> structure -> plan -> decision, then next asset.
+  // Stage machine: scan -> structure -> plan -> decision, then the next asset.
   useEffect(() => {
     if (reduced) {
       setStage(3);
@@ -137,18 +136,19 @@ export const HeroTerminal: React.FC = () => {
 
   useEffect(() => {
     if (reduced || paused) return;
-    const t = window.setTimeout(() => setIdx((i) => (i + 1) % SETUPS.length), 9500);
+    const t = window.setTimeout(() => setIdx((i) => (i + 1) % SETUPS.length), 10500);
     return () => window.clearTimeout(t);
   }, [idx, reduced, paused]);
 
   const score = useCountUp(setup.confidence, stage >= 3, 900);
+  const typed = useTyped(setup.reasoning, stage >= 3, 16);
   const plotW = W - PAD_R;
   const step = plotW / (candles.length + 1);
 
   const lines = [
-    { key: 'target', at: levels.target, label: 'TP', value: setup.prices.target, cls: 'is-target' },
-    { key: 'entry', at: levels.entry, label: 'ENTRY', value: setup.prices.entry, cls: 'is-entry' },
-    { key: 'stop', at: levels.stop, label: 'SL', value: setup.prices.stop, cls: 'is-stop' },
+    { key: 'target', at: levels.target, label: 'TP', cls: 'is-target' },
+    { key: 'entry', at: levels.entry, label: 'ENTRY', cls: 'is-entry' },
+    { key: 'stop', at: levels.stop, label: 'SL', cls: 'is-stop' },
   ];
 
   const statusText =
@@ -162,34 +162,42 @@ export const HeroTerminal: React.FC = () => {
 
   return (
     <div
-      className="rv-term"
+      className="rv-win"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       onFocus={() => setPaused(true)}
       onBlur={() => setPaused(false)}
     >
-      <div className="rv-term-bar">
-        <div className="rv-term-tabs" role="tablist" aria-label="Example setups">
+      <div className="rv-win-bar">
+        <span className="rv-win-title">Araiven workspace</span>
+        <span className="rv-win-status" aria-live="polite">
+          {statusText}
+        </span>
+      </div>
+
+      <div className="rv-win-body">
+        <div className="rv-wl" role="tablist" aria-label="Example setups">
           {SETUPS.map((s, i) => (
             <button
               key={s.symbol}
               role="tab"
               aria-selected={i === idx}
-              className={`rv-term-tab ${i === idx ? 'is-active' : ''}`}
+              className={`rv-wl-row ${i === idx ? 'is-active' : ''}`}
               onClick={() => setIdx(i)}
             >
-              {s.symbol}
+              <span className="rv-wl-sym">{s.symbol}</span>
+              <span className="rv-wl-score">{s.confidence}</span>
+              <span className="rv-wl-sub">{s.note}</span>
             </button>
           ))}
         </div>
-        <span className="rv-term-status" aria-live="polite">
-          {statusText}
-        </span>
-      </div>
 
-      <div className="rv-term-body">
-        <div className="rv-term-chart">
-          <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`Illustrative ${setup.pair} chart with entry, stop and target levels`}>
+        <div className="rv-win-chart">
+          <svg
+            viewBox={`0 0 ${W} ${H}`}
+            role="img"
+            aria-label={`Illustrative ${setup.pair} chart with entry, stop and target levels`}
+          >
             {[0.2, 0.4, 0.6, 0.8].map((g) => (
               <line key={g} x1="0" x2={plotW} y1={yFor(g)} y2={yFor(g)} className="rv-grid-line" />
             ))}
@@ -213,22 +221,14 @@ export const HeroTerminal: React.FC = () => {
               })}
             </g>
 
-            {/* Structure: support zone */}
             <g className={`rv-layer ${stage >= 1 ? 'is-on' : ''}`}>
-              <rect
-                x="0"
-                y={yFor(levels.support) - 7}
-                width={plotW}
-                height="14"
-                className="rv-support-zone"
-              />
+              <rect x="0" y={yFor(levels.support) - 7} width={plotW} height="14" className="rv-support-zone" />
               <line x1="0" x2={plotW} y1={yFor(levels.support)} y2={yFor(levels.support)} className="rv-support-line" />
               <text x="6" y={yFor(levels.support) + 24} className="rv-chart-note">
                 Support
               </text>
             </g>
 
-            {/* Plan: entry, stop, target */}
             {lines.map((l, i) => (
               <g
                 key={l.key}
@@ -245,10 +245,10 @@ export const HeroTerminal: React.FC = () => {
           </svg>
         </div>
 
-        <div className="rv-term-panel">
-          <div className="rv-term-panel-head">
-            <span className="rv-term-pair">{setup.pair}</span>
-            <span className={`rv-side ${stage >= 3 ? 'is-on' : ''}`}>{setup.side}</span>
+        <div className="rv-win-panel">
+          <div className="rv-win-pair">
+            <b>{setup.pair}</b>
+            <span className={`rv-side ${stage >= 3 ? 'is-on' : ''}`}>LONG</span>
           </div>
 
           <div className="rv-score">
@@ -275,7 +275,9 @@ export const HeroTerminal: React.FC = () => {
             </div>
           </dl>
 
-          <p className={`rv-reason ${stage >= 3 ? 'is-on' : ''}`}>{setup.reasoning}</p>
+          <p className={`rv-reason ${stage >= 3 && typed.length < setup.reasoning.length ? 'rv-caret' : ''}`}>
+            {stage >= 3 ? typed : ''}
+          </p>
 
           <button
             className={`rv-approve ${deployed ? 'is-done' : ''}`}
@@ -287,7 +289,7 @@ export const HeroTerminal: React.FC = () => {
         </div>
       </div>
 
-      <div className="rv-term-foot">Illustrative simulation. Not live market data or financial advice.</div>
+      <div className="rv-win-foot">Illustrative simulation. Not live market data or financial advice.</div>
     </div>
   );
 };

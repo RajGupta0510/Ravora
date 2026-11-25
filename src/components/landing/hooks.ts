@@ -66,3 +66,28 @@ export function useCountUp(target: number, active: boolean, duration = 1100, dec
   }, [target, active, duration, reduced]);
   return Number(value.toFixed(decimals));
 }
+
+/** Reveals `text` one character at a time once `active` flips true. */
+export function useTyped(text: string, active: boolean, msPerChar = 18) {
+  const reduced = usePrefersReducedMotion();
+  const [n, setN] = useState(0);
+  useEffect(() => {
+    if (!active) {
+      setN(0);
+      return;
+    }
+    if (reduced) {
+      setN(text.length);
+      return;
+    }
+    setN(0);
+    let i = 0;
+    const id = window.setInterval(() => {
+      i += 1;
+      setN(i);
+      if (i >= text.length) window.clearInterval(id);
+    }, msPerChar);
+    return () => window.clearInterval(id);
+  }, [text, active, msPerChar, reduced]);
+  return text.slice(0, n);
+}
