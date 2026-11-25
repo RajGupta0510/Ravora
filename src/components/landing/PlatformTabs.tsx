@@ -129,7 +129,7 @@ const PortfolioMock = () => (
         <div className="rv-big">96</div>
       </div>
       <div className="rv-data" style={{ color: 'var(--rv-pos)', fontSize: '0.9rem' }}>
-        Safe · 1.4% buffer to cap
+        Safe, 1.4% buffer to the cap
       </div>
     </div>
     <div className="rv-bars">
@@ -168,19 +168,19 @@ const PaperMock = () => (
       </thead>
       <tbody className="rv-data">
         <tr>
-          <td>BTC long · 3x</td>
+          <td>BTC long, 3x</td>
           <td className="r">0.50</td>
           <td className="r">64,120</td>
           <td className="r pos">+2.8%</td>
         </tr>
         <tr>
-          <td>ETH long · 2x</td>
+          <td>ETH long, 2x</td>
           <td className="r">4.00</td>
           <td className="r">3,462</td>
           <td className="r pos">+1.1%</td>
         </tr>
         <tr>
-          <td>SOL long · 2x</td>
+          <td>SOL long, 2x</td>
           <td className="r">60.0</td>
           <td className="r">168.40</td>
           <td className="r neg">-0.6%</td>
@@ -210,7 +210,7 @@ const COPY: Record<TabId, { h: string; p: string; items: string[]; mock: React.R
     mock: <PortfolioMock />,
   },
   paper: {
-    h: 'Practise with $100,000 of simulated capital.',
+    h: 'Practise with simulated capital.',
     p: 'Trade against real price feeds with no real money. Review the result before you ever connect an exchange.',
     items: ['Simulated one-click execution', 'Live position and P&L tracking', 'A ledger of every paper trade'],
     mock: <PaperMock />,

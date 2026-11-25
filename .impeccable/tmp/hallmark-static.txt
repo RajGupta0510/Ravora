@@ -1,0 +1,167 @@
+src\components\landing\landing.css
+  FAIL 10a :870 transitioning top on .rv-equity-dot | fix: Animate transform or opacity instead
+  FAIL 10a :874 transitioning width on .rv-alloc-bar i
+  FAIL 20 :1 no Hallmark stamp on the first non-empty line of any CSS | fix: The stamp comment is line 1 of the CSS; only @charset may precede it
+  FAIL 48 :12 colour literal #eef1f5 outside tokens (--paper on .rv) | fix: Lift the value into the token block
+  FAIL 48 :13 colour literal #f6f8fb outside tokens (--paper-2 on .rv)
+  FAIL 48 :14 colour literal #0b0e14 outside tokens (--ink on .rv)
+  FAIL 48 :15 colour literal #10141d outside tokens (--case on .rv)
+  FAIL 48 :16 colour literal #151a26 outside tokens (--case-2 on .rv)
+  FAIL 48 :17 colour literal #1b2232 outside tokens (--case-3 on .rv)
+  FAIL 48 :18 colour literal #f59e0b outside tokens (--amber on .rv)
+  FAIL 48 :19 colour literal #fbbf24 outside tokens (--amber-hi on .rv)
+  FAIL 48 :26 colour literal #0b0e14 outside tokens (--t on .rv)
+  FAIL 48 :27 colour literal #394456 outside tokens (--b on .rv)
+  FAIL 48 :28 colour literal #5a6578 outside tokens (--m on .rv)
+  FAIL 48 :29 colour literal rgba(11, 14, 20, 0.15) outside tokens (--r on .rv)
+  FAIL 48 :30 colour literal rgba(11, 14, 20, 0.08) outside tokens (--r2 on .rv)
+  FAIL 48 :31 colour literal rgba(11, 14, 20, 0.42) outside tokens (--rs on .rv)
+  FAIL 48 :32 colour literal #f8fafc outside tokens (--s on .rv)
+  FAIL 48 :33 colour literal #e5e9ef outside tokens (--s2 on .rv)
+  FAIL 48 :34 colour literal #b45309 outside tokens (--acc on .rv)
+  FAIL 48 :35 colour literal #047857 outside tokens (--pos on .rv)
+  FAIL 48 :36 colour literal #b91c1c outside tokens (--neg on .rv)
+  FAIL 48 :37 colour literal #b45309 outside tokens (--focus on .rv)
+  FAIL 48 :52 colour literal #f8fafc outside tokens (--t on .rv-case, .rv-amber)
+  FAIL 48 :53 colour literal #cbd5e1 outside tokens (--b on .rv-case, .rv-amber)
+  FAIL 48 :54 colour literal #94a3b8 outside tokens (--m on .rv-case, .rv-amber)
+  FAIL 48 :55 colour literal rgba(203, 213, 225, 0.16) outside tokens (--r on .rv-case, .rv-amber)
+  FAIL 48 :56 colour literal rgba(203, 213, 225, 0.09) outside tokens (--r2 on .rv-case, .rv-amber)
+  FAIL 48 :57 colour literal rgba(203, 213, 225, 0.42) outside tokens (--rs on .rv-case, .rv-amber)
+  FAIL 48 :58 colour literal #151a26 outside tokens (--s on .rv-case, .rv-amber)
+  FAIL 48 :59 colour literal #0e121b outside tokens (--s2 on .rv-case, .rv-amber)
+  FAIL 48 :60 colour literal #fbbf24 outside tokens (--acc on .rv-case, .rv-amber)
+  FAIL 48 :61 colour literal #10b981 outside tokens (--pos on .rv-case, .rv-amber)
+  FAIL 48 :62 colour literal #f87171 outside tokens (--neg on .rv-case, .rv-amber)
+  FAIL 48 :63 colour literal #f59e0b outside tokens (--focus on .rv-case, .rv-amber)
+  FAIL 48 :68 colour literal #0b0e14 outside tokens (--t on .rv-amber)
+  FAIL 48 :69 colour literal rgba(11, 14, 20, 0.84) outside tokens (--b on .rv-amber)
+  FAIL 48 :70 colour literal rgba(11, 14, 20, 0.7) outside tokens (--m on .rv-amber)
+  FAIL 48 :71 colour literal rgba(11, 14, 20, 0.3) outside tokens (--r on .rv-amber)
+  FAIL 48 :72 colour literal rgba(11, 14, 20, 0.16) outside tokens (--r2 on .rv-amber)
+  FAIL 48 :73 colour literal rgba(11, 14, 20, 0.7) outside tokens (--rs on .rv-amber)
+  FAIL 48 :74 colour literal rgba(11, 14, 20, 0.08) outside tokens (--s on .rv-amber)
+  FAIL 48 :75 colour literal rgba(11, 14, 20, 0.1) outside tokens (--s2 on .rv-amber)
+  FAIL 48 :76 colour literal #0b0e14 outside tokens (--acc on .rv-amber)
+  FAIL 48 :77 colour literal #0b0e14 outside tokens (--focus on .rv-amber)
+  FAIL 48 :240 colour literal rgba(238, 241, 245, 0.94) outside tokens (background on .rv-nav)
+  FAIL 48 :350 colour literal rgba(11, 14, 20, 0.055) outside tokens (background on .rv-hero::before)
+  FAIL 48 :351 colour literal #000 outside tokens (-webkit-mask-image on .rv-hero::before)
+  FAIL 48 :352 colour literal #000 outside tokens (mask-image on .rv-hero::before)
+  FAIL 48 :419 colour literal rgba(11, 14, 20, 0.5) outside tokens (box-shadow on .rv-case.rv-inst)
+  FAIL 48 :447 colour literal #3a4558 outside tokens (stroke on .rv-tick)
+  FAIL 48 :448 colour literal #6b7789 outside tokens (stroke on .rv-tick.is-major)
+  FAIL 48 :450 colour literal rgba(203, 213, 225, 0.12) outside tokens (stroke on .rv-arc-track)
+  FAIL 48 :458 colour literal #94a3b8 outside tokens (fill on .rv-dial-num)
+  FAIL 48 :463 colour literal #f8fafc outside tokens (stroke on .rv-hand line)
+  FAIL 48 :464 colour literal #f8fafc outside tokens (fill on .rv-hand circle)
+  FAIL 48 :570 colour literal rgba(245, 158, 11, 0.12) outside tokens (background on .rv-pair.is-active)
+  FAIL 48 :570 colour literal rgba(245, 158, 11, 0.35) outside tokens (border-color on .rv-pair.is-active)
+  FAIL 48 :584 colour literal rgba(16, 185, 129, 0.14) outside tokens (background on .rv-approve.is-done)
+  FAIL 48 :584 colour literal rgba(16, 185, 129, 0.45) outside tokens (border-color on .rv-approve.is-done)
+  FAIL 48 :591 colour literal #000 outside tokens (-webkit-mask-image on .rv-marq-mask)
+  FAIL 48 :592 colour literal #000 outside tokens (mask-image on .rv-marq-mask)
+  FAIL 48 :660 colour literal #f8fafc outside tokens (color on .rv-bubble-you)
+  FAIL 48 :706 colour literal #3a4558 outside tokens (fill on .rv-jewel-stone)
+  FAIL 48 :829 colour literal rgba(248, 113, 113, 0.2) outside tokens (background on .rv-book-row.ask i)
+  FAIL 48 :830 colour literal rgba(16, 185, 129, 0.2) outside tokens (background on .rv-book-row.bid i)
+  FAIL 48 :856 colour literal rgba(11, 14, 20, 0.1) outside tokens (background on .rv-seg button:hover)
+  FAIL 48 :869 colour literal rgba(11, 14, 20, 0.1) outside tokens (fill on .rv-equity-svg path.area)
+  FAIL 48 :873 colour literal rgba(11, 14, 20, 0.16) outside tokens (background on .rv-alloc-bar)
+  FAIL 48 :877 colour literal rgba(11, 14, 20, 0.22) outside tokens (border-bottom on .rv-risk-rows div)
+  FAIL 48 :902 colour literal #fff outside tokens (color on .rv-event.is-done .tick)
+  FAIL 48 :915 colour literal rgba(4, 120, 87, 0.12) outside tokens (background on .rv-perm em.ok)
+  FAIL 48 :916 colour literal rgba(185, 28, 28, 0.12) outside tokens (background on .rv-perm em.no)
+  FAIL 48 :964 colour literal #f8fafc outside tokens (fill on .rv-dial-big)
+  FAIL 48 :1042 colour literal rgba(11, 14, 20, 0.2) outside tokens (stroke on .rv-gauge-track)
+  FAIL 48 :1062 colour literal #5a6578 outside tokens (scrollbar-color on html:has(.rv))
+  FAIL 48 :1062 colour literal #eef1f5 outside tokens (scrollbar-color on html:has(.rv))
+  FAIL 48 :1064 colour literal #eef1f5 outside tokens (background on html:has(.rv)::-webkit-scroll…)
+  FAIL 48 :1065 colour literal rgba(11, 14, 20, 0.32) outside tokens (background on html:has(.rv)::-webkit-scroll…)
+  FAIL 48 :1065 colour literal #eef1f5 outside tokens (border on html:has(.rv)::-webkit-scroll…)
+  FAIL 48 :1066 colour literal #b45309 outside tokens (background on html:has(.rv)::-webkit-scroll…)
+  FAIL 67 :914 .rv-perm em: letter-spaced tracked 0.04em at 11px in a label role | fix: Labels, captions, table heads, nav links and meta are the body face (or the theme's label face), a step smaller, sentence case, untracked
+  REFLEX 24b :136 padding: clamp(8px, 1.2vw, 18px) (off the 4px scale) on .rv-frame | fix: Use the 4px spacing scale
+  REFLEX 24b :139 padding-bottom: clamp(8px, 1.2vw, 18px) (off the 4px scale) on .rv-frame--last
+  REFLEX 24b :159 margin-top: 22px (off the 4px scale) on .rv-lead
+  REFLEX 24b :187 gap: 10px (off the 4px scale) on .rv-btn
+  REFLEX 24b :189 padding: 0 26px (off the 4px scale) on .rv-btn
+  REFLEX 24b :256 gap: 10px (off the 4px scale) on .rv-logo
+  REFLEX 24b :274 gap: 30px (off the 4px scale) on .rv-nav-links
+  REFLEX 24b :285 padding: 6px 0 (off the 4px scale) on .rv-nav-links a
+  REFLEX 24b :311 gap: 18px (off the 4px scale) on .rv-nav-cta
+  REFLEX 24b :395 margin-top: 38px (off the 4px scale) on .rv-hero-actions
+  REFLEX 24b :398 margin-top: 22px (off the 4px scale) on .rv-hero-note
+  REFLEX 24b :418 padding: 22px 26px 22px (off the 4px scale) on .rv-case.rv-inst
+  REFLEX 24b :425 gap: 14px (off the 4px scale) on .rv-inst-top
+  REFLEX 24b :438 margin: 6px auto 0 (off the 4px scale) on .rv-dial-wrap
+  REFLEX 24b :489 margin-top: 10px (off the 4px scale) on .rv-strip
+  REFLEX 24b :520 padding: 9px 0 0 (off the 4px scale) on .rv-plan-grid div
+  REFLEX 24b :551 margin-top: 6px (off the 4px scale) on .rv-inst-foot
+  REFLEX 24b :573 padding: 0 18px (off the 4px scale) on .rv-approve
+  REFLEX 24b :588 gap: 14px (off the 4px scale) on .rv-marq
+  REFLEX 24b :650 padding: 26px (off the 4px scale) on .rv-chat
+  REFLEX 24b :654 gap: 18px (off the 4px scale) on .rv-chat
+  REFLEX 24b :668 padding: 14px 16px (off the 4px scale) on .rv-tape
+  REFLEX 24b :689 padding: 10px 0 (off the 4px scale) on .rv-plan-rows div
+  REFLEX 24b :694 gap: 10px (off the 4px scale) on .rv-plan-actions
+  REFLEX 24b :695 padding: 0 18px (off the 4px scale) on .rv-plan-actions .rv-btn
+  REFLEX 24b :714 padding: 8px 24px 22px (off the 4px scale) on .rv-cert
+  REFLEX 24b :730 padding: 16px 0 10px (off the 4px scale) on .rv-receipt-title
+  REFLEX 24b :734 gap: 14px (off the 4px scale) on .rv-receipt-row
+  REFLEX 24b :736 padding: 13px 0 (off the 4px scale) on .rv-receipt-row
+  REFLEX 24b :768 padding-top: 6px (off the 4px scale) on .rv-gate h3
+  REFLEX 24b :781 padding: 22px 26px (off the 4px scale) on .rv-index-item
+  REFLEX 24b :811 padding: 26px (off the 4px scale) on .rv-case.rv-showcase
+  REFLEX 24b :815 padding: 18px (off the 4px scale) on .rv-mock
+  REFLEX 24b :817 padding: 0 10px 10px 0 (off the 4px scale) on .rv-table th
+  REFLEX 24b :818 padding: 13px 10px 13px 0 (off the 4px scale) on .rv-table td
+  REFLEX 24b :825 gap: 3px (off the 4px scale) on .rv-book
+  REFLEX 24b :835 padding: 6px 8px (off the 4px scale) on .rv-book-mid
+  REFLEX 24b :835 margin-block: 3px (off the 4px scale) on .rv-book-mid
+  REFLEX 24b :837 gap: 18px (off the 4px scale) on .rv-ticket-grid
+  REFLEX 24b :839 padding: 9px 0 (off the 4px scale) on .rv-seg-mini span
+  REFLEX 24b :841 padding: 10px 12px (off the 4px scale) on .rv-field
+  REFLEX 24b :844 gap: 14px (off the 4px scale) on .rv-bars
+  REFLEX 24b :844 margin-top: 22px (off the 4px scale) on .rv-bars
+  REFLEX 24b :855 padding: 0 22px (off the 4px scale) on .rv-seg button
+  REFLEX 24b :861 margin-top: 10px (off the 4px scale) on .rv-cap-desc
+  REFLEX 24b :866 margin-top: 14px (off the 4px scale) on .rv-equity-plot
+  REFLEX 24b :870 margin: -5.5px -5.5px 0 0 (off the 4px scale) on .rv-equity-dot
+  REFLEX 24b :871 margin-top: 22px (off the 4px scale) on .rv-alloc
+  REFLEX 24b :872 gap: 14px (off the 4px scale) on .rv-alloc-row
+  REFLEX 24b :876 margin: 22px 0 0 (off the 4px scale) on .rv-risk-rows
+  REFLEX 24b :877 padding: 11px 0 (off the 4px scale) on .rv-risk-rows div
+  REFLEX 24b :888 padding: 22px 0 (off the 4px scale) on .rv-event
+  REFLEX 24b :907 padding: 22px 0 (off the 4px scale) on .rv-facts div
+  REFLEX 24b :909 margin-top: 6px (off the 4px scale) on .rv-facts p
+  REFLEX 24b :912 padding-bottom: 14px (off the 4px scale) on .rv-keycheck h3
+  REFLEX 24b :913 padding: 15px 0 (off the 4px scale) on .rv-perm
+  REFLEX 24b :914 padding: 5px 10px (off the 4px scale) on .rv-perm em
+  REFLEX 24b :921 margin-top: calc(var(--i) * 38px) (off the 4px scale) on .rv-phase
+  REFLEX 24b :933 margin-top: 14px (off the 4px scale) on .rv-phase-n
+  REFLEX 24b :936 margin: 14px 0 0 (off the 4px scale) on .rv-phase ul
+  REFLEX 24b :937 padding-left: 18px (off the 4px scale) on .rv-phase li
+  REFLEX 24b :943 padding: 26px 0 (off the 4px scale) on .rv-faq-q
+  REFLEX 24b :953 padding: clamp(80px, 10vw, 150px) 0 (off the 4px scale) on .rv-cta
+  REFLEX 24b :971 padding-top: 26px (off the 4px scale) on .rv-risk-note
+  REFLEX 24b :988 padding: 15px 0 (off the 4px scale) on .rv-drawer a
+  REFLEX 24b :989 gap: 10px (off the 4px scale) on .rv-drawer-actions
+  REFLEX 24b :989 margin-top: 18px (off the 4px scale) on .rv-drawer-actions
+  REFLEX 24b :993 row-gap: 6px (off the 4px scale) on .rv-event
+  REFLEX 24b :1002 gap: 10px (off the 4px scale) on .rv-hero-actions
+  REFLEX 24b :1005 padding: 18px 16px (off the 4px scale) on .rv-case.rv-inst
+  REFLEX 24b :1011 padding: 18px (off the 4px scale) on .rv-index-item
+  REFLEX 24b :1013 gap: 10px (off the 4px scale) on .rv-alloc-row
+  REFLEX 24b :1015 padding: 0 6px (off the 4px scale) on .rv-seg button
+  REFLEX 24b :1018 padding: 8px 18px 18px (off the 4px scale) on .rv-cert
+  REFLEX 24b :1059 margin-top: 18px (off the 4px scale) on .rv-split--faq .rv-lead
+  WARN 10b :640 transitioning padding on .rv-prompt | fix: Animate transform or opacity instead
+  WARN F3 :89 no text-wrap: balance on any display head (1 head rule(s), e.g. .rv h1, .rv h2, .rv h3, .rv h4) | fix: Add text-wrap: balance to h1/h2-level heads
+  WARN F15 :1 4 different column gaps across multi-column sections (80px, 56px, 72px, 32px) | fix: One column gap for every multi-column section
+src\components\landing\LandingPage.tsx
+  FAIL 19 :707 cliche: "Everything you need to" | fix: Say what the product does, in its own nouns
+  FAIL 67 :743 "ALLOWED" typed in capitals tracked 0.04em (<em class="ok">) | fix: Sentence case in the body face; capitals survive only as a wordmark or as the display voice
+  FAIL 67 :749 "BLOCKED" typed in capitals tracked 0.04em (<em class="no">)
+  WARN 58 :654 hero paragraph runs 27 words | fix: One sentence, twelve words or fewer
+sloplint: 85 FAIL, 75 REFLEX, 4 WARN across 7 file(s).

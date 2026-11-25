@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useCountUp, usePrefersReducedMotion, useTyped } from './hooks';
 
 type Stage = 0 | 1 | 2 | 3;
@@ -119,7 +120,7 @@ export const HeroInstrument: React.FC = () => {
   const [stage, setStage] = useState<Stage>(reduced ? 3 : 0);
   const [needle, setNeedle] = useState(reduced ? SETUPS[0].confidence : 0);
   const [paused, setPaused] = useState(false);
-  const [placed, setPlaced] = useState(false);
+  const navigate = useNavigate();
 
   const setup = SETUPS[idx];
   const { candles, levels } = useMemo(() => {
@@ -142,7 +143,6 @@ export const HeroInstrument: React.FC = () => {
       return;
     }
     setStage(0);
-    setPlaced(false);
     setNeedle(6);
     const timers = [
       window.setTimeout(() => setNeedle(46), 420),
@@ -295,8 +295,8 @@ export const HeroInstrument: React.FC = () => {
             </button>
           ))}
         </div>
-        <button className={`rv-approve ${placed ? 'is-done' : ''}`} disabled={stage < 3 || placed} onClick={() => setPlaced(true)}>
-          {placed ? 'Placed in paper account' : 'Approve in paper mode'}
+        <button className="rv-approve" disabled={stage < 3} onClick={() => navigate('/auth/register')}>
+          Try this in a paper account
         </button>
       </div>
       <p className="rv-inst-note">Illustrative simulation. Not live market data or financial advice.</p>

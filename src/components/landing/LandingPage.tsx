@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'motion/react';
-import { ArrowRight, Check, Menu, X } from 'lucide-react';
+import { Check, Menu, X } from 'lucide-react';
 import HeroInstrument from './HeroInstrument';
 import AskAraiven from './AskAraiven';
 import PlatformTabs from './PlatformTabs';
@@ -170,7 +170,7 @@ const SIM = [
 ];
 
 const ROAD = [
-  { now: true, t: 'Simulated accounts', items: ['7-step onboarding', '$100k paper trading', 'Terminal and Copilot'] },
+  { now: true, t: 'Simulated accounts', items: ['7-step onboarding', 'Paper trading with a virtual balance', 'Terminal and Copilot'] },
   { t: 'Read-only sync', items: ['Connect your exchange', 'Live balance sync', 'DeFi yield feed'] },
   { t: 'One-click live', items: ['Approve and execute', 'Trailing stop-losses', 'Slippage protection'] },
   { t: 'Autopilot', items: ['Drawdown rotation to stables', 'Stocks and ETFs', 'Specialised agents'] },
@@ -179,12 +179,6 @@ const ROAD = [
 /* ------------------------------------------------------------------ */
 /* Sections                                                            */
 /* ------------------------------------------------------------------ */
-
-const Arrow: React.FC = () => (
-  <span className="rv-arrow">
-    <ArrowRight size={18} strokeWidth={2} aria-hidden="true" />
-  </span>
-);
 
 const GatesSection: React.FC = () => {
   const [lit, setLit] = useState<boolean[]>(() => GATES.map(() => false));
@@ -399,14 +393,14 @@ const RiskSection: React.FC = () => {
                     <path className="area" d={r.area} />
                     <path className="line" d={r.line} vectorEffect="non-scaling-stroke" />
                   </svg>
-                  <span className="rv-equity-dot" style={{ top: `${(r.tipY / 110) * 100}%` }} aria-hidden="true" />
+                  <span className="rv-equity-dot" style={{ transform: `translateY(${(r.tipY / 110) * 150}px)` }} aria-hidden="true" />
                 </div>
                 <div className="rv-alloc">
                   {r.alloc.map((a) => (
                     <div key={a.label} className="rv-alloc-row">
                       <span>{a.label}</span>
                       <div className="rv-alloc-bar">
-                        <i style={{ width: `${a.pct}%` }} />
+                        <i style={{ transform: `scaleX(${a.pct / 100})` }} />
                       </div>
                       <span>{a.pct}%</span>
                     </div>
@@ -657,7 +651,7 @@ export const LandingPage: React.FC = () => {
               </p>
               <div className="rv-hero-actions">
                 <button className="rv-btn rv-btn-primary" onClick={() => navigate('/auth/register')}>
-                  Start with $100k paper money <Arrow />
+                  Start with $100k paper money
                 </button>
                 <a href="#how" className="rv-btn rv-btn-ghost">
                   See how it decides
@@ -704,7 +698,7 @@ export const LandingPage: React.FC = () => {
           <div className="rv-wrap">
             <Reveal kind="wipe">
               <h2 className="rv-h2">One workspace, from signal to execution.</h2>
-              <p className="rv-lead">Everything you need to find a trade, size it safely and understand it, without juggling six tabs.</p>
+              <p className="rv-lead">Find a setup, size it against your drawdown cap and read its reasoning in one workspace.</p>
             </Reveal>
             <Reveal kind="pop" delay={80}>
               <PlatformTabs />
@@ -740,13 +734,13 @@ export const LandingPage: React.FC = () => {
                 <h3>Exchange key check</h3>
                 <div className="rv-perms">
                   <div className="rv-perm">
-                    Read balances <em className="ok">ALLOWED</em>
+                    Read balances <em className="ok">Allowed</em>
                   </div>
                   <div className="rv-perm">
-                    Place orders <em className="ok">ALLOWED</em>
+                    Place orders <em className="ok">Allowed</em>
                   </div>
                   <div className="rv-perm">
-                    Withdraw funds <em className="no">BLOCKED</em>
+                    Withdraw funds <em className="no">Blocked</em>
                   </div>
                 </div>
                 <p>Live exchange connection is part of the next phase. Today you work in the paper account.</p>
@@ -807,11 +801,11 @@ export const LandingPage: React.FC = () => {
             <Dial className="rv-cta-dial" value={82} />
             <div className="rv-wrap">
               <Reveal kind="wipe">
-                <h2 className="rv-h2">Test your first plan with $100,000 of paper money.</h2>
+                <h2 className="rv-h2">Test your first plan with paper money.</h2>
                 <p className="rv-lead">No card, no exchange connection, no real risk. Set your stance and see what Araiven finds.</p>
                 <div className="rv-hero-actions">
                   <button className="rv-btn rv-btn-primary" onClick={() => navigate('/auth/register')}>
-                    Create free account <Arrow />
+                    Create free account
                   </button>
                   <button className="rv-btn rv-btn-ghost" onClick={() => navigate('/auth/login')}>
                     Sign in

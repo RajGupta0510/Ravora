@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { ArrowRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useCountUp, useInView, usePrefersReducedMotion } from './hooks';
 
 interface Script {
@@ -60,7 +61,7 @@ export const AskAraiven: React.FC = () => {
   const { ref, inView } = useInView<HTMLDivElement>(0.25);
   const [sel, setSel] = useState(0);
   const [shown, setShown] = useState(0); // tape lines shown; > steps.length means the answer is visible
-  const [decision, setDecision] = useState<'none' | 'approved' | 'rejected'>('none');
+  const navigate = useNavigate();
   const timers = useRef<number[]>([]);
 
   const script = SCRIPTS[sel];
@@ -70,7 +71,6 @@ export const AskAraiven: React.FC = () => {
   useEffect(() => {
     timers.current.forEach(window.clearTimeout);
     timers.current = [];
-    setDecision('none');
     if (!inView) {
       setShown(0);
       return;
@@ -145,26 +145,9 @@ export const AskAraiven: React.FC = () => {
             </dl>
             <p className="rv-plan-why">{script.why}</p>
             <div className="rv-plan-actions">
-              {decision === 'none' ? (
-                <>
-                  <button className="rv-btn rv-btn-primary" onClick={() => setDecision('approved')}>
-                    {script.filtered ? 'Alert me at 75%' : 'Approve in paper mode'}
-                  </button>
-                  {!script.filtered && (
-                    <button className="rv-btn rv-btn-ghost" onClick={() => setDecision('rejected')}>
-                      Reject
-                    </button>
-                  )}
-                </>
-              ) : (
-                <span className="rv-data" style={{ color: decision === 'approved' ? 'var(--rv-pos)' : 'var(--rv-text-3)', fontSize: '0.88rem' }}>
-                  {decision === 'approved'
-                    ? script.filtered
-                      ? 'Alert set. Araiven will tell you when it clears the filter.'
-                      : 'Placed in your paper account.'
-                    : 'Rejected. Araiven will use this to tune future suggestions.'}
-                </span>
-              )}
+              <button className="rv-btn rv-btn-primary" onClick={() => navigate('/auth/register')}>
+                {script.filtered ? 'Get an alert at 75%' : 'Try it in a paper account'}
+              </button>
             </div>
           </div>
         )}

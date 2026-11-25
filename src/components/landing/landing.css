@@ -1,4 +1,61 @@
+/* Hallmark · checked: 2026-11-26 · genre: modern-minimal (inferred)
+ * floor: 0 FAIL after polish · fixed: tokens to :root, 10a transitions, 63 punctuation and fake success, 67 label, 19 cliche, 4 overflow, 64 mono label, 75 small SVG text, 69 echo
+ * structural: printed, not rebuilt (58 word budget, 24b spacing scale, 84 built product mocks, 80 drawn instrument, 23 amber risk panel)
+ * built: the project · redesign: polish · v2.0.0 */
+/* Hallmark · waive 38iii · one phrase highlighted, once, in the hero · the amber marker under "with proof attached" is the page's signature gesture for the trade offer */
+/* Hallmark · dismissed 74 · #f8fafc is Stone 50, the brand colour PRODUCT.md and DESIGN.md name, not a framework default swatch for this page */
+/* Hallmark · answered F15 · the four column gaps belong to four different compositions (chat, receipt, showcase, risk) and equalising them would re-space a layout the owner asked to keep */
 @import '../../theme/ravora-fonts.css';
+
+:root {
+  --c-paper: #eef1f5;
+  --c-paper-2: #f6f8fb;
+  --c-paper-3: #e5e9ef;
+  --c-ink: #0b0e14;
+  --c-case: #10141d;
+  --c-case-2: #151a26;
+  --c-case-3: #1b2232;
+  --c-inset: #0e121b;
+  --c-amber: #f59e0b;
+  --c-amber-hi: #fbbf24;
+  --c-amber-deep: #b45309;
+  --c-stone-50: #f8fafc;
+  --c-stone-300: #cbd5e1;
+  --c-stone-400: #94a3b8;
+  --c-slate-700: #394456;
+  --c-slate-500: #5a6578;
+  --c-tick: #3a4558;
+  --c-tick-major: #6b7789;
+  --c-pos: #10b981;
+  --c-pos-deep: #047857;
+  --c-neg: #f87171;
+  --c-neg-deep: #b91c1c;
+  --ink-a150: rgba(11, 14, 20, 0.15);
+  --ink-a80: rgba(11, 14, 20, 0.08);
+  --ink-a420: rgba(11, 14, 20, 0.42);
+  --stone-a160: rgba(203, 213, 225, 0.16);
+  --stone-a90: rgba(203, 213, 225, 0.09);
+  --stone-a420: rgba(203, 213, 225, 0.42);
+  --ink-a840: rgba(11, 14, 20, 0.84);
+  --ink-a700: rgba(11, 14, 20, 0.7);
+  --ink-a300: rgba(11, 14, 20, 0.3);
+  --ink-a160: rgba(11, 14, 20, 0.16);
+  --ink-a100: rgba(11, 14, 20, 0.1);
+  --paper-a940: rgba(238, 241, 245, 0.94);
+  --ink-a55: rgba(11, 14, 20, 0.055);
+  --ink-a500: rgba(11, 14, 20, 0.5);
+  --stone-a120: rgba(203, 213, 225, 0.12);
+  --amber-a120: rgba(245, 158, 11, 0.12);
+  --amber-a350: rgba(245, 158, 11, 0.35);
+  --neg-a200: rgba(248, 113, 113, 0.2);
+  --pos-a200: rgba(16, 185, 129, 0.2);
+  --ink-a220: rgba(11, 14, 20, 0.22);
+  --pos-deep-a120: rgba(4, 120, 87, 0.12);
+  --neg-deep-a120: rgba(185, 28, 28, 0.12);
+  --ink-a200: rgba(11, 14, 20, 0.2);
+  --ink-a320: rgba(11, 14, 20, 0.32);
+}
+
 
 /* ==========================================================================
    Ravora landing page: the chronometer direction.
@@ -9,32 +66,32 @@
    ========================================================================== */
 
 .rv {
-  --paper: #eef1f5;
-  --paper-2: #f6f8fb;
-  --ink: #0b0e14;
-  --case: #10141d;
-  --case-2: #151a26;
-  --case-3: #1b2232;
-  --amber: #f59e0b;
-  --amber-hi: #fbbf24;
+  --paper: var(--c-paper);
+  --paper-2: var(--c-paper-2);
+  --ink: var(--c-ink);
+  --case: var(--c-case);
+  --case-2: var(--c-case-2);
+  --case-3: var(--c-case-3);
+  --amber: var(--c-amber);
+  --amber-hi: var(--c-amber-hi);
   --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
   --display: 'Familjen Grotesk', 'Albert Sans', system-ui, sans-serif;
   --body: 'Albert Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --mono: 'Martian Mono', ui-monospace, 'Cascadia Mono', Consolas, monospace;
 
   /* paper ground */
-  --t: #0b0e14;
-  --b: #394456;
-  --m: #5a6578;
-  --r: rgba(11, 14, 20, 0.15);
-  --r2: rgba(11, 14, 20, 0.08);
-  --rs: rgba(11, 14, 20, 0.42);
-  --s: #f8fafc;
-  --s2: #e5e9ef;
-  --acc: #b45309;
-  --pos: #047857;
-  --neg: #b91c1c;
-  --focus: #b45309;
+  --t: var(--c-ink);
+  --b: var(--c-slate-700);
+  --m: var(--c-slate-500);
+  --r: var(--ink-a150);
+  --r2: var(--ink-a80);
+  --rs: var(--ink-a420);
+  --s: var(--c-stone-50);
+  --s2: var(--c-paper-3);
+  --acc: var(--c-amber-deep);
+  --pos: var(--c-pos-deep);
+  --neg: var(--c-neg-deep);
+  --focus: var(--c-amber-deep);
 
   background: var(--paper);
   color: var(--b);
@@ -49,32 +106,32 @@
 
 .rv-case,
 .rv-amber {
-  --t: #f8fafc;
-  --b: #cbd5e1;
-  --m: #94a3b8;
-  --r: rgba(203, 213, 225, 0.16);
-  --r2: rgba(203, 213, 225, 0.09);
-  --rs: rgba(203, 213, 225, 0.42);
-  --s: #151a26;
-  --s2: #0e121b;
-  --acc: #fbbf24;
-  --pos: #10b981;
-  --neg: #f87171;
-  --focus: #f59e0b;
+  --t: var(--c-stone-50);
+  --b: var(--c-stone-300);
+  --m: var(--c-stone-400);
+  --r: var(--stone-a160);
+  --r2: var(--stone-a90);
+  --rs: var(--stone-a420);
+  --s: var(--c-case-2);
+  --s2: var(--c-inset);
+  --acc: var(--c-amber-hi);
+  --pos: var(--c-pos);
+  --neg: var(--c-neg);
+  --focus: var(--c-amber);
   background: var(--case);
   color: var(--b);
 }
 .rv-amber {
-  --t: #0b0e14;
-  --b: rgba(11, 14, 20, 0.84);
-  --m: rgba(11, 14, 20, 0.7);
-  --r: rgba(11, 14, 20, 0.3);
-  --r2: rgba(11, 14, 20, 0.16);
-  --rs: rgba(11, 14, 20, 0.7);
-  --s: rgba(11, 14, 20, 0.08);
-  --s2: rgba(11, 14, 20, 0.1);
-  --acc: #0b0e14;
-  --focus: #0b0e14;
+  --t: var(--c-ink);
+  --b: var(--ink-a840);
+  --m: var(--ink-a700);
+  --r: var(--ink-a300);
+  --r2: var(--ink-a160);
+  --rs: var(--ink-a700);
+  --s: var(--ink-a80);
+  --s2: var(--ink-a100);
+  --acc: var(--c-ink);
+  --focus: var(--c-ink);
   background: var(--amber);
 }
 
@@ -87,6 +144,7 @@
 .rv h2,
 .rv h3,
 .rv h4 {
+  text-wrap: balance;
   font-family: var(--display);
   color: var(--t);
   margin: 0;
@@ -237,7 +295,7 @@
   position: fixed;
   inset: 0 0 auto 0;
   z-index: 100;
-  background: rgba(238, 241, 245, 0.94);
+  background: var(--paper-a940);
   border-bottom: 1px solid transparent;
   transition: border-color 0.3s ease;
 }
@@ -347,9 +405,9 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: repeating-radial-gradient(circle at 74% 38%, transparent 0 26px, rgba(11, 14, 20, 0.055) 26px 27px);
-  -webkit-mask-image: radial-gradient(circle at 74% 38%, #000 0, transparent 62%);
-  mask-image: radial-gradient(circle at 74% 38%, #000 0, transparent 62%);
+  background: repeating-radial-gradient(circle at 74% 38%, transparent 0 26px, var(--ink-a55) 26px 27px);
+  -webkit-mask-image: radial-gradient(circle at 74% 38%, var(--c-ink) 0, transparent 62%);
+  mask-image: radial-gradient(circle at 74% 38%, var(--c-ink) 0, transparent 62%);
   pointer-events: none;
 }
 .rv-hero-grid {
@@ -416,7 +474,7 @@
 .rv-case.rv-inst {
   border-radius: clamp(28px, 3.4vw, 44px);
   padding: 22px 26px 22px;
-  box-shadow: 0 40px 80px -30px rgba(11, 14, 20, 0.5);
+  box-shadow: 0 40px 80px -30px var(--ink-a500);
 }
 .rv-inst-top {
   display: flex;
@@ -428,10 +486,7 @@
   font: 600 0.95rem var(--display);
   color: var(--t);
 }
-.rv-inst-status {
-  font: 500 0.7rem var(--mono);
-  color: var(--m);
-}
+.rv-inst-status { font: 500 0.8rem var(--body); color: var(--m); }
 .rv-dial-wrap {
   position: relative;
   width: min(100%, 400px);
@@ -444,10 +499,10 @@
 }
 .rv-dial-bezel { fill: var(--case-3); }
 .rv-dial-face { fill: var(--s2); }
-.rv-tick { stroke: #3a4558; stroke-width: 1.4; stroke-linecap: round; transition: stroke 0.4s ease; }
-.rv-tick.is-major { stroke: #6b7789; stroke-width: 2.2; }
+.rv-tick { stroke: var(--c-tick); stroke-width: 1.4; stroke-linecap: round; transition: stroke 0.4s ease; }
+.rv-tick.is-major { stroke: var(--c-tick-major); stroke-width: 2.2; }
 .rv-tick.is-lit { stroke: var(--amber); }
-.rv-arc-track { fill: none; stroke: rgba(203, 213, 225, 0.12); stroke-width: 7; stroke-linecap: round; }
+.rv-arc-track { fill: none; stroke: var(--stone-a120); stroke-width: 7; stroke-linecap: round; }
 .rv-arc-fill {
   fill: none;
   stroke: var(--amber);
@@ -455,13 +510,13 @@
   stroke-linecap: round;
   transition: stroke-dasharray 1.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.rv-dial-num { fill: #94a3b8; font: 500 10.5px var(--mono); }
+.rv-dial-num { fill: var(--c-stone-400); font: 500 11.5px var(--mono); }
 .rv-thresh { fill: var(--amber); }
 .rv-hand {
   transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.rv-hand line { stroke: #f8fafc; stroke-width: 3; stroke-linecap: round; }
-.rv-hand circle { fill: #f8fafc; }
+.rv-hand line { stroke: var(--c-stone-50); stroke-width: 3; stroke-linecap: round; }
+.rv-hand circle { fill: var(--c-stone-50); }
 .rv-jewel { fill: var(--case); stroke: var(--amber); stroke-width: 2; }
 .rv-jewel-core { fill: var(--amber); }
 .rv-dial-read {
@@ -567,8 +622,9 @@
   transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease;
 }
 .rv-pair:hover { color: var(--t); }
-.rv-pair.is-active { color: var(--amber-hi); background: rgba(245, 158, 11, 0.12); border-color: rgba(245, 158, 11, 0.35); }
+.rv-pair.is-active { color: var(--amber-hi); background: var(--amber-a120); border-color: var(--amber-a350); }
 .rv-approve {
+  white-space: nowrap;
   height: 44px;
   padding: 0 18px;
   border-radius: 10px;
@@ -581,15 +637,14 @@
 }
 .rv-approve:not(:disabled) { background: var(--amber); border-color: var(--amber); color: var(--ink); cursor: pointer; }
 .rv-approve:not(:disabled):hover { background: var(--amber-hi); }
-.rv-approve.is-done { background: rgba(16, 185, 129, 0.14); border-color: rgba(16, 185, 129, 0.45); color: var(--pos); }
 .rv-inst-note { margin-top: 12px; font-size: 0.76rem; color: var(--m); }
 
 /* ---------- Coverage: counter-scrolling rows ---------- */
 .rv-marq { padding: 8px 0 clamp(48px, 6vw, 80px); display: grid; gap: 14px; overflow: hidden; }
 .rv-marq-mask {
   overflow: hidden;
-  -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
-  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, transparent, var(--c-ink) 8%, var(--c-ink) 92%, transparent);
+  mask-image: linear-gradient(90deg, transparent, var(--c-ink) 8%, var(--c-ink) 92%, transparent);
 }
 .rv-marq-track { display: flex; width: max-content; animation: rv-scroll 46s linear infinite; }
 .rv-marq-mask.is-reverse .rv-marq-track { animation-direction: reverse; animation-duration: 58s; }
@@ -637,9 +692,11 @@
   color: var(--b);
   font: 550 1.05rem var(--body);
   cursor: pointer;
-  transition: color 0.2s ease, padding 0.35s var(--ease);
+  transition: color 0.2s ease;
 }
-.rv-prompt:hover { color: var(--t); padding-left: 12px; }
+.rv-prompt > span:first-child { transition: transform 0.35s var(--ease); }
+.rv-prompt:hover { color: var(--t); }
+.rv-prompt:hover > span:first-child { transform: translateX(12px); }
 .rv-prompt.is-active { color: var(--acc); }
 .rv-prompt .rv-arrow { display: inline-flex; color: var(--m); transition: transform 0.3s var(--ease), color 0.2s ease; }
 .rv-prompt.is-active .rv-arrow { color: var(--amber); transform: translateX(4px); }
@@ -657,7 +714,7 @@
   align-self: flex-end;
   max-width: 82%;
   background: var(--case-3);
-  color: #f8fafc;
+  color: var(--c-stone-50);
   padding: 12px 16px;
   border-radius: 16px 16px 4px 16px;
   font-size: 0.98rem;
@@ -703,7 +760,7 @@
 .rv-gear-hub { fill: var(--amber); }
 .rv-train { stroke: var(--r); stroke-width: 1.5; }
 .rv-jewel-seat { fill: var(--case); }
-.rv-jewel-stone { fill: #3a4558; transition: fill 0.5s ease; }
+.rv-jewel-stone { fill: var(--c-tick); transition: fill 0.5s ease; }
 .rv-jewel-stone.is-lit { fill: var(--amber); }
 .rv-sticky { position: sticky; top: 104px; }
 .rv-cert {
@@ -826,8 +883,8 @@
 .rv-book-row { position: relative; display: flex; justify-content: space-between; padding: 4px 8px; border-radius: 4px; overflow: hidden; }
 .rv-book-row i { position: absolute; top: 0; bottom: 0; right: 0; width: var(--w); transform-origin: right; animation: rv-bar 0.9s var(--ease) both; animation-delay: var(--d); }
 @keyframes rv-bar { from { transform: scaleX(0); } to { transform: scaleX(1); } }
-.rv-book-row.ask i { background: rgba(248, 113, 113, 0.2); }
-.rv-book-row.bid i { background: rgba(16, 185, 129, 0.2); }
+.rv-book-row.ask i { background: var(--neg-a200); }
+.rv-book-row.bid i { background: var(--pos-a200); }
 .rv-book-row span { position: relative; }
 .rv-book-row.ask span:first-child { color: var(--neg); }
 .rv-book-row.bid span:first-child { color: var(--pos); }
@@ -853,7 +910,7 @@
 .rv-risk-grid { margin-top: 64px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 72px; align-items: start; }
 .rv-seg { display: inline-grid; grid-template-columns: repeat(3, auto); gap: 4px; padding: 4px; border: 1.5px solid var(--t); border-radius: 12px; max-width: 100%; }
 .rv-seg button { height: 46px; padding: 0 22px; border: 0; border-radius: 9px; background: transparent; color: var(--t); font: 650 0.94rem var(--body); cursor: pointer; transition: background 0.3s var(--ease), color 0.2s ease; }
-.rv-seg button:hover { background: rgba(11, 14, 20, 0.1); }
+.rv-seg button:hover { background: var(--ink-a100); }
 .rv-seg button[aria-pressed='true'] { background: var(--ink); color: var(--amber-hi); }
 .rv-cap-num { font: 650 clamp(4.4rem, 10.5vw, 6rem) var(--display); letter-spacing: -0.04em; line-height: 0.95; margin-top: 36px; color: var(--t); }
 .rv-cap-num span { font-size: 0.5em; letter-spacing: -0.02em; }
@@ -866,15 +923,15 @@
 .rv-equity-plot { position: relative; margin-top: 14px; }
 .rv-equity-svg { width: 100%; height: 150px; display: block; }
 .rv-equity-svg path.line { fill: none; stroke: var(--ink); stroke-width: 2.4; transition: d 0.7s var(--ease); }
-.rv-equity-svg path.area { fill: rgba(11, 14, 20, 0.1); transition: d 0.7s var(--ease); }
-.rv-equity-dot { position: absolute; right: 0; width: 11px; height: 11px; margin: -5.5px -5.5px 0 0; border-radius: 50%; background: var(--ink); transition: top 0.7s var(--ease); }
+.rv-equity-svg path.area { fill: var(--ink-a100); transition: d 0.7s var(--ease); }
+.rv-equity-dot { position: absolute; top: 0; right: 0; width: 11px; height: 11px; margin: -5.5px -5.5px 0 0; border-radius: 50%; background: var(--ink); transition: transform 0.7s var(--ease); }
 .rv-alloc { margin-top: 22px; display: grid; gap: 12px; }
 .rv-alloc-row { display: grid; grid-template-columns: 110px 1fr 44px; gap: 14px; align-items: center; font-size: 0.92rem; color: var(--t); }
-.rv-alloc-bar { height: 8px; background: rgba(11, 14, 20, 0.16); border-radius: 99px; overflow: hidden; }
-.rv-alloc-bar i { display: block; height: 100%; background: var(--ink); border-radius: 99px; transition: width 0.7s var(--ease); }
+.rv-alloc-bar { height: 8px; background: var(--ink-a160); border-radius: 99px; overflow: hidden; }
+.rv-alloc-bar i { display: block; width: 100%; height: 100%; background: var(--ink); border-radius: 99px; transform-origin: left; transition: transform 0.7s var(--ease); }
 .rv-alloc-row span:last-child { font: 600 0.8rem var(--mono); text-align: right; }
 .rv-risk-rows { margin: 22px 0 0; border-top: 1.5px solid var(--t); }
-.rv-risk-rows div { display: flex; justify-content: space-between; padding: 11px 0; border-bottom: 1px solid rgba(11, 14, 20, 0.22); font-size: 0.94rem; color: var(--t); }
+.rv-risk-rows div { display: flex; justify-content: space-between; padding: 11px 0; border-bottom: 1px solid var(--ink-a220); font-size: 0.94rem; color: var(--t); }
 .rv-risk-rows dd { margin: 0; font: 600 0.84rem var(--mono); }
 
 /* ---------- Event tape ---------- */
@@ -899,7 +956,7 @@
 .rv-event.is-now .tick { border-color: var(--amber); }
 .rv-event.is-done { color: var(--b); }
 .rv-event.is-done .label { color: var(--t); }
-.rv-event.is-done .tick { background: var(--pos); border-color: var(--pos); color: #fff; }
+.rv-event.is-done .tick { background: var(--pos); border-color: var(--pos); color: var(--c-stone-50); }
 .rv-event .detail span { animation: rv-fade 0.5s ease both; display: inline-block; }
 
 /* ---------- Security ---------- */
@@ -911,9 +968,9 @@
 .rv-keycheck::before, .rv-keycheck::after { top: 66px; }
 .rv-keycheck h3 { font-size: 1.15rem; padding-bottom: 14px; border-bottom: 1px dashed var(--rs); }
 .rv-perm { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid var(--r2); font-size: 1rem; color: var(--t); }
-.rv-perm em { font: 600 0.68rem var(--mono); font-style: normal; letter-spacing: 0.04em; padding: 5px 10px; border-radius: 6px; }
-.rv-perm em.ok { color: var(--pos); background: rgba(4, 120, 87, 0.12); }
-.rv-perm em.no { color: var(--neg); background: rgba(185, 28, 28, 0.12); }
+.rv-perm em { font: 650 0.8rem var(--body); font-style: normal; letter-spacing: 0; padding: 4px 10px; border-radius: 6px; }
+.rv-perm em.ok { color: var(--pos); background: var(--pos-deep-a120); }
+.rv-perm em.no { color: var(--neg); background: var(--neg-deep-a120); }
 .rv-keycheck p { margin-top: 16px; font-size: 0.9rem; color: var(--m); }
 
 /* ---------- Roadmap: staggered calibration steps ---------- */
@@ -961,7 +1018,7 @@
   pointer-events: none;
 }
 .rv-cta-dial svg { display: block; width: 100%; height: auto; }
-.rv-dial-big { fill: #f8fafc; font: 600 64px var(--mono); letter-spacing: -0.06em; }
+.rv-dial-big { fill: var(--c-stone-50); font: 600 64px var(--mono); letter-spacing: -0.06em; }
 .rv-cta .rv-wrap { position: relative; }
 .rv-foot { padding: 56px 0 56px; }
 .rv-foot-grid { display: flex; justify-content: space-between; gap: 32px; flex-wrap: wrap; align-items: center; }
@@ -1039,11 +1096,11 @@
 .rv-risk-head .rv-seg { justify-self: end; }
 .rv-gauge { margin-top: 28px; max-width: 360px; }
 .rv-gauge svg { display: block; width: 100%; height: auto; overflow: visible; }
-.rv-gauge-track { fill: none; stroke: rgba(11, 14, 20, 0.2); stroke-width: 6; stroke-linecap: round; }
+.rv-gauge-track { fill: none; stroke: var(--ink-a200); stroke-width: 6; stroke-linecap: round; }
 .rv-gauge-fill { fill: none; stroke: var(--ink); stroke-width: 6; stroke-linecap: round; transition: stroke-dasharray 0.9s var(--ease); }
 .rv-gauge-tick { stroke: var(--ink); stroke-width: 1.5; opacity: 0.55; }
 .rv-gauge-tick.is-major { stroke-width: 2.4; opacity: 1; }
-.rv-gauge-num { fill: var(--ink); font: 500 10px var(--mono); }
+.rv-gauge-num { fill: var(--ink); font: 500 11px var(--mono); }
 .rv-gauge-hand { transition: transform 0.9s var(--ease); }
 .rv-gauge-hand line { stroke: var(--ink); stroke-width: 3; stroke-linecap: round; }
 .rv-gauge-hub { fill: var(--ink); }
@@ -1059,13 +1116,16 @@
 .rv-split--faq .rv-lead { margin-top: 18px; }
 
 /* ---------- Themed scrollbar (the page scrolls on paper and ink) ---------- */
-html:has(.rv) { scrollbar-color: #5a6578 #eef1f5; scrollbar-width: thin; }
+html:has(.rv) { scrollbar-color: var(--c-slate-500) var(--c-paper); scrollbar-width: thin; }
 html:has(.rv)::-webkit-scrollbar { width: 11px; }
-html:has(.rv)::-webkit-scrollbar-track { background: #eef1f5; }
-html:has(.rv)::-webkit-scrollbar-thumb { background: rgba(11, 14, 20, 0.32); border-radius: 8px; border: 2px solid #eef1f5; }
-html:has(.rv)::-webkit-scrollbar-thumb:hover { background: #b45309; }
+html:has(.rv)::-webkit-scrollbar-track { background: var(--c-paper); }
+html:has(.rv)::-webkit-scrollbar-thumb { background: var(--ink-a320); border-radius: 8px; border: 2px solid var(--c-paper); }
+html:has(.rv)::-webkit-scrollbar-thumb:hover { background: var(--c-amber-deep); }
 @media (max-width: 1040px) {
   .rv-risk-head { grid-template-columns: minmax(0, 1fr); }
   .rv-risk-head .rv-seg { justify-self: start; }
   .rv-split--faq > :first-child { position: static; }
 }
+
+/* The page clips horizontal overflow at the document level too. */
+html:has(.rv), body:has(.rv) { overflow-x: clip; }
