@@ -340,42 +340,46 @@ export const AuthCardPage: React.FC = () => {
   return (
     <div className="ra">
       {/* Story panel (desktop) */}
-      <aside className="ra-story" aria-hidden="true">
-        <a className="ra-logo" href="/" tabIndex={-1}>
+      <aside className="ra-story">
+        <a className="ra-logo" href="/">
           <span className="ra-logo-mark">R</span>
           Ravora
         </a>
 
-        <AnimatePresence mode="wait" initial={false}>
-          <motion.div
-            key={mode === 'register' ? 'register' : 'login'}
-            className="ra-story-body"
-            initial={reduced ? false : { opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={reduced ? { opacity: 0 } : { opacity: 0, y: -8 }}
-            transition={{ duration: reduced ? 0 : 0.35, ease }}
-          >
-            <h2 className="ra-story-h">
-              {mode === 'register' ? 'Open your account in a minute.' : 'Pick up where Araiven left off.'}
-            </h2>
-            <p className="ra-story-p">
-              {mode === 'register'
-                ? 'Start with a $100,000 paper portfolio. No card, no exchange connection.'
-                : 'Your watchlist, paper account and trade plans are waiting.'}
-            </p>
-            <ol className="ra-tape">
-              {TAPE.map((row, i) => (
-                <li key={row.l} className={i === TAPE.length - 1 ? 'is-final' : ''} style={{ ['--i' as string]: i }}>
-                  <span className="t">{row.t}</span>
-                  <span className="l">{row.l}</span>
-                  <span className="v">{row.v}</span>
-                </li>
-              ))}
-            </ol>
-          </motion.div>
-        </AnimatePresence>
+        <div className="ra-story-body">
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.div
+              key={mode === 'register' ? 'register' : 'login'}
+              initial={reduced ? false : { opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={reduced ? { opacity: 0 } : { opacity: 0, y: -8 }}
+              transition={{ duration: reduced ? 0 : 0.35, ease }}
+            >
+              <h2 className="ra-story-h">
+                {mode === 'register' ? 'Open your account in a minute.' : 'Pick up where Araiven left off.'}
+              </h2>
+              <p className="ra-story-p">
+                {mode === 'register'
+                  ? 'Start with a $100,000 paper portfolio. No card, no exchange connection.'
+                  : 'Your watchlist, paper account and trade plans are waiting.'}
+              </p>
+            </motion.div>
+          </AnimatePresence>
 
-        <p className="ra-story-foot">Illustrative sequence. © 2026 Ravora</p>
+          {/* The tape is rendered once per visit, outside the keyed block, so mode switches do not replay it. */}
+          <ol className="ra-tape">
+            {TAPE.map((row, i) => (
+              <li key={row.l} className={i === TAPE.length - 1 ? 'is-final' : ''} style={{ ['--i' as string]: i }}>
+                <span className="t">{row.t}</span>
+                <span className="l">{row.l}</span>
+                <span className="v">{row.v}</span>
+              </li>
+            ))}
+          </ol>
+          <p className="ra-tape-note">Illustrative sequence, not live data.</p>
+        </div>
+
+        <p className="ra-story-foot">© 2026 Ravora</p>
       </aside>
 
       {/* Form column */}
@@ -451,13 +455,6 @@ export const AuthCardPage: React.FC = () => {
                   <button type="submit" disabled={isSubmitting} className="ra-btn">
                     {busyLabel('Sign in', 'Signing in…')}
                   </button>
-
-                  <p className="ra-alt">
-                    New to Ravora?{' '}
-                    <button type="button" className="ra-link" onClick={() => changeMode('register')}>
-                      Create an account
-                    </button>
-                  </p>
                 </form>
               )}
 
@@ -543,13 +540,6 @@ export const AuthCardPage: React.FC = () => {
                   <button type="submit" disabled={isSubmitting} className="ra-btn">
                     {busyLabel('Create account', 'Creating account…')}
                   </button>
-
-                  <p className="ra-alt">
-                    Already have an account?{' '}
-                    <button type="button" className="ra-link" onClick={() => changeMode('login')}>
-                      Sign in
-                    </button>
-                  </p>
                 </form>
               )}
 
