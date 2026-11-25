@@ -1,869 +1,639 @@
+diff --git a/.claude/launch.json b/.claude/launch.json
+index a47bb6c..81d5384 100644
+--- a/.claude/launch.json
++++ b/.claude/launch.json
+@@ -1 +1 @@
+-{ "version": "0.0.1", "configurations": [ { "name": "ravora-vite", "runtimeExecutable": "npm", "runtimeArgs": ["run", "dev", "--", "--port", "5173"], "port": 5173 } ] }
++{ "version": "0.0.1", "configurations": [ { "name": "ravora-vite", "runtimeExecutable": "npx", "runtimeArgs": ["vite", "--config", "vite.dash.config.ts", "--port", "5173"], "port": 5173 } ] }
+diff --git a/components/ui/auth-card.css b/components/ui/auth-card.css
+index c6e0189..5c538a0 100644
+--- a/components/ui/auth-card.css
++++ b/components/ui/auth-card.css
+@@ -1,39 +1,44 @@
+ @import '../../src/theme/ravora-fonts.css';
+ 
+ /* ==========================================================================
+-   Ravora auth pages. Scoped under .ra. Extends the landing page world
+-   (see DESIGN.md): Gunmetal Night, Stone rules, one Amber action colour.
++   Ravora auth pages: the chronometer world (see DESIGN.md).
++   Stone paper form column beside one large rounded Gunmetal case that holds the Araiven tape.
++   Semantic variables flip inside .ra-story, exactly as on the landing page.
+    ========================================================================== */
+ 
+ .ra {
+-  --rv-bg: #0b0e14;
+-  --rv-bg-2: #10141d;
+-  --rv-card: #151a26;
+-  --rv-inset: #0e121b;
+-  --rv-text: #f8fafc;
+-  --rv-text-2: #cbd5e1;
+-  --rv-text-3: #94a3b8;
+-  --rv-line: rgba(203, 213, 225, 0.12);
+-  --rv-line-soft: rgba(203, 213, 225, 0.08);
+-  --rv-line-strong: rgba(203, 213, 225, 0.26);
+-  --rv-amber: #f59e0b;
+-  --rv-amber-hi: #fbbf24;
+-  --rv-ink: #0b0e14;
+-  --rv-pos: #10b981;
+-  --rv-neg: #ef4444;
+-  --rv-ease: cubic-bezier(0.16, 1, 0.3, 1);
+-  --rv-display: 'Bricolage Grotesque', 'Hanken Grotesk', system-ui, sans-serif;
+-  --rv-body: 'Hanken Grotesk', system-ui, -apple-system, 'Segoe UI', sans-serif;
+-  --rv-mono: 'Red Hat Mono', ui-monospace, 'Cascadia Mono', Consolas, monospace;
++  --paper: #eef1f5;
++  --ink: #0b0e14;
++  --case: #10141d;
++  --case-3: #1b2232;
++  --amber: #f59e0b;
++  --amber-hi: #fbbf24;
++  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
++  --display: 'Familjen Grotesk', 'Albert Sans', system-ui, sans-serif;
++  --body: 'Albert Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
++  --mono: 'Martian Mono', ui-monospace, 'Cascadia Mono', Consolas, monospace;
++
++  --t: #0b0e14;
++  --b: #394456;
++  --m: #5a6578;
++  --r: rgba(11, 14, 20, 0.15);
++  --r2: rgba(11, 14, 20, 0.08);
++  --rs: rgba(11, 14, 20, 0.42);
++  --s: #f8fafc;
++  --acc: #b45309;
++  --pos: #047857;
++  --neg: #b91c1c;
+ 
+   position: fixed;
+   inset: 0;
+   display: grid;
+   grid-template-columns: minmax(0, 46fr) minmax(0, 54fr);
+-  background: var(--rv-bg);
+-  color: var(--rv-text-2);
+-  font-family: var(--rv-body);
+-  font-size: 1rem;
++  gap: 0;
++  padding: clamp(8px, 1.2vw, 18px);
++  background: var(--paper);
++  color: var(--b);
++  font-family: var(--body);
++  font-size: 1.0625rem;
+   line-height: 1.55;
+   overflow: hidden auto;
+   -webkit-font-smoothing: antialiased;
+@@ -49,20 +54,33 @@
+ :where(.ra) p {
+   margin: 0;
+ }
++.ra h1,
++.ra h2,
++.ra h3 {
++  font-family: var(--display);
++  color: var(--t);
++  font-weight: 650;
++}
+ .ra ::selection {
+-  background: var(--rv-amber);
+-  color: var(--rv-ink);
++  background: var(--amber);
++  color: var(--ink);
+ }
+ .ra :focus-visible {
+-  outline: 2px solid var(--rv-amber);
++  outline: 2px solid var(--acc);
+   outline-offset: 3px;
+ }
+ 
+-/* ---------- Story panel ---------- */
++/* ---------- Story case ---------- */
+ .ra-story {
+-  background: var(--rv-bg-2);
+-  border-right: 1px solid var(--rv-line);
+-  padding: 44px 56px;
++  --t: #f8fafc;
++  --b: #cbd5e1;
++  --m: #94a3b8;
++  --r: rgba(203, 213, 225, 0.16);
++  --acc: #fbbf24;
++  background: var(--case);
++  color: var(--b);
++  border-radius: clamp(28px, 3.6vw, 48px);
++  padding: clamp(32px, 4vw, 56px);
+   display: flex;
+   flex-direction: column;
+   justify-content: space-between;
+@@ -74,344 +92,239 @@
+   align-items: center;
+   gap: 10px;
+   text-decoration: none;
+-  font: 700 1.3rem var(--rv-display);
+-  letter-spacing: -0.02em;
+-  color: var(--rv-text);
++  font: 700 1.35rem var(--display);
++  letter-spacing: -0.03em;
++  color: var(--t);
+   width: max-content;
+ }
+ .ra-logo-mark {
+-  width: 30px;
+-  height: 30px;
+-  border-radius: 7px;
+-  background: var(--rv-amber);
+-  color: var(--rv-ink);
++  width: 32px;
++  height: 32px;
++  border-radius: 9px;
++  background: var(--case);
++  color: var(--amber);
+   display: grid;
+   place-items: center;
+-  font: 800 1.05rem var(--rv-display);
++  font: 700 1.05rem var(--display);
++}
++.ra-story .ra-logo-mark {
++  background: var(--amber);
++  color: var(--ink);
+ }
+ .ra-story-body {
+-  max-width: 30rem;
++  max-width: 31rem;
+   padding: 40px 0;
+ }
+ .ra-story-h {
+-  font: 700 clamp(2.2rem, 3.5vw, 3.3rem) / 1.02 var(--rv-display);
+-  letter-spacing: -0.034em;
+-  color: var(--rv-text);
++  font: 650 clamp(2.2rem, 3.6vw, 3.4rem) / 1.02 var(--display);
++  letter-spacing: -0.038em;
++  color: var(--t);
+   text-wrap: balance;
+ }
+ .ra-story-p {
+   margin-top: 18px;
+-  font-size: 1.12rem;
++  font-size: 1.1rem;
+   line-height: 1.6;
+-  color: var(--rv-text-2);
++  color: var(--b);
+   max-width: 36ch;
+ }
+ .ra-tape {
+   list-style: none;
+   margin: 44px 0 0;
+   padding: 0;
+-  border-top: 1px solid var(--rv-line);
++  border-top: 1px solid var(--r);
+ }
+ .ra-tape li {
+   display: grid;
+-  grid-template-columns: 62px 104px minmax(0, 1fr);
++  grid-template-columns: 70px 108px minmax(0, 1fr);
+   gap: 12px;
+   align-items: baseline;
+-  padding: 13px 0;
+-  border-bottom: 1px solid var(--rv-line);
+-  animation: ra-in 0.6s var(--rv-ease) both;
++  padding: 14px 0;
++  border-bottom: 1px solid var(--r);
++  animation: ra-in 0.7s var(--ease) both;
+   animation-delay: calc(var(--i) * 600ms + 250ms);
+ }
+-.ra-tape .t {
+-  font: 500 0.78rem var(--rv-mono);
+-  color: var(--rv-text-3);
+-}
+-.ra-tape .l {
+-  font: 600 1rem var(--rv-display);
+-  color: var(--rv-text);
+-}
+-.ra-tape .v {
+-  font: 500 0.86rem var(--rv-mono);
+-  font-variant-numeric: tabular-nums;
+-  color: var(--rv-text-2);
+-}
+-.ra-tape li.is-final .v {
+-  color: var(--rv-amber-hi);
+-}
+-@keyframes ra-in {
+-  from { opacity: 0; transform: translateY(8px); }
+-}
+-.ra-tape-note {
+-  margin-top: 14px;
+-  font-size: 0.84rem;
+-  color: var(--rv-text-3);
+-}
+-.ra-story-foot {
+-  font-size: 0.82rem;
+-  color: var(--rv-text-3);
+-}
++.ra-tape .t { font: 500 0.7rem var(--mono); color: var(--m); }
++.ra-tape .l { font: 650 1rem var(--display); color: var(--t); }
++.ra-tape .v { font: 500 0.76rem var(--mono); font-variant-numeric: tabular-nums; color: var(--b); }
++.ra-tape li.is-final .v { color: var(--acc); }
++@keyframes ra-in { from { opacity: 0; transform: translateY(8px); } }
++.ra-tape-note { margin-top: 14px; font-size: 0.84rem; color: var(--m); }
++.ra-story-foot { font-size: 0.84rem; color: var(--m); }
+ 
+-/* ---------- Form column ---------- */
++/* ---------- Form column (paper) ---------- */
+ .ra-main {
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+   justify-content: flex-start;
+-  padding: clamp(40px, 11vh, 112px) 24px 48px;
++  padding: clamp(36px, 10vh, 104px) 24px 48px;
+   min-width: 0;
+ }
+-.ra-col {
+-  width: 100%;
+-  max-width: 400px;
+-}
+-.ra-logo-m {
+-  display: none;
+-  margin-bottom: 36px;
+-}
++.ra-col { width: 100%; max-width: 410px; }
++.ra-logo-m { display: none; margin-bottom: 36px; }
+ .ra-switch {
+   position: relative;
+   display: grid;
+   grid-template-columns: 1fr 1fr;
+   gap: 4px;
+   padding: 4px;
+-  background: var(--rv-bg-2);
+-  border: 1px solid var(--rv-line);
+-  border-radius: 8px;
++  background: #e5e9ef;
++  border: 1px solid var(--r);
++  border-radius: 12px;
+   margin-bottom: 34px;
+ }
+ .ra-switch button {
+   position: relative;
+-  height: 40px;
++  height: 42px;
+   border: 0;
+-  border-radius: 7px;
++  border-radius: 9px;
+   background: none;
+-  color: var(--rv-text-3);
+-  font: 600 0.92rem var(--rv-body);
++  color: var(--m);
++  font: 650 0.94rem var(--body);
+   cursor: pointer;
+-  transition: color 0.2s ease;
+-}
+-.ra-switch button:hover { color: var(--rv-text); }
+-.ra-switch button[aria-pressed='true'] { color: var(--rv-text); }
+-.ra-switch .pill {
+-  position: absolute;
+-  inset: 0;
+-  border-radius: 7px;
+-  background: #1b2232;
+-  border: 1px solid rgba(245, 158, 11, 0.5);
++  transition: color 0.25s ease;
+ }
++.ra-switch button:hover { color: var(--t); }
++.ra-switch button[aria-pressed='true'] { color: #f8fafc; }
++.ra-switch .pill { position: absolute; inset: 0; border-radius: 9px; background: var(--case); box-shadow: inset 0 0 0 1px rgba(245, 158, 11, 0.55); }
+ .ra-switch button > span:not(.pill) { position: relative; z-index: 1; }
+ 
+-.ra-title {
+-  font: 700 clamp(1.7rem, 2.4vw, 2.05rem) / 1.1 var(--rv-display);
+-  letter-spacing: -0.026em;
+-  color: var(--rv-text);
+-}
+-.ra-sub {
+-  margin-top: 10px;
+-  font-size: 1rem;
+-  color: var(--rv-text-3);
+-}
+-.ra-form {
+-  margin-top: 30px;
+-  display: grid;
+-  gap: 20px;
+-}
++.ra-title { font: 650 clamp(1.8rem, 2.6vw, 2.2rem) / 1.08 var(--display); letter-spacing: -0.03em; color: var(--t); }
++.ra-sub { margin-top: 10px; font-size: 1.04rem; color: var(--m); }
++.ra-form { margin-top: 30px; display: grid; gap: 20px; }
+ .ra-field { display: grid; gap: 8px; }
+-.ra-label-row {
+-  display: flex;
+-  justify-content: space-between;
+-  align-items: baseline;
+-  gap: 12px;
+-}
+-.ra-label-row label {
+-  font: 600 0.92rem var(--rv-body);
+-  color: var(--rv-text-2);
+-}
++.ra-label-row { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
++.ra-label-row label { font: 650 0.94rem var(--body); color: var(--t); }
+ .ra-input-wrap { position: relative; }
+ .ra-input {
+   width: 100%;
+-  height: 48px;
++  height: 50px;
+   padding: 0 14px;
+-  background: var(--rv-inset);
+-  border: 1px solid rgba(203, 213, 225, 0.46);
+-  border-radius: 8px;
+-  color: var(--rv-text);
+-  font: 400 1rem var(--rv-body);
+-  transition: border-color 0.18s ease, background 0.18s ease;
+-}
+-.ra-input::placeholder { color: var(--rv-text-3); }
+-.ra-input:hover { border-color: rgba(203, 213, 225, 0.62); }
++  background: var(--s);
++  border: 1.5px solid var(--rs);
++  border-radius: 12px;
++  color: var(--t);
++  font: 400 1.02rem var(--body);
++  transition: border-color 0.2s ease, background 0.2s ease;
++}
++.ra-input::placeholder { color: var(--m); }
++.ra-input:hover { border-color: var(--t); }
+ .ra-input:focus,
+ .ra-input:focus-visible {
+-  outline: 2px solid rgba(245, 158, 11, 0.4) !important;
++  outline: 3px solid rgba(245, 158, 11, 0.4) !important;
+   outline-offset: 0 !important;
+-  border-color: var(--rv-amber);
++  border-color: var(--acc);
+ }
+-.ra-input[aria-invalid='true'] { border-color: rgba(239, 68, 68, 0.75); }
++.ra-input[aria-invalid='true'] { border-color: var(--neg); }
+ .ra-input.has-eye { padding-right: 52px; }
+ .ra-eye {
+   position: absolute;
+   top: 5px;
+   right: 5px;
+-  width: 38px;
+-  height: 38px;
++  width: 40px;
++  height: 40px;
+   display: grid;
+   place-items: center;
+   background: none;
+   border: 0;
+-  border-radius: 7px;
+-  color: var(--rv-text-3);
++  border-radius: 9px;
++  color: var(--m);
+   cursor: pointer;
+-  transition: color 0.18s ease, background 0.18s ease;
+-}
+-.ra-eye:hover { color: var(--rv-text); background: rgba(203, 213, 225, 0.08); }
+-.ra-err {
+-  display: flex;
+-  align-items: flex-start;
+-  gap: 7px;
+-  font-size: 0.86rem;
+-  line-height: 1.4;
+-  color: var(--rv-neg);
+-  overflow: hidden;
++  transition: color 0.2s ease, background 0.2s ease;
+ }
++.ra-eye:hover { color: var(--t); background: var(--r2); }
++.ra-err { display: flex; align-items: flex-start; gap: 7px; font-size: 0.88rem; line-height: 1.4; color: var(--neg); overflow: hidden; }
+ .ra-err svg { flex: none; margin-top: 2px; }
+ 
+ .ra-meter { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-top: 2px; }
+-.ra-meter i { height: 4px; border-radius: 99px; background: rgba(203, 213, 225, 0.12); transition: background 0.3s ease; }
+-.ra-meter i.on-1 { background: var(--rv-neg); }
+-.ra-meter i.on-2 { background: var(--rv-amber); }
+-.ra-meter i.on-3 { background: var(--rv-pos); }
+-.ra-meter-row { display: flex; justify-content: space-between; font-size: 0.82rem; color: var(--rv-text-3); }
+-.ra-meter-row b { font-weight: 600; color: var(--rv-text-2); }
++.ra-meter i { height: 5px; border-radius: 99px; background: var(--r); transition: background 0.3s ease; }
++.ra-meter i.on-1 { background: var(--neg); }
++.ra-meter i.on-2 { background: var(--amber); }
++.ra-meter i.on-3 { background: var(--pos); }
++.ra-meter-row { display: flex; justify-content: space-between; font-size: 0.84rem; color: var(--m); }
++.ra-meter-row b { font-weight: 650; color: var(--t); }
+ 
+ .ra-check { display: flex; align-items: flex-start; gap: 11px; }
+-.ra-check input {
+-  flex: none;
+-  width: 18px;
+-  height: 18px;
+-  margin-top: 2px;
+-  accent-color: var(--rv-amber);
+-  cursor: pointer;
+-}
+-.ra-check label { font-size: 0.92rem; line-height: 1.5; color: var(--rv-text-2); cursor: pointer; }
+-.ra-check a, .ra-link {
+-  color: var(--rv-amber-hi);
++.ra-check input { flex: none; width: 19px; height: 19px; margin-top: 2px; accent-color: var(--ink); cursor: pointer; }
++.ra-check label { font-size: 0.94rem; line-height: 1.5; color: var(--b); cursor: pointer; }
++.ra-check a,
++.ra-link {
++  color: var(--acc);
+   text-decoration: underline;
+   text-underline-offset: 3px;
+-  text-decoration-color: rgba(251, 191, 36, 0.4);
+-  transition: text-decoration-color 0.18s ease;
+-}
+-.ra-check a:hover, .ra-link:hover { text-decoration-color: var(--rv-amber-hi); }
+-.ra-link {
+-  background: none;
+-  border: 0;
+-  padding: 3px 0;
+-  min-height: 26px;
+-  font: 600 0.9rem var(--rv-body);
+-  cursor: pointer;
++  text-decoration-color: rgba(180, 83, 9, 0.4);
++  transition: text-decoration-color 0.2s ease;
+ }
++.ra-check a:hover,
++.ra-link:hover { text-decoration-color: var(--acc); }
++.ra-link { background: none; border: 0; padding: 3px 0; min-height: 26px; font: 650 0.92rem var(--body); cursor: pointer; }
+ 
+ .ra-btn {
+-  height: 50px;
++  height: 52px;
+   width: 100%;
+   display: inline-flex;
+   align-items: center;
+   justify-content: center;
+   gap: 10px;
+-  border: 1px solid transparent;
+-  border-radius: 8px;
+-  background: var(--rv-amber);
+-  color: var(--rv-ink);
+-  font: 700 1rem var(--rv-body);
++  border: 1.5px solid transparent;
++  border-radius: 12px;
++  background: var(--amber);
++  color: var(--ink);
++  font: 700 1.02rem var(--body);
+   cursor: pointer;
+-  transition: background 0.18s ease, transform 0.2s var(--rv-ease), opacity 0.2s ease;
++  transition: background 0.2s ease, transform 0.3s var(--ease), opacity 0.2s ease;
+ }
+-.ra-btn:hover:not(:disabled) { background: var(--rv-amber-hi); }
+-.ra-btn:active:not(:disabled) { transform: translateY(1px); }
++.ra-btn:hover:not(:disabled) { background: var(--amber-hi); transform: translateY(-2px); }
++.ra-btn:active:not(:disabled) { transform: translateY(0); }
+ .ra-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+ .ra-spin { animation: ra-spin 0.8s linear infinite; }
+ @keyframes ra-spin { to { transform: rotate(360deg); } }
+ 
+-.ra-alt { text-align: center; font-size: 0.94rem; color: var(--rv-text-3); }
+-.ra-back {
+-  background: none;
+-  border: 0;
+-  padding: 6px;
+-  margin: 0 auto;
+-  display: inline-flex;
+-  align-items: center;
+-  gap: 8px;
+-  font: 600 0.92rem var(--rv-body);
+-  color: var(--rv-text-3);
+-  cursor: pointer;
+-  transition: color 0.18s ease;
+-}
+-.ra-back:hover { color: var(--rv-text); }
++.ra-back { background: none; border: 0; padding: 6px; margin: 0 auto; display: inline-flex; align-items: center; gap: 8px; font: 650 0.94rem var(--body); color: var(--m); cursor: pointer; transition: color 0.2s ease; }
++.ra-back:hover { color: var(--t); }
+ 
+ .ra-alert {
+   margin-top: 24px;
+   display: flex;
+   gap: 10px;
+   align-items: flex-start;
+-  padding: 12px 14px;
+-  border: 1px solid rgba(239, 68, 68, 0.42);
+-  background: rgba(239, 68, 68, 0.08);
+-  border-radius: 8px;
+-  color: var(--rv-text);
+-  font-size: 0.92rem;
++  padding: 13px 15px;
++  border: 1.5px solid rgba(185, 28, 28, 0.5);
++  background: rgba(185, 28, 28, 0.07);
++  border-radius: 12px;
++  color: var(--t);
++  font-size: 0.94rem;
+   line-height: 1.45;
+ }
+-.ra-alert svg { flex: none; margin-top: 2px; color: var(--rv-neg); }
++.ra-alert svg { flex: none; margin-top: 2px; color: var(--neg); }
+ 
+-.ra-or {
+-  margin-top: 30px;
+-  display: flex;
+-  align-items: center;
+-  gap: 14px;
+-  font-size: 0.86rem;
+-  color: var(--rv-text-3);
+-}
+-.ra-or::before, .ra-or::after { content: ''; flex: 1; height: 1px; background: var(--rv-line); }
++.ra-or { margin-top: 30px; display: flex; align-items: center; gap: 14px; font-size: 0.88rem; color: var(--m); }
++.ra-or::before, .ra-or::after { content: ''; flex: 1; height: 1px; background: var(--r); }
+ .ra-social { margin-top: 18px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+ .ra-social button {
+-  height: 46px;
++  height: 48px;
+   display: inline-flex;
+   align-items: center;
+   justify-content: center;
+   gap: 8px;
+   background: transparent;
+-  border: 1px solid rgba(203, 213, 225, 0.46);
+-  border-radius: 8px;
+-  color: var(--rv-text);
+-  font: 600 0.88rem var(--rv-body);
++  border: 1.5px solid var(--rs);
++  border-radius: 12px;
++  color: var(--t);
++  font: 650 0.9rem var(--body);
+   cursor: pointer;
+-  transition: border-color 0.18s ease, background 0.18s ease;
++  transition: border-color 0.2s ease, background 0.2s ease, transform 0.3s var(--ease);
+ }
+-.ra-social button:hover:not(:disabled) { border-color: var(--rv-amber); color: var(--rv-amber-hi); background: rgba(245, 158, 11, 0.06); }
++.ra-social button:hover:not(:disabled) { border-color: var(--ink); background: #f8fafc; transform: translateY(-2px); }
+ .ra-social button:disabled { opacity: 0.5; cursor: not-allowed; }
+ 
+-.ra-code {
+-  height: 58px;
+-  text-align: center;
+-  font: 600 1.5rem var(--rv-mono);
+-  letter-spacing: 0.32em;
+-  padding-left: calc(14px + 0.32em);
+-}
+-.ra-hint {
+-  background: none;
+-  border: 0;
+-  padding: 0;
+-  text-align: left;
+-  font: 600 0.88rem var(--rv-body);
+-  color: var(--rv-pos);
+-  cursor: pointer;
+-  text-decoration: underline;
+-  text-underline-offset: 3px;
+-}
++.ra-code { height: 60px; text-align: center; font: 600 1.4rem var(--mono); letter-spacing: 0.3em; padding-left: calc(14px + 0.3em); }
++.ra-hint { background: none; border: 0; padding: 0; text-align: left; font: 650 0.9rem var(--body); color: var(--pos); cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+ 
+ /* ---------- Responsive ---------- */
+ @media (max-width: 1000px) {
+-  .ra { grid-template-columns: minmax(0, 1fr); }
++  .ra { grid-template-columns: minmax(0, 1fr); padding: 0; }
+   .ra-story { display: none; }
+   .ra-logo-m { display: inline-flex; }
+   .ra-main { padding-top: 36px; }
+@@ -420,7 +333,6 @@
+   .ra-main { padding: 28px 18px 40px; }
+   .ra-social button { font-size: 0.82rem; gap: 6px; }
+ }
+-
+ @media (prefers-reduced-motion: reduce) {
+   .ra-tape li { animation: none; }
+   .ra-spin { animation-duration: 1.6s; }
 diff --git a/git_status.txt b/git_status.txt
-index ebfd981..bcf0bc8 100644
+index bcf0bc8..90708a6 100644
 --- a/git_status.txt
 +++ b/git_status.txt
-@@ -2,832 +2,8 @@ On branch main
- Your branch is up to date with 'origin/main'.
+@@ -1,9 +1,39 @@
+ On branch main
+-Your branch is up to date with 'origin/main'.
++Your branch is ahead of 'origin/main' by 1 commit.
++  (use "git push" to publish your local commits)
++
++Changes to be committed:
++  (use "git restore --staged <file>..." to unstage)
++	new file:   .claude/launch.json
++	modified:   .impeccable/design.json
++	modified:   .impeccable/surfaces/src-components-landing-landingpage-tsx.md
++	new file:   .impeccable/tmp/fix_landing2.py
++	new file:   .impeccable/tmp/landing.css.bak2
++	new file:   .impeccable/tmp/landing2-brief.md
++	new file:   .impeccable/tmp/platform_patch.py
++	modified:   DESIGN.md
++	new file:   public/fonts/albert-sans-latin-ext.woff2
++	new file:   public/fonts/albert-sans-latin.woff2
++	new file:   public/fonts/familjen-grotesk-latin-ext.woff2
++	new file:   public/fonts/familjen-grotesk-latin.woff2
++	new file:   public/fonts/martian-mono-latin-ext.woff2
++	new file:   public/fonts/martian-mono-latin.woff2
++	new file:   src/components/landing/Dial.tsx
++	new file:   src/components/landing/HeroInstrument.tsx
++	modified:   src/components/landing/LandingPage.tsx
++	new file:   src/components/landing/Movement.tsx
++	modified:   src/components/landing/PlatformTabs.tsx
++	modified:   src/components/landing/landing.css
++	modified:   src/theme/app.css
++	modified:   src/theme/ravora-fonts.css
  
  Changes not staged for commit:
--  (use "git add/rm <file>..." to update what will be committed)
-+  (use "git add <file>..." to update what will be committed)
+   (use "git add <file>..." to update what will be committed)
    (use "git restore <file>..." to discard changes in working directory)
--	modified:   .env
--	deleted:    dist/assets/LandingPage-oXGXZMQn.js
--	deleted:    dist/assets/OnboardingWizard-aPEJIo9w.js
--	deleted:    dist/assets/auth-card-BaB8t2cy.js
--	deleted:    dist/assets/favicon-DyNiQ7Za.svg
--	deleted:    dist/assets/index-BRKJEoXS.css
--	deleted:    dist/assets/index-BVbCccY2.js
--	deleted:    dist/assets/vendor-react-DM9cMQEO.js
--	deleted:    dist/assets/vendor-router-D7lonkYD.js
--	deleted:    dist/assets/vendor-ui-Yox3N_ql.js
--	deleted:    dist/index.html
--	deleted:    node_modules/.bin/color-support
--	deleted:    node_modules/.bin/color-support.cmd
--	deleted:    node_modules/.bin/color-support.ps1
--	deleted:    node_modules/.bin/mkdirp
--	deleted:    node_modules/.bin/mkdirp.cmd
--	deleted:    node_modules/.bin/mkdirp.ps1
--	modified:   node_modules/.bin/node-which
--	modified:   node_modules/.bin/node-which.cmd
--	modified:   node_modules/.bin/node-which.ps1
--	deleted:    node_modules/.bin/rimraf
--	deleted:    node_modules/.bin/rimraf.cmd
--	deleted:    node_modules/.bin/rimraf.ps1
--	modified:   node_modules/.package-lock.json
--	deleted:    node_modules/@gar/promisify/LICENSE.md
--	deleted:    node_modules/@gar/promisify/README.md
--	deleted:    node_modules/@gar/promisify/index.js
--	deleted:    node_modules/@gar/promisify/package.json
--	deleted:    node_modules/@npmcli/fs/LICENSE.md
--	deleted:    node_modules/@npmcli/fs/README.md
--	deleted:    node_modules/@npmcli/fs/lib/common/file-url-to-path/index.js
--	deleted:    node_modules/@npmcli/fs/lib/common/file-url-to-path/polyfill.js
--	deleted:    node_modules/@npmcli/fs/lib/common/get-options.js
--	deleted:    node_modules/@npmcli/fs/lib/common/node.js
--	deleted:    node_modules/@npmcli/fs/lib/common/owner.js
--	deleted:    node_modules/@npmcli/fs/lib/copy-file.js
--	deleted:    node_modules/@npmcli/fs/lib/cp/LICENSE
--	deleted:    node_modules/@npmcli/fs/lib/cp/index.js
--	deleted:    node_modules/@npmcli/fs/lib/cp/polyfill.js
--	deleted:    node_modules/@npmcli/fs/lib/errors.js
--	deleted:    node_modules/@npmcli/fs/lib/fs.js
--	deleted:    node_modules/@npmcli/fs/lib/index.js
--	deleted:    node_modules/@npmcli/fs/lib/mkdir/index.js
--	deleted:    node_modules/@npmcli/fs/lib/mkdir/polyfill.js
--	deleted:    node_modules/@npmcli/fs/lib/mkdtemp.js
--	deleted:    node_modules/@npmcli/fs/lib/rm/index.js
--	deleted:    node_modules/@npmcli/fs/lib/rm/polyfill.js
--	deleted:    node_modules/@npmcli/fs/lib/with-temp-dir.js
--	deleted:    node_modules/@npmcli/fs/lib/write-file.js
--	deleted:    node_modules/@npmcli/fs/package.json
--	deleted:    node_modules/@npmcli/move-file/LICENSE.md
--	deleted:    node_modules/@npmcli/move-file/README.md
--	deleted:    node_modules/@npmcli/move-file/index.js
--	deleted:    node_modules/@npmcli/move-file/package.json
--	deleted:    node_modules/@tootallnate/once/dist/index.d.ts
--	deleted:    node_modules/@tootallnate/once/dist/index.js
--	deleted:    node_modules/@tootallnate/once/dist/index.js.map
--	deleted:    node_modules/@tootallnate/once/package.json
--	deleted:    node_modules/abbrev/abbrev.js
--	modified:   node_modules/abbrev/package.json
--	deleted:    node_modules/agent-base/README.md
--	deleted:    node_modules/agent-base/dist/src/index.d.ts
--	deleted:    node_modules/agent-base/dist/src/index.js
--	deleted:    node_modules/agent-base/dist/src/index.js.map
--	deleted:    node_modules/agent-base/dist/src/promisify.d.ts
--	deleted:    node_modules/agent-base/dist/src/promisify.js
--	deleted:    node_modules/agent-base/dist/src/promisify.js.map
--	deleted:    node_modules/agent-base/node_modules/debug/LICENSE
--	deleted:    node_modules/agent-base/node_modules/debug/README.md
--	deleted:    node_modules/agent-base/node_modules/debug/package.json
--	deleted:    node_modules/agent-base/node_modules/debug/src/browser.js
--	deleted:    node_modules/agent-base/node_modules/debug/src/common.js
--	deleted:    node_modules/agent-base/node_modules/debug/src/index.js
--	deleted:    node_modules/agent-base/node_modules/debug/src/node.js
--	deleted:    node_modules/agent-base/node_modules/ms/index.js
--	deleted:    node_modules/agent-base/node_modules/ms/license.md
--	deleted:    node_modules/agent-base/node_modules/ms/package.json
--	deleted:    node_modules/agent-base/node_modules/ms/readme.md
--	deleted:    node_modules/agent-base/package.json
--	deleted:    node_modules/agent-base/src/index.ts
--	deleted:    node_modules/agent-base/src/promisify.ts
--	deleted:    node_modules/agentkeepalive/LICENSE
--	deleted:    node_modules/agentkeepalive/README.md
--	deleted:    node_modules/agentkeepalive/browser.js
--	deleted:    node_modules/agentkeepalive/index.d.ts
--	deleted:    node_modules/agentkeepalive/index.js
--	deleted:    node_modules/agentkeepalive/lib/agent.js
--	deleted:    node_modules/agentkeepalive/lib/constants.js
--	deleted:    node_modules/agentkeepalive/lib/https_agent.js
--	deleted:    node_modules/agentkeepalive/package.json
--	deleted:    node_modules/aggregate-error/index.d.ts
--	deleted:    node_modules/aggregate-error/index.js
--	deleted:    node_modules/aggregate-error/license
--	deleted:    node_modules/aggregate-error/package.json
--	deleted:    node_modules/aggregate-error/readme.md
--	deleted:    node_modules/ansi-regex/index.d.ts
--	deleted:    node_modules/ansi-regex/index.js
--	deleted:    node_modules/ansi-regex/license
--	deleted:    node_modules/ansi-regex/package.json
--	deleted:    node_modules/ansi-regex/readme.md
--	deleted:    node_modules/aproba/LICENSE
--	deleted:    node_modules/aproba/README.md
--	deleted:    node_modules/aproba/index.js
--	deleted:    node_modules/aproba/package.json
--	deleted:    node_modules/are-we-there-yet/LICENSE.md
--	deleted:    node_modules/are-we-there-yet/README.md
--	deleted:    node_modules/are-we-there-yet/lib/index.js
--	deleted:    node_modules/are-we-there-yet/lib/tracker-base.js
--	deleted:    node_modules/are-we-there-yet/lib/tracker-group.js
--	deleted:    node_modules/are-we-there-yet/lib/tracker-stream.js
--	deleted:    node_modules/are-we-there-yet/lib/tracker.js
--	deleted:    node_modules/are-we-there-yet/package.json
--	deleted:    node_modules/balanced-match/.github/FUNDING.yml
--	deleted:    node_modules/balanced-match/LICENSE.md
--	deleted:    node_modules/balanced-match/README.md
--	deleted:    node_modules/balanced-match/index.js
--	deleted:    node_modules/balanced-match/package.json
--	deleted:    node_modules/brace-expansion/LICENSE
--	deleted:    node_modules/brace-expansion/README.md
--	deleted:    node_modules/brace-expansion/index.js
--	deleted:    node_modules/brace-expansion/package.json
--	deleted:    node_modules/cacache/LICENSE.md
--	deleted:    node_modules/cacache/README.md
--	deleted:    node_modules/cacache/get.js
--	deleted:    node_modules/cacache/index.js
--	deleted:    node_modules/cacache/lib/content/path.js
--	deleted:    node_modules/cacache/lib/content/read.js
--	deleted:    node_modules/cacache/lib/content/rm.js
--	deleted:    node_modules/cacache/lib/content/write.js
--	deleted:    node_modules/cacache/lib/entry-index.js
--	deleted:    node_modules/cacache/lib/memoization.js
--	deleted:    node_modules/cacache/lib/util/disposer.js
--	deleted:    node_modules/cacache/lib/util/fix-owner.js
--	deleted:    node_modules/cacache/lib/util/hash-to-segments.js
--	deleted:    node_modules/cacache/lib/util/move-file.js
--	deleted:    node_modules/cacache/lib/util/tmp.js
--	deleted:    node_modules/cacache/lib/verify.js
--	deleted:    node_modules/cacache/ls.js
--	deleted:    node_modules/cacache/package.json
--	deleted:    node_modules/cacache/put.js
--	deleted:    node_modules/cacache/rm.js
--	deleted:    node_modules/cacache/verify.js
--	deleted:    node_modules/chownr/LICENSE
--	deleted:    node_modules/chownr/chownr.js
--	modified:   node_modules/chownr/package.json
--	deleted:    node_modules/clean-stack/index.d.ts
--	deleted:    node_modules/clean-stack/index.js
--	deleted:    node_modules/clean-stack/license
--	deleted:    node_modules/clean-stack/package.json
--	deleted:    node_modules/clean-stack/readme.md
--	deleted:    node_modules/color-support/LICENSE
--	deleted:    node_modules/color-support/README.md
--	deleted:    node_modules/color-support/bin.js
--	deleted:    node_modules/color-support/browser.js
--	deleted:    node_modules/color-support/index.js
--	deleted:    node_modules/color-support/package.json
--	deleted:    node_modules/concat-map/.travis.yml
--	deleted:    node_modules/concat-map/LICENSE
--	deleted:    node_modules/concat-map/README.markdown
--	deleted:    node_modules/concat-map/example/map.js
--	deleted:    node_modules/concat-map/index.js
--	deleted:    node_modules/concat-map/package.json
--	deleted:    node_modules/concat-map/test/map.js
--	deleted:    node_modules/console-control-strings/LICENSE
--	deleted:    node_modules/console-control-strings/README.md
--	deleted:    node_modules/console-control-strings/README.md~
--	deleted:    node_modules/console-control-strings/index.js
--	deleted:    node_modules/console-control-strings/package.json
--	deleted:    node_modules/delegates/.npmignore
--	deleted:    node_modules/delegates/History.md
--	deleted:    node_modules/delegates/License
--	deleted:    node_modules/delegates/Makefile
--	deleted:    node_modules/delegates/Readme.md
--	deleted:    node_modules/delegates/index.js
--	deleted:    node_modules/delegates/package.json
--	deleted:    node_modules/delegates/test/index.js
--	deleted:    node_modules/emoji-regex/LICENSE-MIT.txt
--	deleted:    node_modules/emoji-regex/README.md
--	deleted:    node_modules/emoji-regex/es2015/index.js
--	deleted:    node_modules/emoji-regex/es2015/text.js
--	deleted:    node_modules/emoji-regex/index.d.ts
--	deleted:    node_modules/emoji-regex/index.js
--	deleted:    node_modules/emoji-regex/package.json
--	deleted:    node_modules/emoji-regex/text.js
--	deleted:    node_modules/encoding/.prettierrc.js
--	deleted:    node_modules/encoding/.travis.yml
--	deleted:    node_modules/encoding/LICENSE
--	deleted:    node_modules/encoding/README.md
--	deleted:    node_modules/encoding/lib/encoding.js
--	deleted:    node_modules/encoding/node_modules/iconv-lite/.github/dependabot.yml
--	deleted:    node_modules/encoding/node_modules/iconv-lite/.idea/codeStyles/Project.xml
--	deleted:    node_modules/encoding/node_modules/iconv-lite/.idea/codeStyles/codeStyleConfig.xml
--	deleted:    node_modules/encoding/node_modules/iconv-lite/.idea/iconv-lite.iml
--	deleted:    node_modules/encoding/node_modules/iconv-lite/.idea/inspectionProfiles/Project_Default.xml
--	deleted:    node_modules/encoding/node_modules/iconv-lite/.idea/modules.xml
--	deleted:    node_modules/encoding/node_modules/iconv-lite/.idea/vcs.xml
--	deleted:    node_modules/encoding/node_modules/iconv-lite/Changelog.md
--	deleted:    node_modules/encoding/node_modules/iconv-lite/LICENSE
--	deleted:    node_modules/encoding/node_modules/iconv-lite/README.md
--	deleted:    node_modules/encoding/node_modules/iconv-lite/encodings/dbcs-codec.js
--	deleted:    node_modules/encoding/node_modules/iconv-lite/encodings/dbcs-data.js
--	deleted:    node_modules/encoding/node_modules/iconv-lite/encodings/index.js
--	deleted:    node_modules/encoding/node_modules/iconv-lite/encodings/internal.js
--	deleted:    node_modules/encoding/node_modules/iconv-lite/encodings/sbcs-codec.js
--	deleted:    node_modules/encoding/node_modules/iconv-lite/encodings/sbcs-data-generated.js
--	deleted:    node_modules/encoding/node_modules/iconv-lite/encodings/sbcs-data.js
--	deleted:    node_modules/encoding/node_modules/iconv-lite/encodings/tables/big5-added.json
--	deleted:    node_modules/encoding/node_modules/iconv-lite/encodings/tables/cp936.json
--	deleted:    node_modules/encoding/node_modules/iconv-lite/encodings/tables/cp949.json
--	deleted:    node_modules/encoding/node_modules/iconv-lite/encodings/tables/cp950.json
--	deleted:    node_modules/encoding/node_modules/iconv-lite/encodings/tables/eucjp.json
--	deleted:    node_modules/encoding/node_modules/iconv-lite/encodings/tables/gb18030-ranges.json
--	deleted:    node_modules/encoding/node_modules/iconv-lite/encodings/tables/gbk-added.json
--	deleted:    node_modules/encoding/node_modules/iconv-lite/encodings/tables/shiftjis.json
--	deleted:    node_modules/encoding/node_modules/iconv-lite/encodings/utf16.js
--	deleted:    node_modules/encoding/node_modules/iconv-lite/encodings/utf32.js
--	deleted:    node_modules/encoding/node_modules/iconv-lite/encodings/utf7.js
--	deleted:    node_modules/encoding/node_modules/iconv-lite/lib/bom-handling.js
--	deleted:    node_modules/encoding/node_modules/iconv-lite/lib/index.d.ts
--	deleted:    node_modules/encoding/node_modules/iconv-lite/lib/index.js
--	deleted:    node_modules/encoding/node_modules/iconv-lite/lib/streams.js
--	deleted:    node_modules/encoding/node_modules/iconv-lite/package.json
--	deleted:    node_modules/encoding/package.json
--	deleted:    node_modules/encoding/test/test.js
--	deleted:    node_modules/err-code/.editorconfig
--	deleted:    node_modules/err-code/.eslintrc.json
--	deleted:    node_modules/err-code/.travis.yml
--	deleted:    node_modules/err-code/README.md
--	deleted:    node_modules/err-code/bower.json
--	deleted:    node_modules/err-code/index.js
--	deleted:    node_modules/err-code/index.umd.js
--	deleted:    node_modules/err-code/package.json
--	deleted:    node_modules/err-code/test/.eslintrc.json
--	deleted:    node_modules/err-code/test/test.js
--	deleted:    node_modules/fs-minipass/LICENSE
--	deleted:    node_modules/fs-minipass/README.md
--	deleted:    node_modules/fs-minipass/index.js
--	deleted:    node_modules/fs-minipass/package.json
--	deleted:    node_modules/fs.realpath/LICENSE
--	deleted:    node_modules/fs.realpath/README.md
--	deleted:    node_modules/fs.realpath/index.js
--	deleted:    node_modules/fs.realpath/old.js
--	deleted:    node_modules/fs.realpath/package.json
--	deleted:    node_modules/gauge/LICENSE.md
--	deleted:    node_modules/gauge/README.md
--	deleted:    node_modules/gauge/lib/base-theme.js
--	deleted:    node_modules/gauge/lib/error.js
--	deleted:    node_modules/gauge/lib/has-color.js
--	deleted:    node_modules/gauge/lib/index.js
--	deleted:    node_modules/gauge/lib/plumbing.js
--	deleted:    node_modules/gauge/lib/process.js
--	deleted:    node_modules/gauge/lib/progress-bar.js
--	deleted:    node_modules/gauge/lib/render-template.js
--	deleted:    node_modules/gauge/lib/set-immediate.js
--	deleted:    node_modules/gauge/lib/set-interval.js
--	deleted:    node_modules/gauge/lib/spin.js
--	deleted:    node_modules/gauge/lib/template-item.js
--	deleted:    node_modules/gauge/lib/theme-set.js
--	deleted:    node_modules/gauge/lib/themes.js
--	deleted:    node_modules/gauge/lib/wide-truncate.js
--	deleted:    node_modules/gauge/package.json
--	deleted:    node_modules/glob/LICENSE
--	deleted:    node_modules/glob/README.md
--	deleted:    node_modules/glob/common.js
--	deleted:    node_modules/glob/glob.js
--	deleted:    node_modules/glob/package.json
--	deleted:    node_modules/glob/sync.js
--	deleted:    node_modules/has-unicode/LICENSE
--	deleted:    node_modules/has-unicode/README.md
--	deleted:    node_modules/has-unicode/index.js
--	deleted:    node_modules/has-unicode/package.json
--	deleted:    node_modules/http-cache-semantics/LICENSE
--	deleted:    node_modules/http-cache-semantics/README.md
--	deleted:    node_modules/http-cache-semantics/index.js
--	deleted:    node_modules/http-cache-semantics/package.json
--	deleted:    node_modules/http-proxy-agent/README.md
--	deleted:    node_modules/http-proxy-agent/dist/agent.d.ts
--	deleted:    node_modules/http-proxy-agent/dist/agent.js
--	deleted:    node_modules/http-proxy-agent/dist/agent.js.map
--	deleted:    node_modules/http-proxy-agent/dist/index.d.ts
--	deleted:    node_modules/http-proxy-agent/dist/index.js
--	deleted:    node_modules/http-proxy-agent/dist/index.js.map
--	deleted:    node_modules/http-proxy-agent/node_modules/debug/LICENSE
--	deleted:    node_modules/http-proxy-agent/node_modules/debug/README.md
--	deleted:    node_modules/http-proxy-agent/node_modules/debug/package.json
--	deleted:    node_modules/http-proxy-agent/node_modules/debug/src/browser.js
--	deleted:    node_modules/http-proxy-agent/node_modules/debug/src/common.js
--	deleted:    node_modules/http-proxy-agent/node_modules/debug/src/index.js
--	deleted:    node_modules/http-proxy-agent/node_modules/debug/src/node.js
--	deleted:    node_modules/http-proxy-agent/node_modules/ms/index.js
--	deleted:    node_modules/http-proxy-agent/node_modules/ms/license.md
--	deleted:    node_modules/http-proxy-agent/node_modules/ms/package.json
--	deleted:    node_modules/http-proxy-agent/node_modules/ms/readme.md
--	deleted:    node_modules/http-proxy-agent/package.json
--	deleted:    node_modules/https-proxy-agent/README.md
--	deleted:    node_modules/https-proxy-agent/dist/agent.d.ts
--	deleted:    node_modules/https-proxy-agent/dist/agent.js
--	deleted:    node_modules/https-proxy-agent/dist/agent.js.map
--	deleted:    node_modules/https-proxy-agent/dist/index.d.ts
--	deleted:    node_modules/https-proxy-agent/dist/index.js
--	deleted:    node_modules/https-proxy-agent/dist/index.js.map
--	deleted:    node_modules/https-proxy-agent/dist/parse-proxy-response.d.ts
--	deleted:    node_modules/https-proxy-agent/dist/parse-proxy-response.js
--	deleted:    node_modules/https-proxy-agent/dist/parse-proxy-response.js.map
--	deleted:    node_modules/https-proxy-agent/node_modules/debug/LICENSE
--	deleted:    node_modules/https-proxy-agent/node_modules/debug/README.md
--	deleted:    node_modules/https-proxy-agent/node_modules/debug/package.json
--	deleted:    node_modules/https-proxy-agent/node_modules/debug/src/browser.js
--	deleted:    node_modules/https-proxy-agent/node_modules/debug/src/common.js
--	deleted:    node_modules/https-proxy-agent/node_modules/debug/src/index.js
--	deleted:    node_modules/https-proxy-agent/node_modules/debug/src/node.js
--	deleted:    node_modules/https-proxy-agent/node_modules/ms/index.js
--	deleted:    node_modules/https-proxy-agent/node_modules/ms/license.md
--	deleted:    node_modules/https-proxy-agent/node_modules/ms/package.json
--	deleted:    node_modules/https-proxy-agent/node_modules/ms/readme.md
--	deleted:    node_modules/https-proxy-agent/package.json
--	deleted:    node_modules/humanize-ms/History.md
--	deleted:    node_modules/humanize-ms/LICENSE
--	deleted:    node_modules/humanize-ms/README.md
--	deleted:    node_modules/humanize-ms/index.js
--	deleted:    node_modules/humanize-ms/package.json
--	deleted:    node_modules/imurmurhash/README.md
--	deleted:    node_modules/imurmurhash/imurmurhash.js
--	deleted:    node_modules/imurmurhash/imurmurhash.min.js
--	deleted:    node_modules/imurmurhash/package.json
--	deleted:    node_modules/indent-string/index.d.ts
--	deleted:    node_modules/indent-string/index.js
--	deleted:    node_modules/indent-string/license
--	deleted:    node_modules/indent-string/package.json
--	deleted:    node_modules/indent-string/readme.md
--	deleted:    node_modules/infer-owner/LICENSE
--	deleted:    node_modules/infer-owner/README.md
--	deleted:    node_modules/infer-owner/index.js
--	deleted:    node_modules/infer-owner/package.json
--	deleted:    node_modules/inflight/LICENSE
--	deleted:    node_modules/inflight/README.md
--	deleted:    node_modules/inflight/inflight.js
--	deleted:    node_modules/inflight/package.json
--	deleted:    node_modules/ip-address/LICENSE
--	deleted:    node_modules/ip-address/README.md
--	deleted:    node_modules/ip-address/dist/address-error.d.ts
--	deleted:    node_modules/ip-address/dist/address-error.js
--	deleted:    node_modules/ip-address/dist/address-error.js.map
--	deleted:    node_modules/ip-address/dist/common.d.ts
--	deleted:    node_modules/ip-address/dist/common.js
--	deleted:    node_modules/ip-address/dist/common.js.map
--	deleted:    node_modules/ip-address/dist/ip-address.d.ts
--	deleted:    node_modules/ip-address/dist/ip-address.js
--	deleted:    node_modules/ip-address/dist/ip-address.js.map
--	deleted:    node_modules/ip-address/dist/ipv4.d.ts
--	deleted:    node_modules/ip-address/dist/ipv4.js
--	deleted:    node_modules/ip-address/dist/ipv4.js.map
--	deleted:    node_modules/ip-address/dist/ipv6.d.ts
--	deleted:    node_modules/ip-address/dist/ipv6.js
--	deleted:    node_modules/ip-address/dist/ipv6.js.map
--	deleted:    node_modules/ip-address/dist/v4/constants.d.ts
--	deleted:    node_modules/ip-address/dist/v4/constants.js
--	deleted:    node_modules/ip-address/dist/v4/constants.js.map
--	deleted:    node_modules/ip-address/dist/v6/constants.d.ts
--	deleted:    node_modules/ip-address/dist/v6/constants.js
--	deleted:    node_modules/ip-address/dist/v6/constants.js.map
--	deleted:    node_modules/ip-address/dist/v6/helpers.d.ts
--	deleted:    node_modules/ip-address/dist/v6/helpers.js
--	deleted:    node_modules/ip-address/dist/v6/helpers.js.map
--	deleted:    node_modules/ip-address/dist/v6/regular-expressions.d.ts
--	deleted:    node_modules/ip-address/dist/v6/regular-expressions.js
--	deleted:    node_modules/ip-address/dist/v6/regular-expressions.js.map
--	deleted:    node_modules/ip-address/package.json
--	deleted:    node_modules/is-fullwidth-code-point/index.d.ts
--	deleted:    node_modules/is-fullwidth-code-point/index.js
--	deleted:    node_modules/is-fullwidth-code-point/license
--	deleted:    node_modules/is-fullwidth-code-point/package.json
--	deleted:    node_modules/is-fullwidth-code-point/readme.md
--	deleted:    node_modules/is-lambda/.npmignore
--	deleted:    node_modules/is-lambda/.travis.yml
--	deleted:    node_modules/is-lambda/LICENSE
--	deleted:    node_modules/is-lambda/README.md
--	deleted:    node_modules/is-lambda/index.js
--	deleted:    node_modules/is-lambda/package.json
--	deleted:    node_modules/is-lambda/test.js
--	deleted:    node_modules/isexe/.npmignore
--	deleted:    node_modules/isexe/LICENSE
--	modified:   node_modules/isexe/README.md
--	deleted:    node_modules/isexe/index.js
--	deleted:    node_modules/isexe/mode.js
--	modified:   node_modules/isexe/package.json
--	deleted:    node_modules/isexe/test/basic.js
--	deleted:    node_modules/isexe/windows.js
--	deleted:    node_modules/lru-cache/LICENSE
--	deleted:    node_modules/lru-cache/README.md
--	deleted:    node_modules/lru-cache/index.js
--	deleted:    node_modules/lru-cache/package.json
--	deleted:    node_modules/make-fetch-happen/LICENSE
--	deleted:    node_modules/make-fetch-happen/README.md
--	deleted:    node_modules/make-fetch-happen/lib/agent.js
--	deleted:    node_modules/make-fetch-happen/lib/cache/entry.js
--	deleted:    node_modules/make-fetch-happen/lib/cache/errors.js
--	deleted:    node_modules/make-fetch-happen/lib/cache/index.js
--	deleted:    node_modules/make-fetch-happen/lib/cache/key.js
--	deleted:    node_modules/make-fetch-happen/lib/cache/policy.js
--	deleted:    node_modules/make-fetch-happen/lib/fetch.js
--	deleted:    node_modules/make-fetch-happen/lib/index.js
--	deleted:    node_modules/make-fetch-happen/lib/options.js
--	deleted:    node_modules/make-fetch-happen/lib/remote.js
--	deleted:    node_modules/make-fetch-happen/package.json
--	deleted:    node_modules/minimatch/LICENSE
--	deleted:    node_modules/minimatch/README.md
--	deleted:    node_modules/minimatch/minimatch.js
--	deleted:    node_modules/minimatch/package.json
--	deleted:    node_modules/minipass-collect/LICENSE
--	deleted:    node_modules/minipass-collect/README.md
--	deleted:    node_modules/minipass-collect/index.js
--	deleted:    node_modules/minipass-collect/package.json
--	deleted:    node_modules/minipass-fetch/LICENSE
--	deleted:    node_modules/minipass-fetch/README.md
--	deleted:    node_modules/minipass-fetch/index.js
--	deleted:    node_modules/minipass-fetch/lib/abort-error.js
--	deleted:    node_modules/minipass-fetch/lib/blob.js
--	deleted:    node_modules/minipass-fetch/lib/body.js
--	deleted:    node_modules/minipass-fetch/lib/fetch-error.js
--	deleted:    node_modules/minipass-fetch/lib/headers.js
--	deleted:    node_modules/minipass-fetch/lib/index.js
--	deleted:    node_modules/minipass-fetch/lib/request.js
--	deleted:    node_modules/minipass-fetch/lib/response.js
--	deleted:    node_modules/minipass-fetch/package.json
--	deleted:    node_modules/minipass-flush/LICENSE.md
--	deleted:    node_modules/minipass-flush/README.md
--	deleted:    node_modules/minipass-flush/index.js
--	deleted:    node_modules/minipass-flush/package.json
--	deleted:    node_modules/minipass-pipeline/LICENSE
--	deleted:    node_modules/minipass-pipeline/README.md
--	deleted:    node_modules/minipass-pipeline/index.js
--	deleted:    node_modules/minipass-pipeline/package.json
--	deleted:    node_modules/minipass-sized/.npmignore
--	deleted:    node_modules/minipass-sized/LICENSE
--	deleted:    node_modules/minipass-sized/README.md
--	deleted:    node_modules/minipass-sized/index.js
--	deleted:    node_modules/minipass-sized/package-lock.json
--	deleted:    node_modules/minipass-sized/package.json
--	deleted:    node_modules/minipass-sized/test/basic.js
--	deleted:    node_modules/minipass/LICENSE
--	modified:   node_modules/minipass/README.md
--	deleted:    node_modules/minipass/index.d.ts
--	deleted:    node_modules/minipass/index.js
--	modified:   node_modules/minipass/package.json
--	modified:   node_modules/minizlib/LICENSE
--	modified:   node_modules/minizlib/README.md
--	deleted:    node_modules/minizlib/constants.js
--	deleted:    node_modules/minizlib/index.js
--	modified:   node_modules/minizlib/package.json
--	deleted:    node_modules/mkdirp/CHANGELOG.md
--	deleted:    node_modules/mkdirp/LICENSE
--	deleted:    node_modules/mkdirp/bin/cmd.js
--	deleted:    node_modules/mkdirp/index.js
--	deleted:    node_modules/mkdirp/lib/find-made.js
--	deleted:    node_modules/mkdirp/lib/mkdirp-manual.js
--	deleted:    node_modules/mkdirp/lib/mkdirp-native.js
--	deleted:    node_modules/mkdirp/lib/opts-arg.js
--	deleted:    node_modules/mkdirp/lib/path-arg.js
--	deleted:    node_modules/mkdirp/lib/use-native.js
--	deleted:    node_modules/mkdirp/package.json
--	deleted:    node_modules/mkdirp/readme.markdown
--	modified:   node_modules/node-addon-api/README.md
--	modified:   node_modules/node-addon-api/common.gypi
--	modified:   node_modules/node-addon-api/index.js
--	modified:   node_modules/node-addon-api/napi-inl.h
--	modified:   node_modules/node-addon-api/napi.h
--	modified:   node_modules/node-addon-api/node_addon_api.gyp
--	modified:   node_modules/node-addon-api/noexcept.gypi
--	modified:   node_modules/node-addon-api/package.json
--	modified:   node_modules/node-addon-api/tools/conversion.js
--	deleted:    node_modules/node-addon-api/tools/eslint-format.js
--	deleted:    node_modules/node-gyp/.github/ISSUE_TEMPLATE.md
--	deleted:    node_modules/node-gyp/.github/PULL_REQUEST_TEMPLATE.md
--	deleted:    node_modules/node-gyp/.github/workflows/release-please.yml
--	deleted:    node_modules/node-gyp/.github/workflows/tests.yml
--	deleted:    node_modules/node-gyp/.github/workflows/visual-studio.yml
--	modified:   node_modules/node-gyp/CHANGELOG.md
--	modified:   node_modules/node-gyp/CONTRIBUTING.md
--	modified:   node_modules/node-gyp/README.md
--	modified:   node_modules/node-gyp/addon.gypi
--	modified:   node_modules/node-gyp/bin/node-gyp.js
--	deleted:    node_modules/node-gyp/docs/Common-issues.md
--	deleted:    node_modules/node-gyp/docs/Error-pre-versions-of-node-cannot-be-installed.md
--	deleted:    node_modules/node-gyp/docs/Home.md
--	deleted:    node_modules/node-gyp/docs/Linking-to-OpenSSL.md
--	deleted:    node_modules/node-gyp/docs/Updating-npm-bundled-node-gyp.md
--	deleted:    node_modules/node-gyp/docs/binding.gyp-files-in-the-wild.md
--	deleted:    node_modules/node-gyp/gyp/.flake8
--	deleted:    node_modules/node-gyp/gyp/.github/workflows/Python_tests.yml
--	deleted:    node_modules/node-gyp/gyp/.github/workflows/node-gyp.yml
--	deleted:    node_modules/node-gyp/gyp/.github/workflows/nodejs-windows.yml
--	deleted:    node_modules/node-gyp/gyp/.github/workflows/release-please.yml
--	deleted:    node_modules/node-gyp/gyp/AUTHORS
--	deleted:    node_modules/node-gyp/gyp/CHANGELOG.md
--	deleted:    node_modules/node-gyp/gyp/CODE_OF_CONDUCT.md
--	deleted:    node_modules/node-gyp/gyp/CONTRIBUTING.md
--	deleted:    node_modules/node-gyp/gyp/README.md
--	modified:   node_modules/node-gyp/gyp/gyp_main.py
--	modified:   node_modules/node-gyp/gyp/pylib/gyp/MSVSNew.py
--	modified:   node_modules/node-gyp/gyp/pylib/gyp/MSVSProject.py
--	modified:   node_modules/node-gyp/gyp/pylib/gyp/MSVSSettings.py
--	modified:   node_modules/node-gyp/gyp/pylib/gyp/MSVSSettings_test.py
--	modified:   node_modules/node-gyp/gyp/pylib/gyp/MSVSToolFile.py
--	modified:   node_modules/node-gyp/gyp/pylib/gyp/MSVSUserFile.py
--	modified:   node_modules/node-gyp/gyp/pylib/gyp/MSVSUtil.py
--	modified:   node_modules/node-gyp/gyp/pylib/gyp/MSVSVersion.py
--	modified:   node_modules/node-gyp/gyp/pylib/gyp/__init__.py
--	modified:   node_modules/node-gyp/gyp/pylib/gyp/common.py
--	modified:   node_modules/node-gyp/gyp/pylib/gyp/common_test.py
--	modified:   node_modules/node-gyp/gyp/pylib/gyp/easy_xml.py
--	modified:   node_modules/node-gyp/gyp/pylib/gyp/easy_xml_test.py
--	modified:   node_modules/node-gyp/gyp/pylib/gyp/flock_tool.py
--	modified:   node_modules/node-gyp/gyp/pylib/gyp/generator/analyzer.py
--	modified:   node_modules/node-gyp/gyp/pylib/gyp/generator/android.py
--	modified:   node_modules/node-gyp/gyp/pylib/gyp/generator/cmake.py
--	modified:   node_modules/node-gyp/gyp/pylib/gyp/generator/compile_commands_json.py
--	modified:   node_modules/node-gyp/gyp/pylib/gyp/generator/dump_dependency_json.py
--	modified:   node_modules/node-gyp/gyp/pylib/gyp/generator/eclipse.py
--	modified:   node_modules/node-gyp/gyp/pylib/gyp/generator/gypd.py
--	modified:   node_modules/node-gyp/gyp/pylib/gyp/generator/gypsh.py
--	modified:   node_modules/node-gyp/gyp/pylib/gyp/generator/make.py
--	modified:   node_modules/node-gyp/gyp/pylib/gyp/generator/msvs.py
--	modified:   node_modules/node-gyp/gyp/pylib/gyp/generator/msvs_test.py
--	modified:   node_modules/node-gyp/gyp/pylib/gyp/generator/ninja.py
--	modified:   node_modules/node-gyp/gyp/pylib/gyp/generator/ninja_test.py
--	modified:   node_modules/node-gyp/gyp/pylib/gyp/generator/xcode.py
--	modified:   node_modules/node-gyp/gyp/pylib/gyp/generator/xcode_test.py
--	modified:   node_modules/node-gyp/gyp/pylib/gyp/input.py
--	modified:   node_modules/node-gyp/gyp/pylib/gyp/input_test.py
--	modified:   node_modules/node-gyp/gyp/pylib/gyp/mac_tool.py
--	modified:   node_modules/node-gyp/gyp/pylib/gyp/msvs_emulation.py
--	modified:   node_modules/node-gyp/gyp/pylib/gyp/simple_copy.py
--	modified:   node_modules/node-gyp/gyp/pylib/gyp/win_tool.py
--	modified:   node_modules/node-gyp/gyp/pylib/gyp/xcode_emulation.py
--	modified:   node_modules/node-gyp/gyp/pylib/gyp/xcode_ninja.py
--	modified:   node_modules/node-gyp/gyp/pylib/gyp/xcodeproj_file.py
--	modified:   node_modules/node-gyp/gyp/pylib/gyp/xml_fix.py
--	deleted:    node_modules/node-gyp/gyp/requirements_dev.txt
--	deleted:    node_modules/node-gyp/gyp/setup.py
--	modified:   node_modules/node-gyp/gyp/test_gyp.py
--	deleted:    node_modules/node-gyp/gyp/tools/README
--	deleted:    node_modules/node-gyp/gyp/tools/Xcode/README
--	deleted:    node_modules/node-gyp/gyp/tools/Xcode/Specifications/gyp.pbfilespec
--	deleted:    node_modules/node-gyp/gyp/tools/Xcode/Specifications/gyp.xclangspec
--	deleted:    node_modules/node-gyp/gyp/tools/emacs/README
--	deleted:    node_modules/node-gyp/gyp/tools/emacs/gyp-tests.el
--	deleted:    node_modules/node-gyp/gyp/tools/emacs/gyp.el
--	deleted:    node_modules/node-gyp/gyp/tools/emacs/run-unit-tests.sh
--	deleted:    node_modules/node-gyp/gyp/tools/emacs/testdata/media.gyp
--	deleted:    node_modules/node-gyp/gyp/tools/emacs/testdata/media.gyp.fontified
--	deleted:    node_modules/node-gyp/gyp/tools/graphviz.py
--	deleted:    node_modules/node-gyp/gyp/tools/pretty_gyp.py
--	deleted:    node_modules/node-gyp/gyp/tools/pretty_sln.py
--	deleted:    node_modules/node-gyp/gyp/tools/pretty_vcproj.py
--	modified:   node_modules/node-gyp/lib/build.js
--	modified:   node_modules/node-gyp/lib/clean.js
--	modified:   node_modules/node-gyp/lib/configure.js
--	modified:   node_modules/node-gyp/lib/create-config-gypi.js
--	modified:   node_modules/node-gyp/lib/find-node-directory.js
--	modified:   node_modules/node-gyp/lib/find-python.js
--	modified:   node_modules/node-gyp/lib/find-visualstudio.js
--	modified:   node_modules/node-gyp/lib/install.js
--	modified:   node_modules/node-gyp/lib/list.js
--	modified:   node_modules/node-gyp/lib/node-gyp.js
--	modified:   node_modules/node-gyp/lib/process-release.js
--	modified:   node_modules/node-gyp/lib/rebuild.js
--	modified:   node_modules/node-gyp/lib/remove.js
--	modified:   node_modules/node-gyp/lib/util.js
--	deleted:    node_modules/node-gyp/macOS_Catalina.md
--	modified:   node_modules/node-gyp/package.json
--	modified:   node_modules/node-gyp/src/win_delay_load_hook.cc
--	deleted:    node_modules/node-gyp/test/common.js
--	deleted:    node_modules/node-gyp/test/fixtures/VS_2017_BuildTools_minimal.txt
--	deleted:    node_modules/node-gyp/test/fixtures/VS_2017_Community_workload.txt
--	deleted:    node_modules/node-gyp/test/fixtures/VS_2017_Express.txt
--	deleted:    node_modules/node-gyp/test/fixtures/VS_2017_Unusable.txt
--	deleted:    node_modules/node-gyp/test/fixtures/VS_2019_BuildTools_minimal.txt
--	deleted:    node_modules/node-gyp/test/fixtures/VS_2019_Community_workload.txt
--	deleted:    node_modules/node-gyp/test/fixtures/VS_2019_Preview.txt
--	deleted:    node_modules/node-gyp/test/fixtures/ca-bundle.crt
--	deleted:    node_modules/node-gyp/test/fixtures/ca.crt
--	deleted:    node_modules/node-gyp/test/fixtures/nodedir/include/node/config.gypi
--	deleted:    node_modules/node-gyp/test/fixtures/server.crt
--	deleted:    node_modules/node-gyp/test/fixtures/server.key
--	deleted:    node_modules/node-gyp/test/fixtures/test-charmap.py
--	deleted:    node_modules/node-gyp/test/process-exec-sync.js
--	deleted:    node_modules/node-gyp/test/simple-proxy.js
--	deleted:    node_modules/node-gyp/test/test-addon.js
--	deleted:    node_modules/node-gyp/test/test-configure-python.js
--	deleted:    node_modules/node-gyp/test/test-create-config-gypi.js
--	deleted:    node_modules/node-gyp/test/test-download.js
--	deleted:    node_modules/node-gyp/test/test-find-accessible-sync.js
--	deleted:    node_modules/node-gyp/test/test-find-node-directory.js
--	deleted:    node_modules/node-gyp/test/test-find-python.js
--	deleted:    node_modules/node-gyp/test/test-find-visualstudio.js
--	deleted:    node_modules/node-gyp/test/test-install.js
--	deleted:    node_modules/node-gyp/test/test-options.js
--	deleted:    node_modules/node-gyp/test/test-process-release.js
--	deleted:    node_modules/node-gyp/update-gyp.py
--	deleted:    node_modules/nopt/CHANGELOG.md
--	modified:   node_modules/nopt/README.md
--	modified:   node_modules/nopt/bin/nopt.js
--	modified:   node_modules/nopt/lib/nopt.js
--	modified:   node_modules/nopt/package.json
--	deleted:    node_modules/npmlog/LICENSE.md
--	deleted:    node_modules/npmlog/README.md
--	deleted:    node_modules/npmlog/lib/log.js
--	deleted:    node_modules/npmlog/package.json
--	deleted:    node_modules/p-map/index.d.ts
--	deleted:    node_modules/p-map/index.js
--	deleted:    node_modules/p-map/license
--	deleted:    node_modules/p-map/package.json
--	deleted:    node_modules/p-map/readme.md
--	deleted:    node_modules/path-is-absolute/index.js
--	deleted:    node_modules/path-is-absolute/license
--	deleted:    node_modules/path-is-absolute/package.json
--	deleted:    node_modules/path-is-absolute/readme.md
--	deleted:    node_modules/promise-inflight/LICENSE
--	deleted:    node_modules/promise-inflight/README.md
--	deleted:    node_modules/promise-inflight/inflight.js
--	deleted:    node_modules/promise-inflight/package.json
--	deleted:    node_modules/promise-retry/.editorconfig
--	deleted:    node_modules/promise-retry/.jshintrc
--	deleted:    node_modules/promise-retry/.travis.yml
--	deleted:    node_modules/promise-retry/LICENSE
--	deleted:    node_modules/promise-retry/README.md
--	deleted:    node_modules/promise-retry/index.js
--	deleted:    node_modules/promise-retry/package.json
--	deleted:    node_modules/promise-retry/test/test.js
--	deleted:    node_modules/retry/.npmignore
--	deleted:    node_modules/retry/.travis.yml
--	deleted:    node_modules/retry/License
--	deleted:    node_modules/retry/Makefile
--	deleted:    node_modules/retry/README.md
--	deleted:    node_modules/retry/equation.gif
--	deleted:    node_modules/retry/example/dns.js
--	deleted:    node_modules/retry/example/stop.js
--	deleted:    node_modules/retry/index.js
--	deleted:    node_modules/retry/lib/retry.js
--	deleted:    node_modules/retry/lib/retry_operation.js
--	deleted:    node_modules/retry/package.json
--	deleted:    node_modules/retry/test/common.js
--	deleted:    node_modules/retry/test/integration/test-forever.js
--	deleted:    node_modules/retry/test/integration/test-retry-operation.js
--	deleted:    node_modules/retry/test/integration/test-retry-wrap.js
--	deleted:    node_modules/retry/test/integration/test-timeouts.js
--	deleted:    node_modules/rimraf/CHANGELOG.md
--	deleted:    node_modules/rimraf/LICENSE
--	deleted:    node_modules/rimraf/README.md
--	deleted:    node_modules/rimraf/bin.js
--	deleted:    node_modules/rimraf/package.json
--	deleted:    node_modules/rimraf/rimraf.js
--	deleted:    node_modules/set-blocking/CHANGELOG.md
--	deleted:    node_modules/set-blocking/LICENSE.txt
--	deleted:    node_modules/set-blocking/README.md
--	deleted:    node_modules/set-blocking/index.js
--	deleted:    node_modules/set-blocking/package.json
--	deleted:    node_modules/signal-exit/LICENSE.txt
--	deleted:    node_modules/signal-exit/README.md
--	deleted:    node_modules/signal-exit/index.js
--	deleted:    node_modules/signal-exit/package.json
--	deleted:    node_modules/signal-exit/signals.js
--	deleted:    node_modules/smart-buffer/.prettierrc.yaml
--	deleted:    node_modules/smart-buffer/.travis.yml
--	deleted:    node_modules/smart-buffer/LICENSE
--	deleted:    node_modules/smart-buffer/README.md
--	deleted:    node_modules/smart-buffer/build/smartbuffer.js
--	deleted:    node_modules/smart-buffer/build/smartbuffer.js.map
--	deleted:    node_modules/smart-buffer/build/utils.js
--	deleted:    node_modules/smart-buffer/build/utils.js.map
--	deleted:    node_modules/smart-buffer/docs/CHANGELOG.md
--	deleted:    node_modules/smart-buffer/docs/README_v3.md
--	deleted:    node_modules/smart-buffer/docs/ROADMAP.md
--	deleted:    node_modules/smart-buffer/package.json
--	deleted:    node_modules/smart-buffer/typings/smartbuffer.d.ts
--	deleted:    node_modules/smart-buffer/typings/utils.d.ts
--	deleted:    node_modules/socks-proxy-agent/README.md
--	deleted:    node_modules/socks-proxy-agent/dist/index.d.ts
--	deleted:    node_modules/socks-proxy-agent/dist/index.js
--	deleted:    node_modules/socks-proxy-agent/dist/index.js.map
--	deleted:    node_modules/socks-proxy-agent/node_modules/debug/LICENSE
--	deleted:    node_modules/socks-proxy-agent/node_modules/debug/README.md
--	deleted:    node_modules/socks-proxy-agent/node_modules/debug/package.json
--	deleted:    node_modules/socks-proxy-agent/node_modules/debug/src/browser.js
--	deleted:    node_modules/socks-proxy-agent/node_modules/debug/src/common.js
--	deleted:    node_modules/socks-proxy-agent/node_modules/debug/src/index.js
--	deleted:    node_modules/socks-proxy-agent/node_modules/debug/src/node.js
--	deleted:    node_modules/socks-proxy-agent/node_modules/ms/index.js
--	deleted:    node_modules/socks-proxy-agent/node_modules/ms/license.md
--	deleted:    node_modules/socks-proxy-agent/node_modules/ms/package.json
--	deleted:    node_modules/socks-proxy-agent/node_modules/ms/readme.md
--	deleted:    node_modules/socks-proxy-agent/package.json
--	deleted:    node_modules/socks/.eslintrc.cjs
--	deleted:    node_modules/socks/.prettierrc.yaml
--	deleted:    node_modules/socks/LICENSE
--	deleted:    node_modules/socks/README.md
--	deleted:    node_modules/socks/build/client/socksclient.js
--	deleted:    node_modules/socks/build/client/socksclient.js.map
--	deleted:    node_modules/socks/build/common/constants.js
--	deleted:    node_modules/socks/build/common/constants.js.map
--	deleted:    node_modules/socks/build/common/helpers.js
--	deleted:    node_modules/socks/build/common/helpers.js.map
--	deleted:    node_modules/socks/build/common/receivebuffer.js
--	deleted:    node_modules/socks/build/common/receivebuffer.js.map
--	deleted:    node_modules/socks/build/common/util.js
--	deleted:    node_modules/socks/build/common/util.js.map
--	deleted:    node_modules/socks/build/index.js
--	deleted:    node_modules/socks/build/index.js.map
--	deleted:    node_modules/socks/docs/examples/index.md
--	deleted:    node_modules/socks/docs/examples/javascript/associateExample.md
--	deleted:    node_modules/socks/docs/examples/javascript/bindExample.md
--	deleted:    node_modules/socks/docs/examples/javascript/connectExample.md
--	deleted:    node_modules/socks/docs/examples/typescript/associateExample.md
--	deleted:    node_modules/socks/docs/examples/typescript/bindExample.md
--	deleted:    node_modules/socks/docs/examples/typescript/connectExample.md
--	deleted:    node_modules/socks/docs/index.md
--	deleted:    node_modules/socks/docs/migratingFromV1.md
--	deleted:    node_modules/socks/package.json
--	deleted:    node_modules/socks/typings/client/socksclient.d.ts
--	deleted:    node_modules/socks/typings/common/constants.d.ts
--	deleted:    node_modules/socks/typings/common/helpers.d.ts
--	deleted:    node_modules/socks/typings/common/receivebuffer.d.ts
--	deleted:    node_modules/socks/typings/common/util.d.ts
--	deleted:    node_modules/socks/typings/index.d.ts
--	modified:   node_modules/sqlite3/LICENSE
--	modified:   node_modules/sqlite3/README.md
--	modified:   node_modules/sqlite3/build/Release/node_sqlite3.node
--	modified:   node_modules/sqlite3/deps/common-sqlite.gypi
--	modified:   node_modules/sqlite3/deps/extract.js
--	deleted:    node_modules/sqlite3/deps/sqlite-autoconf-3440200.tar.gz
--	modified:   node_modules/sqlite3/package.json
--	modified:   node_modules/sqlite3/src/gcc-preinclude.h
--	deleted:    node_modules/ssri/CHANGELOG.md
--	deleted:    node_modules/ssri/LICENSE.md
--	deleted:    node_modules/ssri/README.md
--	deleted:    node_modules/ssri/index.js
--	deleted:    node_modules/ssri/package.json
--	deleted:    node_modules/string-width/index.d.ts
--	deleted:    node_modules/string-width/index.js
--	deleted:    node_modules/string-width/license
--	deleted:    node_modules/string-width/package.json
--	deleted:    node_modules/string-width/readme.md
--	deleted:    node_modules/strip-ansi/index.d.ts
--	deleted:    node_modules/strip-ansi/index.js
--	deleted:    node_modules/strip-ansi/license
--	deleted:    node_modules/strip-ansi/package.json
--	deleted:    node_modules/strip-ansi/readme.md
--	deleted:    node_modules/tar/LICENSE
--	modified:   node_modules/tar/README.md
--	deleted:    node_modules/tar/index.js
--	deleted:    node_modules/tar/lib/create.js
--	deleted:    node_modules/tar/lib/extract.js
--	deleted:    node_modules/tar/lib/get-write-flag.js
--	deleted:    node_modules/tar/lib/header.js
--	deleted:    node_modules/tar/lib/high-level-opt.js
--	deleted:    node_modules/tar/lib/large-numbers.js
--	deleted:    node_modules/tar/lib/list.js
--	deleted:    node_modules/tar/lib/mkdir.js
--	deleted:    node_modules/tar/lib/mode-fix.js
--	deleted:    node_modules/tar/lib/normalize-unicode.js
--	deleted:    node_modules/tar/lib/normalize-windows-path.js
--	deleted:    node_modules/tar/lib/pack.js
--	deleted:    node_modules/tar/lib/parse.js
--	deleted:    node_modules/tar/lib/path-reservations.js
--	deleted:    node_modules/tar/lib/pax.js
--	deleted:    node_modules/tar/lib/read-entry.js
--	deleted:    node_modules/tar/lib/replace.js
--	deleted:    node_modules/tar/lib/strip-absolute-path.js
--	deleted:    node_modules/tar/lib/strip-trailing-slashes.js
--	deleted:    node_modules/tar/lib/types.js
--	deleted:    node_modules/tar/lib/unpack.js
--	deleted:    node_modules/tar/lib/update.js
--	deleted:    node_modules/tar/lib/warn-mixin.js
--	deleted:    node_modules/tar/lib/winchars.js
--	deleted:    node_modules/tar/lib/write-entry.js
--	deleted:    node_modules/tar/node_modules/minipass/LICENSE
--	deleted:    node_modules/tar/node_modules/minipass/README.md
--	deleted:    node_modules/tar/node_modules/minipass/index.d.ts
--	deleted:    node_modules/tar/node_modules/minipass/index.js
--	deleted:    node_modules/tar/node_modules/minipass/index.mjs
--	deleted:    node_modules/tar/node_modules/minipass/package.json
--	modified:   node_modules/tar/package.json
--	deleted:    node_modules/unique-filename/.nyc_output/54942.json
--	deleted:    node_modules/unique-filename/.nyc_output/54944.json
--	deleted:    node_modules/unique-filename/LICENSE
--	deleted:    node_modules/unique-filename/README.md
--	deleted:    node_modules/unique-filename/coverage/__root__/index.html
--	deleted:    node_modules/unique-filename/coverage/__root__/index.js.html
--	deleted:    node_modules/unique-filename/coverage/base.css
--	deleted:    node_modules/unique-filename/coverage/index.html
--	deleted:    node_modules/unique-filename/coverage/prettify.css
--	deleted:    node_modules/unique-filename/coverage/prettify.js
--	deleted:    node_modules/unique-filename/coverage/sort-arrow-sprite.png
--	deleted:    node_modules/unique-filename/coverage/sorter.js
--	deleted:    node_modules/unique-filename/index.js
--	deleted:    node_modules/unique-filename/package.json
--	deleted:    node_modules/unique-filename/test/index.js
--	deleted:    node_modules/unique-slug/.travis.yml
--	deleted:    node_modules/unique-slug/LICENSE
--	deleted:    node_modules/unique-slug/README.md
--	deleted:    node_modules/unique-slug/index.js
--	deleted:    node_modules/unique-slug/package.json
--	deleted:    node_modules/unique-slug/test/index.js
--	deleted:    node_modules/which/CHANGELOG.md
--	modified:   node_modules/which/README.md
--	deleted:    node_modules/which/bin/node-which
--	modified:   node_modules/which/package.json
--	deleted:    node_modules/which/which.js
--	deleted:    node_modules/wide-align/LICENSE
--	deleted:    node_modules/wide-align/README.md
--	deleted:    node_modules/wide-align/align.js
--	deleted:    node_modules/wide-align/package.json
--	deleted:    node_modules/yallist/LICENSE
--	modified:   node_modules/yallist/README.md
--	deleted:    node_modules/yallist/iterator.js
--	modified:   node_modules/yallist/package.json
--	deleted:    node_modules/yallist/yallist.js
--	modified:   package-lock.json
--	modified:   package.json
--	modified:   vite.config.ts
--
--Untracked files:
--  (use "git add <file>..." to include in what will be committed)
--	backend/
-+	modified:   src/App.tsx
+-	modified:   src/App.tsx
++	modified:   .claude/launch.json
++	modified:   components/ui/auth-card.css
++
++Untracked files:
++  (use "git add <file>..." to include in what will be committed)
++	vite.dash.config.ts
  
- no changes added to commit (use "git add" and/or "git commit -a")
-diff --git a/src/App.tsx b/src/App.tsx
-index 6ae2f4f..8c3ecf6 100644
---- a/src/App.tsx
-+++ b/src/App.tsx
-@@ -144,7 +144,7 @@ const AuthRedirect: React.FC = () => {
- // Redirect to legacy HTML/JS dashboard
- const DashboardRedirect: React.FC = () => {
-   React.useEffect(() => {
--    window.location.href = '/app/';
-+    window.location.href = '/app/index.html';
-   }, []);
-   return (
-     <div style={{
-@@ -164,14 +164,14 @@ const DashboardRedirect: React.FC = () => {
-   );
- };
- 
--// Catch reloads on /app/* paths and redirect them to /app/ with initialRoute set
-+// Catch reloads on /app/* paths and redirect them to /app/index.html with initialRoute set
- const LegacyDashboardRedirect: React.FC = () => {
-   React.useEffect(() => {
-     const path = window.location.pathname.replace(/^\/app\/?/, '');
-     if (path) {
-       sessionStorage.setItem('initialRoute', path);
-     }
--    window.location.href = '/app/';
-+    window.location.href = '/app/index.html';
-   }, []);
-   return (
-     <div style={{
+-no changes added to commit (use "git add" and/or "git commit -a")
