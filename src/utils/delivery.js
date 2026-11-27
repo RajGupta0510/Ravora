@@ -23,7 +23,7 @@ if (fs.existsSync(envPath)) {
       if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
         val = val.slice(1, -1);
       }
-      process.env[key] = val;
+      if (process.env[key] === undefined) process.env[key] = val;
     });
     console.log('[Delivery Config] Root .env parsed successfully.');
   } catch (err) {

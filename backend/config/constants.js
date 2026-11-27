@@ -16,6 +16,10 @@ export const RATE_LIMITS = {
   STANDARD: { windowMs: 60_000, max: 100 },
   AUTH: { windowMs: 60_000, max: 10 },
   MARKET: { windowMs: 10_000, max: 50 },
+  // Model calls cost money and are the easiest endpoint to abuse.
+  AI: { windowMs: 60_000, max: 20 },
+  // Order, paper-trade and exchange-credential endpoints.
+  TRADE: { windowMs: 60_000, max: 30 },
 };
 
 // Supported exchanges

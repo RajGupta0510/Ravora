@@ -2904,21 +2904,18 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
           const res = await fetch(`${API_BASE}/auth/social`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (event.data.token || '') },
             body: JSON.stringify({
               provider: event.data.provider,
-              providerUserId: event.data.providerUserId || event.data.code,
-              email: event.data.email,
-              fullName: event.data.fullName,
-              token: event.data.token
+              fullName: event.data.fullName
             })
           });
           if (res.ok) {
             const data = await res.json();
-            localStorage.setItem('ravora_token', data.token);
+            localStorage.setItem('ravora_token', event.data.token);
             localStorage.setItem('ravora_logged_in', 'true');
             localStorage.setItem('ravora_login_time', Date.now().toString());
-            localStorage.setItem('ravora_email', event.data.email);
+            localStorage.setItem('ravora_email', data.user.email || '');
             localStorage.setItem('ravora_onboarding_completed', data.user.onboardingCompleted ? 'true' : 'false');
             localStorage.setItem('ravora_remember_me', 'true');
             sessionStorage.setItem('ravora_session_active', 'true');

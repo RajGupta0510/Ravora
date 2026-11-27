@@ -24,7 +24,6 @@ import adminRoutes from './admin.routes.js';
 import discoverRoutes from './discover.routes.js';
 import workspaceRoutes from './workspace.routes.js';
 import { AiController } from '../ai/controllers/AiController.js';
-import { getSupabaseAdmin, isConfigured } from '../config/database.js';
 import env from '../config/environment.js';
 
 const router = Router();
@@ -42,36 +41,6 @@ router.get('/auth/config', (req, res) => {
   });
 });
 
-// Admin Helper to confirm test users in local development
-router.get('/auth/confirm-user', async (req, res) => {
-  try {
-    const { email } = req.query;
-    if (!email) {
-      return res.status(400).json({ error: 'Email query parameter is required.' });
-    }
-    if (!isConfigured) {
-      return res.json({ success: true, message: 'Running in sandbox mode, no confirmation needed.' });
-    }
-    const admin = getSupabaseAdmin();
-    const { data: { users }, error: listError } = await admin.auth.admin.listUsers();
-    if (listError) throw listError;
-    
-    const user = users.find(u => u.email === email);
-    if (!user) {
-      return res.status(404).json({ error: `User with email ${email} not found.` });
-    }
-    
-    const { error: updateError } = await admin.auth.admin.updateUserById(user.id, {
-      email_confirm: true
-    });
-    if (updateError) throw updateError;
-    
-    return res.json({ success: true, message: `User ${email} has been successfully confirmed!` });
-  } catch (err) {
-    return res.status(500).json({ error: err.message });
-  }
-});
-
 // Public routes (with market-specific rate limiting)
 router.use('/market', rateLimiter(RATE_LIMITS.MARKET), marketRoutes);
 
@@ -84,17 +53,17 @@ authRouter.use('/user', userRoutes);
 authRouter.use('/portfolio', portfolioRoutes);
 authRouter.use('/watchlist', watchlistRoutes);
 authRouter.use('/notifications', notificationRoutes);
-authRouter.use('/paper', paperTradingRoutes);
+authRouter.use('/paper', rateLimiter(RATE_LIMITS.TRADE), paperTradingRoutes);
 authRouter.use('/opportunities', opportunityRoutes);
-authRouter.use('/exchanges', exchangeRoutes);
-authRouter.use('/orders', orderRoutes);
-authRouter.use('/ai', aiRoutes);
+authRouter.use('/exchanges', rateLimiter(RATE_LIMITS.TRADE), exchangeRoutes);
+authRouter.use('/orders', rateLimiter(RATE_LIMITS.TRADE), orderRoutes);
+authRouter.use('/ai', rateLimiter(RATE_LIMITS.AI), aiRoutes);
 authRouter.use('/strategy', strategyRoutes);
 authRouter.use('/news', newsRoutes);
 authRouter.use('/admin', adminRoutes);
 authRouter.use('/discover', discoverRoutes);
 authRouter.use('/workspace', workspaceRoutes);
-authRouter.post('/copilot/message', AiController.copilotMessage);
+authRouter.post('/copilot/message', rateLimiter(RATE_LIMITS.AI), AiController.copilotMessage);
 
 router.use(authRouter);
 

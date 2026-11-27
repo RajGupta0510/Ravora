@@ -411,6 +411,6 @@ export const scanMarkets = async (req, res) => {
 
   } catch (err) {
     console.error('Error during market scan:', err);
-    return res.status(500).json({ error: 'Failed to run market scanner engine: ' + err.message });
+    return res.status(500).json({ error: 'Failed to run market scanner engine.' });
   }
 };

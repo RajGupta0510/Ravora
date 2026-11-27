@@ -4,9 +4,8 @@
 
 import express from 'express';
 import http from 'http';
-import cors from 'cors';
 import { validateEnvironment } from './config/environment.js';
-import { initializeDatabase } from './config/database.js';
+import { initializeDatabase, isConfigured } from './config/database.js';
 import { initializeWebSocket } from './websocket/WebSocketServer.js';
 import { JobScheduler } from './jobs/JobScheduler.js';
 import { requestLogger } from './middleware/logger.js';
@@ -22,6 +21,7 @@ import { rateLimiter } from './middleware/rateLimiter.js';
 import { RATE_LIMITS } from './config/constants.js';
 import env from './config/environment.js';
 import { logger } from './utils/logger.js';
+import { securityHeaders, corsAllowlist, requireHttps, assertProductionConfig } from '../src/middleware/security.js';
 
 // 1. Workers
 import { marketSyncWorker } from './jobs/workers/MarketSyncWorker.js';
@@ -36,15 +36,21 @@ async function bootstrap() {
 
     // 1. Validate Environment
     validateEnvironment();
+    assertProductionConfig({ supabaseConfigured: isConfigured });
 
     // 2. Initialize Database Connection (Supabase)
     initializeDatabase();
 
     // 3. Setup Express
     const app = express();
-    app.use(cors());
-    app.use(express.json());
-    app.use(express.urlencoded({ extended: true }));
+    // Render/Vercel terminate TLS in front of the app; trust one proxy hop so req.ip is the real client (rate limits, logs).
+    app.set('trust proxy', 1);
+    app.disable('x-powered-by');
+    app.use(requireHttps);
+    app.use(securityHeaders({ csp: false }));
+    app.use(corsAllowlist());
+    app.use(express.json({ limit: '100kb' }));
+    app.use(express.urlencoded({ extended: false, limit: '100kb' }));
     app.use(requestLogger);
 
     // 4. Register REST API Routes

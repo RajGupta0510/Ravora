@@ -20,6 +20,15 @@ export const ExchangeSyncService = {
   async connectExchange(userId, exchangeName, apiKey, apiSecret, passphrase = null) {
     const db = getSupabaseAdmin();
 
+    for (const [label, v] of [['exchangeName', exchangeName], ['apiKey', apiKey], ['apiSecret', apiSecret]]) {
+      if (typeof v !== 'string' || v.length === 0 || v.length > 512) {
+        throw ApiError.badRequest(`${label} is required.`);
+      }
+    }
+    if (passphrase != null && (typeof passphrase !== 'string' || passphrase.length > 512)) {
+      throw ApiError.badRequest('passphrase is invalid.');
+    }
+
     // 1. Verify exchange is supported
     const supported = ExchangeFactory.getSupportedExchanges();
     if (!supported.includes(exchangeName.toLowerCase())) {
@@ -31,6 +40,11 @@ export const ExchangeSyncService = {
     const validation = await provider.validateCredentials();
     if (!validation.valid) {
       throw ApiError.badRequest(`Invalid exchange credentials: ${validation.error}`);
+    }
+
+    // Ravora only needs read and trade access. A key that can withdraw funds is refused outright.
+    if (validation.permissions && validation.permissions.withdraw === true) {
+      throw ApiError.badRequest('This API key has withdrawal permission enabled. Create a key without withdrawal access and try again.');
     }
 
     // 3. Encrypt credentials for secure storage at rest

@@ -187,7 +187,7 @@ export const onboard = async (req, res) => {
     return res.json({ success: true, message: 'Onboarding completed successfully.' });
   } catch (err) {
     console.error('Error in onboarding:', err);
-    return res.status(500).json({ error: `Onboarding failed: ${err.message || String(err)}` });
+    return res.status(500).json({ error: 'Onboarding failed. Please try again.' });
   }
 };
 

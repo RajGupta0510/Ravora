@@ -1,4 +1,5 @@
 import { dbGet } from '../database.js';
+import { publicError } from '../middleware/security.js';
 import { PaperTradingService } from '../services/paperTradingService.js';
 import { PositionManager } from '../services/positionManager.js';
 import { TradeHistoryService } from '../services/tradeHistoryService.js';
@@ -14,6 +15,12 @@ export const openPaperPosition = async (req, res) => {
 
   if (!opportunityId || !amount) {
     return res.status(400).json({ error: 'Opportunity ID and amount are required.' });
+  }
+  if (typeof opportunityId !== 'string' || opportunityId.length > 100) {
+    return res.status(400).json({ error: 'Invalid opportunity ID.' });
+  }
+  if (type !== undefined && !['LONG', 'SHORT'].includes(type)) {
+    return res.status(400).json({ error: 'Direction must be LONG or SHORT.' });
   }
 
   try {
@@ -56,7 +63,7 @@ export const openPaperPosition = async (req, res) => {
     });
   } catch (err) {
     console.error('[PaperTradingController] Error opening position:', err);
-    return res.status(500).json({ error: err.message });
+    return res.status(400).json({ error: publicError(err, 'Trade request could not be completed.') });
   }
 };
 
@@ -125,7 +132,7 @@ export const closePaperPosition = async (req, res) => {
     return res.json(result);
   } catch (err) {
     console.error('[PaperTradingController] Error closing position:', err);
-    return res.status(500).json({ error: err.message });
+    return res.status(400).json({ error: publicError(err, 'Trade request could not be completed.') });
   }
 };
 
@@ -140,7 +147,7 @@ export const closeAllPaperPositions = async (req, res) => {
     return res.json(results);
   } catch (err) {
     console.error('[PaperTradingController] Error closing all positions:', err);
-    return res.status(500).json({ error: err.message });
+    return res.status(400).json({ error: publicError(err, 'Trade request could not be completed.') });
   }
 };
 

@@ -28,11 +28,12 @@ export const verifyToken = async (req, res, next) => {
       const phone = user.phone || null;
       const fullName = user.user_metadata?.full_name || 'Ravora Member';
 
-      // Clear any conflicting stale accounts with the same email/phone to prevent constraint failures
+      // If an older local row (different id) already holds this email/phone, detach the identifiers rather than
+      // deleting it: deleting would cascade and destroy that account's portfolio, trades and history.
       if (email || phone) {
         await dbRun(
-          'DELETE FROM users WHERE (email = ? AND ? IS NOT NULL) OR (mobile_number = ? AND ? IS NOT NULL)',
-          [email, email, phone, phone]
+          'UPDATE users SET email = CASE WHEN email = ? THEN NULL ELSE email END, mobile_number = CASE WHEN mobile_number = ? THEN NULL ELSE mobile_number END WHERE id != ? AND (email = ? OR mobile_number = ?)',
+          [email, phone, user.id, email, phone]
         );
       }
 

@@ -23,7 +23,7 @@ setInterval(() => {
  */
 export function rateLimiter({ windowMs = 60_000, max = 100 } = {}) {
   return (req, res, next) => {
-    const key = req.ip || req.connection.remoteAddress || 'unknown';
+    const key = `${windowMs}:${max}:${req.ip || req.socket?.remoteAddress || 'unknown'}`;
     const now = Date.now();
 
     let entry = store.get(key);

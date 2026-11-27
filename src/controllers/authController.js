@@ -628,41 +628,29 @@ export const resetPassword = async (req, res) => {
 };
 
 export const socialLogin = async (req, res) => {
-  const { provider, providerUserId, email, fullName, token } = req.body;
-
-  if (!provider || !providerUserId || !email) {
-    return res.status(400).json({ error: 'OAuth provider, identity ID and email are required.' });
-  }
+  // Route is protected by verifyToken: the identity is the one proven by the access token, not the request body.
+  const providerUserId = req.user.id;
+  const email = req.user.email && req.user.email.includes('@') ? req.user.email : null;
+  const provider = typeof req.body?.provider === 'string' ? req.body.provider.slice(0, 40) : 'oauth';
+  const fullName = typeof req.body?.fullName === 'string' ? req.body.fullName.slice(0, 120) : undefined;
 
   try {
-    // Create Supabase DB profiles record for the OAuth user
     await upsertProfile({
       id: providerUserId,
       name: fullName,
-      email: email,
+      email,
       phone: null,
-      provider: provider
+      provider
     });
 
-    // Ensure local user record exists in SQLite to satisfy foreign key constraints
-    await dbRun(
-      'INSERT OR IGNORE INTO users (id, email, mobile_number, full_name, password_hash) VALUES (?, ?, ?, ?, ?)',
-      [providerUserId, email || null, null, fullName || 'OAuth User', '']
-    );
-
-    // Create default portfolios and settings rows locally
-    await dbRun('INSERT OR IGNORE INTO portfolios (id, user_id, current_balance, safety_score) VALUES (?, ?, 0.00, 100)', [crypto.randomUUID(), providerUserId]);
-    await dbRun('INSERT OR IGNORE INTO user_settings (id, user_id, auto_hedge_enabled, notifications_enabled, execution_mode) VALUES (?, ?, 1, 1, \'advisory\')', [crypto.randomUUID(), providerUserId]);
-
+    // verifyToken already created the local user, portfolio and settings rows.
     const localProfile = await dbGet('SELECT * FROM user_profiles WHERE user_id = ?', [providerUserId]);
-    const clientToken = token || ('mock_jwt_token_' + providerUserId);
 
     return res.json({
       message: `Login successful via ${provider}.`,
-      token: clientToken,
       user: {
         id: providerUserId,
-        email: email,
+        email,
         onboardingCompleted: !!localProfile
       }
     });
@@ -689,23 +677,40 @@ export const checkAccount = async (req, res) => {
 
 export const changePassword = async (req, res) => {
   const userId = req.user.id;
-  const { currentPassword, newPassword, confirmPassword } = req.body;
+  const { currentPassword, newPassword, confirmPassword } = req.body || {};
 
-  if (!currentPassword || !newPassword || !confirmPassword) {
+  if (typeof currentPassword !== 'string' || typeof newPassword !== 'string' || typeof confirmPassword !== 'string') {
     return res.status(400).json({ error: 'All password fields are required.' });
   }
-
   if (newPassword !== confirmPassword) {
     return res.status(400).json({ error: 'New passwords do not match.' });
   }
+  const strength = checkPasswordStrength(newPassword);
+  if (strength.score < 3) {
+    return res.status(400).json({ error: `Password is too weak: ${strength.message}` });
+  }
+  if (newPassword === currentPassword) {
+    return res.status(400).json({ error: 'The new password must be different from the current one.' });
+  }
 
   try {
-    const user = await dbGet('SELECT * FROM users WHERE id = ?', [userId]);
-    if (!user) {
-      return res.status(404).json({ error: 'User not found.' });
+    const identifier = req.user.email || '';
+    const isEmail = identifier.includes('@');
+    const verify = await signInWithPassword({
+      email: isEmail ? identifier : undefined,
+      phone: isEmail ? undefined : identifier,
+      password: currentPassword
+    });
+    if (verify.error || !verify.data?.user) {
+      return res.status(400).json({ error: 'Current password is incorrect.' });
     }
 
-    await dbRun('UPDATE users SET password_hash = ? WHERE id = ?', [newPassword, userId]);
+    if (isSupabaseConfigured()) {
+      const { createClient } = await import('@supabase/supabase-js');
+      const admin = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY, { auth: { persistSession: false } });
+      const { error } = await admin.auth.admin.updateUserById(userId, { password: newPassword });
+      if (error) return res.status(400).json({ error: 'Could not update the password.' });
+    }
     return res.json({ success: true, message: 'Password updated successfully.' });
   } catch (err) {
     console.error('Error changing password:', err);

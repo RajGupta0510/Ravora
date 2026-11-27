@@ -13,3 +13,12 @@ Thumbs.db
 
 # Build output
 dist/
+# Local diagnostics, databases and key material
+git_diff.txt
+git_status.txt
+diagnostics_log.txt
+*.db
+*.pem
+*.key
+.env.*
+!.env.example

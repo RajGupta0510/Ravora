@@ -46,7 +46,7 @@ if (fs.existsSync(envPath)) {
       if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
         val = val.slice(1, -1);
       }
-      process.env[key] = val;
+      if (process.env[key] === undefined) process.env[key] = val;
     });
   } catch (err) {
     console.error('[Supabase Config] Failed to read .env file:', err);
@@ -61,6 +61,8 @@ const isConfigured = SUPABASE_URL &&
                      !SUPABASE_URL.includes('your-project-id') && 
                      SUPABASE_ANON_KEY && 
                      !SUPABASE_ANON_KEY.includes('your_anon_public_key');
+
+export const isSupabaseConfigured = () => !!isConfigured;
 
 let supabase = null;
 let supabaseAdmin = null;
@@ -274,7 +276,13 @@ export const verifyOtp = async ({ email, phone, token, type }) => {
  * Supabase Auth: Get User Details via JWT Token
  */
 export const getUser = async (token) => {
-  if (!isConfigured || token.startsWith('mock_jwt_token_')) {
+  if (!isConfigured) {
+    if (process.env.NODE_ENV === 'production') {
+      return { data: { user: null }, error: new Error('Authentication is not configured.') };
+    }
+    if (!token.startsWith('mock_jwt_token_')) {
+      return { data: { user: null }, error: new Error('Invalid token') };
+    }
     const userId = token.replace('mock_jwt_token_', '');
     const user = mockUsers[userId];
     if (!user) return { data: { user: null }, error: new Error('Invalid token') };

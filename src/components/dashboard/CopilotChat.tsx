@@ -88,10 +88,8 @@ export const CopilotChat: React.FC = () => {
           >
             <p style={{ margin: 0 }}>{msg.text}</p>
             {msg.actionHtml && (
-              <div 
-                style={{ marginTop: '8px' }}
-                dangerouslySetInnerHTML={{ __html: msg.actionHtml }}
-              />
+              // Rendered as text, never as HTML: this string comes from the server/model and must not be able to inject markup.
+              <div style={{ marginTop: '8px' }}>{msg.actionHtml.replace(/<[^>]*>/g, '')}</div>
             )}
           </div>
         ))}

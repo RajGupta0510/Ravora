@@ -44,6 +44,23 @@ export const PaperTradingService = {
     if (!symbol || !type || !side || !quantity) {
       throw ApiError.badRequest('symbol, type, side, and quantity are required.');
     }
+    if (typeof symbol !== 'string' || !/^[A-Za-z0-9/_-]{1,20}$/.test(symbol)) {
+      throw ApiError.badRequest('Invalid symbol.');
+    }
+    if (!['market', 'limit'].includes(String(type).toLowerCase())) {
+      throw ApiError.badRequest('Invalid order type. Allowed: market, limit.');
+    }
+    if (!['buy', 'sell'].includes(String(side).toLowerCase())) {
+      throw ApiError.badRequest('Invalid order side. Allowed: buy, sell.');
+    }
+    const qty = Number(quantity);
+    const lev = Number(leverage);
+    if (!Number.isFinite(qty) || qty <= 0 || qty > 1e9) {
+      throw ApiError.badRequest('Invalid quantity.');
+    }
+    if (!Number.isFinite(lev) || lev < 1 || lev > 100) {
+      throw ApiError.badRequest('Invalid leverage. Allowed range: 1 to 100.');
+    }
 
     const currentPrice = await MarketDataService.getCurrentPrice(symbol);
     const targetPrice = type === 'market' ? currentPrice : parseFloat(price);
@@ -53,8 +70,8 @@ export const PaperTradingService = {
     }
 
     // Calculate order margin required
-    const orderCost = quantity * targetPrice;
-    const marginRequired = orderCost / parseFloat(leverage);
+    const orderCost = qty * targetPrice;
+    const marginRequired = orderCost / lev;
 
     if (marginRequired > account.balance) {
       throw ApiError.badRequest(`Insufficient virtual buying power. Required: $${marginRequired.toFixed(2)}, Available: $${account.balance.toFixed(2)}`);
@@ -69,7 +86,7 @@ export const PaperTradingService = {
       symbol: symbol.toUpperCase(),
       type: type.toLowerCase(),
       side: side.toLowerCase(),
-      quantity: parseFloat(quantity),
+      quantity: qty,
       price: targetPrice,
       status: 'pending'
     });
@@ -78,7 +95,7 @@ export const PaperTradingService = {
 
     // Market orders fill immediately
     if (type.toLowerCase() === 'market') {
-      return this.executeOrderFill(userId, account, order, currentPrice, leverage, stopLoss, takeProfit);
+      return this.executeOrderFill(userId, account, order, currentPrice, lev, stopLoss, takeProfit);
     }
 
     // Broadcast pending order update

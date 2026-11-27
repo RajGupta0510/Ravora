@@ -6,6 +6,7 @@
 import { getSupabaseAdmin, isConfigured } from '../config/database.js';
 import { ApiError } from '../utils/ApiError.js';
 import { logger } from '../utils/logger.js';
+import { securityLog, clientIp } from '../../src/middleware/security.js';
 
 /**
  * Express middleware that verifies the Authorization Bearer token.
@@ -28,8 +29,8 @@ export const authenticate = async (req, res, next) => {
       return next(ApiError.internal('Database client is not configured in production mode.'));
     }
 
-    if (!isConfigured && !isProduction) {
-      // Sandbox mode — accept mock tokens
+    // Sandbox mock tokens exist only for local development and must be switched on explicitly.
+    if (!isConfigured && !isProduction && process.env.ALLOW_SANDBOX_AUTH === 'true') {
       if (token.startsWith('mock_jwt_token_')) {
         const userId = token.replace('mock_jwt_token_', '');
         req.user = { id: userId, email: `sandbox_${userId}@ravora.dev` };
@@ -42,13 +43,15 @@ export const authenticate = async (req, res, next) => {
     const { data: { user }, error } = await supabaseAdmin.auth.getUser(token);
 
     if (error || !user) {
+      securityLog('auth_failed', { ip: clientIp(req), path: req.originalUrl });
       return next(ApiError.unauthorized('Invalid or expired token.'));
     }
 
     req.user = {
       id: user.id,
       email: user.email || user.phone || null,
-      role: user.role || 'authenticated',
+      // app_metadata can only be written with the service role; user_metadata is user-editable and is not trusted.
+      role: user.app_metadata?.role === 'admin' ? 'admin' : 'authenticated',
     };
 
     next();

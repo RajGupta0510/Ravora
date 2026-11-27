@@ -129,7 +129,7 @@ export const OrderController = {
   async toggleEmergencyHalt(req, res, next) {
     try {
       const { status } = req.body;
-      if (status === undefined) throw ApiError.badRequest('status is required (true/false)');
+      if (typeof status !== 'boolean') throw ApiError.badRequest('status is required (true/false)');
       
       RiskManager.setEmergencyHalt(status);
       return res.json({

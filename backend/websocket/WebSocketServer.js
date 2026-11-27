@@ -15,7 +15,7 @@ const clients = new Map(); // userId -> Set<ws>
  * Initialize the WebSocket server on an existing HTTP server.
  */
 export function initializeWebSocket(httpServer) {
-  wss = new WsServer({ server: httpServer, path: '/ws' });
+  wss = new WsServer({ server: httpServer, path: '/ws', maxPayload: 16 * 1024 });
 
   wss.on('connection', async (ws, req) => {
     // Extract token from query params: ws://host/ws?token=xxx

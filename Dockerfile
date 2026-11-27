@@ -20,8 +20,13 @@ RUN npm ci --omit=dev
 
 # Copy backend files and built frontend assets
 COPY backend/ ./backend/
+# backend/ imports the shared HTTP hardening middleware from src/
+COPY src/middleware/security.js ./src/middleware/security.js
 COPY --from=frontend-builder /app/dist/ ./dist/
-COPY --from=frontend-builder /app/server.js ./server.j
+
+# Run as the unprivileged user that ships with the node image
+RUN chown -R node:node /app
+USER node
 
 # Expose backend REST API / WebSocket port
 EXPOSE 10000

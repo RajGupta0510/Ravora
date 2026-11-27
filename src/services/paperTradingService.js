@@ -33,8 +33,14 @@ export class PaperTradingService {
     const parsedMargin = parseFloat(positionSize);
     const parsedLeverage = parseFloat(leverage || 1.0);
 
-    if (isNaN(parsedMargin) || parsedMargin <= 0) {
+    if (!Number.isFinite(parsedMargin) || parsedMargin <= 0 || parsedMargin > 1e9) {
       throw new Error('Invalid position size.');
+    }
+    if (!Number.isFinite(parsedLeverage) || parsedLeverage < 1 || parsedLeverage > 100) {
+      throw new Error('Invalid leverage: use a value from 1 to 100.');
+    }
+    if (direction !== 'LONG' && direction !== 'SHORT') {
+      throw new Error('Invalid direction: use LONG or SHORT.');
     }
 
     // 1. Fetch user's portfolio and USDC holding

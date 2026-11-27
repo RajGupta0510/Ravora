@@ -13,7 +13,8 @@ import { openPaperPosition, getActivePaperPositions, closePaperPosition, closeAl
 import { MarketDataService } from './src/services/marketDataService.js';
 import { RecommendationEngine } from './src/services/recommendations/recommendationEngine.js';
 import { PaperTradingService } from './src/services/paperTradingService.js';
-import { getSupabaseConfig } from './src/utils/supabase.js';
+import { getSupabaseConfig, isSupabaseConfigured } from './src/utils/supabase.js';
+import { securityHeaders, corsAllowlist, requireHttps, rateLimit, identifierKey, assertProductionConfig, securityLog, clientIp } from './src/middleware/security.js';
 
 
 const __filename = fileURLToPath(import.meta.url);
@@ -25,7 +26,12 @@ import zlib from 'zlib';
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(express.json());
+// Behind Render/Vercel the real client address comes from X-Forwarded-For; needed for correct rate limiting.
+app.set('trust proxy', 1);
+app.disable('x-powered-by');
+app.use(requireHttps);
+app.use(securityHeaders());
+app.use(express.json({ limit: '100kb' }));
 
 // Gzip compression middleware for all text-based responses
 app.use((req, res, next) => {
@@ -54,31 +60,29 @@ app.use((req, res, next) => {
   next();
 });
 
-// CORS middleware to support external static servers (Live Server at 5500, etc.)
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  if (req.method === 'OPTIONS') {
-    return res.sendStatus(200);
-  }
-  next();
-});
+// CORS: only the origins in CORS_ORIGINS (or the Ravora frontend and local dev origins) may call the API from a browser.
+app.use(corsAllowlist());
 
 // API Routers under /v1
 const apiRouter = express.Router();
 
+// Rate limits: generous overall, strict on credential and OTP endpoints (also keyed by the targeted account).
+apiRouter.use(rateLimit({ name: 'api', windowMs: 60_000, max: 300 }));
+const authIpLimit = rateLimit({ name: 'auth-ip', windowMs: 60_000, max: 20 });
+const authAccountLimit = rateLimit({ name: 'auth-acct', windowMs: 15 * 60_000, max: 10, keyFn: identifierKey });
+const checkAccountLimit = rateLimit({ name: 'check-account', windowMs: 60_000, max: 10 });
+
 // Auth Endpoints
 apiRouter.get('/auth/config', (req, res) => res.json(getSupabaseConfig()));
-apiRouter.post('/auth/check-account', checkAccount);
-apiRouter.post('/auth/register', register);
-apiRouter.post('/auth/login', login);
-apiRouter.post('/auth/otp/verify', verifyOtp);
-apiRouter.post('/auth/otp/resend', resendOtp);
-apiRouter.post('/auth/forgot-password/request', requestPasswordRecovery);
-apiRouter.post('/auth/forgot-password/reset', resetPassword);
-apiRouter.post('/auth/social', socialLogin);
-apiRouter.post('/auth/change-password', verifyToken, changePassword);
+apiRouter.post('/auth/check-account', checkAccountLimit, checkAccount);
+apiRouter.post('/auth/register', authIpLimit, authAccountLimit, register);
+apiRouter.post('/auth/login', authIpLimit, authAccountLimit, login);
+apiRouter.post('/auth/otp/verify', authIpLimit, authAccountLimit, verifyOtp);
+apiRouter.post('/auth/otp/resend', authIpLimit, authAccountLimit, resendOtp);
+apiRouter.post('/auth/forgot-password/request', authIpLimit, authAccountLimit, requestPasswordRecovery);
+apiRouter.post('/auth/forgot-password/reset', authIpLimit, authAccountLimit, resetPassword);
+apiRouter.post('/auth/social', authIpLimit, verifyToken, socialLogin);
+apiRouter.post('/auth/change-password', authIpLimit, verifyToken, changePassword);
 
 // Market Data Layer v1 Endpoints (Public)
 apiRouter.get('/market/prices', async (req, res) => {
@@ -92,7 +96,8 @@ apiRouter.get('/market/prices', async (req, res) => {
     }));
     return res.json({ prices });
   } catch (error) {
-    return res.status(500).json({ error: error.message });
+    console.error('[market route]', error);
+    return res.status(500).json({ error: 'Market data is temporarily unavailable.' });
   }
 });
 
@@ -101,7 +106,8 @@ apiRouter.get('/market/overview', async (req, res) => {
     const overview = await MarketDataService.getOverview();
     return res.json(overview);
   } catch (error) {
-    return res.status(500).json({ error: error.message });
+    console.error('[market route]', error);
+    return res.status(500).json({ error: 'Market data is temporarily unavailable.' });
   }
 });
 
@@ -112,7 +118,8 @@ apiRouter.get('/market/assets/:symbol', async (req, res) => {
     const details = await MarketDataService.getAssetDetails(symbol, timeframe || '1D');
     return res.json(details);
   } catch (error) {
-    return res.status(500).json({ error: error.message });
+    console.error('[market route]', error);
+    return res.status(500).json({ error: 'Market data is temporarily unavailable.' });
   }
 });
 
@@ -134,7 +141,8 @@ apiRouter.get('/market/summary', async (req, res) => {
       lastUpdated: overview.length > 0 ? Math.max(...overview.map(o => o.lastUpdated)) : Date.now()
     });
   } catch (error) {
-    return res.status(500).json({ error: error.message });
+    console.error('[market route]', error);
+    return res.status(500).json({ error: 'Market data is temporarily unavailable.' });
   }
 });
 
@@ -154,7 +162,8 @@ apiRouter.get('/market/opportunities/top', async (req, res) => {
     }));
     return res.json(formatted);
   } catch (error) {
-    return res.status(500).json({ error: error.message });
+    console.error('[market route]', error);
+    return res.status(500).json({ error: 'Market data is temporarily unavailable.' });
   }
 });
 
@@ -224,8 +233,7 @@ if (fs.existsSync(distPath)) {
     res.sendFile(path.join(distPath, 'index.html'));
   });
 } else {
-  console.log('[SPA Server] Serving developer legacy static files');
-  app.use(express.static(__dirname));
+  console.log('[SPA Server] dist/ not found: serving the legacy pages only. Run `npm run build` for the React app.');
   app.get('/app*', (req, res) => {
     res.sendFile(path.join(__dirname, 'app/index.html'));
   });
@@ -233,6 +241,16 @@ if (fs.existsSync(distPath)) {
     res.sendFile(path.join(__dirname, 'index.html'));
   });
 }
+
+// Unknown API routes and error handling: never return stack traces or internal messages.
+app.use('/v1', (req, res) => res.status(404).json({ error: 'Not found.' }));
+app.use((err, req, res, _next) => {
+  if (err && err.type === 'entity.parse.failed') return res.status(400).json({ error: 'Invalid JSON in request body.' });
+  if (err && err.type === 'entity.too.large') return res.status(413).json({ error: 'Request body too large.' });
+  console.error('[Unhandled error]', req.method, req.path, err);
+  securityLog('unhandled_error', { path: req.path, ip: clientIp(req) });
+  return res.status(500).json({ error: 'An unexpected error occurred.' });
+});
 
 // Start background rebalancing / scoring engine
 const startEngineScheduler = () => {
@@ -273,26 +291,7 @@ const startEngineScheduler = () => {
 // Bootstrapping function
 const startServer = async () => {
   try {
-    try {
-      const { execSync } = await import('child_process');
-      const fs = await import('fs');
-      console.log('[STARTUP DEBUG] Extracting legacy index.html and running git diagnostics...');
-      
-      // Extract legacy index.html
-      const legacyIndex = execSync('git show 05a69abc:index.html', { encoding: 'utf8' });
-      fs.writeFileSync('index_legacy.html', legacyIndex);
-      
-      // Run git status and diff
-      const gitStatus = execSync('git status', { encoding: 'utf8' });
-      fs.writeFileSync('git_status.txt', gitStatus);
-      
-      const gitDiff = execSync('git diff', { encoding: 'utf8' });
-      fs.writeFileSync('git_diff.txt', gitDiff);
-      
-      console.log('[STARTUP DEBUG] Diagnostics and legacy index.html written.');
-    } catch (gitErr) {
-      console.error('[STARTUP DEBUG] Git diagnostics failed:', gitErr);
-    }
+    assertProductionConfig({ supabaseConfigured: isSupabaseConfigured(), secrets: [] });
 
     console.log('Initializing local database...');
     await initializeDatabase();
