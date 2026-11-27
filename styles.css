@@ -8989,8 +8989,18 @@ h2 {
   cursor: pointer;
   outline: none;
   transition: all var(--transition-hover);
-  min-width: 64px;
+  flex: 1 1 0;
+  min-width: 0;
   box-sizing: border-box;
+}
+.mobile-nav-btn span {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+@media (max-width: 400px) {
+  .mobile-nav-btn { padding: 4px 2px; font-size: 9px; }
 }
 
 .mobile-nav-btn svg {
