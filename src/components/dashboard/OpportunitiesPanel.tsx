@@ -350,6 +350,10 @@ export const OpportunitiesPanel: React.FC = () => {
                 <Play size={14} fill="#0b0e14" color="#0b0e14" />
                 <span>{deploying ? 'Deploying...' : 'Deploy to Sandbox'}</span>
               </button>
+              <p style={{ margin: '10px 0 0', fontSize: '0.72rem', lineHeight: 1.5, color: 'var(--text-muted, #94a3b8)' }}>
+                Sandbox allocations use simulated capital. AI-generated opportunities are not guaranteed results or financial advice. See the{' '}
+                <a href="/legal/risk" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textUnderlineOffset: 3 }}>Risk Disclosure</a>.
+              </p>
             </form>
 
           </div>

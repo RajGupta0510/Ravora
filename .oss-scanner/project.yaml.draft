@@ -1,0 +1,23 @@
+# DRAFT enrollment file for anthropics/oss-scanner. Not submitted anywhere.
+#
+# To enroll, the owner would open a PR to https://github.com/anthropics/oss-scanner adding
+# projects/ravora/project.yaml (this file, renamed), after reading its CONTRIBUTING.md.
+# The service targets critical open-source projects, so check that Ravora qualifies first:
+# this repository currently has no LICENSE file.
+#
+# Email addresses in this file become public, so use a security alias, never a personal address.
+
+repo: https://github.com/RajGupta0510/Ravora
+primary_contact: TODO-security-alias@your-domain.example   # required; replace before use
+# auto_ccs:
+#   - another-maintainer@your-domain.example
+disabled: false
+dockerfile: .oss-scanner/Dockerfile
+threat_model: .oss-scanner/threat_model.md
+
+# Optional severity routing
+# output_format:
+#   email:
+#     min_severity: low
+#   github_security_advisory:
+#     min_severity: none

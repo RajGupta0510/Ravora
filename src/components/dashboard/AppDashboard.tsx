@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useApp } from '../../context/AppContext';
+import { LegalLinks } from '../../legal/LegalLinks';
 import PortfolioPanel from './PortfolioPanel';
 import MarketsPanel from './MarketsPanel';
 import OpportunitiesPanel from './OpportunitiesPanel';
@@ -412,6 +413,10 @@ export const AppDashboard: React.FC = () => {
           {activeTab === 'settings' && <SettingsPanel />}
         </main>
 
+        <footer className="app-legal-foot">
+          <LegalLinks className="app-legal-links" />
+          <p>Ravora provides analysis tools, not financial advice. Trading crypto-assets involves substantial risk of loss.</p>
+        </footer>
       </div>
 
       {/* Mobile Bottom Navigation */}

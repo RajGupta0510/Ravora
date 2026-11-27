@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { useConsent } from '../../consent/ConsentContext';
+import { loadTradingView } from '../../consent/loadTradingView';
 import { useApp } from '../../context/AppContext';
 import {
   TrendingUp,
@@ -45,7 +47,9 @@ export const MarketTerminalPanel: React.FC<MarketTerminalPanelProps> = ({
 
   const [activeSymbol, setActiveSymbol] = useState<string>(initialSymbol);
   const [activeTimeframe, setActiveTimeframe] = useState<string>('1h');
-  const [chartEngine, setChartEngine] = useState<'tradingview' | 'native'>('tradingview');
+  const { consent, openPreferences } = useConsent();
+  const [chartEngine, setChartEngine] = useState<'tradingview' | 'native'>(consent.thirdParty ? 'tradingview' : 'native');
+  const [tvReady, setTvReady] = useState<boolean>(typeof window !== 'undefined' && !!window.TradingView);
   const [tradingMode, setTradingMode] = useState<'paper' | 'live'>('paper');
 
   // Trade form
@@ -140,8 +144,19 @@ export const MarketTerminalPanel: React.FC<MarketTerminalPanelProps> = ({
   };
 
   // Embed TradingView Widget
+  // TradingView is third-party content: it is requested only after the visitor allows it.
   useEffect(() => {
     if (chartEngine !== 'tradingview') return;
+    if (!consent.thirdParty) {
+      setChartEngine('native');
+      return;
+    }
+    if (!tvReady) {
+      loadTradingView()
+        .then(() => setTvReady(true))
+        .catch(() => setChartEngine('native'));
+      return;
+    }
 
     const containerId = 'tv_terminal_chart_container';
     const container = document.getElementById(containerId);
@@ -195,7 +210,7 @@ export const MarketTerminalPanel: React.FC<MarketTerminalPanelProps> = ({
       }, 1500);
       return () => clearTimeout(timer);
     }
-  }, [activeSymbol, activeTimeframe, chartEngine]);
+  }, [activeSymbol, activeTimeframe, chartEngine, consent.thirdParty, tvReady]);
 
   // Order Execution Handler
   const handleDeployTrade = async () => {
@@ -418,7 +433,7 @@ export const MarketTerminalPanel: React.FC<MarketTerminalPanelProps> = ({
             }}
           >
             <button
-              onClick={() => setChartEngine('tradingview')}
+              onClick={() => (consent.thirdParty ? setChartEngine('tradingview') : openPreferences())}
               style={{
                 padding: '4px 10px',
                 fontSize: '0.72rem',
@@ -1093,6 +1108,11 @@ export const MarketTerminalPanel: React.FC<MarketTerminalPanelProps> = ({
             >
               {isExecuting ? 'Deploying...' : `1-Click ${orderSide} ${activeSymbol}`}
             </button>
+
+            <p style={{ margin: 0, fontSize: '0.7rem', lineHeight: 1.5, color: 'var(--text-muted, #94a3b8)' }}>
+              Orders here are simulated. Ravora does not place orders on a real exchange and does not give financial advice. See the{' '}
+              <a href="/legal/risk" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textUnderlineOffset: 3 }}>Risk Disclosure</a>.
+            </p>
 
             {/* Feedback Message */}
             {executionMessage && (

@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
-import { Shield, Key, ToggleLeft, ToggleRight, Radio, Server, CheckCircle2 } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
+import { useConsent } from '../../consent/ConsentContext';
+import { Shield, Key, ToggleLeft, ToggleRight, Radio, Server, CheckCircle2, Trash2 } from 'lucide-react';
+import { LEGAL_LINKS } from '../../legal/legalConfig';
 
 export const SettingsPanel: React.FC = () => {
   const { 
@@ -8,6 +11,33 @@ export const SettingsPanel: React.FC = () => {
     updateSettings, 
     connectExchangeKey 
   } = useApp();
+  const { token, logout } = useAuth();
+  const { openPreferences, consent } = useConsent();
+
+  // Account deletion
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleteText, setDeleteText] = useState('');
+  const [deleteBusy, setDeleteBusy] = useState(false);
+  const [deleteError, setDeleteError] = useState('');
+
+  const handleDeleteAccount = async () => {
+    setDeleteBusy(true);
+    setDeleteError('');
+    try {
+      const res = await fetch('/v1/user/profile/account', {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => null);
+        throw new Error(body?.error || 'Deletion failed. Please try again or contact us.');
+      }
+      await logout();
+    } catch (err: any) {
+      setDeleteError(err?.message || 'Deletion failed. Please try again or contact us.');
+      setDeleteBusy(false);
+    }
+  };
 
   // Exchange connection form
   const [exchangeName, setExchangeName] = useState('binance');
@@ -194,7 +224,7 @@ export const SettingsPanel: React.FC = () => {
             {exchangeSuccess && (
               <div style={{ color: '#10b981', fontSize: '0.72rem', background: 'rgba(16, 185, 129, 0.08)', padding: '10px', borderRadius: '7px', border: '1px solid rgba(16, 185, 129, 0.15)', display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <CheckCircle2 size={14} />
-                Connection established. Withdrawal lock active.
+                Preview only: this connection was simulated. Nothing was stored and no exchange was contacted.
               </div>
             )}
 
@@ -204,17 +234,78 @@ export const SettingsPanel: React.FC = () => {
               className="btn btn-primary"
               style={{ height: '40px', fontWeight: 600, fontSize: '0.8rem' }}
             >
-              {exchangeLoading ? 'Connecting...' : 'Secure Connection'}
+              {exchangeLoading ? 'Submitting...' : 'Try connection preview'}
             </button>
           </form>
         </div>
 
-        {/* KMS encryption banner */}
-        <div style={{ padding: '14px 16px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.02)', background: 'rgba(255,255,255,0.003)', display: 'flex', gap: '10px', fontSize: '0.72rem', color: 'var(--text-secondary)', lineHeight: 1.4 }}>
-          <Server size={22} style={{ color: 'var(--primary)', flexShrink: 0 }} />
+        {/* Honest status of the exchange connection */}
+        <div role="note" style={{ padding: '14px 16px', borderRadius: '8px', border: '1px solid rgba(245, 158, 11, 0.35)', background: 'rgba(245, 158, 11, 0.06)', display: 'flex', gap: '10px', fontSize: '0.76rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+          <Server size={22} style={{ color: '#f59e0b', flexShrink: 0 }} />
           <span>
-            API credentials are encrypted in transmission and sealed dynamically within AWS KMS key vaults. Ravora does not cache secret keys in plain text.
+            <strong style={{ color: '#f8fafc' }}>Exchange connection is a preview.</strong> Live trading is not available yet, and this form does not
+            store or use your credentials. Do not enter real exchange API keys. Orders in Ravora are simulated.
           </span>
+        </div>
+
+        {/* Privacy and data */}
+        <div className="card-glass" style={{ padding: 'clamp(16px, 2.5vw, 24px)', borderRadius: '12px', border: '1px solid var(--border)', background: '#151a26' }}>
+          <h3 style={{ fontSize: '0.88rem', fontWeight: 700, margin: '0 0 12px 0', display: 'flex', alignItems: 'center', gap: '8px', color: '#f8fafc' }}>
+            <Shield size={16} style={{ color: '#f59e0b', flexShrink: 0 }} />
+            Privacy and data
+          </h3>
+
+          <ul style={{ listStyle: 'none', margin: '0 0 14px', padding: 0, display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '0.8rem' }}>
+            {LEGAL_LINKS.map((l) => (
+              <li key={l.slug}>
+                <a href={l.path} target="_blank" rel="noopener noreferrer" style={{ color: '#fbbf24', textUnderlineOffset: 3 }}>{l.label}</a>
+              </li>
+            ))}
+          </ul>
+
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', padding: '12px 0', borderTop: '1px solid var(--border)', fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
+            <span>
+              Third-party content (TradingView charts): <strong style={{ color: '#f8fafc' }}>{consent.decided ? (consent.thirdParty ? 'allowed' : 'not allowed') : 'not chosen yet'}</strong>
+            </span>
+            <button type="button" className="btn" onClick={openPreferences} style={{ height: '34px', fontSize: '0.78rem', flexShrink: 0 }}>
+              Cookie settings
+            </button>
+          </div>
+
+          <div style={{ padding: '12px 0 0', borderTop: '1px solid var(--border)' }}>
+            <div style={{ fontWeight: 600, fontSize: '0.8rem', color: '#f8fafc' }}>Delete my Ravora data</div>
+            <p style={{ margin: '6px 0 10px', fontSize: '0.74rem', lineHeight: 1.5, color: 'var(--text-muted)' }}>
+              Permanently removes your profile, portfolio, trade history and settings from Ravora. Your sign-in record is deleted too, and you will be signed out.
+              This cannot be undone.
+            </p>
+            {!deleteOpen ? (
+              <button type="button" className="btn" onClick={() => setDeleteOpen(true)} style={{ height: '36px', fontSize: '0.78rem', display: 'inline-flex', alignItems: 'center', gap: '6px', color: '#f87171' }}>
+                <Trash2 size={14} /> Delete my data
+              </button>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                <label htmlFor="delete-confirm" style={{ fontSize: '0.74rem', color: 'var(--text-secondary)' }}>
+                  Type <strong style={{ color: '#f8fafc' }}>DELETE</strong> to confirm
+                </label>
+                <input
+                  id="delete-confirm"
+                  value={deleteText}
+                  onChange={(e) => setDeleteText(e.target.value)}
+                  autoComplete="off"
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: '7px', border: '1px solid var(--border)', background: '#0e121b', color: '#f8fafc', fontSize: '0.8rem', outline: 'none', boxSizing: 'border-box' }}
+                />
+                {deleteError && <div role="alert" style={{ color: '#f87171', fontSize: '0.74rem' }}>{deleteError}</div>}
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <button type="button" className="btn" disabled={deleteBusy} onClick={() => { setDeleteOpen(false); setDeleteText(''); setDeleteError(''); }} style={{ height: '36px', fontSize: '0.78rem' }}>
+                    Cancel
+                  </button>
+                  <button type="button" className="btn" disabled={deleteBusy || deleteText !== 'DELETE'} onClick={handleDeleteAccount} style={{ height: '36px', fontSize: '0.78rem', color: '#f87171' }}>
+                    {deleteBusy ? 'Deleting...' : 'Delete permanently'}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
       </div>

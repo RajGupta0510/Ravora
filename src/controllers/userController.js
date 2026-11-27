@@ -323,7 +323,25 @@ export const signOutOtherDevices = async (req, res) => {
 export const deleteUserAccount = async (req, res) => {
   const userId = req.user.id;
   try {
+    // Make sure child rows (portfolio, trades, copilot history, settings...) are removed with the user.
+    await dbRun('PRAGMA foreign_keys = ON;');
     await dbRun('DELETE FROM users WHERE id = ?', [userId]);
+
+    // Then remove the sign-in identity held by Supabase. If this fails the user can retry:
+    // their token stays valid, and the local record is simply recreated empty on the next request.
+    const url = process.env.SUPABASE_URL;
+    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!url || !serviceKey) {
+      console.error('Account deletion: SUPABASE_SERVICE_ROLE_KEY is not configured; auth record not removed.');
+      return res.status(500).json({ error: 'Your Ravora data was removed, but the sign-in record could not be erased. Please contact us to complete deletion.' });
+    }
+    const { createClient } = await import('@supabase/supabase-js');
+    const admin = createClient(url, serviceKey, { auth: { persistSession: false } });
+    const { error } = await admin.auth.admin.deleteUser(userId);
+    if (error) {
+      console.error('Account deletion: Supabase deleteUser failed:', error.message);
+      return res.status(500).json({ error: 'Your Ravora data was removed, but the sign-in record could not be erased. Please try again or contact us.' });
+    }
     return res.json({ success: true, message: 'Account deleted successfully.' });
   } catch (err) {
     console.error('Error deleting account:', err);

@@ -1,0 +1,26 @@
+/* Footer legal links. Colour comes from the surrounding page (currentColor), so it works on paper and on gunmetal. */
+.lg-links { display: flex; flex-wrap: wrap; gap: 4px 22px; font-size: 0.9rem; }
+.lg-links a,
+.lg-links button {
+  background: none;
+  border: 0;
+  padding: 6px 0;
+  font: inherit;
+  color: inherit;
+  opacity: 1;
+  text-decoration: none;
+  cursor: pointer;
+}
+.lg-links a:hover,
+.lg-links button:hover { opacity: 1; text-decoration: underline; text-underline-offset: 3px; }
+.lg-links a:focus-visible,
+.lg-links button:focus-visible { outline: 2px solid #b45309; outline-offset: 3px; border-radius: 4px; opacity: 1; }
+
+.rv-foot-legal { margin-top: 28px; color: var(--m, inherit); }
+.ra-legal-links { margin-top: 28px; justify-content: center; color: var(--m, inherit); }
+.ra-legal-note { margin: 0; font-size: 0.86rem; line-height: 1.55; color: var(--m, inherit); }
+.ra-legal-note a { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
+
+.app-legal-foot { padding: 14px clamp(12px, 3vw, 24px) 20px; font-size: 0.8rem; opacity: 0.85; }
+.app-legal-foot p { margin: 6px 0 0; }
+@media (max-width: 900px) { .app-legal-foot { padding-bottom: 84px; } }

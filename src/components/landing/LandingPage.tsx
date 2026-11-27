@@ -8,6 +8,7 @@ import PlatformTabs from './PlatformTabs';
 import Movement from './Movement';
 import Dial from './Dial';
 import { useCountUp, useInView, usePrefersReducedMotion } from './hooks';
+import { LegalLinks } from '../../legal/LegalLinks';
 import './landing.css';
 
 /* ------------------------------------------------------------------ */
@@ -832,6 +833,7 @@ export const LandingPage: React.FC = () => {
               ))}
             </div>
           </div>
+          <LegalLinks className="rv-foot-legal" />
           <p className="rv-risk-note">
             © 2026 Ravora. Ravora provides analysis and trade-planning tools, not financial advice. Trading cryptocurrency involves
             substantial risk of loss. Figures and charts on this page are illustrative simulations, not live data or a guarantee of future

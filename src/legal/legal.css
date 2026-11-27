@@ -1,0 +1,95 @@
+@import '../theme/ravora-fonts.css';
+
+/* Legal pages: Stone paper reading surface in the Ravora (chronometer) world. */
+.lg {
+  --paper: #eef1f5;
+  --ink: #0b0e14;
+  --body: #2d3748;
+  --mut: #4a5568;
+  --rule: rgba(11, 14, 20, 0.16);
+  --amber: #f59e0b;
+  --amber-deep: #b45309;
+  --case: #10141d;
+  min-height: 100vh;
+  background: var(--paper);
+  color: var(--body);
+  font-family: 'Albert Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: 1.0625rem;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+.lg *, .lg *::before, .lg *::after { box-sizing: border-box; }
+.lg :focus-visible { outline: 2px solid var(--amber-deep); outline-offset: 3px; }
+.lg a { color: var(--amber-deep); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: rgba(180, 83, 9, 0.4); }
+.lg a:hover { text-decoration-color: var(--amber-deep); }
+.lg-wrap { width: 100%; max-width: 1180px; margin: 0 auto; padding: 0 28px; }
+.lg-skip { position: absolute; left: -999px; top: 8px; z-index: 300; background: var(--ink); color: #f8fafc; padding: 10px 16px; border-radius: 10px; }
+.lg-skip:focus { left: 12px; }
+
+.lg-top { position: sticky; top: 0; z-index: 50; background: rgba(238, 241, 245, 0.96); border-bottom: 1px solid var(--rule); }
+.lg-top-in { display: flex; align-items: center; justify-content: space-between; gap: 24px; min-height: 72px; flex-wrap: wrap; padding-top: 10px; padding-bottom: 10px; }
+.lg-logo { display: inline-flex; align-items: center; gap: 10px; font: 700 1.3rem 'Familjen Grotesk', 'Albert Sans', sans-serif; letter-spacing: -0.03em; color: var(--ink); text-decoration: none; }
+.lg-logo-mark { width: 32px; height: 32px; border-radius: 9px; background: var(--case); color: var(--amber); display: grid; place-items: center; font: 700 1.05rem 'Familjen Grotesk', sans-serif; }
+.lg-tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+.lg-tabs a { padding: 8px 14px; border-radius: 10px; font-size: 0.94rem; font-weight: 600; color: var(--mut); text-decoration: none; }
+.lg-tabs a:hover { color: var(--ink); background: rgba(11, 14, 20, 0.06); }
+.lg-tabs a.is-current { background: var(--case); color: #f8fafc; }
+
+.lg-main { padding-top: clamp(40px, 6vw, 80px); padding-bottom: clamp(56px, 7vw, 100px); }
+.lg-h1 { margin: 0; font: 650 clamp(2.2rem, 5vw, 3.6rem) / 1.04 'Familjen Grotesk', 'Albert Sans', sans-serif; letter-spacing: -0.035em; color: var(--ink); text-wrap: balance; max-width: 22ch; }
+.lg-lead { margin: 18px 0 0; max-width: 60ch; font-size: 1.15rem; color: var(--body); }
+.lg-meta { margin: 12px 0 0; font-size: 0.92rem; color: var(--mut); }
+.lg-draft { margin-top: 28px; max-width: 78ch; padding: 16px 20px; border: 1.5px solid var(--ink); border-radius: 18px; background: #f6f8fb; font-size: 0.96rem; color: var(--ink); }
+
+.lg-tbc { background: rgba(245, 158, 11, 0.28); color: var(--ink); padding: 1px 7px; border-radius: 6px; font-weight: 650; font-size: 0.92em; }
+
+.lg-layout { margin-top: 48px; display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 64px; align-items: start; }
+.lg-toc { position: sticky; top: 96px; }
+.lg-toc-title { margin: 0 0 12px; font: 650 1rem 'Familjen Grotesk', sans-serif; color: var(--ink); }
+.lg-toc ol { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--rule); }
+.lg-toc li { border-bottom: 1px solid var(--rule); }
+.lg-toc a { display: block; padding: 10px 0; font-size: 0.94rem; color: var(--body); text-decoration: none; }
+.lg-toc a:hover { color: var(--amber-deep); }
+
+.lg-body { max-width: 72ch; }
+.lg-section { padding: 0 0 36px; margin: 0 0 36px; border-bottom: 1px solid var(--rule); scroll-margin-top: 96px; }
+.lg-section:last-child { border-bottom: 0; }
+.lg-h2 { margin: 0 0 14px; font: 650 1.55rem / 1.2 'Familjen Grotesk', 'Albert Sans', sans-serif; letter-spacing: -0.02em; color: var(--ink); }
+.lg-num { color: var(--mut); font-weight: 500; }
+.lg-section p { margin: 0 0 14px; }
+.lg-section ul { margin: 0 0 14px; padding-left: 22px; }
+.lg-section li { margin: 0 0 8px; }
+.lg-section strong { color: var(--ink); }
+
+.lg-dl { margin: 18px 0 0; border-top: 1px solid var(--rule); }
+.lg-dl div { display: grid; grid-template-columns: 170px 1fr; gap: 16px; padding: 12px 0; border-bottom: 1px solid var(--rule); }
+.lg-dl dt { font-weight: 650; color: var(--ink); }
+.lg-dl dd { margin: 0; }
+
+.lg-table-wrap { overflow-x: auto; margin: 8px 0 16px; border: 1px solid var(--rule); border-radius: 16px; background: #f8fafc; }
+.lg-table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+.lg-table th, .lg-table td { text-align: left; vertical-align: top; padding: 12px 16px; border-bottom: 1px solid var(--rule); }
+.lg-table thead th { font-weight: 650; color: var(--ink); background: #e5e9ef; }
+.lg-table tbody tr:last-child th, .lg-table tbody tr:last-child td { border-bottom: 0; }
+.lg-table code { font-family: 'Martian Mono', ui-monospace, Consolas, monospace; font-size: 0.8rem; overflow-wrap: anywhere; color: var(--ink); }
+
+.lg-inline-btn { background: none; border: 0; padding: 0; font: inherit; color: var(--amber-deep); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+
+.lg-foot { border-top: 1px solid var(--rule); padding: 40px 0 48px; }
+.lg-links { display: flex; flex-wrap: wrap; gap: 6px 24px; font-size: 0.94rem; }
+.lg-links a, .lg-links button { background: none; border: 0; padding: 4px 0; font: inherit; font-size: 0.94rem; color: var(--mut); text-decoration: none; cursor: pointer; }
+.lg-links a:hover, .lg-links button:hover { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
+.lg-foot-note { margin: 24px 0 0; max-width: 90ch; font-size: 0.86rem; color: var(--mut); }
+
+@media (max-width: 900px) {
+  .lg-layout { grid-template-columns: minmax(0, 1fr); gap: 32px; }
+  .lg-toc { position: static; }
+  .lg-dl div { grid-template-columns: 1fr; gap: 2px; }
+}
+@media (max-width: 640px) {
+  .lg-wrap { padding: 0 20px; }
+}
+@media print {
+  .lg-top, .lg-toc, .lg-skip, .lg-foot { display: none; }
+  .lg { background: #fff; }
+}

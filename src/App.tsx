@@ -4,6 +4,8 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import { AppProvider } from './context/AppContext';
 import { AppDashboard } from './components/dashboard/AppDashboard';
 import { Toaster } from 'sonner';
+import { ConsentProvider } from './consent/ConsentContext';
+import { ConsentBanner } from './consent/ConsentBanner';
 
 
 const Agentation = import.meta.env.DEV
@@ -12,6 +14,7 @@ const Agentation = import.meta.env.DEV
 
 // Lazy-loaded page components — only downloaded when their route is visited
 const LandingPage = React.lazy(() => import('./components/landing/LandingPage'));
+const LegalPage = React.lazy(() => import('./legal/LegalPage'));
 const OnboardingWizard = React.lazy(() => import('./components/dashboard/OnboardingWizard').then(m => ({ default: m.OnboardingWizard })));
 const AuthCardPage = React.lazy(() => import('components/ui/auth-card').then(m => ({ default: m.AuthCardPage })));
 
@@ -194,6 +197,8 @@ const AppContent: React.FC = () => {
         <Routes>
           <Route path="/" element={<LandingPage />} />
 
+          <Route path="/legal/:doc" element={<LegalPage />} />
+
           <Route path="/auth" element={<AuthRedirect />} />
           <Route path="/auth/:mode" element={
             <GuestRoute>
@@ -217,6 +222,7 @@ const AppContent: React.FC = () => {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Suspense>
+      <ConsentBanner />
       <Toaster theme="dark" position="top-right" richColors />
     </BrowserRouter>
   );
@@ -224,6 +230,7 @@ const AppContent: React.FC = () => {
 
 const App: React.FC = () => {
   return (
+    <ConsentProvider>
     <AuthProvider>
       <AppProvider>
         <AppContent />
@@ -234,6 +241,7 @@ const App: React.FC = () => {
         )}
       </AppProvider>
     </AuthProvider>
+    </ConsentProvider>
   );
 };
 

@@ -8,6 +8,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { ArrowLeft, CircleAlert, Eye, EyeOff, LoaderCircle } from 'lucide-react';
 import AuthSwitch from './auth-switch';
+import { LegalLinks } from '../../src/legal/LegalLinks';
 import './auth-card.css';
 
 // Validation Schemas
@@ -531,10 +532,17 @@ export const AuthCardPage: React.FC = () => {
                     <div className="ra-check">
                       <input type="checkbox" id="acceptTerms" {...signupForm.register('acceptTerms')} />
                       <label htmlFor="acceptTerms">
-                        I accept the Ravora <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+                        I have read and accept the Ravora{' '}
+                        <a href="/legal/terms" target="_blank" rel="noopener noreferrer">Terms and Conditions</a> and{' '}
+                        <a href="/legal/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</a>, and I am 18 or older.
                       </label>
                     </div>
                     <FieldError id="acceptTerms" message={signupForm.formState.errors.acceptTerms?.message} />
+                    <p className="ra-legal-note">
+                      We use your name and email to create and secure your account. Ravora provides analysis tools, not financial advice, and
+                      trading crypto-assets involves a risk of loss. Read the{' '}
+                      <a href="/legal/risk" target="_blank" rel="noopener noreferrer">Risk Disclosure</a>.
+                    </p>
                   </div>
 
                   <button type="submit" disabled={isSubmitting} className="ra-btn">
@@ -683,6 +691,7 @@ export const AuthCardPage: React.FC = () => {
               )}
             </motion.div>
           </AnimatePresence>
+          <LegalLinks className="ra-legal-links" />
         </div>
       </main>
     </div>
