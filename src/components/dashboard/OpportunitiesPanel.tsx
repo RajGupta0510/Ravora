@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useMemo } from 'react';
+import { toast } from 'sonner';
 import { useApp, Opportunity } from '../../context/AppContext';
 import { Sparkles, Play } from 'lucide-react';
 import { parseReasoning } from '../../utils/reasoning';
@@ -40,9 +41,12 @@ export const OpportunitiesPanel: React.FC = () => {
   const handleScan = useCallback(async () => {
     try {
       setScanning(true);
-      await scanMarkets();
+      const ok = await scanMarkets();
+      if (ok) toast.success('Scan complete', { description: 'Opportunities are up to date.' });
+      else toast.error('Scan failed', { description: 'Could not reach the market scanner. Please try again.' });
     } catch (err) {
       console.error(err);
+      toast.error('Scan failed', { description: 'Could not reach the market scanner. Please try again.' });
     } finally {
       setScanning(false);
     }
@@ -63,13 +67,14 @@ export const OpportunitiesPanel: React.FC = () => {
       );
 
       if (success) {
-        alert(`Successfully deployed sandbox trade for ${selectedOpp.symbol}!`);
+        toast.success('Sandbox trade placed', { description: `${selectedOpp.symbol} was added to your open positions.` });
         setSelectedOpp(null);
       } else {
-        alert('Failed to deploy sandbox trade.');
+        toast.error('Trade not placed', { description: 'The sandbox order was rejected. Check the size and leverage and try again.' });
       }
     } catch (err) {
       console.error(err);
+      toast.error('Trade not placed', { description: 'Something went wrong. Please try again.' });
     } finally {
       setDeploying(false);
     }

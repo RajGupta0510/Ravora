@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { toast } from 'sonner';
 import { useApp } from '../../context/AppContext';
 import { 
   Sparkles, 
@@ -89,11 +90,11 @@ export const OnboardingWizard: React.FC = () => {
         araivenValue
       );
       if (!res.success) {
-        alert(res.error || 'Failed to complete onboarding. Please try again.');
+        toast.error('Setup could not be completed', { description: res.error || 'Please try again.' });
       }
     } catch (err: any) {
       console.error(err);
-      alert(err.message || 'An unexpected error occurred.');
+      toast.error('Setup could not be completed', { description: err.message || 'An unexpected error occurred. Please try again.' });
     } finally {
       setLoading(false);
     }

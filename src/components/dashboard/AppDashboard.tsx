@@ -1,4 +1,6 @@
 import React, { useState, useMemo, useCallback } from 'react';
+import { toast } from 'sonner';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useApp } from '../../context/AppContext';
 import { LegalLinks } from '../../legal/LegalLinks';
@@ -57,12 +59,13 @@ export const AppDashboard: React.FC = () => {
       setExecutingRecId(id);
       const success = await executeRecommendation(id);
       if (success) {
-        alert('Portfolio successfully rebalanced!');
+        toast.success('Portfolio rebalanced', { description: 'The recommended orders were executed in your sandbox.' });
       } else {
-        alert('Rebalancing order execution failed.');
+        toast.error('Rebalance failed', { description: 'The orders were not executed. Please try again.' });
       }
     } catch (err) {
       console.error(err);
+      toast.error('Rebalance failed', { description: 'Something went wrong. Please try again.' });
     } finally {
       setExecutingRecId(null);
     }
@@ -107,10 +110,10 @@ export const AppDashboard: React.FC = () => {
       }}>
         {/* Brand Logo */}
         <div className="logo" style={{ padding: 'var(--space-6)', borderBottom: 'var(--border-thickness) solid var(--color-border-divider)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2.5)', fontFamily: 'var(--font-display)', fontWeight: 700 }}>
+          <Link to="/" aria-label="Ravora home" style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2.5)', fontFamily: 'var(--font-display)', fontWeight: 700, textDecoration: 'none' }}>
             <div style={{ width: '32px', height: '32px', borderRadius: 'var(--radius-sm)', background: '#f59e0b', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#0b0e14', fontWeight: 800, flexShrink: 0 }}>R</div>
             <span className="sidebar-logo-text" style={{ color: '#f8fafc', letterSpacing: '-0.02em', fontSize: '1.15rem' }}>Ravora</span>
-          </div>
+          </Link>
         </div>
 
         {/* Navigation list */}

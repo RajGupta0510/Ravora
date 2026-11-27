@@ -554,6 +554,13 @@ export const LandingPage: React.FC = () => {
   }, []);
 
   useEffect(() => {
+    if (!menuOpen) return;
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setMenuOpen(false);
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [menuOpen]);
+
+  useEffect(() => {
     if (typeof IntersectionObserver === 'undefined') return;
     const io = new IntersectionObserver(
       (entries) => entries.forEach((e) => e.isIntersecting && setActive(e.target.id)),
@@ -565,6 +572,13 @@ export const LandingPage: React.FC = () => {
     });
     return () => io.disconnect();
   }, []);
+
+  // The logo is a real link to "/"; on the landing page it scrolls back to the top instead of reloading.
+  const goTop = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setMenuOpen(false);
+    window.scrollTo(0, 0);
+  };
 
   const row = (items: string[], key: string, venue = false) => (
     <div className="rv-marq-group" key={key} aria-hidden={key.endsWith('b')}>
@@ -580,7 +594,7 @@ export const LandingPage: React.FC = () => {
     <div className="rv">
       <header className={`rv-nav ${scrolled || menuOpen ? 'is-scrolled' : ''}`}>
         <div className="rv-wrap rv-nav-inner">
-          <a href="#top" className="rv-logo" aria-label="Ravora home">
+          <a href="/" className="rv-logo" aria-label="Ravora home" onClick={goTop}>
             <span className="rv-logo-mark">R</span>
             Ravora
           </a>
@@ -821,7 +835,7 @@ export const LandingPage: React.FC = () => {
       <footer className="rv-foot">
         <div className="rv-wrap">
           <div className="rv-foot-grid">
-            <a href="#top" className="rv-logo">
+            <a href="/" className="rv-logo" aria-label="Ravora home" onClick={goTop}>
               <span className="rv-logo-mark">R</span>
               Ravora
             </a>
@@ -835,7 +849,7 @@ export const LandingPage: React.FC = () => {
           </div>
           <LegalLinks className="rv-foot-legal" />
           <p className="rv-risk-note">
-            © 2026 Ravora. Ravora provides analysis and trade-planning tools, not financial advice. Trading cryptocurrency involves
+            © {new Date().getFullYear()} Ravora. Ravora provides analysis and trade-planning tools, not financial advice. Trading cryptocurrency involves
             substantial risk of loss. Figures and charts on this page are illustrative simulations, not live data or a guarantee of future
             results.
           </p>

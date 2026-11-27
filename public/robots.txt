@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /onboarding
+Disallow: /app/
+Disallow: /v1/
+
+Sitemap: https://ravoraa.vercel.app/sitemap.xml

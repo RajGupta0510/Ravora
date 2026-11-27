@@ -223,14 +223,16 @@ app.use('/app', express.static(path.join(__dirname, 'app')));
 // Explicitly serve legacy dashboard assets from root to bypass React dist folder fallback
 app.get('/dashboard.js', (req, res) => res.sendFile(path.join(__dirname, 'dashboard.js')));
 app.get('/styles.css', (req, res) => res.sendFile(path.join(__dirname, 'styles.css')));
-app.get('/favicon.svg', (req, res) => res.sendFile(path.join(__dirname, 'favicon.svg')));
+app.get('/favicon.svg', (req, res) => res.sendFile(path.join(__dirname, 'public', 'favicon.svg')));
 
 if (fs.existsSync(distPath)) {
   console.log('[SPA Server] Serving production React Vite assets from /dist');
   app.use(express.static(distPath));
   app.get('*', (req, res, next) => {
     if (req.path.startsWith('/v1')) return next();
-    res.sendFile(path.join(distPath, 'index.html'));
+    // Known client routes answer 200; anything else still gets the app (it renders the 404 page) but with a real 404 status.
+    const known = /^\/(auth(\/[\w-]+)?|legal\/[\w-]+|onboarding|dashboard)?\/?$/.test(req.path);
+    res.status(known ? 200 : 404).sendFile(path.join(distPath, 'index.html'));
   });
 } else {
   console.log('[SPA Server] dist/ not found: serving the legacy pages only. Run `npm run build` for the React app.');

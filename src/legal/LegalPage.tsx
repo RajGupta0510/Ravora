@@ -3,6 +3,7 @@ import { Link, Navigate, useParams } from 'react-router-dom';
 import { DOCS } from './docs';
 import { LEGAL, LEGAL_LINKS, type LegalDocSlug } from './legalConfig';
 import { LegalLinks } from './LegalLinks';
+import { usePageMeta } from '../utils/seo';
 import './legal.css';
 
 export const LegalPage: React.FC = () => {
@@ -10,14 +11,14 @@ export const LegalPage: React.FC = () => {
   const slug = (doc ?? '') as LegalDocSlug;
   const data = DOCS[slug];
 
+  usePageMeta({
+    title: `${data?.title ?? 'Legal'} | Ravora`,
+    description: data?.summary ?? 'Ravora legal documents.',
+    path: data ? `/legal/${slug}` : '/legal/privacy',
+  });
+
   useEffect(() => {
-    if (!data) return;
-    const prev = document.title;
-    document.title = `${data.title} | Ravora`;
-    window.scrollTo(0, 0);
-    return () => {
-      document.title = prev;
-    };
+    if (data) window.scrollTo(0, 0);
   }, [data]);
 
   if (!data) return <Navigate to="/legal/privacy" replace />;
@@ -92,7 +93,7 @@ export const LegalPage: React.FC = () => {
         <div className="lg-wrap">
           <LegalLinks />
           <p className="lg-foot-note">
-            © {new Date(LEGAL.lastUpdated).getFullYear()} Ravora. Ravora provides analysis and trade-planning tools, not financial advice. Trading crypto-assets involves substantial risk of loss.
+            © {new Date().getFullYear()} Ravora. Ravora provides analysis and trade-planning tools, not financial advice. Trading crypto-assets involves substantial risk of loss.
           </p>
         </div>
       </footer>

@@ -1,11 +1,12 @@
 import React, { Suspense, lazy } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useSearchParams } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useSearchParams, useParams } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { AppProvider } from './context/AppContext';
 import { AppDashboard } from './components/dashboard/AppDashboard';
 import { Toaster } from 'sonner';
 import { ConsentProvider } from './consent/ConsentContext';
 import { ConsentBanner } from './consent/ConsentBanner';
+import { usePageMeta } from './utils/seo';
 
 
 const Agentation = import.meta.env.DEV
@@ -16,7 +17,28 @@ const Agentation = import.meta.env.DEV
 const LandingPage = React.lazy(() => import('./components/landing/LandingPage'));
 const LegalPage = React.lazy(() => import('./legal/LegalPage'));
 const OnboardingWizard = React.lazy(() => import('./components/dashboard/OnboardingWizard').then(m => ({ default: m.OnboardingWizard })));
+const NotFound = React.lazy(() => import('./components/NotFound'));
 const AuthCardPage = React.lazy(() => import('components/ui/auth-card').then(m => ({ default: m.AuthCardPage })));
+
+// Per-route title and description. Renders nothing.
+const Seo: React.FC<{ title: string; description: string; noindex?: boolean }> = (props) => {
+  usePageMeta(props);
+  return null;
+};
+
+const AUTH_META: Record<string, { title: string; description: string; noindex?: boolean }> = {
+  login: { title: 'Sign in | Ravora', description: 'Sign in to Ravora to review AI trade plans, manage your paper portfolio and chat with Araiven.' },
+  register: { title: 'Create your account | Ravora', description: 'Create a free Ravora account and start with $100k of paper money. No card and no exchange connection needed.' },
+  forgot: { title: 'Reset your password | Ravora', description: 'Request a link or code to reset your Ravora password.', noindex: true },
+  reset: { title: 'Choose a new password | Ravora', description: 'Choose a new password for your Ravora account.', noindex: true },
+  otp: { title: 'Verify your code | Ravora', description: 'Enter the verification code we sent you to continue to Ravora.', noindex: true },
+};
+
+const AuthSeo: React.FC = () => {
+  const { mode } = useParams<{ mode: string }>();
+  const meta = AUTH_META[mode ?? ''] ?? AUTH_META.login;
+  return <Seo {...meta} />;
+};
 
 // Lightweight loading skeleton shown while lazy chunks download
 const PageSkeleton: React.FC = () => (
@@ -195,31 +217,34 @@ const AppContent: React.FC = () => {
     <BrowserRouter>
       <Suspense fallback={<PageSkeleton />}>
         <Routes>
-          <Route path="/" element={<LandingPage />} />
+          <Route path="/" element={<><Seo title="Ravora | AI crypto trade plans with the reasoning attached" description="Ravora scans crypto markets around the clock, scores every setup and hands you a full trade plan with the reasoning attached. Start with $100k of paper money. No card needed." /><LandingPage /></>} />
 
           <Route path="/legal/:doc" element={<LegalPage />} />
 
           <Route path="/auth" element={<AuthRedirect />} />
           <Route path="/auth/:mode" element={
             <GuestRoute>
+              <AuthSeo />
               <AuthCardPage />
             </GuestRoute>
           } />
 
           <Route path="/onboarding" element={
             <OnboardingRoute>
+              <Seo title="Set up your workspace | Ravora" description="Tell Ravora about your experience and risk comfort to tailor your workspace." noindex />
               <OnboardingWizard />
             </OnboardingRoute>
           } />
 
           <Route path="/dashboard" element={
   <ProtectedRoute>
+    <Seo title="Dashboard | Ravora" description="Your Ravora trading workspace." noindex />
     <AppDashboard />
   </ProtectedRoute>
 } />
 
 
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
       <ConsentBanner />

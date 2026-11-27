@@ -297,7 +297,7 @@ export const AuthCardPage: React.FC = () => {
     try {
       const res = await resetPassword(values.password);
       if (res.success) {
-        toast.success('Password Reset Email Sent', { description: 'Your password has been successfully updated.' });
+        toast.success('Password updated', { description: 'Sign in with your new password.' });
         changeMode('login');
       } else {
         setServerError(getErrorMessage(res.error) || 'Failed to reset password.');
@@ -380,7 +380,7 @@ export const AuthCardPage: React.FC = () => {
           <p className="ra-tape-note">Illustrative sequence, not live data.</p>
         </div>
 
-        <p className="ra-story-foot">© 2026 Ravora</p>
+        <p className="ra-story-foot">© {new Date().getFullYear()} Ravora</p>
       </aside>
 
       {/* Form column */}

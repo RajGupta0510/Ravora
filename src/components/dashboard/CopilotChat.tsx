@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { toast } from 'sonner';
 import { useApp } from '../../context/AppContext';
 import { MessageSquareCode, Send } from 'lucide-react';
 
@@ -19,6 +20,7 @@ export const CopilotChat: React.FC = () => {
       await sendCopilotMessage(text);
     } catch (err) {
       console.error(err);
+      toast.error('Message not sent', { description: 'Araiven could not respond. Please try again.' });
     } finally {
       setSending(false);
     }

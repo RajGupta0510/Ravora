@@ -1,0 +1,85 @@
+/* 404 page: gunmetal case, amber accent, same type as the landing page. */
+.nf {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: #0b0e14;
+  color: #f8fafc;
+  font-family: var(--font-body, 'Hanken Grotesk', system-ui, sans-serif);
+}
+.nf-top { padding: 20px clamp(16px, 4vw, 40px); }
+.nf-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: #f8fafc;
+  text-decoration: none;
+  font-family: var(--font-display, 'Bricolage Grotesque', system-ui, sans-serif);
+  font-weight: 700;
+  font-size: 1.15rem;
+  letter-spacing: -0.02em;
+}
+.nf-logo-mark {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: #f59e0b;
+  color: #0b0e14;
+  font-weight: 800;
+}
+.nf-logo:focus-visible,
+.nf-btn:focus-visible { outline: 2px solid #fbbf24; outline-offset: 3px; }
+.nf-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  width: min(640px, 100% - 2 * clamp(16px, 4vw, 40px));
+  margin: 0 auto;
+  padding: 32px 0 56px;
+}
+.nf-code {
+  margin: 0 0 8px;
+  font-family: var(--font-mono, 'Martian Mono', ui-monospace, monospace);
+  font-size: clamp(4rem, 18vw, 8rem);
+  line-height: 1;
+  font-weight: 600;
+  color: #f59e0b;
+  letter-spacing: -0.04em;
+}
+.nf-h1 {
+  margin: 0 0 12px;
+  font-family: var(--font-display, 'Bricolage Grotesque', system-ui, sans-serif);
+  font-size: clamp(1.6rem, 5vw, 2.4rem);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+.nf-sub { margin: 0 0 28px; max-width: 46ch; color: #cbd5e1; line-height: 1.6; }
+.nf-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.nf-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 22px;
+  border-radius: 10px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color 160ms ease, border-color 160ms ease;
+}
+.nf-btn-primary { background: #f59e0b; color: #0b0e14; }
+.nf-btn-primary:hover { background: #fbbf24; }
+.nf-btn-ghost { border: 1px solid rgba(203, 213, 225, 0.32); color: #f8fafc; }
+.nf-btn-ghost:hover { border-color: #f59e0b; }
+.nf-foot {
+  padding: 20px clamp(16px, 4vw, 40px) 28px;
+  border-top: 1px solid rgba(203, 213, 225, 0.12);
+  color: #94a3b8;
+  font-size: 0.85rem;
+}
+.nf-foot p { margin: 8px 0 0; }
+@media (prefers-reduced-motion: reduce) { .nf-btn { transition: none; } }

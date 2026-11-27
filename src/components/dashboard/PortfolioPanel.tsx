@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useCallback } from 'react';
+import { toast } from 'sonner';
 import { useApp } from '../../context/AppContext';
 import { Shield, TrendingUp, Activity, FileText, Trash2, ArrowUpRight, ArrowDownRight } from 'lucide-react';
 
@@ -22,9 +23,12 @@ export const PortfolioPanel: React.FC = () => {
   const handleClosePos = useCallback(async (id: string) => {
     try {
       setClosingPosId(id);
-      await closePaperPosition(id);
+      const ok = await closePaperPosition(id);
+      if (ok) toast.success('Position closed');
+      else toast.error('Could not close position', { description: 'Please try again.' });
     } catch (err) {
       console.error(err);
+      toast.error('Could not close position', { description: 'Please try again.' });
     } finally {
       setClosingPosId(null);
     }
@@ -34,9 +38,12 @@ export const PortfolioPanel: React.FC = () => {
     if (!window.confirm('Are you sure you want to close all open paper positions?')) return;
     try {
       setClosingAll(true);
-      await closeAllPaperPositions();
+      const ok = await closeAllPaperPositions();
+      if (ok) toast.success('All positions closed');
+      else toast.error('Could not close all positions', { description: 'Some may still be open. Please try again.' });
     } catch (err) {
       console.error(err);
+      toast.error('Could not close all positions', { description: 'Please try again.' });
     } finally {
       setClosingAll(false);
     }

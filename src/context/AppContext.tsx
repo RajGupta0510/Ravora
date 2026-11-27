@@ -116,7 +116,7 @@ interface AppContextType {
   onboardUser: (experience: string, capital: number, riskLevel: number, goal: string, markets: string[], workspace: string, araiven: string[]) => Promise<{ success: boolean; error?: string }>;
   updateSettings: (executionMode: string, autoHedgeEnabled: boolean, notificationsEnabled: boolean) => Promise<boolean>;
   fetchDashboardData: () => Promise<void>;
-  scanMarkets: () => Promise<void>;
+  scanMarkets: () => Promise<boolean>;
   executeRecommendation: (recId: string) => Promise<boolean>;
   deployOpportunity: (symbol: string, side: 'LONG' | 'SHORT', amount: number, leverage: number, stopLoss: number | null, takeProfit: number | null) => Promise<boolean>;
   closePaperPosition: (positionId: string) => Promise<boolean>;
@@ -328,9 +328,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       const res = await fetchWithAuth(`${API_BASE}/market/scan`, { method: 'POST' });
       if (res.ok) {
         await fetchDashboardData();
+        return true;
       }
+      return false;
     } catch (err) {
       console.error('[Market scan API error]', err);
+      return false;
     } finally {
       setLoading(false);
     }
