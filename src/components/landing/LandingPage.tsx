@@ -7,6 +7,7 @@ import AskAraiven from './AskAraiven';
 import PlatformTabs from './PlatformTabs';
 import Movement from './Movement';
 import Dial from './Dial';
+import ArcBackdrop from './ArcBackdrop';
 import { useCountUp, useInView, usePrefersReducedMotion } from './hooks';
 import { LegalLinks } from '../../legal/LegalLinks';
 import './landing.css';
@@ -813,6 +814,7 @@ export const LandingPage: React.FC = () => {
         {/* Close */}
         <section className="rv-frame rv-frame--last">
           <div className="rv-case rv-panel rv-cta">
+            <ArcBackdrop />
             <Dial className="rv-cta-dial" value={82} />
             <div className="rv-wrap">
               <Reveal kind="wipe">

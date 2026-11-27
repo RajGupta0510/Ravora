@@ -265,7 +265,7 @@
   transform: translateY(0);
 }
 .rv-btn-primary:disabled {
-  opacity: 0.55;
+  opacity: 0.8;
   cursor: not-allowed;
 }
 .rv-btn-ghost {
@@ -1132,3 +1132,23 @@ html:has(.rv), body:has(.rv) { overflow-x: clip; }
 
 /* Anchor jumps must clear the fixed 74px header. */
 .rv section[id] { scroll-margin-top: 84px; }
+
+/* Closing panel backdrop: ThreeUI predictive arc. The canvas paints its own near-black ground, so `screen` keeps only
+   the dots; the mask fades it out behind the headline so the text stays at full contrast. */
+.rv-cta { position: relative; overflow: hidden; isolation: isolate; }
+.rv-arc {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  opacity: 0.8;
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, transparent 18%, #000 70%);
+  mask-image: linear-gradient(to right, transparent 0%, transparent 18%, #000 70%);
+}
+/* The only two ThreeUI rules this component needs, so the package's 72 KB stylesheet is not loaded. */
+.rv-arc .threeui-background { position: relative; width: 100%; height: 100%; overflow: hidden; isolation: isolate; background: #030304; }
+.rv-arc .threeui-background > canvas { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
+@media (max-width: 760px) {
+  .rv-arc { opacity: 0.4; -webkit-mask-image: linear-gradient(to bottom, #000, transparent 85%); mask-image: linear-gradient(to bottom, #000, transparent 85%); }
+}

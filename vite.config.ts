@@ -80,6 +80,10 @@ export default defineConfig({
       output: {
         manualChunks(id) {
           if (id.includes('node_modules')) {
+            // ThreeUI and three.js are loaded on demand by the landing page backdrop; let Rollup split them naturally so they stay out of the shared vendor chunk.
+            if (id.includes('@designcodeio/threeui') || /node_modules\/(three|three128|three165)\//.test(id)) {
+              return undefined;
+            }
             if (id.includes('react-router-dom')) {
               return 'vendor-router';
             }

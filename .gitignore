@@ -1,5 +1,9 @@
 # Local Database
 ravora.db
+*.db-journal
+
+# Temporary tool scripts
+.impeccable/
 
 # Dependencies
 node_modules/
