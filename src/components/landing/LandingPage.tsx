@@ -8,6 +8,7 @@ import PlatformTabs from './PlatformTabs';
 import Movement from './Movement';
 import Dial from './Dial';
 import ArcBackdrop from './ArcBackdrop';
+import ReplayProof from './ReplayProof';
 import { useCountUp, useInView, usePrefersReducedMotion } from './hooks';
 import { LegalLinks } from '../../legal/LegalLinks';
 import './landing.css';
@@ -709,6 +710,7 @@ export const LandingPage: React.FC = () => {
         </section>
 
         <GatesSection />
+        <ReplayProof Reveal={Reveal} />
 
         <section id="features" className="rv-section rv-section--tight">
           <div className="rv-wrap">
